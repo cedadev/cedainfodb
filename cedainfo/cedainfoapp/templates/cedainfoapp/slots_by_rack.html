@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}
+Slots by rack
+{% endblock %}
+
+{% block content %}
+    <h2>{{rack}} ({{rack.building}}, {{rack.room}})</h2>
+	    <table border="1">
+            <tr>
+		        <th>Position</th><th>Hardware</th>
+			</tr>
+			{% for slot in slots %}
+			    <tr>
+				    <th>{{slot.position}}</th>
+					<td>
+					    {% if slot.occupant %}
+						    <a href="/host/{{slot.occupant.id}}">{{slot.occupant}}</a>
+						{% else %}
+						    Empty
+						{% endif %}
+					</td>
+				</tr>
+			{% endfor %}
+		</table>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit data entity
+{% endblock %}
+
+{% block content %}
+	    <h2>Edit data entity</h2>
+		{% if dataentity %}
+    	    <h3>{{dataentity.dataentity_id}}</h3>
+	        {% if form %}
+	        <form method="POST" action="/dataentity/{{dataentity.id}}/">
+	        <table>
+            {{ form.as_table }}
+	        </table>
+	        <input type="submit" value="Submit">
+	        </form>
+	        {% endif %}
+		{% else %}
+		    <p>DataEntity with id={{dataentity.id}} not found.</p>
+		{% endif %}
+{% endblock %}

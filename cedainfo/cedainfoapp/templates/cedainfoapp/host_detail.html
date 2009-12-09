@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}
+Host details
+{% endblock %}
+
+{% block content %}
+    <h2>Host details : {{host}}</h2>
+	<table border="1">
+	    <tr>
+		    <td>
+				<table border="1">
+					<tr><th>hostname</th><td>{{host.hostname}}</td></tr>
+					<tr><th>ip_addr</th><td>{{host.ip_addr}}</td></tr>
+					<tr><th>serial_no</th><td>{{host.serial_no}}</td></tr>
+					<tr><th>retired</th><td>{{host.retired}}</td></tr>
+					<tr><th>po_no</th><td>{{host.po_no}}</td></tr>
+					<tr><th>organization</th><td>{{host.organization}}</td></tr>
+					<tr><th>height</th><td>{{host.height}}</td></tr>
+					<tr><th>supplier</th><td>{{host.supplier}}</td></tr>
+					<tr><th>arrival_date</th><td>{{host.arrival_date}}</td></tr>
+					<tr><th>planned_end_of_life</th><td>{{host.planned_end_of_life}}</td></tr>
+					<tr><th>retirement</th><td>{{host.retirement}}</td></tr>
+					<tr><th>notes</th><td>{{host.notes}}</td></tr>
+					<tr><th>capacity</th><td>{{host.capacity}}</td></tr>
+				</table>
+		    </td>
+			<td valign="top">
+			    <table border="1">
+					<tr><th colspan="3">Services</th></tr>
+					<tr><th>Type</th><th>Details</th><th>Port</th></tr>
+					{% for service in services %}
+					    <tr><td>{{service.service_type}}</td><td>{{service.details}}</td><td>{{service.port}}</td></tr>
+					{% endfor %}
+				</table>
+			    <table border="1">
+					<tr><th colspan="3">History</th></tr>
+					<tr><th>Date</th><th>Description</th><th>Admin contact</th></tr>
+					{% for event in history %}
+					    <tr><td>{{event.date}}</td><td>{{event.history_desc}}</td><td>{{event.admin_contact}}</td></tr>
+					{% endfor %}
+				</table>
+			</td>
+		</tr>
+
+	</table>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}
+Host list
+{% endblock %}
+
+{% block content %}
+    <h2>Hosts {{subset}}</h2>
+	<table border="1">
+	    <tr>
+		<th><a href="?ob=hostname">hostname</a></th>
+        <th><a href="?ob=ip_addr">ip_addr</a></th>
+        <th><a href="?ob=serial_no">serial_no</a></th>
+        <th><a href="?ob=binned">retired</a></th>
+        <th><a href="?ob=po_no">po_no</a></th>
+        <th><a href="?ob=organization">organization</a></th>
+        <th><a href="?ob=height">height</a></th>
+        <th><a href="?ob=supplier">supplier</a></th>
+        <th><a href="?ob=arrival_date">arrival_date</a></th>
+        <th><a href="?ob=planned_end_of_life">planned_end_of_life</a></th>
+        <th><a href="?ob=retirement">retirement</a></th>
+        <th><a href="?ob=notes">notes</a></th>
+        <th><a href="?ob=capacity">capacity</a></th>
+        </tr>
+	    {% for host in host_list %}
+		    <tr>
+	    	    <td><a href="/host/{{host.id}}">{{host.hostname}}</a></td>
+	            <td>{{host.ip_addr}}</td>
+	            <td>{{host.serial_no}}</td>
+	            <td>{{host.retired}}</td>
+	            <td>{{host.po_no}}</td>
+	            <td>{{host.organization}}</td>
+ 	            <td>{{host.height}}</td>
+	            <td>{{host.supplier}}</td>
+	            <td>{{host.arrival_date}}</td>
+	            <td>{{host.planned_end_of_life}}</td>
+	            <td>{{host.retirement}}</td>
+	            <td>{{host.notes}}</td>
+	            <td>{{host.capacity}}</td>
+			</tr>
+        {% endfor %}
+	</table>
+{% endblock %}

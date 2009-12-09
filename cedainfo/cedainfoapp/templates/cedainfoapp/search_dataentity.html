@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}
+DataEntity search
+{% endblock %}
+
+{% block content %}
+<h1>DataEntity search</h1>
+		<form action=".">
+		    <label for="q">Search: </label>
+			<input type="text" name="q" value="{{ query }}">
+			<input type="submit" value="Search">
+		</form>
+
+    {% if query %}
+	    <h2>Results</h2>
+		{% if results %}
+		    <ul>
+		    {% for de in results %}
+		        <li><a href="/dataentity/{{de.id}}">{{ de.dataentity_id }}</a></li>
+		    {% endfor %}
+		    </ul>
+		{% else %}
+		    <p>No DataEntity objects found matching the search</p>
+			<p><a href="/dataentity/add/{{query}}">Create a new DataEntity object named "{{query}}"</a></p>
+		{% endif %}
+	{% endif %}
+{% endblock %}

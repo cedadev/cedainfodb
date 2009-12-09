@@ -1,0 +1,24 @@
+/* CSS numbers reminder 0,0,0,0 corresponds to top right bottom left */
+
+/* Generic css */
+
+* {margin:0;padding:0;font-family:Verdana, Arial, Helvetica, sans-serif;
+   line-height:1.4;}
+
+body {
+    background-color:#eeeeee;
+    margin:auto; }
+    
+table,form {margin: 0; padding: 0;}
+p {padding: 2px; }
+ol {padding-left:20px;}
+ul {padding-left:20px;}
+
+.errorlist li {color:red;}
+
+
+
+
+
+
+
