@@ -91,7 +91,7 @@ class AccessStatus(models.Model):
         return self.status
 
 class DataEntity(models.Model):
-    dataentity_id = models.CharField(max_length=1024, unique=True)
+    dataentity_id = models.CharField(max_length=255, unique=True)
     friendly_name = models.CharField(max_length=1024, blank=True)
     symbolic_name = models.CharField(max_length=1024, blank=True)
     logical_path = models.CharField(max_length=1024, blank=True)
@@ -100,8 +100,8 @@ class DataEntity(models.Model):
     final_size = BigIntegerField(null=True, blank=True)
     curation_category = models.ForeignKey(CurationCategory, null=True, blank=True)
     notes = models.TextField(blank=True)
-    availability_priority = models.BooleanField(null=True, blank=True)
-    availability_failover = models.BooleanField(null=True, blank=True)
+    availability_priority = models.BooleanField(blank=True)
+    availability_failover = models.BooleanField(blank=True)
     backup_destination = models.CharField(max_length=1024, blank=True)
     current_backup_policy = models.ForeignKey(BackupPolicy, null=True, blank=True)
     recipes_expression = models.CharField(max_length=1024, blank=True)
