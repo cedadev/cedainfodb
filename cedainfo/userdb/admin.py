@@ -1,4 +1,4 @@
-from userdb.usermanagement.models import User, Institute, Country, Role, Licence
+from cedainfo.userdb.models import User, Institute, Country, Role, Licence
 from django.contrib import admin
 
 admin.site.register(Institute)
