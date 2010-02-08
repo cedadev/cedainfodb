@@ -1,7 +1,6 @@
 from cedainfo.userdb.models import User, Institute, Country, Role, Licence
 from django.contrib import admin
 
-admin.site.register(Institute)
 admin.site.register(Country)
 admin.site.register(Role)
 admin.site.register(Licence)
@@ -14,4 +13,9 @@ class UserAdmin(admin.ModelAdmin):
 admin.site.register(User, UserAdmin)
 
 
+class InstituteAdmin(admin.ModelAdmin):
+    list_display =  ('name', 'itype', 'country')
+    search_fields = ['name', 'itype']
+
+admin.site.register(Institute, InstituteAdmin)
 
