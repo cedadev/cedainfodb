@@ -7,8 +7,9 @@ admin.site.register(Licence)
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('surname', 'othernames')
-    search_fields = ['surname', 'othernames', 'accountid']
+    list_display = ('surname', 'othernames', 'accountid', 'emailaddress', 'startdate')
+    search_fields = ['surname', 'othernames', 'accountid', 'emailaddress']
+    list_filter = ('accounttype',)
 
 admin.site.register(User, UserAdmin)
 

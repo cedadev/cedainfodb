@@ -86,7 +86,7 @@ sql = """select userkey, title, surname, othernames, telephoneno,
 emailaddress, comments, endorsedby, degree, field, accountid,
 accounttype, encpasswd, md5passwd, webpage, sharedetails, 
 datacenter, openid_username_component, openid, department, 
-address1, address2, address3, address4, address5, institutekey
+address1, address2, address3, address4, address5, institutekey, startdate
  from tbusers AS u, addresses AS a 
 WHERE a.addresskey = u.addresskey
 """
@@ -95,7 +95,9 @@ cur.execute(sql)
 records = cur.fetchall()
 
 
-for rec in records[:20]:
+for rec in records:
+    startdate = ("%s"%rec[26])[0:10]
+    if startdate == "None": startdate = "1995-01-01"
     JSON.write( """
     
   {
@@ -126,53 +128,30 @@ for rec in records[:20]:
         "address3": "%s",
         "address4": "%s",
         "address5": "%s",
-        "institutekey": %s
+        "institute": %s,
+	"startdate": "%s"
 	}
   },
   """ % (rec[0],rec[1],rec[2],rec[3], 
         rec[4],rec[5],jsonescape(rec[6]),rec[7], 
 	rec[8],rec[9],rec[10],rec[11],
-	rec[12],rec[13],rec[14],rec[15],
+	rec[12],rec[13],rec[14],rec[15] == -1,
 	rec[16],rec[17],rec[18],rec[19],
 	rec[20],rec[21],rec[22],rec[23],
-	rec[24],rec[25])  )
+	rec[24],rec[25], startdate)  )
 
-rec = records[-1]
+
+
+# write a dummy end record to get the last comma right and end JSON file
 JSON.write("""
- {
-     "model": "userdb.user",
-     "pk":%s,
+  {
+     "model": "userdb.country",
+     "pk":10000,
      "fields": {
-        "title": "%s",
-	"surname": "%s",
-	"othernames": "%s",
-        "telephoneno": "%s", 
-        "emailaddress": "%s", 
-        "comments": "%s",
-        "endorsedby": "%s",
-        "degree": "%s",
-        "field": "%s",
-        "accountid": "%s",
-        "accounttype": "%s", 
-        "encpasswd": "%s",
-        "md5passwd": "%s",
-        "webpage": "%s",
-        "sharedetails": "%s",
-        "datacentre": "%s",
-        "openid_username_component": "%s",
-        "openid": "%s",
-        "department": "%s",
-        "address1": "%s",
-        "address2": "%s",
-        "address3": "%s",
-        "address4": "%s",
-        "address5": "%s",
-        "institutekey": %s
-        }
+        "name": "DELETE ME",
+	"area": "other",
+	"isocode": "XX"
+	}
   }
-  """ % rec )
-
- 
-#end JSON file  
-JSON.write(']\n')
-
+]
+""" )
