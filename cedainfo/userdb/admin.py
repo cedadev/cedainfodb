@@ -16,6 +16,8 @@ admin.site.register(User, UserAdmin)
 class InstituteAdmin(admin.ModelAdmin):
     list_display =  ('name', 'itype', 'country')
     search_fields = ['name', 'itype']
+    list_filter = ('itype', 'country')
+
 
 admin.site.register(Institute, InstituteAdmin)
 

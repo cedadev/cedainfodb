@@ -1,0 +1,10 @@
+
+
+[DEFAULT]
+
+
+[database]
+dbname   = <database>
+user     = <user>
+password = <password> 
+host     = <databasehost>

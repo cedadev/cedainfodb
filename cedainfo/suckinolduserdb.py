@@ -17,6 +17,16 @@ conn = psycopg.connect("dbname=%s user=%s password=%s host=%s" % (dbname, user, 
 
 cur = conn.cursor()
 
+
+def jsonescape(s): 
+    if s ==None: s =''
+    s = s.replace('\n', '\\n')
+    s = s.replace('\r', '')
+    s = s.replace('"', '\\"')
+    s = s.replace("\t", "\\t")
+    return s
+
+
 JSON = open("dump.json", 'w')
 JSON.write('[\n')
 
@@ -85,7 +95,7 @@ cur.execute(sql)
 records = cur.fetchall()
 
 
-for rec in records[:-1]:
+for rec in records[:20]:
     JSON.write( """
     
   {
@@ -116,10 +126,16 @@ for rec in records[:-1]:
         "address3": "%s",
         "address4": "%s",
         "address5": "%s",
-        "institutekey": "%s"
+        "institutekey": %s
 	}
   },
-  """ % rec  )
+  """ % (rec[0],rec[1],rec[2],rec[3], 
+        rec[4],rec[5],jsonescape(rec[6]),rec[7], 
+	rec[8],rec[9],rec[10],rec[11],
+	rec[12],rec[13],rec[14],rec[15],
+	rec[16],rec[17],rec[18],rec[19],
+	rec[20],rec[21],rec[22],rec[23],
+	rec[24],rec[25])  )
 
 rec = records[-1]
 JSON.write("""
@@ -151,8 +167,8 @@ JSON.write("""
         "address3": "%s",
         "address4": "%s",
         "address5": "%s",
-        "institutekey": "%s"
-
+        "institutekey": %s
+        }
   }
   """ % rec )
 
