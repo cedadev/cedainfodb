@@ -64,7 +64,7 @@ class User(models.Model):
     institute = models.ForeignKey(Institute)   
 
     def __unicode__(self):
-        return "%s %s %s (%s)" % (self.title, self.othernames, self.surname, self.institute)
+        return "%s %s %s" % (self.title, self.othernames, self.surname)
     
 
 class Role(models.Model):
@@ -97,14 +97,14 @@ class Licence(models.Model):
     research = models.TextField() 
     nercfunded = models.BooleanField()
     removed = models.BooleanField()
-    removedate = models.DateField()
+    removeddate = models.DateField(null=True)
     grantref = models.CharField(max_length=50, blank=True, null=True) 
     openpub = models.CharField(max_length=10, blank=True, null=True) 
-    extrainfo = models.CharField(max_length=200, blank=True, null=True) 
-    expiredate = models.DateField()
+    extrainfo = models.TextField(blank=True, null=True) 
+    expiredate = models.DateField(null=True)
     
     def __unicode__(self):
-        return "%s - %s" % (self.role, self.user)
+        return "%s - %s" % (self.role, self.user.surname)
     
     
     

@@ -20,8 +20,10 @@ cur = conn.cursor()
 
 def jsonescape(s): 
     if s ==None: s =''
+    s = s.replace('\\', '\\\\')
     s = s.replace('\n', '\\n')
     s = s.replace('\r', '')
+    s = s.replace('\v', ' ')
     s = s.replace('"', '\\"')
     s = s.replace("\t", "\\t")
     return s
@@ -140,6 +142,91 @@ for rec in records:
 	rec[20],rec[21],rec[22],rec[23],
 	rec[24],rec[25], startdate)  )
 
+# roles (aka groups)
+sql = """select datasetid, authtype, grp, grouptype, description,
+source, ukmoform, ordr, comments, directory, metdata, 
+conditions, defaultreglength, datacentre, infourl 
+FROM tbdatasets"""
+    
+cur.execute(sql)
+records = cur.fetchall()
+
+i=1
+roles = {}
+
+for rec in records:
+    JSON.write("""
+  {
+     "model": "userdb.role",
+     "pk":%s,
+     "fields": {
+        "name": "%s",
+	"authtype": "%s",
+	"grouptype": "%s",
+	"description": "%s",
+	"source": "%s",
+	"ukmoform": "%s",
+	"comments": "%s",
+	"directory": "%s",
+	"metdata": "%s",
+	"conditions": "%s",
+	"defaultreglength": "%s",
+	"datacentre": "%s",
+	"infourl": "%s"
+	}
+  },
+  """ % (i,rec[0], rec[1], rec[3], jsonescape(rec[4]), 
+         rec[5], rec[6] == -1, jsonescape(rec[8]), rec[9],
+	 rec[10] == -1, rec[11], rec[12], rec[13], rec[14] ) )
+    roles[rec[0]] = i
+    i = i+1
+
+
+# Licences
+    
+sql = """select userkey, datasetid, ver, endorsedby, endorseddate,
+research, nercfunded, removed, removeddate, grantref, openpub,
+extrainfo, expiredate 
+FROM tbdatasetjoin"""
+    
+cur.execute(sql)
+records = cur.fetchall()
+
+i=0
+
+for rec in records:
+    if rec[8]: removeddate = '"removeddate": "%s",'% ("%s"%rec[8])[0:10] 
+    else: removeddate = ""
+    if rec[12]: expiredate = '"expiredate": "%s",'% ("%s"%rec[12])[0:10] 
+    else: expiredate = ""
+    JSON.write("""
+  {
+     "model": "userdb.licence",
+     "pk":%s,
+     "fields": {
+        "role": "%s",
+	"user": "%s",
+	"ver": "%s",
+	"endorsedby": "%s",
+	"endorseddate": "%s",
+	"research": "%s",
+	"nercfunded": "%s",
+	"removed": "%s",
+	%s
+	"grantref": "%s",
+	"grantref": "%s",
+	%s
+	"extrainfo": "%s"
+	}
+  },
+  """ % (i,roles[rec[1]], rec[0], rec[2], rec[3], 
+         ("%s"%rec[4])[0:10],
+	 jsonescape(rec[5]), 
+	 rec[6] == -1, rec[7] == -1, 
+	 removeddate, jsonescape(rec[9]), rec[10], 
+	 expiredate, jsonescape(rec[11])  ) )
+
+    i = i+1
 
 
 # write a dummy end record to get the last comma right and end JSON file

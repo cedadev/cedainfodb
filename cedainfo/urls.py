@@ -3,7 +3,8 @@ from django.views.generic import list_detail
 from cedainfoapp.models import *
 from cedainfoapp.views import *
 from django.conf import settings
-
+from userdb.views import *
+from userdb.models import *
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -47,4 +48,8 @@ urlpatterns = patterns('',
     (r'^rack/(?P<rack_id>\d+)/$', slots_by_rack),
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root':settings.STATIC_DOC_ROOT,'show_indexes': True}),
 
+
+    # userdb
+    (r'^userdb/userstats/$', user_stats),
+    
 )
