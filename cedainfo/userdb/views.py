@@ -102,3 +102,10 @@ def user_form(request, id):
        return render_to_response('user_form.html', {'user': user, 'form': form} )
 
 
+# Edit a dataentity
+def user_view(request, id):
+       user = User.objects.get(pk=id)
+       licences = Licence.objects.filter(user=user, removed=False)
+       return render_to_response('user_view.html', {'user': user, 'licences':licences} )
+
+
