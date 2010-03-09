@@ -1,0 +1,28 @@
+
+
+
+
+<html>
+  <head>
+    <title>Email addresses</title>
+  </head>
+
+<body>
+
+
+<h1>Email addresses</h1>
+This page lists the email addresses of all people currently registered for the
+selected dataset. It is intended to be used when you need to send out an email
+to all users of a given dataset. See operations manual for further details.
+<p>
+Role: {{ role.name }}
+
+<p>
+
+{{ emails|join:'; ' }}
+ 
+</body> 
+</html>
+
+
+

@@ -21,3 +21,4 @@ class UserStatsForm(Form):
     # customise the form a bit
     Role = ModelChoiceField(queryset= Role.objects.all().order_by('name'))
 
+

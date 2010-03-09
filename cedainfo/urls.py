@@ -52,5 +52,6 @@ urlpatterns = patterns('',
     # userdb
     (r'^userdb/userstats/$', user_stats),
     (r'^userdb/user/(?P<id>\d+)/$', user_form),
+    (r'^userdb/role/emails/(?P<id>\d+)/$', role_emails),
     
 )

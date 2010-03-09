@@ -87,6 +87,10 @@ class Role(models.Model):
     def __unicode__(self):
         return self.name
 
+    def emaillistlink(self):
+        return '''<a href = "/userdb/role/emails/%s">Emails</a> 
+	          <a href = "/admin/userdb/user/?licence__role=%s&licence__removed=0">Users</a>''' %  (self.id, self.id)
+    emaillistlink.allow_tags = True
 
 
 

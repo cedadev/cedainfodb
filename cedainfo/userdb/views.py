@@ -80,6 +80,16 @@ def user_stats(request):
 						     'byitype_labels':byitype_labels} )
 
 
+
+def role_emails(request, id):
+       role = Role.objects.get(pk=id)
+       users = User.objects.filter(licence__removed=False, licence__role=role)
+       emails = users.distinct().values_list('emailaddress', flat=True).order_by('emailaddress')
+
+       return render_to_response('role_emails.html', {'role': role, 'emails': emails} )
+
+
+
 # Edit a dataentity
 def user_form(request, id):
        user = User.objects.get(pk=id)

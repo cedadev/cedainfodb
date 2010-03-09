@@ -18,7 +18,7 @@ class InstituteAdmin(admin.ModelAdmin):
 admin.site.register(Institute, InstituteAdmin)
 
 class RoleAdmin(admin.ModelAdmin):
-    list_display = ('name', 'authtype', 'description')
+    list_display = ('name', 'authtype', 'description', 'emaillistlink')
     search_fields = ['name', 'description']
     list_filter = ('datacentre',)
 admin.site.register(Role, RoleAdmin)
