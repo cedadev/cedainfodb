@@ -66,6 +66,8 @@ class User(models.Model):
     def __unicode__(self):
         return "%s %s %s" % (self.title, self.othernames, self.surname)
     
+    
+    
 
 class Role(models.Model):
     name = models.CharField(max_length=50) 
