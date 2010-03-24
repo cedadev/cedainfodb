@@ -8,27 +8,20 @@ admin.site.register(BackupPolicy)
 admin.site.register(AccessStatus)
 admin.site.register(Role)
 admin.site.register(Person)
-admin.site.register(DataEntityAdministrator)
+admin.site.register(DataEntityContact)
+admin.site.register(DataEntitySizeMeasurement)
 admin.site.register(Rack)
 admin.site.register(Allocation)
-admin.site.register(HostService)
+admin.site.register(Service)
+admin.site.register(ServiceContact)
 admin.site.register(HostHistory)
 admin.site.register(DataEntityBackupLog)
 admin.site.register(ServiceBackupLog)
-admin.site.register(HostTag)
-
-# customise the Slot admin interface
-class SlotAdmin(admin.ModelAdmin):
-    list_display = ('parent_rack', 'position', 'occupant')
-    list_filter = ('parent_rack', 'occupant')
-    ordering = ('parent_rack', 'position',)
-    search_fields = ('parent_rack', 'occupant',)
-admin.site.register(Slot, SlotAdmin)
 
 # customise the Host admin interface
 class HostAdmin(admin.ModelAdmin):
     list_display = ('hostname','ip_addr')
-    list_filter = ('supplier','planned_end_of_life', 'retired','tags')
+    list_filter = ('supplier','planned_end_of_life', 'retired_on','host_type')
     ordering = ('hostname','planned_end_of_life',)
 admin.site.register(Host, HostAdmin)
 
