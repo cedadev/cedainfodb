@@ -17,7 +17,7 @@ DataEntity search
 		{% if results %}
 		    <ul>
 		    {% for de in results %}
-		        <li><a href="/dataentity/{{de.id}}">{{ de.dataentity_id }}</a></li>
+		        <li><a href="/dataentity/{{de.id}}">{{ de }}</a></li>
 		    {% endfor %}
 		    </ul>
 		{% else %}
