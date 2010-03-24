@@ -30,7 +30,7 @@ def host_detail(request, host_id):
     url=reverse('cedainfo.cedainfoapp.views.host_list',args=(None,))
     try:
        host = get_object_or_404(Host, pk=host_id)
-       services = HostService.objects.filter(host=host)
+       services = Service.objects.filter(host=host)
        history = HostHistory.objects.filter(host=host)
        return render_to_response('cedainfoapp/host_detail.html', {'host': host, 'services': services, 'history': history})
     except:
@@ -43,7 +43,10 @@ def dataentity_search(request):
     query = request.GET.get('q', '')
     if query:
         qset = (
-	    Q(dataentity_id__icontains=query)
+	    Q(dataentity_id__icontains=query) |
+	    Q(symbolic_name__icontains=query) |
+            Q(friendly_name__icontains=query) |
+            Q(logical_path__icontains=query)
 	)
 	results = DataEntity.objects.filter(qset).distinct()
     else:
@@ -100,33 +103,27 @@ def dataentity_add(request, dataentity_id):
         form = DataEntityForm(instance=dataentity)
     return render_to_response('cedainfoapp/edit_dataentity.html', {'dataentity': dataentity, 'form': form} )
 
-# Show slots by rack
-def slots_by_rack(request, rack_id):
-    rack = Rack.objects.get(pk=rack_id)
-    slots = Slot.objects.filter(parent_rack = rack)
-    return render_to_response('cedainfoapp/slots_by_rack.html', {'rack': rack, 'slots': slots} )    
-	
 # Dan's pre-made database views, recreated here...
 
 # original name : datasets_with_responsible_names
-# New model has DataEntity, Person, Role and DataEntityAdministrator
+# New model has DataEntity, Person, Role and DataEntityContact
 # ... Need to list each combination of [person & role] associated with a data entity
-def dataentity_with_dataentity_administrators(request, dataentity_id):
+def dataentity_with_dataentity_contacts(request, dataentity_id):
     # find this data entity
     dataentity = DataEntity.objects.get(pk=dataentity_id)
-    # find the list of data entity administrator intances for this data entity
+    # find the list of data entity contact intances for this data entity
     # for each of these, we should be able to find the person and role
-    dataentity_administrators = DataEntityAdministrator.objects.filter(data_entity=dataentity_id)
-    return render_to_response('cedainfoapp/dataentity_with_dataentity_administrators.html', {'dataentity': dataentity, 'dataentity_administrators': dataentity_administrators, })
+    dataentity_contacts = DataEntityContact.objects.filter(data_entity=dataentity_id)
+    return render_to_response('cedainfoapp/dataentity_with_dataentity_contacts.html', {'dataentity': dataentity, 'dataentity_contacts': dataentity_contacts, })
 
-def dataentities_with_dataentity_administrators(request):
+def dataentities_with_dataentity_contacts(request):
     # find all dataentities
     dataentities = DataEntity.objects.all()
     # for each dataentity, find the list of data entity administrator intances for this data entity
     dataentity_list = []
     for dataentity in dataentities:
 	# for each of these, append an additional attribute which is a queryset representing the deas for this de
-	dataentity.deas = DataEntityAdministrator.objects.filter(data_entity=dataentity.dataentity_id)
+	dataentity.deas = DataEntityContact.objects.filter(data_entity=dataentity.dataentity_id)
 	dataentity_list.append(dataentity)
 		
-    return render_to_response('cedainfoapp/dataentities_with_dataentity_administrators.html', {'dataentities': dataentity_list} )
+    return render_to_response('cedainfoapp/dataentities_with_dataentity_contacts.html', {'dataentities': dataentity_list} )
