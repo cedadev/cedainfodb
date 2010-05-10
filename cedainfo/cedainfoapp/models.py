@@ -184,15 +184,11 @@ class Service(models.Model):
 	    ),
 	default="disposable"
     )
+    requester = models.ForeignKey(Person, null=True, blank=True, related_name='service_requester')
+    installer = models.ForeignKey(Person, null=True, blank=True, related_name='service_installer')
+    software_contact = models.ForeignKey(Person, null=True, blank=True, related_name='service_software_contact')
     def __unicode__(self):
 	return self.name
-
-class ServiceContact(models.Model):
-    role = models.ForeignKey(Role)
-    person = models.ForeignKey(Person)
-    service = models.ForeignKey(Service)
-    def __unicode__(self):
-	return '%s|%s|%s' % (self.role, self.person, self.service)
 
 class HostHistory(models.Model):
     host = models.ForeignKey(Host)
