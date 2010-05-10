@@ -202,15 +202,9 @@ if __name__=="__main__":
     # do some things
     nodelistfile = sys.argv[1]
     parser = nodelistparser(nodelistfile)
-    #parser.showXenServers()
-    #parser.showXenClients()
+    parser.showXenServers()
+    parser.showXenClients()
     parser.hackLists()
-    #parser.insertHosts()
+    parser.insertHosts()
     parser.checkHosts()
     parser.assignRacks()
-
-# ATSR
-#for rack in sorted(get_list('ATSRCabList', False)):
-#    print rack
-#    for host in sorted(get_list(rack, True)):
-#        print host     
