@@ -10,10 +10,10 @@ from userdb.models import *
 from django.contrib import admin
 admin.autodiscover()
   
-host_info =  {
-    "queryset" : Host.objects.all(),
-    "template_object_name" : "host",
-}
+#host_info =  {
+#    "queryset" : Host.objects.all(),
+#    "template_object_name" : "host",
+#}
 
 urlpatterns = patterns('',
     # Example:
@@ -29,11 +29,11 @@ urlpatterns = patterns('',
     # views
     #  - hosts
     #   - list view of all hosts
-    (r'^hosts/$', list_detail.object_list, host_info),
+    #(r'^hosts/$', list_detail.object_list, host_info),
     #   - list view of hosts subsetted (e.g. in_pool, not_retired)
-    (r'^hosts/(?P<subset>\w+)$', host_list),
+    #(r'^hosts/(?P<subset>\w+)$', host_list),
     #   - detail view of 1 host, by id
-    (r'^host/(?P<host_id>\d+)/$', host_detail),
+    #(r'^host/(?P<host_id>\d+)/$', host_detail),
 
     # detail view of data entity
     (r'^dataentity/(?P<id>\d+)/$', dataentity_detail_form),
@@ -41,11 +41,11 @@ urlpatterns = patterns('',
     (r'^dataentity/find/(?P<dataentity_id>.*)$', dataentity_find),
     (r'^dataentity/add/(?P<dataentity_id>.*)$', dataentity_add),
     # data entity with administrators
-    (r'^dataentityadmins/(?P<dataentity_id>\d+)/$', dataentity_with_dataentity_administrators),
-    (r'^dataentitieswithadmins/$', dataentities_with_dataentity_administrators),
+    (r'^dataentitycontacts/(?P<dataentity_id>\d+)/$', dataentity_with_dataentity_contacts),
+    (r'^dataentitieswithcontacts/$', dataentities_with_dataentity_contacts),
 
     # slots by rack (= 
-    (r'^rack/(?P<rack_id>\d+)/$', slots_by_rack),
+    #(r'^rack/(?P<rack_id>\d+)/$', slots_by_rack),
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root':settings.STATIC_DOC_ROOT,'show_indexes': True}),
 
 
