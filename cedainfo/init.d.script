@@ -40,7 +40,10 @@ start ()
       #
       echo "Please wait..."
       sleep 10
+      chown badc:badcint $SOCKET
       chmod 770 $SOCKET
+
+      chown badc:badcint $PIDFILE
       exit 0
    fi;
 
