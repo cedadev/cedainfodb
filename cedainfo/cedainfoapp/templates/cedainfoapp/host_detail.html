@@ -5,12 +5,12 @@ Host details
 {% endblock %}
 
 {% block content %}
-    <h2>Host details : {{host}}</h2>
-	<table border="1">
+    <h2>Host details</h2>
+	<table border="1" width="90%">
 	    <tr>
-		    <td>
-				<table border="1">
-					<tr><th>hostname</th><td>{{host.hostname}}</td></tr>
+		    <td width="40%" rowspan="2">
+				<table border="1" width="100%">
+					<tr><th>host</th><td><a href="/admin/cedainfoapp/host/{{host.id}}">{{host}}</a></td></tr>
 					<tr><th>ip_addr</th><td>{{host.ip_addr}}</td></tr>
 					<tr><th>serial_no</th><td>{{host.serial_no}}</td></tr>
 					<tr><th>retired</th><td>{{host.retired}}</td></tr>
@@ -25,23 +25,40 @@ Host details
 					<tr><th>capacity</th><td>{{host.capacity}}</td></tr>
 				</table>
 		    </td>
-			<td valign="top">
-			    <table border="1">
+			<td valign="top" width="60%">
+			    <table border="1" width="100%">
 					<tr><th colspan="3">Services</th></tr>
-					<tr><th>Type</th><th>Details</th><th>Port</th></tr>
+					<tr>
+						<th>Name</th>
+						<th>Description</th>
+						<th>Ext</th>
+					</tr>
 					{% for service in services %}
-					    <tr><td>{{service.service_type}}</td><td>{{service.details}}</td><td>{{service.port}}</td></tr>
+					    <tr>
+							<td><a href="/admin/cedainfoapp/service/{{service.id}}">{{service.name}}</a></td>
+							<td>{{service.description}}</td>
+							<td>{{service.externally_visible}}</td>
+						</tr>
 					{% endfor %}
 				</table>
-			    <table border="1">
-					<tr><th colspan="3">History</th></tr>
-					<tr><th>Date</th><th>Description</th><th>Admin contact</th></tr>
-					{% for event in history %}
-					    <tr><td>{{event.date}}</td><td>{{event.history_desc}}</td><td>{{event.admin_contact}}</td></tr>
-					{% endfor %}
-				</table>
-			</td>
+		  </td>
 		</tr>
 
+
 	</table>
+	
+
+<h2>Host history</h2>
+<table border="1" width="100%">
+	<tr><th colspan="3">History</th></tr>
+	<tr><th>Date</th><th>Description</th><th>Admin contact</th></tr>
+	{% for event in history %}
+		<tr>
+			<td><a href="/admin/cedainfoapp/hosthistory/{{event.id}}">{{event.date}}</a></td>
+			<td>{{event.history_desc}}</td>
+			<td>{{event.admin_contact}}</td>
+		</tr>
+	{% endfor %}
+</table>
+				
 {% endblock %}

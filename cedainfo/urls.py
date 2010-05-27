@@ -10,10 +10,10 @@ from django.conf import settings
 from django.contrib import admin
 admin.autodiscover()
   
-#host_info =  {
-#    "queryset" : Host.objects.all(),
-#    "template_object_name" : "host",
-#}
+host_info =  {
+    "queryset" : Host.objects.all(),
+    "template_object_name" : "host",
+}
 
 urlpatterns = patterns('',
     # Example:
@@ -29,11 +29,11 @@ urlpatterns = patterns('',
     # views
     #  - hosts
     #   - list view of all hosts
-    #(r'^hosts/$', list_detail.object_list, host_info),
+    (r'^hosts/$', list_detail.object_list, host_info),
     #   - list view of hosts subsetted (e.g. in_pool, not_retired)
-    #(r'^hosts/(?P<subset>\w+)$', host_list),
+    (r'^hosts/(?P<subset>\w+)$', host_list),
     #   - detail view of 1 host, by id
-    #(r'^host/(?P<host_id>\d+)/$', host_detail),
+    (r'^host/(?P<host_id>\d+)/$', host_detail),
 
     # detail view of data entity
     (r'^dataentity/(?P<id>\d+)/$', dataentity_detail_form),
