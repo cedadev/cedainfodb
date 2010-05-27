@@ -16,10 +16,8 @@ import datetime
 # host_list view: optionally includes subsetting (e.g. in_pool or not yet retired)
 def host_list(request, subset=None):
     # define the queryset, using the subset if available
-    if (subset == 'in_pool'):
-        hosts = Host.objects.filter(in_pool=True)
-    elif (subset == 'not_retired'):
-	hosts = Host.objects.filter(planned_end_of_life__gt=datetime.date.today() )
+    if (subset == 'active'):
+	    hosts = Host.objects.filter(retired_on=None)
     else:
         hosts = Host.objects.all()
     return render_to_response('cedainfoapp/host_list.html', {'host_list': hosts, 'subset': subset}, )

@@ -27,17 +27,19 @@ Host details
 		    </td>
 			<td valign="top" width="60%">
 			    <table border="1" width="100%">
-					<tr><th colspan="3">Services</th></tr>
+					<tr><th colspan="4">Services</th></tr>
 					<tr>
 						<th>Name</th>
 						<th>Description</th>
-						<th>Ext</th>
+						<th>Ext. visible</th>
+						<th>Dependencies</th>
 					</tr>
 					{% for service in services %}
 					    <tr>
 							<td><a href="/admin/cedainfoapp/service/{{service.id}}">{{service.name}}</a></td>
 							<td>{{service.description}}</td>
 							<td>{{service.externally_visible}}</td>
+							<td>&nbsp;</td>
 						</tr>
 					{% endfor %}
 				</table>
