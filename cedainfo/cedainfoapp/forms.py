@@ -6,9 +6,11 @@ from cedainfo.cedainfoapp.custom_widgets import TinyMCE
 
 class DataEntityForm(ModelForm):
     # customise the form a bit
-    dataentity_id = CharField(widget=forms.TextInput(attrs={'size':'60'}))
+    dataentity_id = CharField(widget=forms.TextInput(attrs={'size':'90'}))
     friendly_name = CharField(widget=forms.TextInput(attrs={'size':'60'}), required=False)
     symbolic_name = CharField(widget=forms.TextInput(attrs={'size':'60'}), required=False)
+    logical_path  = CharField(widget=forms.TextInput(attrs={'size':'60'}), required=False)
+    
     backup_destination = CharField(widget=forms.TextInput(attrs={'size':'60'}), required=False)
     notes = CharField(widget=forms.Textarea(attrs={'cols':'60','rows':'10'}), required=False)
     recipes_expression = CharField(widget=forms.TextInput(attrs={'size':'60'}), required=False)
@@ -23,7 +25,7 @@ class DataEntityFormTinyMCE(ModelForm):
     symbolic_name = CharField(widget=forms.TextInput(attrs={'size':'60'}))
     backup_destination = CharField(widget=forms.TextInput(attrs={'size':'60'}))
     notes = CharField(widget=forms.Textarea(attrs={'cols':'60','rows':'10'}))
-    recipes_expression = CharField(widget=forms.TextInput(attrs={'size':'60'}))
+    recipes_expression = CharField(widget=forms.TextInput(attrs={'size':'80'}))
     recipes_explanation = CharField(widget=TinyMCE())
     class Meta:
         model = DataEntity
