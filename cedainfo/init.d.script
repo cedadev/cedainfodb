@@ -30,9 +30,9 @@ start ()
 {
 
    if [ -f $PIDFILE ]; then
-      echo "$APP already running (pid file $PIDFILE exists)"
-      exit 1
-   else
+      stop
+   fi
+   
       umask 007
       /usr/local/bin/python2.5 manage.py runfcgi socket=$SOCKET daemonize=true pidfile=$PIDFILE
       #
@@ -45,7 +45,7 @@ start ()
 
       chown badc:badcint $PIDFILE
       exit 0
-   fi;
+
 
 }
 
