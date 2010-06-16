@@ -34,7 +34,7 @@ class User(models.Model):
     othernames = models.CharField(max_length=100) 
     telephoneno = models.CharField(max_length=50, blank=True, null=True) 
     faxno = models.CharField(max_length=50, blank=True, null=True) 
-    emailaddress = models.CharField(max_length=100) 
+    emailaddress = models.EmailField() 
     comments = models.TextField(blank=True, null=True) 
     endorsedby = models.CharField(max_length=50, blank=True, null=True) 
     degree = models.CharField(max_length=20, blank=True, null=True,       
