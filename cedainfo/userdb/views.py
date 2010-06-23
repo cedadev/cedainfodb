@@ -88,9 +88,12 @@ def role_emails(request, id):
 
        return render_to_response('role_emails.html', {'role': role, 'emails': emails} )
 
+# View a role
+def role_view(request, id):
+       role = Role.objects.get(pk=id)
+       return render_to_response('role_view.html', {'role': role, } )
 
-
-# Edit a dataentity
+# Edit a user
 def user_form(request, id):
        user = User.objects.get(pk=id)
        if request.method == 'POST':
@@ -102,10 +105,17 @@ def user_form(request, id):
        return render_to_response('user_form.html', {'user': user, 'form': form} )
 
 
-# Edit a dataentity
+# View a user (a la MyBADC)
 def user_view(request, id):
        user = User.objects.get(pk=id)
        licences = Licence.objects.filter(user=user, removed=False)
        return render_to_response('user_view.html', {'user': user, 'licences':licences} )
 
+# View a user's licences (like http://badc.nerc.ac.uk/cgi-bin/mybadc/list_datasets.cgi.pl?source=mybadc)
+def user_licences(request, id):
+       user = User.objects.get(pk=id)
+       licences_active = Licence.objects.filter(user=user, removed=False)
+       licences_pending = Licence.objects.filter(user=user, removed=False) #TODO sort out filter criteria
+       licences_removed = Licence.objects.filter(user=user, removed=True)
+       return render_to_response('user_licences.html', {'user': user, 'licences':licences} )
 

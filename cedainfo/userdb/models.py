@@ -61,7 +61,9 @@ class User(models.Model):
     address3 = models.CharField(max_length=256, blank=True, null=True) 
     address4 = models.CharField(max_length=256, blank=True, null=True)
     address5 = models.CharField(max_length=256, blank=True, null=True)
-    institute = models.ForeignKey(Institute)   
+    institute = models.ForeignKey(Institute)
+    # TODO custom save method:
+    #   - if emailaddress or institute are changned, notify helpdesk
 
     def __unicode__(self):
         return "%s %s %s" % (self.title, self.othernames, self.surname)

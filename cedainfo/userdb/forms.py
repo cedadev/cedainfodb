@@ -14,8 +14,6 @@ class UserForm(ModelForm):
 #    recipes_explanation = CharField(widget=forms.Textarea(attrs={'cols':'60','rows':'10'}), required=False)
     class Meta:
         model = User
-
-
     
 class UserStatsForm(Form):
     # customise the form a bit

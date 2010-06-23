@@ -3,8 +3,8 @@ from django.views.generic import list_detail
 from cedainfoapp.models import *
 from cedainfoapp.views import *
 from django.conf import settings
-#from userdb.views import *
-#from userdb.models import *
+from userdb.views import *
+from userdb.models import *
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -50,6 +50,11 @@ urlpatterns = patterns('',
 
 
     # userdb
-    #(r'^userdb/userstats/$', user_stats),
+    (r'^userdb/userstats/$', user_stats),
+    (r'^userdb/user/edit/(?P<id>\d+)/$', user_form),
+    (r'^userdb/user/view/(?P<id>\d+)/$', user_view),
+    (r'^userdb/user/licences/(?P<id>\d+)/$', user_licences),
+    (r'^userdb/role/emails/(?P<id>\d+)/$', role_emails),
+    (r'^userdb/role/view/(?P<id>\d+)/$', role_view),
     
 )
