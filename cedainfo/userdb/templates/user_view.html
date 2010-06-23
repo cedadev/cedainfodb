@@ -1,195 +1,160 @@
-
-
-
-
-
-
-
-
-
-
-
 <html>
 <head>
 <title>My BADC</title>
 </head>
 <body>
-
-
 <table width="100%">
-<tr>
-<td valign="top" width="35%">
-<table bgcolor="#eeeeee" width="100%">
-<tr><td bgcolor="#5f99ff" align=center><b>Data</b><tr><td><a title="List all datasets available and apply for access" href="/data/dataset_index">Apply for datasets</a>
-<tr><td><a href="/data/submit.html">Submit data</a>
-<tr><td><a href="/cgi-bin/data_browser/data_browser/requests/{{ user.accountid }}" title="Download the data you have requested">My requested data</a>
+  <!-- main layout table -->
+  <tr>
+    <td valign="top" width="35%">
+	  <!-- leftmost of 3 major columns -->
+	  <table bgcolor="#eeeeee" width="100%">
+        <tr>
+          <td bgcolor="#5f99ff" align=center><b>Data</b></td>
+        </tr>
+        <tr>
+          <td><a title="List all datasets available and apply for access" href="/data/dataset_index">Apply for datasets</a></td>
+        </tr>
+        <tr>
+          <td><a href="/data/submit.html">Submit data</a></td>
+        </tr>
+        <tr>
+          <td><a href="/cgi-bin/data_browser/data_browser/requests/{{ user.accountid }}" title="Download the data you have requested">My requested data</a></td>
+        </tr>
+      </table>
+      <p>
+      <p>
+      <table bgcolor="#eeeeee" width=100%>
+        <tr>
+          <td colspan="2" bgcolor="#5f99ff" align=center><b>My groups</b></td>
+        </tr>
+        <tr>
+          <td colspan="2" align="center"><font size=2><em><a href="/cgi-bin/mybadc/list_datasets.cgi.pl">Show details</a></em></font></td>
+        </tr>
+        <tr>
+          <td> {% for l in licences %}
+            <table width="100%">
+              <tr>
+                <td width="90%"><font size="2"> <a title="Information about this group" href="{{l.role.infourl}}">{{l.role}}</a></font></font></td>
+                <td nowrap><font size="2"><em><a href="{{l.role.directory}}">Get Data</a></em></font> </td>
+              </tr>
+            </table>
+            {% endfor %} </td>
+        </tr>
+      </table>
+      <script language="javascript" src="/javascript/makeWindows.js"></script>
+    <td valign="top">
+	  <!-- middle of 3 major columns -->
+	  <table cellpadding="2">
+        <tr>
+          <td><b>Name:</b>
+          <td>{{ user }}
+        <tr>
+          <td><b>Email:</b>
+          <td>{{ user.emailaddress }}
+        <tr>
+          <td><b>Discipline:</b>
+          <td>{{ user.field }}
+        <tr>
+          <td><b>Institute:</b>
+          <td>{{ user.intitute }}
+        <tr>
+          <td><b>Country:</b>
+          <td>
+        <tr>
+          <td><b>Department:</b>
+          <td>
+        <tr>
+          <td valign="top"><b>Address:</b>
+          <td>
+        <tr>
+          <td><b>Telephone:</b>
+          <td>{{ user.fax }}
+        <tr>
+          <td><b>Fax:</b>
+          <td>{{ user.tel }}
+        <tr>
+          <td><b>Studying for degree:</b>
+          <td>None
+        <tr>
+          <td><b>Supervisor:</b>
+          <td>
+        <tr>
+          <td><b>Personal web page:</b>
+          <td><a href="http://home.badc.rl.ac.uk/spepler">home.badc.rl.ac.uk/spepler</a>
+        <tr>
+          <td><b>OpenID: </b>
+          <td><font size=2>https://ceda.ac.uk/openid/</font>Sam.Pepler
+      </table>
+	</td>
+    <td valign="top">
+	<!-- rightmost of 3 major columns -->
+	<table border=0 width="100%" bgcolor="#eeeeee">
+        <tr>
+          <td colspan=2 bgcolor="#5f99ff" align=center><b>Actions</b>
+        <tr>
+          <td><a href="javascript:OpenPasswdWin('/cgi-bin/mybadc/change_passwd.cgi.pl')">Change password</a>
+        <tr>
+          <td><a href="javascript:OpenEditWin('/cgi-bin/mybadc/amend_user_details.cgi.pl')">Edit user details</a>
+        <tr>
+          <td><a href="/cgi-bin/mybadc/mybadc.cgi.pl?action=logout">Logout</a>
+      </table>
+      <form method=POST action="/cgi-bin/search/select_search">
+        <input type="hidden" name=badc_only value="y">
+        <input type="hidden" name=year value="any">
+        <table border=0 width="100%" bgcolor="#eeeeee">
+          <tr>
+            <td colspan=2 bgcolor="#5f99ff" align=center><b>Quick search</b>
+          <tr>
+            <td nowrap valign=top><font size=3><b>Search for:</b></font>
+            <td><input name="SEARCH_STRING" type="text" size="15" maxlength="50">
+          <tr>
+            <td align=right><b>in:</b>
+            <td><SELECT NAME="SEARCH_WHAT" SIZE="1">
+                <OPTION value="BADCWEBPAGES" SELECTED>Webpages</OPTION>
+                <OPTION value="MOLES_ALL">Datasets</OPTION>
+                <OPTION value="LINKS">Links</OPTION>
+                <OPTION value="UKMOSTATIONS">UKMO stations</OPTION>
+              </SELECT>
+          <tr>
+            <td>
+            <td><input type=image src="/search/go.gif">
+        </table>
+      </form>
+      <table bgcolor="#eeeeee" width="100%">
+        <tr>
+          <td bgcolor="#5f99ff" align=center><b>Community</b>
+        <tr>
+          <td><a href="http://bscw.badc.nerc.ac.uk/bscw/bscw.cgi">My workspaces</a>
+        <tr>
+          <td><a title="View any BADC mailing lists you are subscribed to" href="/cgi-bin/mailman/mylists_interface">My mailing lists</a>
+        <tr>
+          <td><a  title="Find other users at your institute" href="/cgi-bin/community/whoswho_at_institutions.cgi.pl?Display=Rutherford%20Appleton%20Laboratory%20(RAL)&source=mybadc">Who's @ my institute?</a>
+        <tr>
+          <td><a title="Find other users who share your field of interest"href="/cgi-bin/community/whoswho_field_list.cgi.pl?Field=Atmospheric%20Physics&source=mybadc">Who's in my field?</a>
+        <tr>
+          <td><a title="Find other users in your country"href="/cgi-bin/community/whoswho_country_list.cgi.pl?Field=UK&source=mybadc">Who's in my country?</a>
+      </table>
 </table>
 <p>
 <p>
-<table bgcolor="#eeeeee" width=100%>
-<tr><td colspan="2" bgcolor="#5f99ff" align=center><b>My groups</b></td></tr><tr><td colspan="2" align=middle><font size=2><em><a href="/cgi-bin/mybadc/list_datasets.cgi.pl">Show details</a></em></font></td></tr>
-
-<tr><td width="100%">&nbsp;</tr>
-<tr><td>
-<table bgcolor="#d0d0d0" width="100%"><tr><td>
-<td width="90%"><font size="2">
-{% for l in licences %}
-          <tr><td>{{ l.role }}</td></tr>
-{% endfor %}
-ARSF - Photo scan (<a href="http://www.neodc.rl.ac.uk">NEODC</a>)</font></font></td>
-<td nowrap><font size="2"><em><a href="http://www.neodc.rl.ac.uk/browse/neodc/arsf">Get Data</a></em></font>
-</td>
-</tr>
-</td></tr></table>
-<tr><td>
-<table width="100%"><tr><td>
-<td width="90%"><font size="2">
-<a title="Information about this group" href="http://www.ceda.ac.uk">CEDA staff</a></font></font></td>
-
-<td nowrap><font size="2"><em>&nbsp; &nbsp;</em></font>
-</td>
-</tr>
-</td></tr></table>
-<tr><td>
-<table bgcolor="#d0d0d0" width="100%"><tr><td>
-<td width="90%"><font size="2">
-ECMWF <a href="/data/ecmwf-era">ERA-15</a>, <a href="/data/ecmwf-e40/">ERA-40</a> and<a href="/data/ecmwf-era-interim/">ERA-Interim</a></font></td>
-<td nowrap><font size="2"><em><a href="http://badc.nerc.ac.uk/data/ecmwf-e40/era_data.html">Get Data</a></em></font>
-
-</td>
-</tr>
-</td></tr></table>
-<tr><td>
-<table width="100%"><tr><td>
-<td width="90%"><font size="2">
-<a title="Information about this group" href="http://badc.nerc.ac.uk/data/pum">Met Office - Ported Unified Model (PUM) v6.1 software</a></font></font></td>
-<td nowrap><font size="2"><em><a href="/browse/badc/ukmo-pum/software/6.1">Get Data</a></em></font>
-</td>
-</tr>
-</td></tr></table>
-<tr><td>
-<table bgcolor="#d0d0d0" width="100%"><tr><td>
-<td width="90%"><font size="2">
-<a title="Information about this group" href="http://www.ncas.ac.uk">NCAS staff</a></font></font></td>
-
-<td nowrap><font size="2"><em>&nbsp; &nbsp;</em></font>
-</td>
-</tr>
-</td></tr></table>
-<tr><td>
-<table width="100%"><tr><td>
-<td width="90%"><font size="2">
-<a title="Information about this group" href="http://badc.nerc.ac.uk/data/msf">RAL Molecular Spectroscopy Facility (MSF)</a></font></font></td>
-<td nowrap><font size="2"><em><a href="/browse/badc/msf">Get Data</a></em></font>
-</td>
-</tr>
-</td></tr></table>
-<tr><td>
-<table bgcolor="#d0d0d0" width="100%"><tr><td>
-
-<td width="90%"><font size="2">
-<a title="Information about this group" href="http://badc.nerc.ac.uk/data/sage2">Stratospheric Aerosol and Gas Experiment II (SAGE II)</a></font></font></td>
-<td nowrap><font size="2"><em><a href="/browse/badc/sage2">Get Data</a></em></font>
-</td>
-</tr>
-</td></tr></table>
-<tr><td>
-<table width="100%"><tr><td>
-<td width="90%"><font size="2">
-<a title="Information about this group" href="http://badc.nerc.ac.uk/data/ukmo-charts">UKMO Charts</a></font></font></td>
-<td nowrap><font size="2"><em><a href="/browse/badc/ukmo-charts">Get Data</a></em></font>
-</td>
-</tr>
-
-</td></tr></table>
-<tr><td>
-<table bgcolor="#d0d0d0" width="100%"><tr><td>
-<td width="90%"><font size="2">
-Weybourne Atmospheric Observatory dataset</font></td>
-<td nowrap><font size="2"><em><a href="/browse/badc/weybourne">Get Data</a></em></font>
-</td>
-</tr>
-</td></tr></table>
-</table>
-<td valign="top">
-<script language="javascript" src="/javascript/makeWindows.js"></script>
-<table cellpadding="2">
-<tr><td><b>Name:</b><td>{{ user }}
-
-<tr><td><b>Email:</b><td>{{ user.emailaddress }}
-<tr><td><b>Discipline:</b><td>{{ user.field }}
-<tr><td><b>Institute:</b><td>{{ user.intitute }}
-<tr><td><b>Country:</b><td>
-<tr><td><b>Department:</b><td>
-<tr><td valign="top"><b>Address:</b><td>     
-<tr><td><b>Telephone:</b><td>{{ user.fax }}
-<tr><td><b>Fax:</b><td>{{ user.tel }}
-<tr><td><b>Studying for degree:</b><td>None
-
-<tr><td><b>Supervisor:</b><td>
-<tr><td><b>Personal web page:</b><td><a href="http://home.badc.rl.ac.uk/spepler">home.badc.rl.ac.uk/spepler</a>
-<tr><td><b>OpenID: </b><td><font size=2>https://ceda.ac.uk/openid/</font>Sam.Pepler</table>
-<td valign="top">
-    <table border=0 width="100%" bgcolor="#eeeeee">
-    <tr><td colspan=2 bgcolor="#5f99ff" align=center><b>Actions</b>
-    <tr><td><a href="javascript:OpenPasswdWin('/cgi-bin/mybadc/change_passwd.cgi.pl')">Change password</a>
-
-    <tr><td><a href="javascript:OpenEditWin('/cgi-bin/mybadc/amend_user_details.cgi.pl')">Edit user details</a> 
-    <tr><td><a href="/cgi-bin/mybadc/mybadc.cgi.pl?action=logout">Logout</a>
-    </table>
-
-<form method=POST action="/cgi-bin/search/select_search">
-<input type="hidden" name=badc_only value="y">
-<input type="hidden" name=year value="any">
-
-    <table border=0 width="100%" bgcolor="#eeeeee">
-    <tr><td colspan=2 bgcolor="#5f99ff" align=center><b>Quick search</b>
-
-    <tr><td nowrap valign=top>
-<font size=3><b>Search for:</b></font> 
-<td>
-<input name="SEARCH_STRING" type="text" size="15" maxlength="50">
-<tr><td align=right><b>in:</b>
-<td> 
-<SELECT NAME="SEARCH_WHAT" SIZE="1">
-<OPTION value="BADCWEBPAGES" SELECTED>Webpages</OPTION>
-<OPTION value="MOLES_ALL">Datasets</OPTION>
-<OPTION value="LINKS">Links</OPTION>
-<OPTION value="UKMOSTATIONS">UKMO stations</OPTION>
-
-</SELECT>
-<tr><td><td>
-<input type=image src="/search/go.gif">
-
-</table>
-</form>
-
-<table bgcolor="#eeeeee" width="100%">
-<tr><td bgcolor="#5f99ff" align=center><b>Community</b><tr><td><a href="http://bscw.badc.nerc.ac.uk/bscw/bscw.cgi">My workspaces</a>
-<tr><td><a title="View any BADC mailing lists you are subscribed to" href="/cgi-bin/mailman/mylists_interface">My mailing lists</a>
-<tr><td><a  title="Find other users at your institute" href="/cgi-bin/community/whoswho_at_institutions.cgi.pl?Display=Rutherford%20Appleton%20Laboratory%20(RAL)&source=mybadc">Who's @ my institute?</a>
-<tr><td><a title="Find other users who share your field of interest"href="/cgi-bin/community/whoswho_field_list.cgi.pl?Field=Atmospheric%20Physics&source=mybadc">Who's in my field?</a>
-
-<tr><td><a title="Find other users in your country"href="/cgi-bin/community/whoswho_country_list.cgi.pl?Field=UK&source=mybadc">Who's in my country?</a>
-</table>
-</table><p>
-<p>
-<TABLE width="100%" height="25" BORDER="0" CELLSPACING="0"  CELLPADDING="0"><TR> <TD BGCOLOR="#333399"><IMG SRC="/graphics/tabs/bottomleft.jpg"></TD> <TD BGCOLOR="#333399"><a class=menu HREF="/">Home</a>&nbsp;&nbsp;&nbsp;
-</TD> <TD BGCOLOR="#333399"><a class=menu HREF="/help/contact.html">Contact</a>&nbsp;&nbsp;&nbsp;
-</TD> <TD BGCOLOR="#333399"><a class=menu HREF="/conditions/badc_anon.html">Disclaimer</a>&nbsp;&nbsp;&nbsp;
-</TD> <TD BGCOLOR="#333399"><div class=lastm>Last Modified: <script>document.write(document.lastModified);</script></div>
-
-</TD> <TD WIDTH="10" bgcolor="#333399" align="right"><IMG SRC="/graphics/tabs/bottomright.jpg"></TD> </TR></TABLE>
-
-
-
+<TABLE width="100%" height="25" BORDER="0" CELLSPACING="0"  CELLPADDING="0">
+  <TR>
+    <TD BGCOLOR="#333399"><IMG SRC="/graphics/tabs/bottomleft.jpg"></TD>
+    <TD BGCOLOR="#333399"><a class=menu HREF="/">Home</a>&nbsp;&nbsp;&nbsp; </TD>
+    <TD BGCOLOR="#333399"><a class=menu HREF="/help/contact.html">Contact</a>&nbsp;&nbsp;&nbsp; </TD>
+    <TD BGCOLOR="#333399"><a class=menu HREF="/conditions/badc_anon.html">Disclaimer</a>&nbsp;&nbsp;&nbsp; </TD>
+    <TD BGCOLOR="#333399"><div class=lastm>Last Modified:
+        <script>document.write(document.lastModified);</script>
+      </div></TD>
+    <TD WIDTH="10" bgcolor="#333399" align="right"><IMG SRC="/graphics/tabs/bottomright.jpg"></TD>
+  </TR>
+</TABLE>
 <html>
-  <head>
-    <title>User stats</title>
-  </head>
-
+<head>
+<title>User stats</title>
+</head>
 <body>
 {{ user }}
 </body>
-
 </html>
