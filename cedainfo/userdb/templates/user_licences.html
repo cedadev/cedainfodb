@@ -22,15 +22,15 @@
 <p>
 <b>You are currently a member of the following groups:</b>
 <p>
-<table cellspacing=10 border="1">
+<table>
 <th>Dataset</th><th>Access granted</th><th>Expires</th><th>Research</th></th>
 
 	{% for licence in licences_active %}
 		<tr>
 		<td width=25%><a href="{{licence.role.infourl}}">{{licence.role}}</a>
-		<td nowrap>{{licence.startdate}}
-		<td nowrap>&nbsp;
-		<td height=3>{{licence.comment}}<td>
+		<td nowrap>{{licence.endorseddate}}
+		<td nowrap>{{licence.expiredate}}
+		<td height=3>{{licence.research}}<td>
 		<tr>
 	{% endfor %}
 </table>
@@ -43,51 +43,15 @@
 <p>
 <table cellspacing=10>
 <th>Dataset</th><th>Access granted</th><th>Access removed</th><th>Research</th></th><th>Reapply</th>
-<tr>
-<td width=25%><a href="http://www.neodc.rl.ac.uk/browse/neodc/nextmap">NextMap</a>
-<td nowrap>10-Jun-2004
-<td nowrap>28-Jan-2010
-<td height=3>Test
-<td><a target="_blank" href="/dataset_info?datasetid=nextmap">Re-apply</a><tr>
-<td width=25%><a href="http://www.neodc.rl.ac.uk/browse/neodc/atsrubt">Along Track Scanning Radiometer</a>
-<td nowrap>08-Nov-2004
-<td nowrap>24-Mar-2010
-<td height=3>NEODC Team
-<td><a target="_blank" href="/dataset_info?datasetid=atsrubt">Re-apply</a><tr>
-<td width=25%><a href="/browse/badc">Test</a>
-<td nowrap>19-May-2005
-<td nowrap>14-Jul-2005
-<td height=3>a project to blah blah just testing... do I need to write more than one line
-<td><a target="_blank" href="/dataset_info?datasetid=test">Re-apply</a><tr>
-<td width=25%><a href="http://www.neodc.rl.ac.uk/browse/neodc/arsf">NERC Airborne Research and Survey Facility (ARSF)</a>
-<td nowrap>12-Aug-2005
-<td nowrap>24-Mar-2010
-<td height=3>NEODC Team
-<td><a target="_blank" href="/dataset_info?datasetid=arsf">Re-apply</a><tr>
-<td width=25%><a href="http://www.neodc.rl.ac.uk/browse/neodc/aatsr_multimission">AATSR  multimission</a>
-<td nowrap>20-Sep-2005
-<td nowrap>24-Mar-2010
-<td height=3>NEODC Team
-<td><a target="_blank" href="/dataset_info?datasetid=aatsr_multimission">Re-apply</a><tr>
-<td width=25%><a href="http://www.neodc.rl.ac.uk/browse/neodc/landsat7etm">Landsat7 ETM and Landsat4/5 TM</a>
-<td nowrap>23-Sep-2005
-<td nowrap>24-Mar-2010
-<td height=3>NEODC Team
-<td><a target="_blank" href="/dataset_info?datasetid=landsat7etm">Re-apply</a><tr>
-<td width=25%><a href="http://www.neodc.rl.ac.uk/browse/neodc/aatsr_multimission">AATSR Early Access</a>
-<td nowrap>09-Dec-2005
-<td nowrap>24-Mar-2010
-<td height=3>NEODC Staff
-<td><a target="_blank" href="/dataset_info?datasetid=aatsr_mm_earlyaccess">Re-apply</a><tr>
-<td width=25%><a href="http://www.neodc.rl.ac.uk/browse/neodc/shac2000">SHAC2000</a>
-<td nowrap>29-Mar-2006
-<td nowrap>24-Mar-2010
-<td height=3>NEODC staff
-<td><a target="_blank" href="/dataset_info?datasetid=shac2000">Re-apply</a><tr>
-<td width=25%><a href="/browse/badc/cwvc">Cloud Water Vapour and Climate (CWVC) data</a>
-<td nowrap>04-May-2006
-<td nowrap>04-May-2009
-<td height=3>NEODC Staff
-<td><a target="_blank" href="/dataset_info?datasetid=cwvc">Re-apply</a></table>
+	{% for licence in licences_removed %}
+	<tr>
+		<td width="25%"><a href="http://www.neodc.rl.ac.uk/browse/neodc/nextmap">{{licence.role}}</a></td>
+		<td nowrap>{{licence.endorseddate}}</td>
+		<td nowrap>{{licence.removeddate}}</td>
+		<td height="3">{{licence.research}}</td>
+		<td><a target="_blank" href="{{licence.role.extrainfo}}">Re-apply</a></td>
+	</tr>
+	{% endfor %}
+</table>
  </body>
 </html>

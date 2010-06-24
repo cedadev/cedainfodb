@@ -88,7 +88,7 @@ def role_emails(request, id):
 
        return render_to_response('role_emails.html', {'role': role, 'emails': emails} )
 
-# View a role
+# View a role (public view of a role)
 def role_view(request, id):
        role = Role.objects.get(pk=id)
        return render_to_response('role_view.html', {'role': role, } )
@@ -104,18 +104,22 @@ def user_form(request, id):
           form = UserForm(instance=user)
        return render_to_response('user_form.html', {'user': user, 'form': form} )
 
-
 # View a user (a la MyBADC)
+# TODO Should be protected so only user can see
 def user_view(request, id):
        user = User.objects.get(pk=id)
        licences = Licence.objects.filter(user=user, removed=False)
        return render_to_response('user_view.html', {'user': user, 'licences':licences} )
 
 # View a user's licences (like http://badc.nerc.ac.uk/cgi-bin/mybadc/list_datasets.cgi.pl?source=mybadc)
+# TODO Should be protected so only user can see
 def user_licences(request, id):
        user = User.objects.get(pk=id)
        licences_active = Licence.objects.filter(user=user, removed=False)
        licences_pending = Licence.objects.filter(user=user, removed=False) #TODO sort out filter criteria
        licences_removed = Licence.objects.filter(user=user, removed=True)
-       return render_to_response('user_licences.html', {'user': user, 'licences':licences} )
+       return render_to_response('user_licences.html', {    'user': user, 
+                                                            'licences_active': licences_active,
+                                                            'licences_pending': licences_pending,
+                                                            'licences_removed': licences_removed,} )
 
