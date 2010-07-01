@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}
+Services by rack
+{% endblock %}
+
+{% block header %}
+Services by rack
+{% endblock %}
+
+{% block content %}
+
+<table border="1">
+	<tr>
+		<th>Rack {{rack}}</th>
+		<td class="tiny">Select a rack:
+		{% for item in all_racks %}
+			<a href="/rack/services/{{item.id}}">[{{item}}]&nbsp;</a>
+		{% endfor %}
+		</td>
+	</tr>
+	<tr>
+		<th><a href="/admin/cedainfoapp/rack/{{rack.id}}" title="{{rack}}"><img src="/static/images/rack_colour.png" width="60" height="99" border="0" alt="{{rack}}" title="rack : {{rack}}"></a></th>
+		<td>
+			<table>
+				<tr>
+					<td>
+						{% if hosts %}
+							<table border="1" frame="below" rules="rows">
+								{% for host in hosts %}
+									<tr class="{% cycle 'greybgd' 'darkgreybgd' %}">
+										<td class="lightgreybgd">
+											{% ifequal host.host_type "hypervisor_server" %}
+												<a href="/admin/cedainfoapp/host/{{host.id}}" title="hypervisor server: {{host}}"><img src="/static/images/set_hypervisor.png" width="69" height="34" border="0" alt="hypervisor server: {{host}}"><br>{{host}}</a>
+											{% else %}
+												<a href="/admin/cedainfoapp/host/{{host.id}}" title="physical server: {{host}}"><img src="/static/images/set_large_server.png" width="69" height="34" border="0" alt="physical server: {{host}}"><br>{{host}}</a>
+											{% endifequal %}
+											
+											<!-- Services belonging to this host -->
+											{% for key,value in services_by_host.items %}
+												{% ifequal key host %}
+												{% ifnotequal value.count 0 %}
+														<table border="0">
+															<!-- <tr>
+																<th colspan="2">Services</th>
+															</tr> -->
+														{% for service in value %}
+															<tr>
+																<td class="tiny">
+																	<a href="/admin/cedainfoapp/service/{{service.id}}" title="service: {{service}}"><img src="/static/images/led_green_ok.png" width="24" height="23" border="0" alt="{{service}}">{{service}}</a>
+																</td>
+															</tr>
+
+														{% endfor %}
+														</table>
+
+												{% endifnotequal %}
+												{% endifequal %}																	
+											{% endfor %}											
+										</td>
+										<td>
+											<!-- Virtual hosts belonging to this host -->
+											{% for key,value in vms_by_hypervisor.items %}
+												{% ifequal key host %}
+													{% ifnotequal value.count 0 %}
+														<table border="1" frame="vsides" rules="cols">
+															<tr valign="top">
+																{% for vm in value %}
+																	<td>
+																		<a href="/admin/cedainfoapp/host/{{vm.id}}"  title="virtual server: {{vm}}"><img src="/static/images/set_virtual_server.png" width="69" height="34" border="0" alt="{{vm}}"><br>{{vm}}</a>
+																		<!-- Services belonging to this host -->
+																		{% for k,v in services_by_host.items %}
+																			{% ifequal k vm %}
+																				{% ifnotequal v.count 0 %}
+																					<table border="0">
+																						<!-- <tr>
+																							<th colspan="2">Services</th>
+																						</tr> -->
+																					{% for s in v %}
+																						<tr>
+																							<td class="tiny">
+																								<a href="/admin/cedainfoapp/service/{{s.id}}" title="service: {{s}}"><img src="/static/images/led_green_ok.png" width="24" height="23" border="0" alt="{{s}}">{{s}}</a>
+																								
+																							</td>
+																						</tr>
+
+																					{% endfor %}
+																					</table>
+
+																				{% endifnotequal %}
+																			{% endifequal %}																	
+																		{% endfor %}
+																	</td>
+																{% endfor %}
+															</tr>
+														</table>
+													{% endifnotequal %}
+												{% endifequal %}											
+											{% endfor %}
+										</td>
+									</tr>
+								{% endfor %}
+							</table>
+						{% endif %}
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+
+{% endblock %}

@@ -43,6 +43,7 @@ urlpatterns = patterns('',
     # data entity with administrators
     (r'^dataentitycontacts/(?P<dataentity_id>\d+)/$', dataentity_with_dataentity_contacts),
     (r'^dataentitieswithcontacts/$', dataentities_with_dataentity_contacts),
+    (r'^rack/services/(?P<rack_id>\d+)$', services_by_rack),
 
     # slots by rack (= 
     #(r'^rack/(?P<rack_id>\d+)/$', slots_by_rack),

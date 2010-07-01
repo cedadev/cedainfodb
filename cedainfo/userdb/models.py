@@ -56,7 +56,7 @@ class User(models.Model):
     openid_username_component = models.CharField(max_length=200, blank=True, null=True) 
     openid = models.CharField(max_length=256, blank=True, null=True) 
     department = models.CharField(max_length=256, blank=True, null=True) 
-    address1 = models.CharField(max_length=256, blank=True, null=True) 
+    address1 = models.CharField(max_length=256, blank=True, null=True) # TODO "address would be fine as textfield
     address2 = models.CharField(max_length=256, blank=True, null=True) 
     address3 = models.CharField(max_length=256, blank=True, null=True) 
     address4 = models.CharField(max_length=256, blank=True, null=True)
@@ -67,8 +67,6 @@ class User(models.Model):
 
     def __unicode__(self):
         return "%s %s %s" % (self.title, self.othernames, self.surname)
-    
-    
     
 
 class Role(models.Model):
@@ -85,7 +83,8 @@ class Role(models.Model):
     defaultreglength = models.IntegerField()
     datacentre = models.CharField(max_length=50) 
     infourl = models.CharField(max_length=200)
-
+    authorisers = models.ManyToManyField(User, blank=True)
+    #authviewers = models.ManyToManyField(
     def __unicode__(self):
         return self.name
 

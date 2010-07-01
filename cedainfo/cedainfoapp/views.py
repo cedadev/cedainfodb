@@ -125,3 +125,29 @@ def dataentities_with_dataentity_contacts(request):
 	dataentity_list.append(dataentity)
 		
     return render_to_response('cedainfoapp/dataentities_with_dataentity_contacts.html', {'dataentities': dataentity_list} )
+
+def services_by_rack(request, rack_id):
+    # show a rack, show hosts within rack, show virtual hosts within hypervisor hosts, services within hosts ...sort of deployment diagram
+    # Create a data structure to hold hierarchical structure:
+    # rack
+    #   host
+    #     [virtualhost]
+    #        service
+    layout = {}
+    rack = Rack.objects.get(pk=rack_id)
+    all_racks = Rack.objects.all()
+    # Find list of physical hosts belonging to this rack
+    hosts = Host.objects.filter(rack=rack).filter(hypervisor=None)
+    services_by_host = {}
+    vms_by_hypervisor = {}
+    for host in hosts:
+        services_by_host[host] = Service.objects.filter(host=host)
+        # Make a list of any vms that are on this physical host
+        vms_by_hypervisor[host] = Host.objects.filter(hypervisor=host)
+        # Loop through child vms that we've found
+        for vm in vms_by_hypervisor[host]:
+            # look for services that belong to this vm
+            services_by_host[vm] = Service.objects.filter(host=vm)
+
+    return render_to_response('cedainfoapp/services_view.html', {'rack': rack, 'all_racks': all_racks, 'hosts': hosts, 'services_by_host': services_by_host, 'vms_by_hypervisor': vms_by_hypervisor} )
+    
