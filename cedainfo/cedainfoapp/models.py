@@ -11,17 +11,17 @@ from django.conf import settings
 class BigIntegerField(IntegerField):
     empty_strings_allowed=False
     def get_internal_type(self):
-        return "BigIntegerField"	
+        return "BigIntegerField"    
     def db_type(self):
         return 'bigint' # Will this work with non-postgres?
 
 # Create your models here.
-	
+    
 class Rack(models.Model):
     name = models.CharField(max_length=126)
     room = models.CharField(max_length=126)
     def __unicode__(self):
-	return self.name
+        return self.name
 
 class Host(models.Model):
     hostname = models.CharField(max_length=512)
@@ -36,14 +36,14 @@ class Host(models.Model):
     notes = models.TextField(blank=True)
     host_type = models.CharField(
         max_length=50,
-	choices=(
-	    ("virtual_server","virtual server"),
+        choices=(
+            ("virtual_server","virtual server"),
             ("hypervisor_server","hypervisor server"),
-	    ("storage_server", "storage server"),
-	    ("workstation", "workstation"),
-	    ("server", "server"),
-	),
-	default="server"
+            ("storage_server", "storage server"),
+            ("workstation", "workstation"),
+            ("server", "server"),
+        ),
+        default="server"
     )
     os = models.CharField(max_length=512, blank=True)
     capacity = models.DecimalField(max_digits=6, decimal_places=2,null=True,blank=True) # just an estimate (cf Partition which uses bytes from df)
@@ -63,13 +63,13 @@ class Partition(models.Model):
     type = models.CharField(max_length=512, blank=True)
     last_checked = models.DateTimeField(null=True, blank=True)
     def __unicode__(self):
-	return self.mountpoint
+        return self.mountpoint
 
 class CurationCategory(models.Model):
     category = models.CharField(max_length=5)
     description = models.CharField(max_length=1024)
     def __unicode__(self):
-	return self.category
+        return self.category
 
 class BackupPolicy(models.Model):
     tool = models.CharField(max_length=45)
@@ -77,7 +77,7 @@ class BackupPolicy(models.Model):
     type = models.CharField(max_length=45)
     policy_version = models.IntegerField()
     def __unicode__(self):
-	return self.tool
+        return self.tool
 
 class AccessStatus(models.Model):
     status = models.CharField(max_length=45)
@@ -103,7 +103,7 @@ class DataEntity(models.Model):
     access_status = models.ForeignKey(AccessStatus)
     db_match = models.IntegerField(null=True, blank=True) # id match to "dataset" in old storage db
     def __unicode__(self):
-	return '%s (%s)' % (self.dataentity_id, self.symbolic_name)
+        return '%s (%s)' % (self.dataentity_id, self.symbolic_name)
 
 class TopLevelDir(models.Model):
     # top-level dir on a partition of a nas box, e.g. /disks/foo1/archive/<dataentity symbolic name>
@@ -122,30 +122,36 @@ class TopLevelDir(models.Model):
     status_last_checked = models.DateTimeField(null=True,blank=True)
     special = models.CharField(max_length=1024,blank=True)
     def __unicode__(self):
-        expansion_label = 'primary'
-	if self.expansion_no != 0:
-	    expansion_label = 'expansion_%d' % expansion_no
-	return '%s|%s|%s' % (self.dataentity.symbolic_name, expansion_label, self.mounted_location )
+        #if (self.dataentity.symbolic_name != None):
+        #    symbolic_label = self.dataentity.symbolic_name
+        #else:
+        #    symbolic_label = ''
+        #if (self.expansion_no != 0) and (self.expansion_no != None):
+        #    expansion_label = 'expansion_%d' % expansion_no
+        #else:
+        #    expansion_label = 'primary'
+        #return '%s|%s|%s' % (self.dataentity.symbolic_name, expansion_label, self.mounted_location )
+        return '%s' % (self.mounted_location )
 
 class Role(models.Model):
     role = models.CharField(max_length=45)
     comment = models.TextField(blank=True)
     def __unicode__(self):
-	return self.role
+        return self.role
 
 class Person(models.Model):
     name = models.CharField(max_length=1024)
     email = models.EmailField()
     username = models.CharField(max_length=45)
     def __unicode__(self):
-	return self.name
+        return self.name
 
 class DataEntityContact(models.Model):
     role = models.ForeignKey(Role)
     person = models.ForeignKey(Person)
     data_entity = models.ForeignKey(DataEntity)
     def __unicode__(self):
-	return '%s|%s|%s' % (self.role, self.person, self.data_entity)
+        return '%s|%s|%s' % (self.role, self.person, self.data_entity)
 
 class Allocation(models.Model):
     # allocation of a topleveldir (for a primary or expansion dir) to a partition
@@ -159,7 +165,7 @@ class Allocation(models.Model):
     end_date = models.DateTimeField()
     notes = models.TextField(blank=True)
     def __unicode__(self):
-	return '%s|%s' % (self.top_level_dir, self.partition)
+        return '%s|%s' % (self.top_level_dir, self.partition)
 
 class Service(models.Model):
     host = models.ManyToManyField(Host)
@@ -168,27 +174,27 @@ class Service(models.Model):
     externally_visible = models.BooleanField(default=False)
     deployment_type = models.CharField(max_length=50,       
         choices=(
-	    ("failover","failover"),
+        ("failover","failover"),
             ("loadbalanced","loadbalanced"),
             ("simple","simple")
-	    ),
-	default="simple"
+        ),
+        default="simple"
     )
     dependencies = models.ManyToManyField('self', blank=True)
     availability_tolerance = models.CharField(max_length=50,
         choices=(
-	    ("disposable","disposable"),
-	    ("immediate","must be restored ASAP"),
-	    ("24 hours","must be restored within 24 hours of failure"),
-	    ("1 workingday","must be restored within 1 working day of failure"),
-	    ),
-	default="disposable"
+        ("disposable","disposable"),
+        ("immediate","must be restored ASAP"),
+        ("24 hours","must be restored within 24 hours of failure"),
+        ("1 workingday","must be restored within 1 working day of failure"),
+        ),
+        default="disposable"
     )
     requester = models.ForeignKey(Person, null=True, blank=True, related_name='service_requester')
     installer = models.ForeignKey(Person, null=True, blank=True, related_name='service_installer')
     software_contact = models.ForeignKey(Person, null=True, blank=True, related_name='service_software_contact')
     def __unicode__(self):
-	return self.name
+        return self.name
 
 class HostHistory(models.Model):
     host = models.ForeignKey(Host)
@@ -196,7 +202,7 @@ class HostHistory(models.Model):
     history_desc = models.TextField()
     admin_contact = models.ForeignKey(Person)
     def __unicode__(self):
-	return '%s|%s' % (self.host, self.date)
+        return '%s|%s' % (self.host, self.date)
 
 class DataEntityBackupLog(models.Model):
     data_entity = models.ForeignKey(DataEntity)
@@ -206,8 +212,8 @@ class DataEntityBackupLog(models.Model):
     success = models.BooleanField(default=False)
     comment = models.TextField(blank=True)
     def __unicode__(self):
-	return '%s|%s' % (self.data_entity, self.date)	
-	
+        return '%s|%s' % (self.data_entity, self.date)  
+    
 class ServiceBackupLog(models.Model):
     service = models.ForeignKey(Service)
     backup_policy = models.ForeignKey(BackupPolicy)
@@ -215,8 +221,8 @@ class ServiceBackupLog(models.Model):
     success = models.BooleanField(default=False)
     comment = models.TextField(blank=True)
     def __unicode__(self):
-	return '%s|%s' % (self.service, self.date)	
-	
+        return '%s|%s' % (self.service, self.date)  
+    
 class DataEntitySizeMeasurement(models.Model):
     # entry giving measured size of dataset on given date
     dataentity = models.ForeignKey(DataEntity)
