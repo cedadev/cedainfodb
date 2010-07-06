@@ -13,9 +13,9 @@ Services by rack
 <table border="1">
 	<tr>
 		<th>Rack {{rack}}</th>
-		<td class="tiny">Select a rack:
+		<td>Select a rack:
 		{% for item in all_racks %}
-			<a href="/rack/services/{{item.id}}">[{{item}}]&nbsp;</a>
+			<span class="tiny"><a href="/rack/services/{{item.id}}">[{{item}}]&nbsp;</a></span>
 		{% endfor %}
 		</td>
 	</tr>
@@ -26,14 +26,14 @@ Services by rack
 				<tr>
 					<td>
 						{% if hosts %}
-							<table border="1" frame="below" rules="rows">
+							<table border="1">
 								{% for host in hosts %}
 									<tr class="{% cycle 'greybgd' 'darkgreybgd' %}">
 										<td class="lightgreybgd">
 											{% ifequal host.host_type "hypervisor_server" %}
-												<a href="/admin/cedainfoapp/host/{{host.id}}" title="hypervisor server: {{host}}"><img src="/static/images/set_hypervisor.png" width="69" height="34" border="0" alt="hypervisor server: {{host}}"><br>{{host}}</a>
+												<span class="cell_normal"><a href="/admin/cedainfoapp/host/{{host.id}}" title="hypervisor server: {{host}}"><img src="/static/images/set_hypervisor.png" width="69" height="34" border="0" alt="hypervisor server: {{host}}"><br>{{host}}</a></span>
 											{% else %}
-												<a href="/admin/cedainfoapp/host/{{host.id}}" title="physical server: {{host}}"><img src="/static/images/set_large_server.png" width="69" height="34" border="0" alt="physical server: {{host}}"><br>{{host}}</a>
+												<span class="cell_normal"><a href="/admin/cedainfoapp/host/{{host.id}}" title="physical server: {{host}}"><img src="/static/images/set_large_server.png" width="69" height="34" border="0" alt="physical server: {{host}}"><br>{{host}}</a></span>
 											{% endifequal %}
 											
 											<!-- Services belonging to this host -->
@@ -46,8 +46,8 @@ Services by rack
 															</tr> -->
 														{% for service in value %}
 															<tr>
-																<td class="tiny">
-																	<a href="/admin/cedainfoapp/service/{{service.id}}" title="service: {{service}}"><img src="/static/images/led_green_ok.png" width="24" height="23" border="0" alt="{{service}}">{{service}}</a>
+																<td>
+																	<span class="tiny"><a href="/admin/cedainfoapp/service/{{service.id}}" title="service: {{service}}"><img src="/static/images/service.png" border="0" alt="{{service}}">{{service}}</a></span>
 																</td>
 															</tr>
 
@@ -63,11 +63,11 @@ Services by rack
 											{% for key,value in vms_by_hypervisor.items %}
 												{% ifequal key host %}
 													{% ifnotequal value.count 0 %}
-														<table border="1" frame="vsides" rules="cols">
+														<table border="1">
 															<tr valign="top">
 																{% for vm in value %}
-																	<td>
-																		<a href="/admin/cedainfoapp/host/{{vm.id}}"  title="virtual server: {{vm}}"><img src="/static/images/set_virtual_server.png" width="69" height="34" border="0" alt="{{vm}}"><br>{{vm}}</a>
+																	<td width="200px">
+																		<span class="cell_small"><a href="/admin/cedainfoapp/host/{{vm.id}}"  title="virtual server: {{vm}}"><img src="/static/images/set_virtual_server.png" width="69" height="34" border="0" alt="{{vm}}"><br>{{vm}}</a></span>
 																		<!-- Services belonging to this host -->
 																		{% for k,v in services_by_host.items %}
 																			{% ifequal k vm %}
@@ -78,8 +78,8 @@ Services by rack
 																						</tr> -->
 																					{% for s in v %}
 																						<tr>
-																							<td class="tiny">
-																								<a href="/admin/cedainfoapp/service/{{s.id}}" title="service: {{s}}"><img src="/static/images/led_green_ok.png" width="24" height="23" border="0" alt="{{s}}">{{s}}</a>
+																							<td>
+																								<span class="tiny"><a href="/admin/cedainfoapp/service/{{s.id}}" title="service: {{s}}"><img src="/static/images/service.png" border="0" alt="{{s}}">{{s}}</a></span>
 																								
 																							</td>
 																						</tr>

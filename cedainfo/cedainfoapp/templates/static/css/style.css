@@ -28,10 +28,14 @@ a:hover {
 .tiny {
 	font-size: 0.6em;
 }
-.small {
-	font-size: 0.6em;
+.cell_small {
+	font-size: 0.7em;
+	font-weight: bold;
 }
-.greybgd {
+.cell_normal {
+	font-size: 0.8em;
+	font-weight: bold;
+}.greybgd {
 	background-color:#dddddd;
 }
 .darkgreybgd {
