@@ -10,10 +10,15 @@ Edit data entity
     	    <h3>{{dataentity.dataentity_id}}</h3>
 	        {% if form %}
 	        <form method="POST" action="/dataentity/{{dataentity.id}}/">
-	        <table>
-            {{ form.as_table }}
+	        <table border="1">
+			{% for field in form %}
+				<tr>
+					<th>{{field.label_tag}}:</th>
+					<td>{{field.errors}}{{field}}{% if field.help_text %}<br><span class="help_text">{{field.help_text}}</span>{% endif %}</td>
+				</tr>
+			{% endfor %}
 	        </table>
-	        <input type="submit" value="Submit">
+			<input type="submit" value="Submit">
 	        </form>
 	        {% endif %}
 		{% else %}

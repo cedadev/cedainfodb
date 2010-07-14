@@ -32,6 +32,10 @@ a:hover {
 	font-size: 0.7em;
 	font-weight: bold;
 }
+.help_text {
+	font-size: 0.7em;
+	font-style: italic;
+}
 .cell_normal {
 	font-size: 0.8em;
 	font-weight: bold;

@@ -69,7 +69,7 @@ class CurationCategory(models.Model):
     category = models.CharField(max_length=5)
     description = models.CharField(max_length=1024)
     def __unicode__(self):
-        return self.category
+        return "%s : %s" % (self.category, self.description) 
 
 class BackupPolicy(models.Model):
     tool = models.CharField(max_length=45)
@@ -77,31 +77,39 @@ class BackupPolicy(models.Model):
     type = models.CharField(max_length=45)
     policy_version = models.IntegerField()
     def __unicode__(self):
-        return self.tool
+        return "%s %s %s %s" % (self.tool, self.frequency, self.type, self.policy_version)
 
 class AccessStatus(models.Model):
     status = models.CharField(max_length=45)
     comment = models.CharField(max_length=1024)
     def __unicode__(self):
-        return self.status
+        return "%s : %s" % (self.status, self.comment)
+
+class Person(models.Model):
+    name = models.CharField(max_length=1024)
+    email = models.EmailField()
+    username = models.CharField(max_length=45)
+    def __unicode__(self):
+        return self.name
 
 class DataEntity(models.Model):
-    dataentity_id = models.CharField(max_length=255, unique=True)
+    dataentity_id = models.CharField(help_text="MOLES data entity id", max_length=255, unique=True)
     friendly_name = models.CharField(max_length=1024, blank=True)
     symbolic_name = models.CharField(max_length=1024, blank=True)
     logical_path = models.CharField(max_length=1024, blank=True)
-    monthly_growth = BigIntegerField(null=True, blank=True) # monthly growth in bytes
-    still_expected = BigIntegerField(null=True, blank=True) # Additional data still expected (as yet uningested) in bytes
-    curation_category = models.ForeignKey(CurationCategory, null=True, blank=True)
+    monthly_growth = BigIntegerField(null=True, blank=True, help_text="Monthly growth in bytes") # monthly growth in bytes
+    still_expected = BigIntegerField(null=True, blank=True, help_text="Additional data still expected (as yet uningested) in bytes") # Additional data still expected (as yet uningested) in bytes
+    curation_category = models.ForeignKey(CurationCategory, null=True, blank=True, help_text="Curation catagory : choose from list")
     notes = models.TextField(blank=True)
-    availability_priority = models.BooleanField(default=False)
-    availability_failover = models.BooleanField(default=False)
-    backup_destination = models.CharField(max_length=1024, blank=True)
-    current_backup_policy = models.ForeignKey(BackupPolicy, null=True, blank=True)
+    availability_priority = models.BooleanField(default=False, help_text="Priority dataset : use highest spec hardware")
+    availability_failover = models.BooleanField(default=False, help_text="Whether or not this dataset requires redundant copies for rapid failover (different from recovery from backup)")
+    backup_destination = models.CharField(max_length=1024, blank=True, help_text="Path made up of e.g. dmf:/path_within_dmf, rsync:/path_to_nas_box, tape:/tape_number")
+    current_backup_policy = models.ForeignKey(BackupPolicy, null=True, blank=True, help_text="Current policy which is intended to be applied to this dataset (look in backup log for record of what actually got applied)")
     recipes_expression = models.CharField(max_length=1024, blank=True)
-    recipes_explanation = models.TextField(blank=True)
-    access_status = models.ForeignKey(AccessStatus)
-    db_match = models.IntegerField(null=True, blank=True) # id match to "dataset" in old storage db
+    recipes_explanation = models.TextField(blank=True, help_text="Verbal explanation of registration process. Can be HTML snippet. To be used in dataset index to explain to user steps required to gain access to dataset.")
+    access_status = models.ForeignKey(AccessStatus, help_text="Security applied to dataset")
+    db_match = models.IntegerField(null=True, blank=True, help_text="Admin use only : please ignore") # id match to "dataset" in old storage db
+    contact = models.ForeignKey(Person, blank=True, null=True, help_text="CEDA person acting as contact for this dataset")
     def __unicode__(self):
         return '%s (%s)' % (self.dataentity_id, self.symbolic_name)
 
@@ -132,26 +140,6 @@ class TopLevelDir(models.Model):
         #    expansion_label = 'primary'
         #return '%s|%s|%s' % (self.dataentity.symbolic_name, expansion_label, self.mounted_location )
         return '%s' % (self.mounted_location )
-
-class Role(models.Model):
-    role = models.CharField(max_length=45)
-    comment = models.TextField(blank=True)
-    def __unicode__(self):
-        return self.role
-
-class Person(models.Model):
-    name = models.CharField(max_length=1024)
-    email = models.EmailField()
-    username = models.CharField(max_length=45)
-    def __unicode__(self):
-        return self.name
-
-class DataEntityContact(models.Model):
-    role = models.ForeignKey(Role)
-    person = models.ForeignKey(Person)
-    data_entity = models.ForeignKey(DataEntity)
-    def __unicode__(self):
-        return '%s|%s|%s' % (self.role, self.person, self.data_entity)
 
 class Allocation(models.Model):
     # allocation of a topleveldir (for a primary or expansion dir) to a partition
