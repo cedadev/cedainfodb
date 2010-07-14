@@ -39,8 +39,8 @@ admin.site.register(Rack, RackAdmin)
 
 # customise the DataEntity admin interface
 class DataEntityAdmin(admin.ModelAdmin):
-    list_display = ('dataentity_id','symbolic_name','curation_category','access_status',)
-    list_filter = ('curation_category','access_status','availability_priority','availability_failover','contact')
-    ordering = ('dataentity_id','symbolic_name','logical_path','curation_category','access_status',)
+    list_display = ('dataentity_id','symbolic_name','responsible_officer','last_reviewed','recipes_expression',)
+    list_filter = ('curation_category','responsible_officer','last_reviewed','access_status','availability_priority','availability_failover',)
+    ordering = ('dataentity_id','symbolic_name','responsible_officer','last_reviewed')
     search_fields = ['dataentity_id','symbolic_name',]
 admin.site.register(DataEntity, DataEntityAdmin)

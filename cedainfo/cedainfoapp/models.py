@@ -105,11 +105,12 @@ class DataEntity(models.Model):
     availability_failover = models.BooleanField(default=False, help_text="Whether or not this dataset requires redundant copies for rapid failover (different from recovery from backup)")
     backup_destination = models.CharField(max_length=1024, blank=True, help_text="Path made up of e.g. dmf:/path_within_dmf, rsync:/path_to_nas_box, tape:/tape_number")
     current_backup_policy = models.ForeignKey(BackupPolicy, null=True, blank=True, help_text="Current policy which is intended to be applied to this dataset (look in backup log for record of what actually got applied)")
+    access_status = models.ForeignKey(AccessStatus, help_text="Security applied to dataset")
     recipes_expression = models.CharField(max_length=1024, blank=True)
     recipes_explanation = models.TextField(blank=True, help_text="Verbal explanation of registration process. Can be HTML snippet. To be used in dataset index to explain to user steps required to gain access to dataset.")
-    access_status = models.ForeignKey(AccessStatus, help_text="Security applied to dataset")
     db_match = models.IntegerField(null=True, blank=True, help_text="Admin use only : please ignore") # id match to "dataset" in old storage db
-    contact = models.ForeignKey(Person, blank=True, null=True, help_text="CEDA person acting as contact for this dataset")
+    responsible_officer = models.ForeignKey(Person, blank=True, null=True, help_text="CEDA person acting as contact for this dataset")
+    last_reviewed = models.DateField(null=True, blank=True, help_text="Date of last dataset review")
     def __unicode__(self):
         return '%s (%s)' % (self.dataentity_id, self.symbolic_name)
 
