@@ -5,14 +5,17 @@ DataEntity list
 {% endblock %}
 
 {% block content %}
-    <h2>DataEntity list</h2>
-	<table border="1">
+    <h2>DataEntity list </h2>
+<p>View list in <a href="/admin/cedainfoapp/dataentity/">admin interface</a></p>
+
+<table border="1">
 	    <tr>
 		<th>Id</th>
-		<th>Symbolic name</th>
+		<th>Symbolic name (Friendly name)</th>
 		<th>Responsible Officer</th>
 		<th>Registration info</th>
 		<th>Last reviewed</th>
+		<th>Admin</th>
         </tr>
 	    {% for de in dataentity_list %}
 		    <tr>
@@ -21,6 +24,7 @@ DataEntity list
 	    	    <td>{{de.responsible_officer}}</td>
 	    	    <td>{{de.recipes_expression}}</td>
 	    	    <td>{{de.last_reviewed}}</td>
+	    	    <td><a href="/admin/cedainfoapp/dataentity/{{de.id}}">{{de.id}}</a></td>
 			</tr>
         {% endfor %}
 	</table>
