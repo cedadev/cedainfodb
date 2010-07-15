@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}
+DataEntity list
+{% endblock %}
+
+{% block content %}
+    <h2>DataEntity list</h2>
+	<table border="1">
+	    <tr>
+		<th>Id</th>
+		<th>Symbolic name</th>
+		<th>Responsible Officer</th>
+		<th>Registration info</th>
+		<th>Last reviewed</th>
+        </tr>
+	    {% for de in dataentity_list %}
+		    <tr>
+	    	    <td><a href="/dataentity/{{de.id}}">{{de.id}}</a></td>
+	    	    <td><a href="/dataentity/{{de.id}}">{{de.symbolic_name}} ({{de.friendly_name}})</a></td>
+	    	    <td>{{de.responsible_officer}}</td>
+	    	    <td>{{de.recipes_expression}}</td>
+	    	    <td>{{de.last_reviewed}}</td>
+			</tr>
+        {% endfor %}
+	</table>
+{% endblock %}

@@ -15,6 +15,11 @@ host_info =  {
     "template_object_name" : "host",
 }
 
+dataentity_info = {
+    "queryset": DataEntity.objects.all(),
+    "template_object_name" : "dataentity",
+}
+
 urlpatterns = patterns('',
     # Example:
     # (r'^cedainfo/', include('cedainfo.foo.urls')),
@@ -40,15 +45,13 @@ urlpatterns = patterns('',
     (r'^dataentity/search/$', dataentity_search),
     (r'^dataentity/find/(?P<dataentity_id>.*)$', dataentity_find),
     (r'^dataentity/add/(?P<dataentity_id>.*)$', dataentity_add),
-    # data entity with administrators
-    (r'^dataentitycontacts/(?P<dataentity_id>\d+)/$', dataentity_with_dataentity_contacts),
-    (r'^dataentitieswithcontacts/$', dataentities_with_dataentity_contacts),
+    # generic index view of all hosts
+    (r'^dataentity/index/$', list_detail.object_list, dataentity_info),
+
+
     (r'^rack/services/(?P<rack_id>\d+)$', services_by_rack),
 
-    # slots by rack (= 
-    #(r'^rack/(?P<rack_id>\d+)/$', slots_by_rack),
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root':settings.STATIC_DOC_ROOT,'show_indexes': True}),
-
 
     # userdb
     (r'^userdb/userstats/$', user_stats),
