@@ -15,7 +15,7 @@ class DataEntityForm(ModelForm):
     notes = CharField(widget=forms.Textarea(attrs={'cols':'60','rows':'10'}), required=False, help_text="(free text)")
     recipes_expression = CharField(label="Registration info", widget=forms.TextInput(attrs={'size':'60'}), required=False, help_text="URI to registration info e.g. http://neodc.nerc.ac.uk/dataset_info?datasetid=aatsr_multimission or multiple e.g. http://badc.nerc.ac.uk/dataset_info?datasetid=faam_core&datasetid=ecmwftrj. Leave blank if access_status = public")
     recipes_explanation = CharField(label="Registration info explanation", widget=forms.Textarea(attrs={'cols':'60','rows':'10'}), required=False, help_text="Text explanation of registration requirements if complex.")
-    last_reviewed = DateField(widget=SelectDateWidget(), label="Date of last dataset review") # TODO find how to use some date time widget e.g. django.contrib.admin.widgets.AdminSplitDateTime. See http://faces.eti.br/2009/02/18/fixing-date-input-in-django/
+    last_reviewed = DateField(widget=SelectDateWidget(), help_text="Date of last dataset review") # TODO find how to use some date time widget e.g. django.contrib.admin.widgets.AdminSplitDateTime. See http://faces.eti.br/2009/02/18/fixing-date-input-in-django/
     class Meta:
         model = DataEntity
         exclude = ('db_match') # admin use only
