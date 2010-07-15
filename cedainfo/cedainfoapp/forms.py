@@ -2,6 +2,7 @@ from django.forms import *
 from cedainfo.cedainfoapp.models import *
 from django.contrib.admin import widgets
 from cedainfo.cedainfoapp.custom_widgets import TinyMCE
+from django.forms.extras.widgets import SelectDateWidget
 
 class DataEntityForm(ModelForm):
     # customise the form a bit
