@@ -4,8 +4,11 @@
 Edit data entity
 {% endblock %}
 
+{% block header %}
+<h2>Edit data entity</h2>
+{% endblock %}
+
 {% block content %}
-	    <h2>Edit data entity</h2>
 		{% if dataentity %}
     	    <h3>{{dataentity.dataentity_id}}</h3>
 	        {% if form %}

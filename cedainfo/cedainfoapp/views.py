@@ -15,13 +15,19 @@ import datetime
 
 # host_list view: optionally includes subsetting (e.g. in_pool or not yet retired)
 def host_list(request, subset=None):
+    o = request.GET.get('o', 'id') # default order is ascending id
     # define the queryset, using the subset if available
     if (subset == 'active'):
-	    hosts = Host.objects.filter(retired_on=None)
+	    qs = Host.objects.filter(retired_on=None).order_by(o)
     else:
-        hosts = Host.objects.all()
-    return render_to_response('cedainfoapp/host_list.html', {'host_list': hosts, 'subset': subset}, )
-
+        qs = Host.objects.all().order_by(o)
+    # Use the object_list view.
+    return list_detail.object_list(
+        request,
+        queryset = qs,
+        template_name = "cedainfoapp/host_list.html",
+        template_object_name = "host",
+    )    
 
 # host_detail view: includes details of host, plus services and history entries for that host
 def host_detail(request, host_id):
@@ -136,4 +142,8 @@ def services_by_rack(request, rack_id):
             services_by_host[vm] = Service.objects.filter(host=vm)
 
     return render_to_response('cedainfoapp/services_view.html', {'rack': rack, 'all_racks': all_racks, 'hosts': hosts, 'services_by_host': services_by_host, 'vms_by_hypervisor': vms_by_hypervisor} )
+
+def home(request):
+    # Home page view
+    return render_to_response('cedainfoapp/home.html', )
     

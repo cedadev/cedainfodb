@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}
+CEDA Information Database
+{% endblock %}
+
+{% block header %}
+<h2>Welcome to the CEDA Information Database</h2>
+{% endblock %}
+
+{% block content %}
+	<p>Available views:</p>
+	<ul>
+		<li>Data Entities
+			<ul>
+				<li><a href="/dataentity/index">List of all data entities</a></li>
+				<li><a href="/dataentity/search">search</a></li>
+				<li><a href="/dataentity/add">add a new data entity</a></li>
+			</ul>
+		</li>
+		<li>Hosts
+			<ul>
+				<li><a href="/hosts/">List of all hosts</a></li>
+				<li><a href="/hosts/active">List of all active hosts</a></li>
+			</ul>
+		</li>
+		<li>Racks / Servers / Services
+			<ul>
+				<li><a href="/rack/services/1">Services</a></li>
+			</ul>
+		</li>
+		<li><a href="/admin">Admin Interface</a></li>
+	</ul>
+{% endblock %}

@@ -10,16 +10,6 @@ from userdb.models import *
 from django.contrib import admin
 admin.autodiscover()
   
-host_info =  {
-    "queryset" : Host.objects.all(),
-    "template_object_name" : "host",
-}
-
-dataentity_info = {
-    "queryset": DataEntity.objects.all(),
-    "template_object_name" : "dataentity",
-}
-
 urlpatterns = patterns('',
     # Example:
     # (r'^cedainfo/', include('cedainfo.foo.urls')),
@@ -32,9 +22,11 @@ urlpatterns = patterns('',
     (r'^admin/(.*)', admin.site.root),
 
     # views
+    # home page
+    (r'^$', home),
     #  - hosts
     #   - list view of all hosts
-    (r'^hosts/$', list_detail.object_list, host_info),
+    (r'^hosts/$', host_list),
     #   - list view of hosts subsetted (e.g. in_pool, not_retired)
     (r'^hosts/(?P<subset>\w+)$', host_list),
     #   - detail view of 1 host, by id
@@ -46,7 +38,8 @@ urlpatterns = patterns('',
     (r'^dataentity/find/(?P<dataentity_id>.*)$', dataentity_find),
     (r'^dataentity/add/(?P<dataentity_id>.*)$', dataentity_add),
     # generic index view of all hosts
-    (r'^dataentity/index/$', list_detail.object_list, dataentity_info),
+    #(r'^dataentity/index/$', list_detail.object_list, dataentity_info),
+    (r'^dataentity/index/$', dataentity_list),
 
 
     (r'^rack/services/(?P<rack_id>\d+)$', services_by_rack),

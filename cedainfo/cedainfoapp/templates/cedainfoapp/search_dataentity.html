@@ -4,8 +4,11 @@
 DataEntity search
 {% endblock %}
 
+{% block header %}
+<h2>DataEntity search</h2>
+{% endblock %}
+
 {% block content %}
-<h1>DataEntity search</h1>
 		<form action=".">
 		    <label for="q">Search: </label>
 			<input type="text" name="q" value="{{ query }}">
