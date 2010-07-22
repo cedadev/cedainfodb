@@ -101,30 +101,16 @@ def dataentity_add(request, dataentity_id):
         form = DataEntityForm(instance=dataentity)
     return render_to_response('cedainfoapp/edit_dataentity.html', {'dataentity': dataentity, 'form': form} )
 
-# Dan's pre-made database views, recreated here...
-
-# original name : datasets_with_responsible_names
-# New model has DataEntity, Person, Role and DataEntityContact
-# ... Need to list each combination of [person & role] associated with a data entity
-def dataentity_with_dataentity_contacts(request, dataentity_id):
-    # find this data entity
-    dataentity = DataEntity.objects.get(pk=dataentity_id)
-    # find the list of data entity contact intances for this data entity
-    # for each of these, we should be able to find the person and role
-    dataentity_contacts = DataEntityContact.objects.filter(data_entity=dataentity_id)
-    return render_to_response('cedainfoapp/dataentity_with_dataentity_contacts.html', {'dataentity': dataentity, 'dataentity_contacts': dataentity_contacts, })
-
-def dataentities_with_dataentity_contacts(request):
-    # find all dataentities
-    dataentities = DataEntity.objects.all()
-    # for each dataentity, find the list of data entity administrator intances for this data entity
-    dataentity_list = []
-    for dataentity in dataentities:
-	# for each of these, append an additional attribute which is a queryset representing the deas for this de
-	dataentity.deas = DataEntityContact.objects.filter(data_entity=dataentity.dataentity_id)
-	dataentity_list.append(dataentity)
-		
-    return render_to_response('cedainfoapp/dataentities_with_dataentity_contacts.html', {'dataentities': dataentity_list} )
+def dataentity_list(request):
+    o = request.GET.get('o', 'id') # default order is ascending id
+    qs = DataEntity.objects.order_by(o)
+    # Use the object_list view.
+    return list_detail.object_list(
+        request,
+        queryset = qs,
+        template_name = "cedainfoapp/dataentity_list.html",
+        template_object_name = "dataentity",
+    )    
 
 def services_by_rack(request, rack_id):
     # show a rack, show hosts within rack, show virtual hosts within hypervisor hosts, services within hosts ...sort of deployment diagram
