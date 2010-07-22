@@ -2,7 +2,6 @@ from django.contrib import admin
 from cedainfo.cedainfoapp.models import *
 
 admin.site.register(Partition)
-admin.site.register(TopLevelDir)
 admin.site.register(CurationCategory)
 admin.site.register(BackupPolicy)
 admin.site.register(AccessStatus)
@@ -44,3 +43,7 @@ class DataEntityAdmin(admin.ModelAdmin):
     ordering = ('dataentity_id','symbolic_name','responsible_officer','last_reviewed')
     search_fields = ['dataentity_id','symbolic_name',]
 admin.site.register(DataEntity, DataEntityAdmin)
+
+class TopLevelDirAdmin(admin.ModelAdmin):
+    list_display = ('mounted_location','partition','dataentity')
+admin.site.register(TopLevelDir, TopLevelDirAdmin)
