@@ -19,6 +19,7 @@ DataEntity list
 		<th><a href="?o=recipes_expression">Registration info</a></th>
 		<th><a href="?o=-last_reviewed">Last reviewed</a></th>
 		<th>Admin</th>
+		<th><a href="?o=-dataentity_id">dataentity_id</a></th>
         </tr>
 	    {% for de in dataentity_list %}
 		    <tr>
@@ -28,6 +29,7 @@ DataEntity list
 	    	    <td>{{de.recipes_expression}}</td>
 	    	    <td>{{de.last_reviewed}}</td>
 	    	    <td><a href="/admin/cedainfoapp/dataentity/{{de.id}}">{{de.id}}</a></td>
+	    	    <td>{{de.dataentity_id}}</td>
 			</tr>
         {% endfor %}
 	</table>
