@@ -97,15 +97,18 @@ def dataentity_detail_form(request, id):
 
 # Add a new dataentity
 def dataentity_add(request, dataentity_id):
-    dataentity = DataEntity(dataentity_id=dataentity_id, access_status=AccessStatus.objects.get(pk=2) ) # TODO : add defaults / dummy values...
-    dataentity.save()
-    if request.method == 'POST':
-        form = DataEntityForm(request.POST, instance=dataentity)
-        if form.is_valid():
-	    form.save()
-    else:
-        form = DataEntityForm(instance=dataentity)
-    return render_to_response('cedainfoapp/edit_dataentity.html', {'dataentity': dataentity, 'form': form} )
+    if (dataentity_id==''):
+       message="Unable to create dataentity with blank dataentity_id. Add a string to the end of the URL representing the id, e.g. .../dataentity/add/newid"
+       return render_to_response('error.html',{'message':message})
+    else:  
+        dataentity = DataEntity(dataentity_id=dataentity_id, access_status=AccessStatus.objects.get(pk=2) ) # TODO : add defaults / dummy values...
+        if request.method == 'POST':
+            form = DataEntityForm(request.POST, instance=dataentity)
+            if form.is_valid():
+                form.save()
+        else:
+            form = DataEntityForm(instance=dataentity)
+        return render_to_response('cedainfoapp/edit_dataentity.html', {'dataentity': dataentity, 'form': form} )
 
 def dataentity_list(request):
     o = request.GET.get('o', 'id') # default order is ascending id
