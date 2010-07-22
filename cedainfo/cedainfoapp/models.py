@@ -115,6 +115,10 @@ class DataEntity(models.Model):
         return '%s (%s)' % (self.dataentity_id, self.symbolic_name)
 
 class TopLevelDir(models.Model):
+    # In the normal case, a dataentity is smaller than a partition, therefore there is a one-to-one mapping of dataentity to partition.
+    # In cases where the size of a dataentity exceeds 1 partition ....
+    #   - Need to record Allocations of additional partitions to be expansion partitions for given dataentity
+    #   
     # top-level dir on a partition of a nas box, e.g. /disks/foo1/archive/<dataentity symbolic name>
     # expansion example would be /disks/foo1/archive/.<dataentity symbolic name>_expansion1
     partition = models.ForeignKey(Partition, null=True, blank=True) # allow to be temporarily null (until db built 1st time)
@@ -143,6 +147,8 @@ class TopLevelDir(models.Model):
         return '%s' % (self.mounted_location )
 
 class Allocation(models.Model):
+    # More to do with future allocation of dataentities to partitions via topleveldirs.
+
     # allocation of a topleveldir (for a primary or expansion dir) to a partition
     # example
     # "this particular topleveldir is to be moved to this parition via migration or be received there via ingest"
