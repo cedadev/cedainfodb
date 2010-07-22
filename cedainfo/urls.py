@@ -24,6 +24,7 @@ urlpatterns = patterns('',
     # views
     # home page
     (r'^$', home),
+    (r'^home/$', home),
     #  - hosts
     #   - list view of all hosts
     (r'^hosts/$', host_list),
