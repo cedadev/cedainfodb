@@ -1,5 +1,9 @@
 # Django settings for cedainfo project.
 
+import os
+# get the current working dir (used for relative location of template dirs)
+PROJECT_DIR = os.path.dirname(__file__)
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -67,14 +71,14 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'cedainfo.urls'
 
-STATIC_DOC_ROOT = "/cygdrive/d/dev/sandboxes/django-cedainfodb/cedainfo/cedainfoapp/templates/static"
+STATIC_DOC_ROOT = os.path.join(PROJECT_DIR,"cedainfoapp","templates","static")
 
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "/cygdrive/d/dev/sandboxes/django-cedainfodb/cedainfo/cedainfoapp/templates"
+    os.path.join(PROJECT_DIR,"cedainfoapp","templates"),
 )
 
 INSTALLED_APPS = (
