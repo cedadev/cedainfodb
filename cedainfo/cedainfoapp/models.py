@@ -66,16 +66,18 @@ class Partition(models.Model):
         return self.mountpoint
 
 class CurationCategory(models.Model):
+    '''Category indicating whether CEDA is the primary or secondary archive (or other status) for a dataset'''
     category = models.CharField(max_length=5)
     description = models.CharField(max_length=1024)
     def __unicode__(self):
         return "%s : %s" % (self.category, self.description) 
 
 class BackupPolicy(models.Model):
-    tool = models.CharField(max_length=45)
-    frequency = models.CharField(max_length=45)
-    type = models.CharField(max_length=45)
-    policy_version = models.IntegerField()
+    tool = models.CharField(max_length=45, help_text="DMF / rsync / tape")
+    destination = models.CharField(max_length=1024, blank=True, help_text="Path made up of e.g. dmf:/path_within_dmf, rsync:/path_to_nas_box, tape:/tape_number")
+    frequency = models.CharField(max_length=45, help_text="Daily, weekly, monthly...")
+    type = models.CharField(max_length=45, help_text="Full, incremental, versioned")
+    policy_version = models.IntegerField(help_text="Policy version number")
     def __unicode__(self):
         return "%s %s %s %s" % (self.tool, self.frequency, self.type, self.policy_version)
 
@@ -92,25 +94,47 @@ class Person(models.Model):
     def __unicode__(self):
         return self.name
 
+class FileSet(models.Model):
+    '''Non-overlapping subtree of archive directory hierarchy.
+    Collection of all filesets taken together should exactly represent 
+    all files in the archive. Must never span multiple filesystems.'''
+    logical_path = models.CharField(max_length=1024, blank=True, unique=True, help_text="Root directory of this fileset (used as unique identifier)")
+    monthly_growth = BigIntegerField(null=True, blank=True, help_text="Monthly growth in bytes (estimated by data scientist)") # monthly growth in bytes
+    still_expected = BigIntegerField(null=True, blank=True, help_text="Additional data still expected (as yet uningested) in bytes. Estimate from data scientist.") # Additional data still expected (as yet uningested) in bytes
+    notes = models.TextField(blank=True)
+    current_backup_policy = models.ForeignKey(BackupPolicy, null=True, blank=True, help_text="Current policy which is intended to be applied to this dataset (look in backup log for record of what actually got applied)")
+    def __unicode__(self):
+        return self.logical_path
+        
+
 class DataEntity(models.Model):
     dataentity_id = models.CharField(help_text="MOLES data entity id", max_length=255, unique=True)
     friendly_name = models.CharField(max_length=1024, blank=True)
     symbolic_name = models.CharField(max_length=1024, blank=True)
     logical_path = models.CharField(max_length=1024, blank=True)
-    monthly_growth = BigIntegerField(null=True, blank=True, help_text="Monthly growth in bytes") # monthly growth in bytes
-    still_expected = BigIntegerField(null=True, blank=True, help_text="Additional data still expected (as yet uningested) in bytes") # Additional data still expected (as yet uningested) in bytes
+    fileset = models.ManyToManyField(FileSet, null=True)
     curation_category = models.ForeignKey(CurationCategory, null=True, blank=True, help_text="Curation catagory : choose from list")
     notes = models.TextField(blank=True)
     availability_priority = models.BooleanField(default=False, help_text="Priority dataset : use highest spec hardware")
     availability_failover = models.BooleanField(default=False, help_text="Whether or not this dataset requires redundant copies for rapid failover (different from recovery from backup)")
-    backup_destination = models.CharField(max_length=1024, blank=True, help_text="Path made up of e.g. dmf:/path_within_dmf, rsync:/path_to_nas_box, tape:/tape_number")
-    current_backup_policy = models.ForeignKey(BackupPolicy, null=True, blank=True, help_text="Current policy which is intended to be applied to this dataset (look in backup log for record of what actually got applied)")
     access_status = models.ForeignKey(AccessStatus, help_text="Security applied to dataset")
     recipes_expression = models.CharField(max_length=1024, blank=True)
     recipes_explanation = models.TextField(blank=True, help_text="Verbal explanation of registration process. Can be HTML snippet. To be used in dataset index to explain to user steps required to gain access to dataset.")
     db_match = models.IntegerField(null=True, blank=True, help_text="Admin use only : please ignore") # id match to "dataset" in old storage db
     responsible_officer = models.ForeignKey(Person, blank=True, null=True, help_text="CEDA person acting as contact for this dataset")
     last_reviewed = models.DateField(null=True, blank=True, help_text="Date of last dataset review")
+    review_status = models.CharField(
+        max_length=50,
+        choices=(
+            ("to be reviewed","to be reviewed"),
+            ("in review","in review"),
+            ("reviewed but issues", "reviewed but issues"),
+            ("passed", "passed"),
+        ),
+        default="to be reviewed",
+        help_text="Remember to set date of next review if \"to be reviewed\""
+    )
+    next_review = models.DateField(null=True, blank=True, help_text="Date of next dataset review")
     def __unicode__(self):
         return '%s (%s)' % (self.dataentity_id, self.symbolic_name)
 
@@ -199,8 +223,8 @@ class HostHistory(models.Model):
     def __unicode__(self):
         return '%s|%s' % (self.host, self.date)
 
-class DataEntityBackupLog(models.Model):
-    data_entity = models.ForeignKey(DataEntity)
+class FileSetBackupLog(models.Model):
+    fileset = models.ForeignKey(FileSet)
     subdirectory = models.CharField(max_length=2048)
     backup_policy = models.ForeignKey(BackupPolicy)
     date = models.DateTimeField()
@@ -218,9 +242,9 @@ class ServiceBackupLog(models.Model):
     def __unicode__(self):
         return '%s|%s' % (self.service, self.date)  
     
-class DataEntitySizeMeasurement(models.Model):
-    # entry giving measured size of dataset on given date
-    dataentity = models.ForeignKey(DataEntity)
+class FileSetSizeMeasurement(models.Model):
+    # entry giving measured size of fileset on given date
+    dataentity = models.ForeignKey(FileSet)
     date = models.DateTimeField(default=datetime.now )
     size = BigIntegerField() # in bytes
 

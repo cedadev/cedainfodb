@@ -149,4 +149,15 @@ def services_by_rack(request, rack_id):
 def home(request):
     # Home page view
     return render_to_response('cedainfoapp/home.html', )
-    
+
+def fileset_list(request):
+    '''Barebones list of filesets'''
+    o = request.GET.get('o', 'id') # default order is ascending id
+    qs = FileSet.objects.order_by(o)
+    # Use the object_list view.
+    return list_detail.object_list(
+        request,
+        queryset = qs,
+        template_name = "cedainfoapp/fileset_list.html",
+        template_object_name = "fileset",
+    )
