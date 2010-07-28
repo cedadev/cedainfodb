@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}
+DataEntity/FileSet view
+{% endblock %}
+
+{% block header %}
+    <h2>DataEntity/FileSet list</h2>
+{% endblock %}
+
+{% block content %}
+
+<table border="1">
+		{% for key,value in de_dict.items %}
+	    <tr>
+			<td>DataEntity {{key.dataentity_id}}
+				<table border="1">
+					<tr>
+						<th>FileSets</th>
+					</tr>
+					{% for fs in value %}
+						<tr>
+							<td>{{fs}}
+							</td>
+						</tr>
+					{% endfor %}
+				</table>
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+{% endblock %}

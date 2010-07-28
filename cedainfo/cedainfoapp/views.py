@@ -161,3 +161,13 @@ def fileset_list(request):
         template_name = "cedainfoapp/fileset_list.html",
         template_object_name = "fileset",
     )
+
+def dataentity_fileset_view(request):
+    '''Complete list of dataentities and their component filesets'''
+    de_list = DataEntity.objects.all()
+    # build a dictionary of these de objects, containing their filesets
+    de_dict = dict()
+    for de in de_list:
+        fs_list = de.fileset.all()
+        de_dict[ de ] = fs_list
+    return render_to_response('cedainfoapp/dataentity_fileset_list.html', {'de_dict': de_dict} )

@@ -41,6 +41,8 @@ urlpatterns = patterns('',
     # generic index view of all hosts
     #(r'^dataentity/index/$', list_detail.object_list, dataentity_info),
     (r'^dataentity/index/$', dataentity_list),
+    (r'^dataentity/filesets/$', dataentity_fileset_view), # TODO there's probably a better url for this...
+    (r'^fileset/index/$', fileset_list),
 
 
     (r'^rack/services/(?P<rack_id>\d+)$', services_by_rack),
