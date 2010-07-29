@@ -18,12 +18,14 @@ class BigIntegerField(IntegerField):
 # Create your models here.
     
 class Rack(models.Model):
+    '''Physical rack in which physical servers are installed'''
     name = models.CharField(max_length=126)
     room = models.CharField(max_length=126)
     def __unicode__(self):
         return u'%s' % self.name
 
 class Host(models.Model):
+    '''An identifiable machine having a distinct IP address'''
     hostname = models.CharField(max_length=512)
     ip_addr = models.IPAddressField(blank=True)
     serial_no = models.CharField(max_length=126,blank=True)
@@ -53,7 +55,7 @@ class Host(models.Model):
         return u'%s' % self.hostname
 
 class Partition(models.Model):
-    # individual filesystem equipped with standard directory structure for archive storage
+    '''Filesystem equipped with standard directory structure for archive storage'''
     mountpoint = models.CharField(blank=True,max_length=1024)
     host = models.ForeignKey(Host, blank=True, null=True) # implies partition can only exist on StorageHost (not PhysicalHost or VirtualHost)
     used_bytes = BigIntegerField(null=True, blank=True) # "Used" in df-speak, i.e. no. of bytes used (mutable & constantly updated from df)
@@ -73,6 +75,7 @@ class CurationCategory(models.Model):
         return u"%s : %s" % (self.category, self.description) 
 
 class BackupPolicy(models.Model):
+    '''Backup policy'''
     tool = models.CharField(max_length=45, help_text="DMF / rsync / tape")
     destination = models.CharField(max_length=1024, blank=True, help_text="Path made up of e.g. dmf:/path_within_dmf, rsync:/path_to_nas_box, tape:/tape_number")
     frequency = models.CharField(max_length=45, help_text="Daily, weekly, monthly...")
@@ -82,12 +85,14 @@ class BackupPolicy(models.Model):
         return u"%s %s %s %s" % (self.tool, self.frequency, self.type, self.policy_version)
 
 class AccessStatus(models.Model):
+    '''Degree to which access to a DataEntity is restricted'''
     status = models.CharField(max_length=45)
     comment = models.CharField(max_length=1024)
     def __unicode__(self):
         return u"%s : %s" % (self.status, self.comment)
 
 class Person(models.Model):
+    '''Person with some role'''
     name = models.CharField(max_length=1024)
     email = models.EmailField()
     username = models.CharField(max_length=45)
@@ -108,6 +113,7 @@ class FileSet(models.Model):
         
 
 class DataEntity(models.Model):
+    '''Collection of FileSets treated together as a data set. Has corresponding MOLES DataEntity record.'''
     dataentity_id = models.CharField(help_text="MOLES data entity id", max_length=255, unique=True)
     friendly_name = models.CharField(max_length=1024, blank=True)
     symbolic_name = models.CharField(max_length=1024, blank=True)
@@ -187,6 +193,7 @@ class Allocation(models.Model):
         return u'%s|%s' % (self.top_level_dir, self.partition)
 
 class Service(models.Model):
+    '''Software-based service'''
     host = models.ManyToManyField(Host)
     name = models.CharField(max_length=512)
     description = models.TextField(blank=True)
@@ -216,6 +223,7 @@ class Service(models.Model):
         return u'%s' % self.name
 
 class HostHistory(models.Model):
+    '''Entries detailing history of changes to a Host'''
     host = models.ForeignKey(Host)
     date = models.DateField()
     history_desc = models.TextField()
@@ -224,6 +232,7 @@ class HostHistory(models.Model):
         return u'%s|%s' % (self.host, self.date)
 
 class FileSetBackupLog(models.Model):
+    '''Backup history for a FileSet'''
     fileset = models.ForeignKey(FileSet)
     subdirectory = models.CharField(max_length=2048)
     backup_policy = models.ForeignKey(BackupPolicy)
@@ -234,6 +243,7 @@ class FileSetBackupLog(models.Model):
         return u'%s|%s' % (self.data_entity, self.date)  
     
 class ServiceBackupLog(models.Model):
+    '''Backup history for a Service'''
     service = models.ForeignKey(Service)
     backup_policy = models.ForeignKey(BackupPolicy)
     date = models.DateTimeField()
@@ -243,7 +253,7 @@ class ServiceBackupLog(models.Model):
         return u'%s|%s' % (self.service, self.date)  
     
 class FileSetSizeMeasurement(models.Model):
-    # entry giving measured size of fileset on given date
+    '''Date-stampted size measurement of a FileSet'''
     fileset = models.ForeignKey(FileSet)
     date = models.DateTimeField(default=datetime.now )
     size = BigIntegerField() # in bytes
