@@ -21,7 +21,7 @@ class Rack(models.Model):
     name = models.CharField(max_length=126)
     room = models.CharField(max_length=126)
     def __unicode__(self):
-        return self.name
+        return u'%s' % self.name
 
 class Host(models.Model):
     hostname = models.CharField(max_length=512)
@@ -50,7 +50,7 @@ class Host(models.Model):
     rack = models.ForeignKey(Rack, blank=True, null=True)
     hypervisor = models.ForeignKey('self', blank=True, null=True)
     def __unicode__(self):
-        return self.hostname
+        return u'%s' % self.hostname
 
 class Partition(models.Model):
     # individual filesystem equipped with standard directory structure for archive storage
@@ -63,14 +63,14 @@ class Partition(models.Model):
     type = models.CharField(max_length=512, blank=True)
     last_checked = models.DateTimeField(null=True, blank=True)
     def __unicode__(self):
-        return self.mountpoint
+        return u'%s' % self.mountpoint
 
 class CurationCategory(models.Model):
     '''Category indicating whether CEDA is the primary or secondary archive (or other status) for a dataset'''
     category = models.CharField(max_length=5)
     description = models.CharField(max_length=1024)
     def __unicode__(self):
-        return "%s : %s" % (self.category, self.description) 
+        return u"%s : %s" % (self.category, self.description) 
 
 class BackupPolicy(models.Model):
     tool = models.CharField(max_length=45, help_text="DMF / rsync / tape")
@@ -79,20 +79,20 @@ class BackupPolicy(models.Model):
     type = models.CharField(max_length=45, help_text="Full, incremental, versioned")
     policy_version = models.IntegerField(help_text="Policy version number")
     def __unicode__(self):
-        return "%s %s %s %s" % (self.tool, self.frequency, self.type, self.policy_version)
+        return u"%s %s %s %s" % (self.tool, self.frequency, self.type, self.policy_version)
 
 class AccessStatus(models.Model):
     status = models.CharField(max_length=45)
     comment = models.CharField(max_length=1024)
     def __unicode__(self):
-        return "%s : %s" % (self.status, self.comment)
+        return u"%s : %s" % (self.status, self.comment)
 
 class Person(models.Model):
     name = models.CharField(max_length=1024)
     email = models.EmailField()
     username = models.CharField(max_length=45)
     def __unicode__(self):
-        return self.name
+        return u'%s' % self.name
 
 class FileSet(models.Model):
     '''Non-overlapping subtree of archive directory hierarchy.
@@ -104,7 +104,7 @@ class FileSet(models.Model):
     notes = models.TextField(blank=True)
     current_backup_policy = models.ForeignKey(BackupPolicy, null=True, blank=True, help_text="Current policy which is intended to be applied to this dataset (look in backup log for record of what actually got applied)")
     def __unicode__(self):
-        return self.logical_path
+        return u'%s' % self.logical_path
         
 
 class DataEntity(models.Model):
@@ -136,7 +136,7 @@ class DataEntity(models.Model):
     )
     next_review = models.DateField(null=True, blank=True, help_text="Date of next dataset review")
     def __unicode__(self):
-        return '%s (%s)' % (self.dataentity_id, self.symbolic_name)
+        return u'%s (%s)' % (self.dataentity_id, self.symbolic_name)
 
 class TopLevelDir(models.Model):
     # In the normal case, a dataentity is smaller than a partition, therefore there is a one-to-one mapping of dataentity to partition.
@@ -168,7 +168,7 @@ class TopLevelDir(models.Model):
         #else:
         #    expansion_label = 'primary'
         #return '%s|%s|%s' % (self.dataentity.symbolic_name, expansion_label, self.mounted_location )
-        return '%s' % (self.mounted_location )
+        return u'%s' % (self.mounted_location )
 
 class Allocation(models.Model):
     # More to do with future allocation of dataentities to partitions via topleveldirs.
@@ -184,7 +184,7 @@ class Allocation(models.Model):
     end_date = models.DateTimeField()
     notes = models.TextField(blank=True)
     def __unicode__(self):
-        return '%s|%s' % (self.top_level_dir, self.partition)
+        return u'%s|%s' % (self.top_level_dir, self.partition)
 
 class Service(models.Model):
     host = models.ManyToManyField(Host)
@@ -213,7 +213,7 @@ class Service(models.Model):
     installer = models.ForeignKey(Person, null=True, blank=True, related_name='service_installer')
     software_contact = models.ForeignKey(Person, null=True, blank=True, related_name='service_software_contact')
     def __unicode__(self):
-        return self.name
+        return u'%s' % self.name
 
 class HostHistory(models.Model):
     host = models.ForeignKey(Host)
@@ -221,7 +221,7 @@ class HostHistory(models.Model):
     history_desc = models.TextField()
     admin_contact = models.ForeignKey(Person)
     def __unicode__(self):
-        return '%s|%s' % (self.host, self.date)
+        return u'%s|%s' % (self.host, self.date)
 
 class FileSetBackupLog(models.Model):
     fileset = models.ForeignKey(FileSet)
@@ -231,7 +231,7 @@ class FileSetBackupLog(models.Model):
     success = models.BooleanField(default=False)
     comment = models.TextField(blank=True)
     def __unicode__(self):
-        return '%s|%s' % (self.data_entity, self.date)  
+        return u'%s|%s' % (self.data_entity, self.date)  
     
 class ServiceBackupLog(models.Model):
     service = models.ForeignKey(Service)
@@ -240,7 +240,7 @@ class ServiceBackupLog(models.Model):
     success = models.BooleanField(default=False)
     comment = models.TextField(blank=True)
     def __unicode__(self):
-        return '%s|%s' % (self.service, self.date)  
+        return u'%s|%s' % (self.service, self.date)  
     
 class FileSetSizeMeasurement(models.Model):
     # entry giving measured size of fileset on given date
