@@ -244,9 +244,12 @@ class ServiceBackupLog(models.Model):
     
 class FileSetSizeMeasurement(models.Model):
     # entry giving measured size of fileset on given date
-    dataentity = models.ForeignKey(FileSet)
+    fileset = models.ForeignKey(FileSet)
     date = models.DateTimeField(default=datetime.now )
     size = BigIntegerField() # in bytes
+    def __unicode__(self):
+        return u'%s|%s' % (self.date, self.fileset)
+        
 
 # Notes from Dan
 
