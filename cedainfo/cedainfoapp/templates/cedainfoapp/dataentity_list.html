@@ -18,6 +18,8 @@ DataEntity list
 		<th><a href="?o=responsible_officer">Responsible Officer</a></th>
 		<th><a href="?o=recipes_expression">Registration info</a></th>
 		<th><a href="?o=-last_reviewed">Last reviewed</a></th>
+		<th><a href="?o=next_review">Next review</a></th>
+		<th><a href="?o=review_status">Review status</a></th>
 		<th>Admin</th>
 		<th><a href="?o=-dataentity_id">dataentity_id</a></th>
         </tr>
@@ -28,6 +30,8 @@ DataEntity list
 	    	    <td>{{de.responsible_officer}}</td>
 	    	    <td>{{de.recipes_expression}}</td>
 	    	    <td>{{de.last_reviewed}}</td>
+	    	    <td>{{de.next_review}}</td>
+	    	    <td>{{de.review_status}}</td>
 	    	    <td><a href="/admin/cedainfoapp/dataentity/{{de.id}}">{{de.id}}</a></td>
 	    	    <td>{{de.dataentity_id}}</td>
 			</tr>

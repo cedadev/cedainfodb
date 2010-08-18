@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}
+FileSetCollection view
+{% endblock %}
+
+{% block header %}
+    <h2>FileSetCollection view</h2>
+{% endblock %}
+
+{% block content %}
+
+<table border="1">
+	    <tr>
+			<th><a href="?o=id">Id</a></th>
+			<th><a href="?o=label">Label</a></th>
+			<th>Primary</th>
+			</tr>
+	    {% for fs in fs_list %}
+		    <tr>
+	    	    <td><a href="/fileset/{{fs.id}}">{{fs.id}}</a></td>
+	    	    <td>{{fs.label}}</td>
+	    	    <td>{{fs.is_primary}}</td>
+			</tr>
+        {% endfor %}
+	</table>
+{% endblock %}

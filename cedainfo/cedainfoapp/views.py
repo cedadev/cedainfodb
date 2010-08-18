@@ -121,6 +121,17 @@ def dataentity_list(request):
         template_object_name = "dataentity",
     )    
 
+def dataentities_for_review(request):
+    o = request.GET.get('o', 'next_review') # default order is ascending next_review (date)
+    qs = DataEntity.objects.filter(review_status="to be reviewed").order_by(o)
+    # Use the object_list view.
+    return list_detail.object_list(
+        request,
+        queryset = qs,
+        template_name = "cedainfoapp/dataentity_list.html",
+        template_object_name = "dataentity",
+    )    
+
 def services_by_rack(request, rack_id):
     # show a rack, show hosts within rack, show virtual hosts within hypervisor hosts, services within hosts ...sort of deployment diagram
     # Create a data structure to hold hierarchical structure:
@@ -171,3 +182,10 @@ def dataentity_fileset_view(request):
         fs_list = de.fileset.all()
         de_dict[ de ] = fs_list
     return render_to_response('cedainfoapp/dataentity_fileset_list.html', {'de_dict': de_dict} )
+
+# Spec for view of FileSetCollection
+# Needs to show total storage requirements for a FileSetCollection, calculated with and without non-primary FileSet members.
+def filesetcollection_view(request, id):
+    fsc = FileSetCollection.objects.get(pk=id)
+    fs_list = fsc.fileset.all()
+    return render_to_response('cedainfoapp/filesetcollection_view.html', {'fsc': fsc, 'fs_list': fs_list} )

@@ -27,7 +27,7 @@ class Rack(models.Model):
 class Host(models.Model):
     '''An identifiable machine having a distinct IP address'''
     hostname = models.CharField(max_length=512)
-    ip_addr = models.IPAddressField(blank=True)
+    ip_addr = models.IPAddressField(blank=True) # TODO check if admin allows no ip_addr field (otherwise default='0.0.0.0')
     serial_no = models.CharField(max_length=126,blank=True)
     po_no = models.CharField(max_length=126,blank=True)
     organization = models.CharField(max_length=512,blank=True)
@@ -48,24 +48,39 @@ class Host(models.Model):
         default="server"
     )
     os = models.CharField(max_length=512, blank=True)
-    capacity = models.DecimalField(max_digits=6, decimal_places=2,null=True,blank=True) # just an estimate (cf Partition which uses bytes from df)
+    capacity = models.DecimalField(max_digits=6, decimal_places=2,null=True,blank=True, help_text="Rough estimate in Tb only") # just an estimate (cf Partition which uses bytes from df)
     rack = models.ForeignKey(Rack, blank=True, null=True)
-    hypervisor = models.ForeignKey('self', blank=True, null=True)
+    hypervisor = models.ForeignKey('self', blank=True, null=True, help_text="If host_type=virtual_server, give the name of the hypervisor which contains this one.")
     def __unicode__(self):
         return u'%s' % self.hostname
 
+class PartitionPool(models.Model):
+    '''Container for paritions that are grouped together, often associated with a particular FileSetCollection'''
+    purpose = models.CharField(
+        max_length=50, 
+        help_text="Single or general purpose partition pool",
+        choices=(
+            ("general","general"),
+            ("single","single"),
+        ),
+        default="general"
+       )
+    def __unicode__(self):
+        return u'%d : %s' % (self.id, self.purpose) 
+
 class Partition(models.Model):
     '''Filesystem equipped with standard directory structure for archive storage'''
-    mountpoint = models.CharField(blank=True,max_length=1024)
-    host = models.ForeignKey(Host, blank=True, null=True) # implies partition can only exist on StorageHost (not PhysicalHost or VirtualHost)
-    used_bytes = BigIntegerField(null=True, blank=True) # "Used" in df-speak, i.e. no. of bytes used (mutable & constantly updated from df)
-    capacity_bytes = BigIntegerField(null=True, blank=True) # "Size" in df-speak, i.e. physical size of partition
-    primary_use = models.TextField(blank=True)
-    special = models.CharField(max_length=1024,blank=True)
-    type = models.CharField(max_length=512, blank=True)
-    last_checked = models.DateTimeField(null=True, blank=True)
+    mountpoint = models.CharField(blank=True,max_length=1024, help_text="E.g. /disks/machineN", unique=True)
+    host = models.ForeignKey(Host, blank=True, null=True, help_text="Host on which this partition resides")
+    used_bytes = BigIntegerField(default=0, help_text="\"Used\" value from df, i.e. no. of bytes used. May be populated by script.")
+    capacity_bytes = BigIntegerField(default=0, help_text="\"Size\" value from df, i.e. no. of bytes total. May be populated by script.")
+    last_checked = models.DateTimeField(null=True, blank=True, help_text="Last time df was run against this partition & size values updated")
+    partition_pool = models.ForeignKey(PartitionPool, null=True, blank=True, help_text="Unique pool that this partition belongs to.")
+    expansion_no = models.IntegerField(help_text="0 for primary, 1 to N for expansion number", default=0)
     def __unicode__(self):
-        return u'%s' % self.mountpoint
+        tb_remaining = (self.capacity_bytes - self.used_bytes) / (1024**4)
+        return u'%s (%d %s)' % (self.mountpoint, tb_remaining, 'Tb free')
+    __unicode__.allow_tags = True
 
 class CurationCategory(models.Model):
     '''Category indicating whether CEDA is the primary or secondary archive (or other status) for a dataset'''
@@ -103,14 +118,39 @@ class FileSet(models.Model):
     '''Non-overlapping subtree of archive directory hierarchy.
     Collection of all filesets taken together should exactly represent 
     all files in the archive. Must never span multiple filesystems.'''
-    logical_path = models.CharField(max_length=1024, blank=True, unique=True, help_text="Root directory of this fileset (used as unique identifier)")
+    label = models.CharField(max_length=1024, blank=True, help_text="Arbitrary label for this FileSet")
+    current_size = BigIntegerField(default=0, help_text="Initial or current size, e.g. by using du on directory")
     monthly_growth = BigIntegerField(null=True, blank=True, help_text="Monthly growth in bytes (estimated by data scientist)") # monthly growth in bytes
     still_expected = BigIntegerField(null=True, blank=True, help_text="Additional data still expected (as yet uningested) in bytes. Estimate from data scientist.") # Additional data still expected (as yet uningested) in bytes
     notes = models.TextField(blank=True)
     current_backup_policy = models.ForeignKey(BackupPolicy, null=True, blank=True, help_text="Current policy which is intended to be applied to this dataset (look in backup log for record of what actually got applied)")
+    partition = models.ForeignKey(Partition, blank=True, null=True, help_text="Actual partition where this FileSet is physically stored")
     def __unicode__(self):
-        return u'%s' % self.logical_path
-        
+        return u'%s : %s' % (self.id, self.label)
+    # TODO custom save method (for when assigning a partition) : check that FileSet size
+
+class FileSetCollection(models.Model):
+    '''Group of fileSets handled together'''
+    fileset = models.ManyToManyField(FileSet, through='FileSetCollectionMembership')
+    logical_path = models.CharField(max_length=1024, help_text="Logical path to the root of this FileSetCollection. Omit trailing slash.")
+    partitionpool = models.ForeignKey(PartitionPool, help_text="PartitionPool to which this FileSetCollection is allocated. Must be provided if any of the FileSets in the FileSetCollection are primary.", null=True, blank=True)
+    # TODO : should really have monthly_growth / still_expected size estimates for files in the top level of the FileSetCollection (e.g. ancillary files), but for now will assume they are trivial in size (compared to FileSets)
+    def __unicode__(self):
+        return u'%d : %s' % (self.id, self.logical_path)
+
+class FileSetCollectionMembership(models.Model):
+    '''Documents the relationship of a fileSet with a FileSetCollection.
+       A FileSet's relationship with a FileSetCollection can be:
+        - primary : this is where the data are actually stored
+        - secondary : symlink to the physical instance of the FileSet (and e.g. would be skipped in backups)
+    '''
+    fileset = models.ForeignKey(FileSet)
+    fileset_collection = models.ForeignKey(FileSetCollection)
+    logical_path = models.CharField(max_length=1024, blank=True, help_text="Location, relative to the FileSetCollection root, of this FileSet (NB: not the directory in which this resides). Omit leading and trailing slash.")
+    is_primary = models.BooleanField(default='True', help_text="Whether or not the presence of this FileSet in this FileSetCollection represents where the FileSet is physically stored [True] (or whether it is just a symlink [False])")
+    def __unicode__(self):
+        return u'%s' % (self.logical_path)
+    #TODO Need a custom save method where to impose uniqueness constraint : a given FileSet can only have ONE FileSetCollectionMembership that is primary (i.e. can only be stored physically in one place).       
 
 class DataEntity(models.Model):
     '''Collection of FileSets treated together as a data set. Has corresponding MOLES DataEntity record.'''
@@ -143,54 +183,6 @@ class DataEntity(models.Model):
     next_review = models.DateField(null=True, blank=True, help_text="Date of next dataset review")
     def __unicode__(self):
         return u'%s (%s)' % (self.dataentity_id, self.symbolic_name)
-
-class TopLevelDir(models.Model):
-    # In the normal case, a dataentity is smaller than a partition, therefore there is a one-to-one mapping of dataentity to partition.
-    # In cases where the size of a dataentity exceeds 1 partition ....
-    #   - Need to record Allocations of additional partitions to be expansion partitions for given dataentity
-    #   
-    # top-level dir on a partition of a nas box, e.g. /disks/foo1/archive/<dataentity symbolic name>
-    # expansion example would be /disks/foo1/archive/.<dataentity symbolic name>_expansion1
-    partition = models.ForeignKey(Partition, null=True, blank=True) # allow to be temporarily null (until db built 1st time)
-    mounted_location = models.CharField(max_length=1024)
-    badc_symlink_name = models.CharField(max_length=1024, blank=True)
-    neodc_symlink_name = models.CharField(max_length=1024,blank=True)
-    dataentity = models.ForeignKey(DataEntity, null=True, blank=True)
-    expansion_no = models.IntegerField(null=True, blank=True) # convention: 0 (or null) if this is the only topleveldir. 1,2,3, otherwise
-    dataset_type = models.CharField(max_length=512,blank=True)
-    notes = models.TextField(blank=True)
-    size = BigIntegerField(null=True,blank=True) # 
-    no_files = BigIntegerField(null=True,blank=True)
-    last_modified = models.DateTimeField(null=True,blank=True)
-    status_last_checked = models.DateTimeField(null=True,blank=True)
-    special = models.CharField(max_length=1024,blank=True)
-    def __unicode__(self):
-        #if (self.dataentity.symbolic_name != None):
-        #    symbolic_label = self.dataentity.symbolic_name
-        #else:
-        #    symbolic_label = ''
-        #if (self.expansion_no != 0) and (self.expansion_no != None):
-        #    expansion_label = 'expansion_%d' % expansion_no
-        #else:
-        #    expansion_label = 'primary'
-        #return '%s|%s|%s' % (self.dataentity.symbolic_name, expansion_label, self.mounted_location )
-        return u'%s' % (self.mounted_location )
-
-class Allocation(models.Model):
-    # More to do with future allocation of dataentities to partitions via topleveldirs.
-
-    # allocation of a topleveldir (for a primary or expansion dir) to a partition
-    # example
-    # "this particular topleveldir is to be moved to this parition via migration or be received there via ingest"
-    # The same topleveldir can have multiple entries in this table because of migrations, i.e. can be scheduled to move to another partition on a given date
-    top_level_dir = models.ForeignKey(TopLevelDir)
-    partition = models.ForeignKey(Partition)
-    allocated_space = BigIntegerField() # maximum over the entire period that this allocation represents
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
-    notes = models.TextField(blank=True)
-    def __unicode__(self):
-        return u'%s|%s' % (self.top_level_dir, self.partition)
 
 class Service(models.Model):
     '''Software-based service'''
@@ -259,8 +251,21 @@ class FileSetSizeMeasurement(models.Model):
     size = BigIntegerField() # in bytes
     def __unicode__(self):
         return u'%s|%s' % (self.date, self.fileset)
-        
 
+class FileSetAllocationPlan(models.Model):
+    '''Future plan of allocation of a particular FileSet to a Partition
+    Most common use case = migrating between partitions, e.g. if one partition has run
+    out of space for a given fileset.
+    '''
+    fileset = models.ForeignKey(FileSet, help_text="FileSet to allocate to a Parition")
+    partition = models.ForeignKey(Partition, help_text="Proposed Partition for allocation")
+    allocated_space = BigIntegerField(help_text="Estimate of volume required (bytes)") # maximum over the entire period that this allocation represents
+    start_date = models.DateTimeField(help_text="Proposed start date for this allocation. SHould be after Host.arrival_date for that partition")
+    end_date = models.DateTimeField(help_text="Proposed end date for this allocation. Should be before Host.planned_end_of_life for that partition")
+    notes = models.TextField(blank=True)
+    def __unicode__(self):
+        return u'%s|%s' % (self.fileset, self.partition)
+        
 # Notes from Dan
 
 # Allocations:

@@ -1,18 +1,20 @@
 from django.contrib import admin
 from cedainfo.cedainfoapp.models import *
 
-admin.site.register(Partition)
 admin.site.register(CurationCategory)
 admin.site.register(BackupPolicy)
 admin.site.register(AccessStatus)
 admin.site.register(Person)
 admin.site.register(FileSetSizeMeasurement)
-admin.site.register(Allocation)
 admin.site.register(Service)
 admin.site.register(HostHistory)
 admin.site.register(FileSet)
+admin.site.register(FileSetCollection)
+admin.site.register(FileSetCollectionMembership)
+admin.site.register(PartitionPool)
 admin.site.register(FileSetBackupLog)
 admin.site.register(ServiceBackupLog)
+admin.site.register(FileSetAllocationPlan)
 
 # customise the Host admin interface
 class HostAdmin(admin.ModelAdmin):
@@ -45,6 +47,6 @@ class DataEntityAdmin(admin.ModelAdmin):
     search_fields = ['dataentity_id','symbolic_name',]
 admin.site.register(DataEntity, DataEntityAdmin)
 
-class TopLevelDirAdmin(admin.ModelAdmin):
-    list_display = ('mounted_location','partition','dataentity')
-admin.site.register(TopLevelDir, TopLevelDirAdmin)
+class PartitionAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__','mountpoint','host','partition_pool',)
+admin.site.register(Partition, PartitionAdmin)

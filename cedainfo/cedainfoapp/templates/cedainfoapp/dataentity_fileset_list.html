@@ -13,15 +13,25 @@ DataEntity/FileSet view
 <table border="1">
 		{% for key,value in de_dict.items %}
 	    <tr>
-			<td>DataEntity {{key.dataentity_id}}
+			<td>DataEntity {{key.symbolic_name}} {{key.contact}}, {{key.curation_category}}
 				<table border="1">
 					<tr>
-						<th>FileSets</th>
+						<th colspan="5">FileSets</th>
+					</tr>
+					<tr>
+						<th>Logical path</th>
+						<th>Est. monthly growth</th>
+						<th>Est. still expected</th>
+						<th>Measured size</th>
+						<th>Measured growth</th>
 					</tr>
 					{% for fs in value %}
 						<tr>
-							<td>{{fs}}
-							</td>
+							<td>{{fs.logical_path}}</td>
+							<td>{{fs.monthly_growth}}</td>
+							<td>{{fs.still_expected}} </td>
+							<td>date: size</td>
+							<td>growth/month</td>
 						</tr>
 					{% endfor %}
 				</table>
