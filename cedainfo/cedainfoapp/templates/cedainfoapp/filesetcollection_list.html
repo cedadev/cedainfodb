@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}
+FileSetCollection list
+{% endblock %}
+
+{% block header %}
+    <h2>FileSetCollection list </h2>
+{% endblock %}
+
+{% block content %}
+<p>View list in <a href="/admin/cedainfoapp/filesetcollection/">admin interface</a></p>
+
+<table border="1">
+	    <tr>
+			<th><a href="?o=id">FileSetCollection</a></th>
+        </tr>
+	    {% for fsc in filesetcollection_list %}
+		    <tr>
+	    	    <td><a href="/filesetcollection/{{fsc.id}}">{{fsc}}</a></td>
+			</tr>
+        {% endfor %}
+	</table>
+{% endblock %}

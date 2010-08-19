@@ -8,8 +8,6 @@ admin.site.register(Person)
 admin.site.register(FileSetSizeMeasurement)
 admin.site.register(Service)
 admin.site.register(HostHistory)
-admin.site.register(FileSet)
-admin.site.register(FileSetCollection)
 admin.site.register(FileSetCollectionMembership)
 admin.site.register(PartitionPool)
 admin.site.register(FileSetBackupLog)
@@ -50,3 +48,16 @@ admin.site.register(DataEntity, DataEntityAdmin)
 class PartitionAdmin(admin.ModelAdmin):
     list_display = ('__unicode__','mountpoint','host','partition_pool',)
 admin.site.register(Partition, PartitionAdmin)
+
+# Create an inline form to manage FileSetCollection memberships (to be used in FileSetCollection & FileSet Admins)
+class FileSetCollectionMembershipInline(admin.TabularInline):
+    model = FileSetCollectionMembership
+    extra = 1
+
+class FileSetCollectionAdmin(admin.ModelAdmin):
+    inlines = (FileSetCollectionMembershipInline,)
+admin.site.register(FileSetCollection,FileSetCollectionAdmin)
+
+class FileSetAdmin(admin.ModelAdmin):
+    inlines = (FileSetCollectionMembershipInline,)
+admin.site.register(FileSet,FileSetAdmin)

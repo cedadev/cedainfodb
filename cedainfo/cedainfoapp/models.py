@@ -80,7 +80,7 @@ class Partition(models.Model):
     def __unicode__(self):
         tb_remaining = (self.capacity_bytes - self.used_bytes) / (1024**4)
         return u'%s (%d %s)' % (self.mountpoint, tb_remaining, 'Tb free')
-    __unicode__.allow_tags = True
+    __unicode__.allow_tags = True # seem to need this in order to use __unicode__ as one of the fields in list_display in the admin view (see http://docs.djangoproject.com/en/dev/ref/contrib/admin/#django.contrib.admin.ModelAdmin.list_display)
 
 class CurationCategory(models.Model):
     '''Category indicating whether CEDA is the primary or secondary archive (or other status) for a dataset'''

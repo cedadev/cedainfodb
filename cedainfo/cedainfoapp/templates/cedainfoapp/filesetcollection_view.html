@@ -11,17 +11,31 @@ FileSetCollection view
 {% block content %}
 
 <table border="1">
-	    <tr>
-			<th><a href="?o=id">Id</a></th>
-			<th><a href="?o=label">Label</a></th>
+		<tr>
+			<th>FileSetCollection</th>
+			<td colspan="3">{{fsc}}</td>
+		</tr>
+		<tr>
+			<th>Fileset</th>
+			<th>Logical Path</th>
 			<th>Primary</th>
+			<th>Current Size</th>
 			</tr>
-	    {% for fs in fs_list %}
+	    {% for fscm in fscm_list %}
 		    <tr>
-	    	    <td><a href="/fileset/{{fs.id}}">{{fs.id}}</a></td>
-	    	    <td>{{fs.label}}</td>
-	    	    <td>{{fs.is_primary}}</td>
+	    	    <td><a href="/admin/cedainfoapp/fileset/{{fscm.fileset.id}}">{{fscm.fileset}}</a></td>
+	    	    <td><a href="/admin/cedainfoapp/filesetcollectionmembership/{{fscm.id}}">{{fscm}}</a></td>
+	    	    <td><a href="/admin/cedainfoapp/fileset/{{fscm.fileset.id}}">{{fscm.is_primary}}</a></td>
+	    	    <td><a href="/admin/cedainfoapp/fileset/{{fscm.fileset.current_size}}">{{fscm.fileset.current_size}}</a></td>
 			</tr>
         {% endfor %}
+		<tr>
+			<th colspan="3">Total current size (incl all FileSets)</th>
+			<td>{{fsc.size_all_filesets_incl_nonprimary_sum}}</td>
+		</tr>
+		<tr>
+			<th colspan="3">Total current size (primary FileSets only)</th>
+			<td>{{fsc.size_all_filesets_primaryonly_sum}}</td>
+		</tr>
 	</table>
 {% endblock %}
