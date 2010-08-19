@@ -8,7 +8,7 @@ admin.site.register(Person)
 admin.site.register(FileSetSizeMeasurement)
 admin.site.register(Service)
 admin.site.register(HostHistory)
-admin.site.register(FileSetCollectionMembership)
+admin.site.register(FileSetCollectionRelation)
 admin.site.register(PartitionPool)
 admin.site.register(FileSetBackupLog)
 admin.site.register(ServiceBackupLog)
@@ -50,14 +50,14 @@ class PartitionAdmin(admin.ModelAdmin):
 admin.site.register(Partition, PartitionAdmin)
 
 # Create an inline form to manage FileSetCollection memberships (to be used in FileSetCollection & FileSet Admins)
-class FileSetCollectionMembershipInline(admin.TabularInline):
-    model = FileSetCollectionMembership
+class FileSetCollectionRelationInline(admin.TabularInline):
+    model = FileSetCollectionRelation
     extra = 1
 
 class FileSetCollectionAdmin(admin.ModelAdmin):
-    inlines = (FileSetCollectionMembershipInline,)
+    inlines = (FileSetCollectionRelationInline,)
 admin.site.register(FileSetCollection,FileSetCollectionAdmin)
 
 class FileSetAdmin(admin.ModelAdmin):
-    inlines = (FileSetCollectionMembershipInline,)
+    inlines = (FileSetCollectionRelationInline,)
 admin.site.register(FileSet,FileSetAdmin)

@@ -131,14 +131,14 @@ class FileSet(models.Model):
 
 class FileSetCollection(models.Model):
     '''Group of fileSets handled together'''
-    fileset = models.ManyToManyField(FileSet, through='FileSetCollectionMembership')
+    fileset = models.ManyToManyField(FileSet, through='FileSetCollectionRelation')
     logical_path = models.CharField(max_length=1024, help_text="Logical path to the root of this FileSetCollection. Omit trailing slash.")
     partitionpool = models.ForeignKey(PartitionPool, help_text="PartitionPool to which this FileSetCollection is allocated. Must be provided if any of the FileSets in the FileSetCollection are primary.", null=True, blank=True)
     # TODO : should really have monthly_growth / still_expected size estimates for files in the top level of the FileSetCollection (e.g. ancillary files), but for now will assume they are trivial in size (compared to FileSets)
     def __unicode__(self):
         return u'%d : %s' % (self.id, self.logical_path)
 
-class FileSetCollectionMembership(models.Model):
+class FileSetCollectionRelation(models.Model):
     '''Documents the relationship of a fileSet with a FileSetCollection.
        A FileSet's relationship with a FileSetCollection can be:
         - primary : this is where the data are actually stored

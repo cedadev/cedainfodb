@@ -200,18 +200,18 @@ def filesetcollection_view(request, id):
     fsc = FileSetCollection.objects.get(pk=id)
     # Get the FileSetCollectionMemberships associated with this FileSetCollection
     # These will be the fileset's we're interested in
-    fscm_list = FileSetCollectionMembership.objects.filter(fileset_collection=fsc)
+    fscr_list = FileSetCollectionRelation.objects.filter(fileset_collection=fsc)
 
     # Use dynamic atributes to aggregate sizes of all filesets within filesetcollection
     # ...with and without non-primary filesets
     fsc.size_all_filesets_incl_nonprimary_sum = 0
     fsc.size_all_filesets_primaryonly_sum = 0
-    for fscm in fscm_list:
-        fsc.size_all_filesets_incl_nonprimary_sum += fscm.fileset.current_size
-        if fscm.is_primary:
-            fsc.size_all_filesets_primaryonly_sum += fscm.fileset.current_size
+    for fscr in fscr_list:
+        fsc.size_all_filesets_incl_nonprimary_sum += fscr.fileset.current_size
+        if fscr.is_primary:
+            fsc.size_all_filesets_primaryonly_sum += fscr.fileset.current_size
     
-    return render_to_response('cedainfoapp/filesetcollection_view.html', {'fsc': fsc, 'fscm_list': fscm_list} )
+    return render_to_response('cedainfoapp/filesetcollection_view.html', {'fsc': fsc, 'fscr_list': fscr_list} )
 
 def partitionpool_list(request):
     o = request.GET.get('o', 'id') # default order is ascending id

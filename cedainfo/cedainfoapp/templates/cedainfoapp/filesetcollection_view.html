@@ -21,12 +21,12 @@ FileSetCollection view
 			<th>Primary</th>
 			<th>Current Size</th>
 			</tr>
-	    {% for fscm in fscm_list %}
+	    {% for fscr in fscr_list %}
 		    <tr>
-	    	    <td><a href="/admin/cedainfoapp/fileset/{{fscm.fileset.id}}">{{fscm.fileset}}</a></td>
-	    	    <td><a href="/admin/cedainfoapp/filesetcollectionmembership/{{fscm.id}}">{{fscm}}</a></td>
-	    	    <td>{{fscm.is_primary}}</td>
-	    	    <td>{{fscm.fileset.current_size}}</td>
+	    	    <td><a href="/admin/cedainfoapp/fileset/{{fscm.fileset.id}}">{{fscr.fileset}}</a></td>
+	    	    <td><a href="/admin/cedainfoapp/filesetcollectionmembership/{{fscm.id}}">{{fscr}}</a></td>
+	    	    <td>{{fscr.is_primary}}</td>
+	    	    <td>{{fscr.fileset.current_size}}</td>
 			</tr>
         {% endfor %}
 		<tr>
