@@ -25,8 +25,8 @@ FileSetCollection view
 		    <tr>
 	    	    <td><a href="/admin/cedainfoapp/fileset/{{fscm.fileset.id}}">{{fscm.fileset}}</a></td>
 	    	    <td><a href="/admin/cedainfoapp/filesetcollectionmembership/{{fscm.id}}">{{fscm}}</a></td>
-	    	    <td><a href="/admin/cedainfoapp/fileset/{{fscm.fileset.id}}">{{fscm.is_primary}}</a></td>
-	    	    <td><a href="/admin/cedainfoapp/fileset/{{fscm.fileset.current_size}}">{{fscm.fileset.current_size}}</a></td>
+	    	    <td>{{fscm.is_primary}}</td>
+	    	    <td>{{fscm.fileset.current_size}}</td>
 			</tr>
         {% endfor %}
 		<tr>

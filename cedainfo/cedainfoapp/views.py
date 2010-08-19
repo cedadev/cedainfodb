@@ -194,8 +194,7 @@ def filesetcollection_list(request):
         template_object_name = "filesetcollection",
     )    
 
-# Spec for view of FileSetCollection
-# Needs to show total storage requirements for a FileSetCollection, calculated with and without non-primary FileSet members.
+# Show total storage requirements for a FileSetCollection, calculated with and without non-primary FileSet members.
 def filesetcollection_view(request, id):
     # Get this FileSetCollection
     fsc = FileSetCollection.objects.get(pk=id)
@@ -213,3 +212,25 @@ def filesetcollection_view(request, id):
             fsc.size_all_filesets_primaryonly_sum += fscm.fileset.current_size
     
     return render_to_response('cedainfoapp/filesetcollection_view.html', {'fsc': fsc, 'fscm_list': fscm_list} )
+
+def partitionpool_list(request):
+    o = request.GET.get('o', 'id') # default order is ascending id
+    qs = PartitionPool.objects.order_by(o)
+    # Use the object_list view.
+    return list_detail.object_list(
+        request,
+        queryset = qs,
+        template_name = "cedainfoapp/partitionpool_list.html",
+        template_object_name = "partitionpool",
+    )
+    
+def partition_list(request):
+    o = request.GET.get('o', 'id') # default order is ascending id
+    qs = Partition.objects.order_by(o)
+    # Use the object_list view.
+    return list_detail.object_list(
+        request,
+        queryset = qs,
+        template_name = "cedainfoapp/partition_list.html",
+        template_object_name = "partition",
+    )    

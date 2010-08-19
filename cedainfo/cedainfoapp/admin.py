@@ -46,7 +46,7 @@ class DataEntityAdmin(admin.ModelAdmin):
 admin.site.register(DataEntity, DataEntityAdmin)
 
 class PartitionAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__','mountpoint','host','partition_pool',)
+    list_display = ('__unicode__','mountpoint','host','partition_pool','used_bytes','capacity_bytes',)
 admin.site.register(Partition, PartitionAdmin)
 
 # Create an inline form to manage FileSetCollection memberships (to be used in FileSetCollection & FileSet Admins)
