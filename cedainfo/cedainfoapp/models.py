@@ -73,7 +73,7 @@ class Partition(models.Model):
     mountpoint = models.CharField(blank=True,max_length=1024, help_text="E.g. /disks/machineN", unique=True)
     host = models.ForeignKey(Host, blank=True, null=True, help_text="Host on which this partition resides")
     used_bytes = BigIntegerField(default=0, help_text="\"Used\" value from df, i.e. no. of bytes used. May be populated by script.")
-    capacity_bytes = BigIntegerField(default=0, help_text="\"Size\" value from df, i.e. no. of bytes total. May be populated by script.")
+    capacity_bytes = BigIntegerField(default=0, help_text="\"Available\" value from df, i.e. no. of bytes total. May be populated by script.")
     last_checked = models.DateTimeField(null=True, blank=True, help_text="Last time df was run against this partition & size values updated")
     partition_pool = models.ForeignKey(PartitionPool, null=True, blank=True, help_text="Unique pool that this partition belongs to.")
     expansion_no = models.IntegerField(help_text="0 for primary, 1 to N for expansion number", default=0)
@@ -121,7 +121,7 @@ class FileSet(models.Model):
     label = models.CharField(max_length=1024, blank=True, help_text="Arbitrary label for this FileSet")
     current_size = BigIntegerField(default=0, help_text="Initial or current size, e.g. by using du on directory")
     monthly_growth = BigIntegerField(null=True, blank=True, help_text="Monthly growth in bytes (estimated by data scientist)") # monthly growth in bytes
-    still_expected = BigIntegerField(null=True, blank=True, help_text="Additional data still expected (as yet uningested) in bytes. Estimate from data scientist.") # Additional data still expected (as yet uningested) in bytes
+    overall_final_size = BigIntegerField(null=True, blank=True, help_text="Overall final size in bytes. Estimate from data scientist.") # Additional data still expected (as yet uningested) in bytes
     notes = models.TextField(blank=True)
     current_backup_policy = models.ForeignKey(BackupPolicy, null=True, blank=True, help_text="Current policy which is intended to be applied to this dataset (look in backup log for record of what actually got applied)")
     partition = models.ForeignKey(Partition, blank=True, null=True, help_text="Actual partition where this FileSet is physically stored")
