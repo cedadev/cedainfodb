@@ -1,5 +1,13 @@
 from django.contrib import admin
 from cedainfo.cedainfoapp.models import *
+from django import forms
+
+
+class BigIntegerInput(forms.TextInput):
+  def __init__(self, *args, **kwargs):
+    attrs = kwargs.setdefault('attrs', {})
+    attrs.setdefault('size', 80)
+    super(BigIntegerInput, self).__init__(*args, **kwargs)
 
 admin.site.register(CurationCategory)
 admin.site.register(BackupPolicy)
@@ -47,6 +55,8 @@ admin.site.register(DataEntity, DataEntityAdmin)
 
 class PartitionAdmin(admin.ModelAdmin):
     list_display = ('__unicode__','mountpoint','host','partition_pool','used_bytes','capacity_bytes',)
+    formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput}}
+
 admin.site.register(Partition, PartitionAdmin)
 
 # Create an inline form to manage FileSetCollection memberships (to be used in FileSetCollection & FileSet Admins)
