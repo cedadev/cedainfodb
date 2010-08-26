@@ -19,23 +19,23 @@ class BigIntegerField(IntegerField):
     
 class Rack(models.Model):
     '''Physical rack in which physical servers are installed'''
-    name = models.CharField(max_length=126)
-    room = models.CharField(max_length=126)
+    name = models.CharField(max_length=126, help_text="Name of Rack")
+    room = models.CharField(max_length=126, help_text="Physical location of Rack")
     def __unicode__(self):
         return u'%s' % self.name
 
 class Host(models.Model):
     '''An identifiable machine having a distinct IP address'''
-    hostname = models.CharField(max_length=512)
-    ip_addr = models.IPAddressField(blank=True) # TODO check if admin allows no ip_addr field (otherwise default='0.0.0.0')
-    serial_no = models.CharField(max_length=126,blank=True)
-    po_no = models.CharField(max_length=126,blank=True)
-    organization = models.CharField(max_length=512,blank=True)
-    supplier = models.CharField(max_length=126,blank=True)
-    arrival_date = models.DateField(null=True,blank=True)
-    planned_end_of_life = models.DateField(null=True,blank=True)
-    retired_on = models.DateField(null=True,blank=True)
-    notes = models.TextField(blank=True)
+    hostname = models.CharField(max_length=512, help_text="Full hostname e.g. machine.badc.rl.ac.uk")
+    ip_addr = models.IPAddressField(blank=True, help_text="IP Address") # TODO check if admin allows no ip_addr field (otherwise default='0.0.0.0')
+    serial_no = models.CharField(max_length=126,blank=True, help_text="Serial no (if physical machine)")
+    po_no = models.CharField(max_length=126,blank=True, help_text="Purchase order no (if physical machine)")
+    organization = models.CharField(max_length=512,blank=True, help_text="Organisation for which machine was purchased (if physical machine)")
+    supplier = models.CharField(max_length=126,blank=True, help_text="Hardware supplier (if physical machine)")
+    arrival_date = models.DateField(null=True,blank=True, help_text="Date host was installed (physical) / created (virtual)")
+    planned_end_of_life = models.DateField(null=True,blank=True, help_text="Date foreseen for retirement of machine (if physical machine)")
+    retired_on = models.DateField(null=True,blank=True, help_text="Date host was retired (leave blank if still in service)")
+    notes = models.TextField(blank=True, help_text="Additional notes")
     host_type = models.CharField(
         max_length=50,
         choices=(
@@ -45,17 +45,19 @@ class Host(models.Model):
             ("workstation", "workstation"),
             ("server", "server"),
         ),
-        default="server"
+        default="server",
+        help_text="Type of host"
     )
-    os = models.CharField(max_length=512, blank=True)
+    os = models.CharField(max_length=512, blank=True, help_text="Operating system")
     capacity = models.DecimalField(max_digits=6, decimal_places=2,null=True,blank=True, help_text="Rough estimate in Tb only") # just an estimate (cf Partition which uses bytes from df)
-    rack = models.ForeignKey(Rack, blank=True, null=True)
+    rack = models.ForeignKey(Rack, blank=True, null=True, help_text="Rack (if virtual machine, give that of hypervisor)")
     hypervisor = models.ForeignKey('self', blank=True, null=True, help_text="If host_type=virtual_server, give the name of the hypervisor which contains this one.")
     def __unicode__(self):
         return u'%s' % self.hostname
 
 class PartitionPool(models.Model):
     '''Container for paritions that are grouped together, often associated with a particular FileSetCollection'''
+    label = models.CharField(max_length=50, blank=True, default='newpool')
     purpose = models.CharField(
         max_length=50, 
         help_text="Single or general purpose partition pool",
@@ -84,14 +86,14 @@ class Partition(models.Model):
 
 class CurationCategory(models.Model):
     '''Category indicating whether CEDA is the primary or secondary archive (or other status) for a dataset'''
-    category = models.CharField(max_length=5)
-    description = models.CharField(max_length=1024)
+    category = models.CharField(max_length=5, help_text="Curation category label")
+    description = models.CharField(max_length=1024, help_text="Longer description")
     def __unicode__(self):
         return u"%s : %s" % (self.category, self.description) 
 
 class BackupPolicy(models.Model):
     '''Backup policy'''
-    tool = models.CharField(max_length=45, help_text="DMF / rsync / tape")
+    tool = models.CharField(max_length=45, help_text="e.g. DMF / rsync / tape")
     destination = models.CharField(max_length=1024, blank=True, help_text="Path made up of e.g. dmf:/path_within_dmf, rsync:/path_to_nas_box, tape:/tape_number")
     frequency = models.CharField(max_length=45, help_text="Daily, weekly, monthly...")
     type = models.CharField(max_length=45, help_text="Full, incremental, versioned")
@@ -101,16 +103,16 @@ class BackupPolicy(models.Model):
 
 class AccessStatus(models.Model):
     '''Degree to which access to a DataEntity is restricted'''
-    status = models.CharField(max_length=45)
-    comment = models.CharField(max_length=1024)
+    status = models.CharField(max_length=45, help_text="Status label")
+    comment = models.CharField(max_length=1024, help_text="Comment describing this status")
     def __unicode__(self):
         return u"%s : %s" % (self.status, self.comment)
 
 class Person(models.Model):
     '''Person with some role'''
-    name = models.CharField(max_length=1024)
-    email = models.EmailField()
-    username = models.CharField(max_length=45)
+    name = models.CharField(max_length=1024, help_text="Firstname Lastname")
+    email = models.EmailField(help_text="Email address")
+    username = models.CharField(max_length=45, help_text="System username")
     def __unicode__(self):
         return u'%s' % self.name
 
@@ -119,7 +121,6 @@ class FileSet(models.Model):
     Collection of all filesets taken together should exactly represent 
     all files in the archive. Must never span multiple filesystems.'''
     label = models.CharField(max_length=1024, blank=True, help_text="Arbitrary label for this FileSet")
-    current_size = BigIntegerField(default=0, help_text="Initial or current size, e.g. by using du on directory")
     monthly_growth = BigIntegerField(null=True, blank=True, help_text="Monthly growth in bytes (estimated by data scientist)") # monthly growth in bytes
     overall_final_size = BigIntegerField(null=True, blank=True, help_text="Overall final size in bytes. Estimate from data scientist.") # Additional data still expected (as yet uningested) in bytes
     notes = models.TextField(blank=True)
@@ -153,14 +154,13 @@ class FileSetCollectionRelation(models.Model):
     #TODO Need a custom save method where to impose uniqueness constraint : a given FileSet can only have ONE FileSetCollectionMembership that is primary (i.e. can only be stored physically in one place).       
 
 class DataEntity(models.Model):
-    '''Collection of FileSets treated together as a data set. Has corresponding MOLES DataEntity record.'''
+    '''Collection of data treated together. Has corresponding MOLES DataEntity record.'''
     dataentity_id = models.CharField(help_text="MOLES data entity id", max_length=255, unique=True)
-    friendly_name = models.CharField(max_length=1024, blank=True)
-    symbolic_name = models.CharField(max_length=1024, blank=True)
-    logical_path = models.CharField(max_length=1024, blank=True)
-    fileset = models.ManyToManyField(FileSet, null=True)
+    friendly_name = models.CharField(max_length=1024, blank=True, help_text="Longer name (possibly incl spaces, braces)")
+    symbolic_name = models.CharField(max_length=1024, blank=True, help_text="Short abbreviation to be used for directory names etc")
+    logical_path = models.CharField(max_length=1024, blank=True, help_text="Top level of location within archive")
     curation_category = models.ForeignKey(CurationCategory, null=True, blank=True, help_text="Curation catagory : choose from list")
-    notes = models.TextField(blank=True)
+    notes = models.TextField(blank=True, help_text="Additional notes")
     availability_priority = models.BooleanField(default=False, help_text="Priority dataset : use highest spec hardware")
     availability_failover = models.BooleanField(default=False, help_text="Whether or not this dataset requires redundant copies for rapid failover (different from recovery from backup)")
     access_status = models.ForeignKey(AccessStatus, help_text="Security applied to dataset")
@@ -186,19 +186,20 @@ class DataEntity(models.Model):
 
 class Service(models.Model):
     '''Software-based service'''
-    host = models.ManyToManyField(Host)
-    name = models.CharField(max_length=512)
-    description = models.TextField(blank=True)
-    externally_visible = models.BooleanField(default=False)
+    host = models.ManyToManyField(Host, help_text="Host machine on which service is deployed")
+    name = models.CharField(max_length=512, help_text="Name of service")
+    description = models.TextField(blank=True, help_text="Longer description if needed")
+    externally_visible = models.BooleanField(default=False, help_text="Whether or not this service is visible outside the RAL firewall")
     deployment_type = models.CharField(max_length=50,       
         choices=(
         ("failover","failover"),
             ("loadbalanced","loadbalanced"),
             ("simple","simple")
         ),
-        default="simple"
+        default="simple",
+        help_text="Type of deployment"
     )
-    dependencies = models.ManyToManyField('self', blank=True)
+    dependencies = models.ManyToManyField('self', blank=True, help_text="Other services that this one depends on")
     availability_tolerance = models.CharField(max_length=50,
         choices=(
         ("disposable","disposable"),
@@ -206,49 +207,51 @@ class Service(models.Model):
         ("24 hours","must be restored within 24 hours of failure"),
         ("1 workingday","must be restored within 1 working day of failure"),
         ),
-        default="disposable"
+        default="disposable",
+        help_text="How tolerant of unavailability we should be for this service"
     )
-    requester = models.ForeignKey(Person, null=True, blank=True, related_name='service_requester')
-    installer = models.ForeignKey(Person, null=True, blank=True, related_name='service_installer')
-    software_contact = models.ForeignKey(Person, null=True, blank=True, related_name='service_software_contact')
+    requester = models.ForeignKey(Person, null=True, blank=True, related_name='service_requester', help_text="CEDA Person requesting deployment")
+    installer = models.ForeignKey(Person, null=True, blank=True, related_name='service_installer', help_text="CEDA Person installing the service")
+    software_contact = models.ForeignKey(Person, null=True, blank=True, related_name='service_software_contact', help_text="CEDA or 3rd party contact who is responsible for the software component used for the service")
     def __unicode__(self):
         return u'%s' % self.name
 
 class HostHistory(models.Model):
     '''Entries detailing history of changes to a Host'''
-    host = models.ForeignKey(Host)
-    date = models.DateField()
-    history_desc = models.TextField()
-    admin_contact = models.ForeignKey(Person)
+    host = models.ForeignKey(Host, help_text="Host name")
+    date = models.DateField(help_text="Event date")
+    history_desc = models.TextField(help_text="Details of event / noteworthy item in host's history")
+    admin_contact = models.ForeignKey(Person, help_text="CEDA Person reporting this event")
     def __unicode__(self):
         return u'%s|%s' % (self.host, self.date)
 
 class FileSetBackupLog(models.Model):
     '''Backup history for a FileSet'''
-    fileset = models.ForeignKey(FileSet)
-    subdirectory = models.CharField(max_length=2048)
-    backup_policy = models.ForeignKey(BackupPolicy)
-    date = models.DateTimeField()
-    success = models.BooleanField(default=False)
-    comment = models.TextField(blank=True)
+    fileset = models.ForeignKey(FileSet, help_text="FileSet being backed up")
+    subdirectory = models.CharField(max_length=2048, help_text="Subdirectory backed up (default: '.' i.e. whole directory)")
+    backup_policy = models.ForeignKey(BackupPolicy, help_text="Backup policy implemented for this backup event")
+    date = models.DateTimeField(help_text="Date and time of backup")
+    success = models.BooleanField(default=False, help_text="Success (True) or Failure (False) of backup event")
+    comment = models.TextField(blank=True, help_text="Additional comment(s)")
     def __unicode__(self):
         return u'%s|%s' % (self.data_entity, self.date)  
     
 class ServiceBackupLog(models.Model):
     '''Backup history for a Service'''
-    service = models.ForeignKey(Service)
-    backup_policy = models.ForeignKey(BackupPolicy)
-    date = models.DateTimeField()
-    success = models.BooleanField(default=False)
-    comment = models.TextField(blank=True)
+    service = models.ForeignKey(Service, help_text="Service being backed up")
+    backup_policy = models.ForeignKey(BackupPolicy, help_text="Backup policy implemented for this backup event")
+    date = models.DateTimeField(help_text="Date and time of backup")
+    success = models.BooleanField(default=False, help_text="Success (True) or Failure (False) of backup event")
+    comment = models.TextField(blank=True, help_text="Additional comment(s)")
     def __unicode__(self):
         return u'%s|%s' % (self.service, self.date)  
     
 class FileSetSizeMeasurement(models.Model):
     '''Date-stampted size measurement of a FileSet'''
-    fileset = models.ForeignKey(FileSet)
-    date = models.DateTimeField(default=datetime.now )
-    size = BigIntegerField() # in bytes
+    fileset = models.ForeignKey(FileSet, help_text="FileSet that was measured")
+    date = models.DateTimeField(default=datetime.now, help_text="Date and time of measurement")
+    size = BigIntegerField(help_text="Size in bytes") # in bytes
+    no_files = BigIntegerField(null=True, blank=True, help_text="Number of files") 
     def __unicode__(self):
         return u'%s|%s' % (self.date, self.fileset)
 
@@ -262,15 +265,7 @@ class FileSetAllocationPlan(models.Model):
     allocated_space = BigIntegerField(help_text="Estimate of volume required (bytes)") # maximum over the entire period that this allocation represents
     start_date = models.DateTimeField(help_text="Proposed start date for this allocation. SHould be after Host.arrival_date for that partition")
     end_date = models.DateTimeField(help_text="Proposed end date for this allocation. Should be before Host.planned_end_of_life for that partition")
-    notes = models.TextField(blank=True)
+    notes = models.TextField(blank=True, help_text="Additional notes")
     def __unicode__(self):
         return u'%s|%s' % (self.fileset, self.partition)
         
-# Notes from Dan
-
-# Allocations:
-# Start with data entity. DE has a log over time of its current size. Data Scientits provides either a monthly growth rate, or a still_expected amount ...describes the DE size requirements.
-# Create an allocation (of a dataentity to a partition) ...manually for now. Thought process : look at remaining space & remaining time available for that machine, based on its expectied retirement date. 
-# Based on info for DE described above, calculate whether or not, over that given period, there will be sufficient space to accommodate that dataentity. If so, allocation is for now until retirement date of the machine. For each partition, calculate how quickly it will fill up based on the above calculation. This will give a priority order : pick the best.
-
-# When that allocation has been implemented, update the topleveldirs table to reflect what has been implemented (Allocation is more of a planning tool).

@@ -53,7 +53,9 @@ admin.site.register(DataEntity, DataEntityAdmin)
 
 class PartitionAdmin(admin.ModelAdmin):
     list_display = ('__unicode__','mountpoint','host','partition_pool','used_bytes','capacity_bytes',)
+    list_filter = ('partition_pool',)
     formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
+    search_fields = ['mountpoint','host',]
 admin.site.register(Partition, PartitionAdmin)
 
 # Create an inline form to manage FileSetCollection memberships (to be used in FileSetCollection & FileSet Admins)

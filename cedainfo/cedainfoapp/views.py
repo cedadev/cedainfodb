@@ -206,10 +206,21 @@ def filesetcollection_view(request, id):
     # ...with and without non-primary filesets
     fsc.size_all_filesets_incl_nonprimary_sum = 0
     fsc.size_all_filesets_primaryonly_sum = 0
+    fsc_count=0
     for fscr in fscr_list:
-        fsc.size_all_filesets_incl_nonprimary_sum += fscr.fileset.current_size
+        try:
+            fssm = FileSetSizeMeasurement.objects.filter(fileset=fscr.fileset).order_by('-date')
+            if fssm != None:
+                size = fssm[0].size
+            else:
+                size = 0
+        except:
+            size = 0 # NB sets size to zero if no measurement found.
+        fscr_list[fsc_count].fileset.current_size = size #???
+        fsc.size_all_filesets_incl_nonprimary_sum += size
         if fscr.is_primary:
-            fsc.size_all_filesets_primaryonly_sum += fscr.fileset.current_size
+            fsc.size_all_filesets_primaryonly_sum += size
+        fsc_count += 1
     
     return render_to_response('cedainfoapp/filesetcollection_view.html', {'fsc': fsc, 'fscr_list': fscr_list} )
 
