@@ -45,6 +45,7 @@ urlpatterns = patterns('',
     (r'^dataentity/filesets/$', dataentity_fileset_view), # TODO there's probably a better url for this...
     (r'^fileset/index/$', fileset_list),
     (r'^filesetcollection/index/$', filesetcollection_list),
+    (r'^filesetcollection/index/extended/$', filesetcollection_list_extended),
     (r'^filesetcollection/(?P<id>\d+)/$', filesetcollection_view),
 
     (r'^rack/services/(?P<rack_id>\d+)$', services_by_rack),

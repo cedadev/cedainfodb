@@ -52,8 +52,8 @@ class DataEntityAdmin(admin.ModelAdmin):
 admin.site.register(DataEntity, DataEntityAdmin)
 
 class PartitionAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__','mountpoint','host','partition_pool','used_bytes','capacity_bytes',)
-    list_filter = ('partition_pool',)
+    list_display = ('__unicode__','mountpoint','expansion_no','host','partition_pool','used_bytes','capacity_bytes',)
+    list_filter = ('partition_pool','expansion_no')
     formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
     search_fields = ['mountpoint','host',]
 admin.site.register(Partition, PartitionAdmin)
@@ -68,7 +68,9 @@ class FileSetCollectionAdmin(admin.ModelAdmin):
 admin.site.register(FileSetCollection,FileSetCollectionAdmin)
 
 class FileSetAdmin(admin.ModelAdmin):
+    list_display = ('label','partition',)
     inlines = (FileSetCollectionRelationInline,)
+    formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
     formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
 admin.site.register(FileSet,FileSetAdmin)
 

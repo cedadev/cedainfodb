@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}
+FileSetCollection list
+{% endblock %}
+
+{% block header %}
+    <h2>FileSetCollection list </h2>
+{% endblock %}
+
+{% block content %}
+<p>View list in <a href="/admin/cedainfoapp/filesetcollection/">admin interface</a></p>
+
+<table border="1">
+	    <tr>
+			<th><a href="?o=id">FileSetCollection</a></th>
+			<th>Partitions</th>
+			<th>Current size</th>
+        </tr>
+	    {% for fsc in filesetcollection_list %}
+		    <tr>
+	    	    <td><a href="/filesetcollection/{{fsc.id}}">{{fsc}}</a></td>
+				<td>
+					<!-- Table of partitions associated with this FileSetCollection -->
+					<table border="1">
+						<tr>
+							<th>Partition</th>
+							<th>Capacity</th>
+							<th>Host end of life</th>
+							<th>FileSets</th>
+						</tr>
+						{% for partition in fsc.partitions %}
+							<tr>
+								<td>{{partition}} ({{partition.host.arrival_date}})</td>
+								<td>{{partition.capacity_bytes}}</td>
+								<td>{{partition.host.planned_end_of_life}}</td>
+								<td>{% for fileset in partition.filesets %}{{fileset.label}} {% endfor %}</td>
+							</tr>
+						{% endfor %}
+						<tr>
+							<td>Unallocated filesets</td>
+							<td colspan="3">{{fsc.num_filesets_unallocated}}</td>
+						</td>
+					</table>
+				</td>
+				<td>
+					{{fsc.size_all_filesets_primaryonly_sum}}
+				</td>
+			</tr>
+        {% endfor %}
+	</table>
+{% endblock %}

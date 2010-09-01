@@ -5,8 +5,6 @@ from datetime import datetime
 from django.db.models.fields import IntegerField
 from django.conf import settings
 
-
-
 # BigInteger fix as per http://www.mattwaite.com/posts/2009/mar/10/django-and-really-big-numbers/
 class BigIntegerField(IntegerField):
     empty_strings_allowed=False
@@ -60,7 +58,7 @@ class PartitionPool(models.Model):
     label = models.CharField(max_length=50, blank=True, default='newpool')
     purpose = models.CharField(
         max_length=50, 
-        help_text="Single or general purpose partition pool",
+        help_text="Single or general purpose partition pool. General = to contain only 1 partition, for multiple FileSetCollections. Single = For a single FileSetCollection, using multiple Partitions.",
         choices=(
             ("general","general"),
             ("single","single"),
@@ -68,7 +66,7 @@ class PartitionPool(models.Model):
         default="general"
        )
     def __unicode__(self):
-        return u'%d : %s' % (self.id, self.purpose) 
+        return u'%s (%s)' % (self.label, self.purpose) 
 
 class Partition(models.Model):
     '''Filesystem equipped with standard directory structure for archive storage'''

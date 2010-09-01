@@ -192,7 +192,64 @@ def filesetcollection_list(request):
         queryset = qs,
         template_name = "cedainfoapp/filesetcollection_list.html",
         template_object_name = "filesetcollection",
-    )    
+    )
+    
+def filesetcollection_list_extended(request):
+    '''Full view of filesetcollections, meant to be functional replacement for table on Dan's volume planning Wiki page
+       http://proj.badc.rl.ac.uk/badc/wiki/VolumePlanning'''
+    # Columns:
+    # FileSetCollection (loosely one-to-one with DataEntity (via logical_path) )
+    # For each Partition in PartitionPool associated with this FileSetCollection:
+    #   Partition
+    #   Partition.Host.arrival_date
+    #   Parition.capacity_bytes
+    #   Parition.Host.planned_end_of_life
+    #   FileSetCollection total current size (sum of most recent primary FSSMs for this fileset)
+    #   FileSet.monthly_growth
+    #   FileSet.overall_total_size
+    #   contact (...needs to come from DataEntity(filter=same logical path as fileset).responsible_officer
+    #   Derived field : FSC won't drow too big before end of machine warranty period
+    #   Derived field : Escess / Deficit
+
+    o = request.GET.get('o', 'id') # default order is ascending id
+    fsc_list = FileSetCollection.objects.order_by(o)
+    fsc_count = 0
+    my_fsc_list = []
+    for fsc in fsc_list:
+        # add some dynamic attributes to make things easier in the template
+        fsc.partitions = Partition.objects.filter(partition_pool=fsc.partitionpool)
+        for partition in fsc.partitions:
+            partition.filesets = FileSet.objects.filter(partition=partition)
+        fscr_list = FileSetCollectionRelation.objects.filter(fileset_collection=fsc)
+        fsc.size_all_filesets_incl_nonprimary_sum = 0
+        fsc.size_all_filesets_primaryonly_sum = 0
+        fsc.num_filesets_unallocated = 0
+        for fscr in fscr_list:
+            try:
+                fssm = FileSetSizeMeasurement.objects.filter(fileset=fscr.fileset).order_by('-date')
+                if fssm != None:
+                    size = fssm[0].size
+                else:
+                    size = 0
+            except:
+                size = 0 # NB sets size to zero if no measurement found.
+            fsc.size_all_filesets_incl_nonprimary_sum += size
+            if fscr.is_primary:
+                fsc.size_all_filesets_primaryonly_sum += size
+            fsc_count += 1
+            # filesets that belong to this filesetcollection (have an fscr) but no partition allocated
+            if (fscr.fileset.partition is None) or (fscr.fileset.partition == ''):
+                fsc.num_filesets_unallocated += 1
+
+        my_fsc_list.append(fsc)
+
+    return render_to_response('cedainfoapp/filesetcollection_list_extended.html', 
+        {
+            'filesetcollection_list': my_fsc_list,
+        }
+    )
+    
+
 
 # Show total storage requirements for a FileSetCollection, calculated with and without non-primary FileSet members.
 def filesetcollection_view(request, id):
