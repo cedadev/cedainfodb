@@ -32,6 +32,8 @@ urlpatterns = patterns('',
     (r'^hosts/(?P<subset>\w+)$', host_list),
     #   - detail view of 1 host, by id
     (r'^host/(?P<host_id>\d+)/$', host_detail),
+    # Recreate the SDDCS "nodelist" file as a view
+    (r'^nodelist$', nodelist),
 
     # detail view of data entity
     (r'^dataentity/(?P<id>\d+)/$', dataentity_detail_form),

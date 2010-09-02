@@ -301,4 +301,8 @@ def partition_list(request):
         queryset = qs,
         template_name = "cedainfoapp/partition_list.html",
         template_object_name = "partition",
-    )    
+    )
+    
+def nodelist(request):
+    host_list = Host.objects.all()
+    return render_to_response('cedainfoapp/nodelist_view.txt', {'host_list': host_list}, mimetype="text/plain")  
