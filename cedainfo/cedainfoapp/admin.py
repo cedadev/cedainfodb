@@ -23,7 +23,7 @@ admin.site.register(FileSetAllocationPlan)
 # customise the Host admin interface
 class HostAdmin(admin.ModelAdmin):
     list_display = ('hostname','ip_addr','host_type','hypervisor','rack')
-    list_filter = ('supplier','planned_end_of_life', 'retired_on','host_type','rack')
+    list_filter = ('supplier','planned_end_of_life', 'retired_on','host_type','rack','hostlist')
     ordering = ('hostname','planned_end_of_life')
     search_fields = ['hostname',]
 
@@ -38,8 +38,8 @@ admin.site.register(Host, HostAdmin)
 
 # customise the Rack admin interface
 class RackAdmin(admin.ModelAdmin):
-    list_display = ('name', 'room')
-    list_filter = ('room',)
+    list_display = ('name', 'room', 'racklist')
+    list_filter = ('room','racklist')
     ordering = ('name', 'room')
 admin.site.register(Rack, RackAdmin)
 
@@ -64,7 +64,9 @@ class FileSetCollectionRelationInline(admin.TabularInline):
     extra = 1
 
 class FileSetCollectionAdmin(admin.ModelAdmin):
-    inlines = (FileSetCollectionRelationInline,)
+    #inlines = (FileSetCollectionRelationInline,) # probably too many filesets for this to work well
+    list_display = ('logical_path', 'partitionpool',)
+    list_filter = ('partitionpool',)
 admin.site.register(FileSetCollection,FileSetCollectionAdmin)
 
 class FileSetAdmin(admin.ModelAdmin):
@@ -77,3 +79,11 @@ admin.site.register(FileSet,FileSetAdmin)
 class FileSetSizeMeasurementAdmin(admin.ModelAdmin):
     formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
 admin.site.register(FileSetSizeMeasurement,FileSetSizeMeasurementAdmin)
+
+#class NodeListTagAdmin(admin.ModelAdmin):
+#    list_display=('name',)
+#    list_filter=('tag',)
+#admin.site.register(NodeListTag, NodeListTagAdmin)
+admin.site.register(NodeList)
+admin.site.register(HostList)
+admin.site.register(RackList)    

@@ -17,14 +17,12 @@ FileSetCollection view
 		</tr>
 		<tr>
 			<th>Fileset</th>
-			<th>Logical Path</th>
 			<th>Primary</th>
 			<th>Current Size</th>
 			</tr>
 	    {% for fscr in fscr_list %}
 		    <tr>
-	    	    <td><a href="/admin/cedainfoapp/fileset/{{fscm.fileset.id}}">{{fscr.fileset}}</a></td>
-	    	    <td><a href="/admin/cedainfoapp/filesetcollectionmembership/{{fscm.id}}">{{fscr}}</a></td>
+	    	    <td><a href="/admin/cedainfoapp/fileset/{{fscr.fileset.id}}">{{fscr.fileset}}</a></td>
 	    	    <td>{{fscr.is_primary}}</td>
 	    	    <td>{{fscr.fileset.current_size}}</td>
 			</tr>

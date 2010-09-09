@@ -205,8 +205,8 @@ def filesetcollection_list_extended(request):
     #   Parition.capacity_bytes
     #   Parition.Host.planned_end_of_life
     #   FileSetCollection total current size (sum of most recent primary FSSMs for this fileset)
-    #   FileSet.monthly_growth
-    #   FileSet.overall_total_size
+    #   FileSet.monthly_growth (TODO ...group by partition)
+    #   FileSet.overall_total_size (TODO ...group by partition)
     #   contact (...needs to come from DataEntity(filter=same logical path as fileset).responsible_officer
     #   Derived field : FSC won't drow too big before end of machine warranty period
     #   Derived field : Escess / Deficit
@@ -304,5 +304,27 @@ def partition_list(request):
     )
     
 def nodelist(request):
-    host_list = Host.objects.all()
-    return render_to_response('cedainfoapp/nodelist_view.txt', {'host_list': host_list}, mimetype="text/plain")  
+    hostlist_list = HostList.objects.all()
+    for hostlist in hostlist_list:
+        # pre-populate list with its members
+        hostlist.members = Host.objects.filter(hostlist=hostlist)
+        hostlist.memberlist = Host.objects.filter(hostlist=hostlist).values_list('hostname', flat=True)
+        # Generate string containing members
+        mylist = []
+        for member in hostlist.memberlist:
+            mylist.append(member)
+        hostlist.memberstring = (" ").join(mylist)
+        
+    racklist_list = RackList.objects.all()
+    for racklist in racklist_list:
+        # pre-populate list with its members
+        racklist.members = Rack.objects.filter(racklist=racklist)
+        racklist.memberlist = Rack.objects.filter(racklist=racklist).values_list('name', flat=True)
+        # Generate string containing members
+        mylist = []
+        for member in racklist.memberlist:
+            mylist.append("$%s" % member)
+        racklist.memberstring = (" ").join(mylist)
+
+
+    return render_to_response('cedainfoapp/nodelist_view.txt', {'hostlist_list': hostlist_list, 'racklist_list': racklist_list}, mimetype="text/plain")  

@@ -14,11 +14,37 @@ class BigIntegerField(IntegerField):
         return 'bigint' # Will this work with non-postgres?
 
 # Create your models here.
-    
+
+# Tags to help in creation of SDDCS nodelist view
+# Each tag can itself be tagged (hence tag attribute)
+#class NodeListTag(models.Model):
+#    name=models.CharField(max_length=126, help_text="name of this tag")
+#    tag=models.ManyToManyField('self', null=True, blank=True, help_text="tag associated with this tag")
+#    def __unicode__(self):
+#        return u'%s' % self.name
+
+class NodeList(models.Model):
+    name = models.CharField(max_length=126)
+    def __unicode__(self):
+        return u'%s the nodelist' % self.name
+
+class HostList(models.Model):
+    nodelist = models.OneToOneField(NodeList)
+    def __unicode__(self):
+        return u'%s the hostlist' % self.nodelist.name
+
+class RackList(models.Model):
+    nodelist = models.OneToOneField(NodeList)
+    def __unicode__(self):
+        return u'%s the racklist' % self.nodelist.name
+        
+
 class Rack(models.Model):
     '''Physical rack in which physical servers are installed'''
     name = models.CharField(max_length=126, help_text="Name of Rack")
     room = models.CharField(max_length=126, help_text="Physical location of Rack")
+    #tag = models.ManyToManyField(NodeListTag, null=True, blank=True, help_text="tag for nodelist")
+    racklist = models.ForeignKey(RackList, null=True, blank=True, help_text="list this rack belongs to (only one)")
     def __unicode__(self):
         return u'%s' % self.name
 
@@ -50,6 +76,8 @@ class Host(models.Model):
     capacity = models.DecimalField(max_digits=6, decimal_places=2,null=True,blank=True, help_text="Rough estimate in Tb only") # just an estimate (cf Partition which uses bytes from df)
     rack = models.ForeignKey(Rack, blank=True, null=True, help_text="Rack (if virtual machine, give that of hypervisor)")
     hypervisor = models.ForeignKey('self', blank=True, null=True, help_text="If host_type=virtual_server, give the name of the hypervisor which contains this one.")
+    #tag = models.ManyToManyField(NodeListTag, null=True, blank=True, help_text="tag for nodelist")
+    hostlist = models.ManyToManyField(HostList, null=True, blank=True, help_text="list(s) this host belongs to")
     def __unicode__(self):
         return u'%s' % self.hostname
 
@@ -118,7 +146,7 @@ class FileSet(models.Model):
     '''Non-overlapping subtree of archive directory hierarchy.
     Collection of all filesets taken together should exactly represent 
     all files in the archive. Must never span multiple filesystems.'''
-    label = models.CharField(max_length=1024, blank=True, help_text="Arbitrary label for this FileSet")
+    label = models.CharField(max_length=1024, blank=True, default='unallocated', help_text="Initially unallocated, indicating not belonging to FileSetCollection. Then set by save method of FileSetCollectionRelation to hold path within FSCR.")
     monthly_growth = BigIntegerField(null=True, blank=True, help_text="Monthly growth in bytes (estimated by data scientist)") # monthly growth in bytes
     overall_final_size = BigIntegerField(null=True, blank=True, help_text="Overall final size in bytes. Estimate from data scientist.") # Additional data still expected (as yet uningested) in bytes
     notes = models.TextField(blank=True)
@@ -149,7 +177,14 @@ class FileSetCollectionRelation(models.Model):
     is_primary = models.BooleanField(default='True', help_text="Whether or not the presence of this FileSet in this FileSetCollection represents where the FileSet is physically stored [True] (or whether it is just a symlink [False])")
     def __unicode__(self):
         return u'%s' % (self.logical_path)
-    #TODO Need a custom save method where to impose uniqueness constraint : a given FileSet can only have ONE FileSetCollectionMembership that is primary (i.e. can only be stored physically in one place).       
+    
+    def save(self):
+        '''Set the label field of the fileset to be the logical path of this filesetcollectionrelation'''
+        #TODO Need to impose uniqueness constraint : a given FileSet can only have ONE FileSetCollectionMembership that is primary (i.e. can only be stored physically in one place).
+        self.fileset.label = self.logical_path
+        self.fileset.save()
+        super(FileSetCollectionRelation, self).save() # Call the "real" save() method
+        
 
 class DataEntity(models.Model):
     '''Collection of data treated together. Has corresponding MOLES DataEntity record.'''
