@@ -98,10 +98,13 @@ def dataentity_detail_form(request, id):
 # Add a new dataentity
 def dataentity_add(request, dataentity_id):
     if (dataentity_id==''):
+        # blank id ...can't make a new dataentity object
        message="Unable to create dataentity with blank dataentity_id. Add a string to the end of the URL representing the id, e.g. .../dataentity/add/newid"
        return render_to_response('error.html',{'message':message})
     else:  
+        # make a new dataentity using this new id
         dataentity = DataEntity(dataentity_id=dataentity_id, access_status=AccessStatus.objects.get(pk=2) ) # TODO : add defaults / dummy values...
+        dataentity.save()
         if request.method == 'POST':
             form = DataEntityForm(request.POST, instance=dataentity)
             if form.is_valid():
