@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# Script Name: nodelist
+#
+# Author:  CedaInfoDB
+# Purpose: define all node groups
+# Usage:   simple # sh /usr/local/bin/nodelist
+# History: created on: {{date}}
+
+{% for hostlist in hostlist_list %}
+${{hostlist.nodelist.name}}="{{hostlist.memberstring}}"
+{% endfor %}
+
+{% for racklist in racklist_list %}
+${{racklist.nodelist.name}}="{{racklist.memberstring}}"
+{% endfor %}
