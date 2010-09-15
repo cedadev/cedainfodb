@@ -1,11 +1,24 @@
 import os, subprocess
 import sys
+import logging
 
 from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
 from cedainfoapp.models import *
+
+def usage():
+    print "FileSet sizer"
+    print "Usage: %s <fsc_path>" % sys.argv[0]
+    print "Arguments:"
+    print "\t<fsc_path> = FileSetCollection logical path"
+
+
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+
 fsc = None
 
 # Find the FileSetCollection if one given
@@ -13,10 +26,12 @@ if len(sys.argv) == 2:
     fsc_path = sys.argv[1]
     try:
         fsc = FileSetCollection.objects.get(logical_path=fsc_path)
+        logging.info("Found FileSetCollection %s" % fsc)
     except:
-        print "FileSetCollection not found : %s" % fsc_path
+        logging.error( "FileSetCollection not found : %s" % fsc_path )
         sys.exit(1)
-
+else:
+    usage()
 
 # Loop through all FileSets (or those belonging to the given FileSetCollection, if given) and measure their size. Record a timestampted FileSetSizeMeasurement for each.
 if fsc is not None:
@@ -34,6 +49,10 @@ for fscr in fscrs:
         if sp.returncode == 0:
             size_in_bytes = sout.split('\t')[0] # size in bytes is 1st field of tab-delimited stdout
             size = FileSetSizeMeasurement(fscr.fileset, size_in_bytes)
-            print size
+            logging.info( "size: %s" % size )
         else:
-            print "Failed to get size for directory %s" % fsdir
+            logging.warn( "Failed to get size for directory %s" % fsdir )
+    else:
+        logging.error("Handling of non-primary FileSetCollectionRelations not implemented")
+else:
+    logging.info("No FileSets found in FileSetCollection %s" % fsc)
