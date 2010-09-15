@@ -1,6 +1,7 @@
 import getopt, sys
 import os, errno
 import re
+import logging
 
 from django.core.management import setup_environ
 import settings
@@ -40,7 +41,7 @@ def mkdir_p(path):
     except OSError, e:
         if e.errno == errno.EEXIST:
             # If dir exists already, skip gracefully
-            print "Directory exists : skipping"
+            logging.warn( "Directory exists : %s : skipping" % path )
             pass
         else: raise
 
@@ -51,7 +52,7 @@ def ln(src, dst):
     except OSError, e:
         if e.errno == errno.EEXIST:
             # If dir exists already, skip gracefully
-            print "Link exists : skipping"
+            logging.warn( "Link exists : %s : skipping" % dst )
             pass
         else: raise
 
@@ -71,11 +72,11 @@ class fsc_partition_linker:
         for partition in partitions :
             (expansion_path, top_level_dir) = get_expansion_path_and_top_level_dir(partition, self.logical_path)
             # Create a directory on the partition (should skip if exists already)
-            print 'Making dir %s' % top_level_dir
+            logging.info( 'Making dir %s' % top_level_dir )
             mkdir_p(top_level_dir)
 
             # Create a symlink to that directory (should skip if exists already)
-            print '%s -> %s' % get_expansion_path_and_top_level_dir(partition, self.logical_path)
+            logging.info( '%s -> %s' % get_expansion_path_and_top_level_dir(partition, self.logical_path) )
             ln(expansion_path, top_level_dir)
 
 class fsc_fileset_dir_maker:
@@ -100,7 +101,7 @@ class fsc_fileset_dir_maker:
                     physical_path = os.path.join(expansion_path, fscr.logical_path)
                     if fscr.fileset.partition.expansion_no == 0:
                         # make this dir
-                        print "mkdir_p(%s)" % physical_path
+                        logging.info( "mkdir_p(%s)" % physical_path )
                         #mkdir_p(physical_path)
                         # no links to make in this case
                     elif fscr.fileset.partition.expansion_no > 0:
@@ -109,15 +110,15 @@ class fsc_fileset_dir_maker:
                         # Now lop off the FileSet dir to get to the parent
                         (parent, fs) = os.path.split( fs_full_path )
                         # make the parent
-                        print "mkdir_p(%s)" % parent
+                        logging.info( "mkdir_p(%s)" % parent )
                         #mkdir_p( parent )
                         # make the symlink (sits in the parent dir ...ie. = fs_full_path) pointing to the expansion dir
-                        print "ln(%s, %s)" % (physical_path, fs_full_path)
+                        logging.info( "ln(%s, %s)" % (physical_path, fs_full_path) )
                         #ln( physical_path , fs_full_path )
                     else:
-                        print "Invalid expansion no for partition %s" % fscr.fileset.partition
+                        logging.error( "Invalid expansion no for partition %s" % fscr.fileset.partition )
                 else:
-                        print "No partition allocated for fileset : unable to make & link fileset dirs"
+                        logging.error( "No partition allocated for fileset : unable to make & link fileset dirs" )
                         pass
             else:
                 pass
@@ -135,10 +136,10 @@ def fileset_will_fit(fileset, partition, threshold=0.9):
     result = None
     if fileset.overall_final_size <= (partition.available_space * threshold):
         result = True
-        print "FileSet: %d\tAvailable:\t%d\tResult:\t%d" % (fileset.overall_final_size, (partition.available_space * threshold), result)
+        logging.info( "FileSet: %d\tAvailable:\t%d\tResult:\t%d" % (fileset.overall_final_size, (partition.available_space * threshold), result) )
     else:
         result = False
-        print "FileSet: %d\tAvailable:\t%d\tResult:\t%d" % (fileset.overall_final_size, (partition.available_space * threshold), result)
+        logging.info( "FileSet: %d\tAvailable:\t%d\tResult:\t%d" % (fileset.overall_final_size, (partition.available_space * threshold), result) )
 
     return result
     
@@ -191,12 +192,12 @@ class allocator:
                         pass
                     # TODO ...update this partition's availability value to reflect the fact we've just given it a load of data (but not really, yet)
                     fs.save()
-                    print "FileSet %s allocated to Partition %s" % (fs, alloc_partition.mountpoint)
+                    logging.info( "FileSet %s allocated to Partition %s" % (fs, alloc_partition.mountpoint) )
                     partitions.append( alloc_partition )
                 else:
-                    print "FileSet %s already allocated to Partition %s" % (fs, fs.partition.mountpoint)
+                    logging.warn( "FileSet %s already allocated to Partition %s" % (fs, fs.partition.mountpoint) )
             else:
-                print "Handling non-primary FileSetCollectionRelations not implemented yet"
+                logging.error( "Handling non-primary FileSetCollectionRelations not implemented yet" )
             
         
 def usage():
@@ -217,11 +218,13 @@ def usage():
     
 
 def main():
+    logging.basicConfig(level=logging.INFO)
+
     try:
         opts, args = getopt.getopt(sys.argv[1:], "ha:p:", ["help", "action="])
     except getopt.GetoptError, err:
         # print help information and exit:
-        print str(err) # will print something like "option -a not recognized"
+        logging.error( str(err) )# will print something like "option -a not recognized"
         usage()
         sys.exit(2)
     action = None
@@ -237,21 +240,24 @@ def main():
         else:
             assert False, "unhandled option"
 
-    print "Action : %s" % action
-    print "Path : %s" % path
+    logging.info( "Action : %s" % action )
+    logging.info( "Path : %s" % path )
 
     if action == "link_fsc_partitions":
-        print "Link FileSetCollection to Partitions in PartitionPool"
+        logging.info( "Link FileSetCollection to Partitions in PartitionPool" )
         tool = fsc_partition_linker(path)
         tool.link_fsc_to_partitions()
     elif action == "allocate":
-        print "Allocate Partitions to FileSets"
+        logging.info( "Allocate Partitions to FileSets" )
         tool = allocator(path)
         tool.allocate_round_robin()    
     elif action == "make_fsdirs":
-        print "Make & link FileSet dirs"
+        logging.info( "Make & link FileSet dirs" )
         tool = fsc_fileset_dir_maker(path)
         tool.make_fileset_dirs()
+    else:
+        logging.error( "Action not supported: %s" % action )
+        usage()
 
 if __name__=="__main__":
     main()
