@@ -1,6 +1,8 @@
 from django.core.management import setup_environ
 import sys
 import settings
+import logging
+
 setup_environ(settings)
 
 from cedainfoapp.models import *
@@ -13,27 +15,35 @@ This maps filesets to filesetcollections and sets up expansion directories and l
 
 import csv
 
+logging.basicConfig(level=logging.INFO)
+
 csv_file = sys.argv[1]
 fsc_path = sys.argv[2]
-csvReader = csv.reader(open(csv_file), delimiter=',')
+try:
+    csvReader = csv.reader(open(csv_file), delimiter=',')
+    logging.debug("Opened CSV file %s" % csv_file) 
+except(IOError), e:
+    logging.error("Could not open CSV file %s : exiting\n" % csv_file )
+    sys.exit(1)
 
 try:
     fsc = FileSetCollection.objects.get(logical_path=fsc_path)
+    logging.debug("Found FileSetCollection %s" % fsc)
 except:
-    print "Could not find FileSetCollection with logical path %s : exiting" % fsc_path
+    logging.error("Could not find FileSetCollection with logical path %s : exiting" % fsc_path)
     sys.exit(1)
 
 for row in csvReader:
     if ((row[4] is not None) and (row[4] != "")):
         (requested_vol,FileSet_relative_logical_path) = (row[3],row[4])
-        print "Creating FileSet:  %s : %s" % (FileSet_relative_logical_path, requested_vol)
+        logging.info("Creating FileSet:  %s : %s" % (FileSet_relative_logical_path, requested_vol) )
         fs = FileSet(overall_final_size=requested_vol)
-        print "%s %s" % (fs, fs.overall_final_size)
-        fs.save()
+        logging.info( "%s %s" % (fs, fs.overall_final_size) )
+        #fs.save()
         fscr = FileSetCollectionRelation(fileset=fs, fileset_collection=fsc, logical_path=FileSet_relative_logical_path, is_primary=True)
-        print "%s %s" % (fscr, fs.label)
-        fscr.save() # save method should re-save fs so don't need to explicitly do fs.save() again
-        print "%s %s" % (fscr, fs.label)
+        logging.info( "%s %s" % (fscr, fs.label) )
+        #fscr.save() # save method should re-save fs so don't need to explicitly do fs.save() again
+        logging.info( "%s %s" % (fscr, fs.label) )
     else:
-        print "Insufficient info : %s" % row[1]
+        logging.warn( "Insufficient info : %s" % row[1] )
         pass
