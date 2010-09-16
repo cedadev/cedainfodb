@@ -2,6 +2,7 @@ import getopt, sys
 import os, errno
 import re
 import logging
+import csv
 
 from django.core.management import setup_environ
 import settings
@@ -198,8 +199,47 @@ class allocator:
                     logging.warn( "FileSet %s already allocated to Partition %s" % (fs, fs.partition.mountpoint) )
             else:
                 logging.error( "Handling non-primary FileSetCollectionRelations not implemented yet" )
-            
+
+class filesetmaker:
+    '''Allocates filesets in a FileSetCollection to partitions in the associated partitionpool'''
+    def __init__(self, path):
+        self.logical_path = path
+        self.fsc = FileSetCollection.objects.get(logical_path=self.logical_path)
         
+    def make_filesets_from_csv(self, csvfile):  # NB csvfile = file object (not filename)
+        logging.info("Make filesets from CSV file")
+        try:
+            csvReader = csv.reader(csvfile, delimiter=',')
+            logging.debug("Opened CSV file %s" % csvfile) 
+        except(IOError), e:
+            logging.error("Could not open CSV file %s : exiting\n" % csvfile )
+            pass
+
+        try:
+            fsc = FileSetCollection.objects.get(logical_path=self.logical_path)
+            logging.debug("Found FileSetCollection %s" % fsc)
+            fscr_made = []
+            for row in csvReader:
+                if ((row[4] is not None) and (row[4] != "")):
+                    (requested_vol,FileSet_relative_logical_path) = (row[3],row[4])
+                    logging.info("Creating FileSet:  %s : %s" % (FileSet_relative_logical_path, requested_vol) )
+                    fs = FileSet(overall_final_size=requested_vol)
+                    logging.info( "%s %s" % (fs, fs.overall_final_size) )
+                    fs.save()
+                    fscr = FileSetCollectionRelation(fileset=fs, fileset_collection=fsc, logical_path=FileSet_relative_logical_path, is_primary=True)
+                    logging.info( "%s %s" % (fscr, fs.label) )
+                    fscr.save() # save method should re-save fs so don't need to explicitly do fs.save() again
+                    fscr_made.append(fscr)
+                    logging.info( "%s %s" % (fscr, fs.label) )
+                else:
+                    logging.warn( "Insufficient info : %s" % row[1] )
+                    pass        
+        except:
+            logging.error("Could not find FileSetCollection with logical path %s : exiting" % self.logical_path)
+            
+        # return a list of the filesetcollectionrelations created
+        return fscr_made
+
 def usage():
     print "FileSetCollection Manager"
     print "Usage: %s <arguments>" % sys.argv[0]
@@ -208,11 +248,15 @@ def usage():
     print "\t\tlink_fsc_partitions:"
     print "\t\t\tLink FileSetCollection to Partitions in PartitionPool"
     print "\t\tallocate"
+    print "\t\t\tMake FileSets"
+    print "\t\tmake_filesets"
     print "\t\t\tAllocate Partitions to FileSets"
     print "\t\tmake_fsdirs"
     print "\t\t\tMake and link directories for FileSets"
     print "\t-p --path"
     print "\t\tlogical path of FileSetCollection to be managed"
+    print "\t-c --csvfile"
+    print "\t\tCSV File (for action=make_filesets)"
 
 
     
@@ -221,7 +265,7 @@ def main():
     logging.basicConfig(level=logging.INFO)
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "ha:p:", ["help", "action="])
+        opts, args = getopt.getopt(sys.argv[1:], "ha:p:c:", ["help", "action="])
     except getopt.GetoptError, err:
         # print help information and exit:
         logging.error( str(err) )# will print something like "option -a not recognized"
@@ -229,6 +273,7 @@ def main():
         sys.exit(2)
     action = None
     path = None
+    csvfilename = None
     for o, a in opts:
         if o in ("-h", "--help"):
             usage()
@@ -237,6 +282,8 @@ def main():
             action = a
         elif o in ("-p", "--path"):
             path = a
+        elif o in ("-c", "--csvfile"):
+            csvfilename = a
         else:
             assert False, "unhandled option"
 
@@ -247,6 +294,26 @@ def main():
         logging.info( "Link FileSetCollection to Partitions in PartitionPool" )
         tool = fsc_partition_linker(path)
         tool.link_fsc_to_partitions()
+    elif action == "make_filesets":
+        logging.info( "Make Filesets" )
+        tool = filesetmaker(path)
+        if csvfilename is not None:
+            # create a file object & pass that to make_filesets_from_csv()
+            logging.info( "Making Filesets from CSV file ")
+            csvfile = None
+            try:
+                logging.debug("Opening csv file %s" % csvfilename)
+                csvfile = open(csvfilename)
+                logging.debug("Got csv file object %s" % csvfile)
+            except:
+                logging.error("Unable to open CSV file %s" % csvfilename)
+                system.exit(1)
+            if csvfile is not None:
+                fs_made = tool.make_filesets_from_csv(csvfile)
+                for fscr in fs_made:
+                    logging.info("***FileSet %s" % fscr.fileset)                    
+            else:
+                logging.error("CSV file object was empty...")
     elif action == "allocate":
         logging.info( "Allocate Partitions to FileSets" )
         tool = allocator(path)
