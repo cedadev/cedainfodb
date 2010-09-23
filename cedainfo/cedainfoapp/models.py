@@ -219,9 +219,11 @@ class DataEntity(models.Model):
 
 class Service(models.Model):
     '''Software-based service'''
-    host = models.ManyToManyField(Host, help_text="Host machine on which service is deployed")
+    host = models.ManyToManyField(Host, help_text="Host machine on which service is deployed", null=True, blank=True)
     name = models.CharField(max_length=512, help_text="Name of service")
+    active = models.BooleanField(default=False)
     description = models.TextField(blank=True, help_text="Longer description if needed")
+    documentation = models.URLField(blank=True)
     externally_visible = models.BooleanField(default=False, help_text="Whether or not this service is visible outside the RAL firewall")
     deployment_type = models.CharField(max_length=50,       
         choices=(
@@ -235,10 +237,14 @@ class Service(models.Model):
     dependencies = models.ManyToManyField('self', blank=True, help_text="Other services that this one depends on")
     availability_tolerance = models.CharField(max_length=50,
         choices=(
-        ("disposable","disposable"),
         ("immediate","must be restored ASAP"),
         ("24 hours","must be restored within 24 hours of failure"),
         ("1 workingday","must be restored within 1 working day of failure"),
+        ("3 workingdays","must be restored within 3 working days of failure"),
+        ("1 week","must be restored within 1 week of failure"),
+        ("2 weeks","must be restored within 2 weeks of failure"),
+        ("1 month","must be restored within 1 month of failure"),
+        ("disposable","disposable"),
         ),
         default="disposable",
         help_text="How tolerant of unavailability we should be for this service"

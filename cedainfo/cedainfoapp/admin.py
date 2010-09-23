@@ -12,7 +12,7 @@ admin.site.register(CurationCategory)
 admin.site.register(BackupPolicy)
 admin.site.register(AccessStatus)
 admin.site.register(Person)
-admin.site.register(Service)
+#admin.site.register(Service)
 admin.site.register(HostHistory)
 admin.site.register(FileSetCollectionRelation)
 admin.site.register(PartitionPool)
@@ -35,6 +35,18 @@ class HostAdmin(admin.ModelAdmin):
 	    return db_field.formfield(**kwargs)
 	return super(HostAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 admin.site.register(Host, HostAdmin)
+
+# For the service admin we need a form with hosts listed in alphabetical order.
+# Create a custom form, then use it in the ServiceAdmin class
+class ServiceAdminForm(forms.ModelForm):
+    host = forms.ModelMultipleChoiceField(Host.objects.all().order_by('hostname'))
+    dependencies = forms.ModelMultipleChoiceField(Service.objects.all().order_by('name'))
+    class Meta:
+        model = Host
+
+class ServiceAdmin(admin.ModelAdmin):
+    form = ServiceAdminForm
+admin.site.register(Service, ServiceAdmin)
 
 # customise the Rack admin interface
 class RackAdmin(admin.ModelAdmin):
