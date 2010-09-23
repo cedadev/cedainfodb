@@ -221,9 +221,9 @@ class Service(models.Model):
     '''Software-based service'''
     host = models.ManyToManyField(Host, help_text="Host machine on which service is deployed", null=True, blank=True)
     name = models.CharField(max_length=512, help_text="Name of service")
-    active = models.BooleanField(default=False, "Is this service active or has it been decomissioned?")
+    active = models.BooleanField(default=False, help_text="Is this service active or has it been decomissioned?")
     description = models.TextField(blank=True, help_text="Longer description if needed")
-    documentation = models.URLField(blank=True, "URL to documentation for service in opman")
+    documentation = models.URLField(blank=True, help_text="URL to documentation for service in opman")
     externally_visible = models.BooleanField(default=False, help_text="Whether or not this service is visible outside the RAL firewall")
     deployment_type = models.CharField(max_length=50,       
         choices=(
