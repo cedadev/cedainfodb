@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}
+FileSetCollection setup workflow
+{% endblock %}
+
+{% block header %}
+    <h2>FileSetCollection setup workflow</h2>
+{% endblock %}
+
+{% block content %}
+<h3>1. Choose a FileSetCollection and a PartitionPool. Make archive directories and link them.</h3>
+<form action="" method="POST">
+<table border="1">
+	{{ form.as_table }}
+	<tr>
+		<td>Link FSC with Parition Pool</td>
+		<td><input name="submitButton" type="Submit" value="Go"></td>
+	</tr>
+	<tr>
+		<td>Status</td>
+		<td>{{status}}</td>
+	</tr>
+</table>
+</form>
+{% endblock %}

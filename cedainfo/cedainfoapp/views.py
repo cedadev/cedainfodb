@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 
 import datetime
 
+logging=settings.LOG
 
 # use generic view list_detail.object_list for Hosts (see urls.py)
 
@@ -331,3 +332,72 @@ def nodelist(request):
 
 
     return render_to_response('cedainfoapp/nodelist_view.txt', {'hostlist_list': hostlist_list, 'racklist_list': racklist_list}, mimetype="text/plain")  
+
+#### Methods to setup filesetcollections
+
+def filesetcollection_setup(request):
+# Workflow for setting up new FileSetCollection
+
+    return render_to_response('cedainfoapp/filesetcollection_setup.html', )
+
+from fsc_manager import *
+
+def filesetcollection_link_fsc_partition(request):
+    
+    #Choose or create a filesetcollection to link with a ParitionPool
+    form = None
+    disabled = None
+    status = None
+    if request.method=='POST':
+        # Must have come from a form submission ...process the form
+        form = FileSetCollectionLinkForm(request.POST)
+        if form.is_valid():
+            fsc = form.cleaned_data['filesetcollection']
+            logging.debug("Got fsc from form : %s" % fsc)
+            if fsc.partitionpool is not None:
+                if Partition.objects.filter(partition_pool=fsc.partitionpool).count() < 1:
+                    # Parition pool has no partitions
+                    status = "Selected PartitionPool has no Partitions associated with it : please try again"
+                else:
+                    try:
+                        tool = fsc_partition_linker(fsc.logical_path)
+                        logging.info("About to link filesetcollection to partitionpool")
+                        tool.link_fsc_to_partitions()
+                        status = "Done"
+                    except:
+                        status = "Error"
+            else:
+                # No partitionpool attached to this FSC
+                status = "Selected FileSetCollection has no ParitionPool : please try again"
+    else:
+        # First time loading page is via GET, from a link
+        form = FileSetCollectionLinkForm()
+
+    return render_to_response('cedainfoapp/filesetcollection_link.html', {'form': form, 'status': status})
+
+def filesetcollection_make_filesets(request):
+    '''Parse a CSV File to define filesets & their estimated sizes'''
+    status = None
+    fs_made = []
+    if request.method == 'POST':
+        form = FileSetMakerForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                # do something
+                logging.info("Setting up tool for making FileSets")
+                fsc = form.cleaned_data['filesetcollection']
+                logging.info("Got FileSetCollection %s from form" % fsc)
+                file = form.cleaned_data['file']
+                logging.info("Got File %s from form" % file)
+                tool = filesetmaker(fsc.logical_path)
+                logging.info("Made tool")
+                fs_made = tool.make_filesets_from_csv( file )
+                logging.info("Made FileSets")
+                status = 'success : %d filesets made' % len(fs_made)
+            except:
+                status = "Error"
+    else:
+        form = FileSetMakerForm()
+
+    return render_to_response('cedainfoapp/filesetcollection_make_filesets.html', {'form': form, 'status': status, 'fs_made': fs_made})
+

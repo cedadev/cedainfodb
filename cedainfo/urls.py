@@ -49,10 +49,12 @@ urlpatterns = patterns('',
     (r'^filesetcollection/index/$', filesetcollection_list),
     (r'^filesetcollection/index/extended/$', filesetcollection_list_extended),
     (r'^filesetcollection/(?P<id>\d+)/$', filesetcollection_view),
+    (r'^filesetcollection/setup$', filesetcollection_setup),
+    (r'^filesetcollection/link$', filesetcollection_link_fsc_partition),
+    (r'^filesetcollection/allocate/(?P<id>\d+)/$', filesetcollection_link_fsc_partition),
+    (r'^filesetcollection/make_filesets$', filesetcollection_make_filesets),
 
     (r'^rack/services/(?P<rack_id>\d+)$', services_by_rack),
-
-    (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root':settings.STATIC_DOC_ROOT,'show_indexes': True}),
 
     # userdb
     (r'^userdb/userstats/$', user_stats),

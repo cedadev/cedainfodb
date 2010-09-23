@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}
+FileSetCollection : make filesets
+{% endblock %}
+
+{% block header %}
+    <h2>FileSetCollection make filesets</h2>
+{% endblock %}
+
+{% block content %}
+<h3>2. Parse a CSV file to define FileSets for a FileSetCollection</h3>
+<table border="1">
+	<form action="" method="POST" enctype="multipart/form-data">
+	{{form.as_table}}
+	<tr>
+		<td>Make filesets</td>
+		<td><input type="Submit" value="Go"></td>
+	</tr>
+	</form>
+	<tr>
+		<td>Status</td>
+		<td>{{status}}</td>
+	</tr>
+	{% for fscr in fs_made %}
+	<tr>
+		<td>{{fscr.fileset}}</td>
+		<td>{{fscr.fileset.overall_final_size}} bytes</td>
+	</tr>
+	{% endfor %}
+</table>
+{% endblock %}
