@@ -219,7 +219,8 @@ class DataEntity(models.Model):
 
 class Service(models.Model):
     '''Software-based service'''
-    host = models.ManyToManyField(Host, help_text="Host machine on which service is deployed", null=True, blank=True)
+    #host = models.ManyToManyField(Host, help_text="Host machine on which service is deployed", null=True, blank=True)
+    host = models.ForeignKey(Host, help_text="Host machine on which service is deployed", null=True, blank=True)
     name = models.CharField(max_length=512, help_text="Name of service")
     active = models.BooleanField(default=False, help_text="Is this service active or has it been decomissioned?")
     description = models.TextField(blank=True, help_text="Longer description if needed")
@@ -253,7 +254,10 @@ class Service(models.Model):
     installer = models.ForeignKey(Person, null=True, blank=True, related_name='service_installer', help_text="CEDA Person installing the service")
     software_contact = models.ForeignKey(Person, null=True, blank=True, related_name='service_software_contact', help_text="CEDA or 3rd party contact who is responsible for the software component used for the service")
     def __unicode__(self):
-        return u'%s' % self.name
+        theHost = ''
+        if self.host is not None:
+            theHost = self.host
+        return u'%s (%s)' % (self.name, theHost)
 
 class HostHistory(models.Model):
     '''Entries detailing history of changes to a Host'''

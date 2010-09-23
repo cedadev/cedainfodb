@@ -47,7 +47,7 @@ Services by rack
 														{% for service in value %}
 															<tr>
 																<td>
-																	<span class="tiny"><a href="/admin/cedainfoapp/service/{{service.id}}" title="service: {{service}}"><img src="/static/images/service.png" border="0" alt="{{service}}">{{service}}</a></span>
+																	<span class="tiny"><a href="/admin/cedainfoapp/service/{{service.id}}" title="service: {{service.name}}"><img src="/static/images/service.png" border="0" alt="{{service.name}}">{{service.name}}</a></span>
 																</td>
 															</tr>
 
@@ -79,7 +79,7 @@ Services by rack
 																					{% for s in v %}
 																						<tr>
 																							<td>
-																								<span class="tiny"><a href="/admin/cedainfoapp/service/{{s.id}}" title="service: {{s}}"><img src="/static/images/service.png" border="0" alt="{{s}}">{{s}}</a></span>
+																								<span class="tiny"><a href="/admin/cedainfoapp/service/{{s.id}}" title="service: {{s.name}}"><img src="/static/images/service.png" border="0" alt="{{s.name}}">{{s.name}}</a></span>
 																								
 																							</td>
 																						</tr>

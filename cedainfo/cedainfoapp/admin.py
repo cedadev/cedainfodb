@@ -39,13 +39,15 @@ admin.site.register(Host, HostAdmin)
 # For the service admin we need a form with hosts listed in alphabetical order.
 # Create a custom form, then use it in the ServiceAdmin class
 class ServiceAdminForm(forms.ModelForm):
-    host = forms.ModelMultipleChoiceField(Host.objects.all().order_by('hostname'))
+    host = forms.ModelChoiceField(Host.objects.all().order_by('hostname'))
     dependencies = forms.ModelMultipleChoiceField(Service.objects.all().order_by('name'))
     class Meta:
         model = Host
 
 class ServiceAdmin(admin.ModelAdmin):
     form = ServiceAdminForm
+    list_display = ('name', 'host', 'active')
+    list_filter = ('host', 'active')
 admin.site.register(Service, ServiceAdmin)
 
 # customise the Rack admin interface
