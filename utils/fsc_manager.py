@@ -220,6 +220,7 @@ class filesetmaker:
             logging.debug("Found FileSetCollection %s" % fsc)
             fscr_made = []
             for row in csvReader:
+                # TOCO : skip if FileSet already exists with this relative path in this FSC
                 if ((row[4] is not None) and (row[4] != "")):
                     (requested_vol,FileSet_relative_logical_path) = (row[3],row[4])
                     logging.info("Creating FileSet:  %s : %s" % (FileSet_relative_logical_path, requested_vol) )

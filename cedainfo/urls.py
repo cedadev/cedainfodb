@@ -51,7 +51,7 @@ urlpatterns = patterns('',
     (r'^filesetcollection/(?P<id>\d+)/$', filesetcollection_view),
     (r'^filesetcollection/setup$', filesetcollection_setup),
     (r'^filesetcollection/link$', filesetcollection_link_fsc_partition),
-    (r'^filesetcollection/allocate/(?P<id>\d+)/$', filesetcollection_link_fsc_partition),
+    (r'^filesetcollection/allocate$', filesetcollection_allocate),
     (r'^filesetcollection/make_filesets$', filesetcollection_make_filesets),
 
     (r'^rack/services/(?P<rack_id>\d+)$', services_by_rack),

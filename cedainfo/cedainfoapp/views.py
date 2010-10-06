@@ -400,3 +400,35 @@ def filesetcollection_make_filesets(request):
 
     return render_to_response('cedainfoapp/filesetcollection_make_filesets.html', {'form': form, 'status': status, 'fs_made': fs_made})
 
+def filesetcollection_allocate(request):
+    
+    #Choose or create a filesetcollection to perform allocations on
+    form = None
+    disabled = None
+    status = None
+    if request.method=='POST':
+        # Must have come from a form submission ...process the form
+        form = FileSetCollectionAllocationForm(request.POST)
+        if form.is_valid():
+            fsc = form.cleaned_data['filesetcollection']
+            logging.debug("Got fsc from form : %s" % fsc)
+            if fsc.partitionpool is not None:
+                if Partition.objects.filter(partition_pool=fsc.partitionpool).count() < 1:
+                    # Parition pool has no partitions
+                    status = "Selected PartitionPool has no Partitions associated with it : please try again"
+                else:
+                    try:
+                        tool = allocator(fsc.logical_path)
+                        logging.info("About to allocate filesets for filesetcollection ")
+                        tool.allocate_round_robin()
+                        status = "Done"
+                    except:
+                        status = "Error"
+            else:
+                # No partitionpool attached to this FSC
+                status = "Selected FileSetCollection has no ParitionPool : please try again"
+    else:
+        # First time loading page is via GET, from a link
+        form = FileSetCollectionAllocationForm()
+
+    return render_to_response('cedainfoapp/filesetcollection_allocate.html', {'form': form, 'status': status})

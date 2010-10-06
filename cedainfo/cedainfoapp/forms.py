@@ -1,10 +1,10 @@
 from django.forms import *
-from cedainfo.cedainfoapp.models import *
+from models import *
 from django.contrib.admin import widgets
 from django.forms.extras.widgets import SelectDateWidget
 
 import datetime
-
+ 
 # make list of years to use in select box for date widget, current year minus 10
 YEARS = []
 start_year = -10 + datetime.date.today().year
@@ -33,25 +33,25 @@ class DataEntityRecipeForm(DataEntityForm):
     def __init__(self, *args, **kwargs):
         super(DataEntityRecipeForm, self).__init__(*args, **kwargs)
         # doesn't seem to work disabling fields here ...makes form incomplete & therefore invalid.
-	self.fields['recipes_explanation'] = CharField(widget=forms.Textarea(attrs={'cols':'60','rows':'10'}))
+        self.fields['recipes_explanation'] = CharField(widget=forms.Textarea(attrs={'cols':'60','rows':'10'}))
 
 
 ### popupplus stuff see http://www.hoboes.com/Mimsy/hacks/replicating-djangos-admin/
 from django.template.loader import render_to_string
 
 class SelectWithPop(Select):
-	def render(self, name, *args, **kwargs):
-		html = super(SelectWithPop, self).render(name, *args, **kwargs)
-		popupplus = render_to_string("form/popupplus.html", {'field': name})
+    def render(self, name, *args, **kwargs):
+        html = super(SelectWithPop, self).render(name, *args, **kwargs)
+        popupplus = render_to_string("form/popupplus.html", {'field': name})
 
-		return html+popupplus
+        return html+popupplus
 
 class MultipleSelectWithPop(SelectMultiple):
-	def render(self, name, *args, **kwargs):
-		html = super(MultipleSelectWithPop, self).render(name, *args, **kwargs)
-		popupplus = render_to_string("form/popupplus.html", {'field': name})
+    def render(self, name, *args, **kwargs):
+        html = super(MultipleSelectWithPop, self).render(name, *args, **kwargs)
+        popupplus = render_to_string("form/popupplus.html", {'field': name})
 
-		return html+popupplus
+        return html+popupplus
 # end of popupplus stuff
 
 # Subclass ModelChoiceForm with custom label_from_instance method to use custom label showing FileSetCollection AND PartitionPool
@@ -69,5 +69,6 @@ class FileSetMakerForm(Form):
     filesetcollection = ModelChoiceField( queryset=FileSetCollection.objects.all() )
     file = FileField()
     
-        
+class FileSetCollectionAllocationForm(Form):
+    filesetcollection = FSCPPModelChoiceField( queryset=FileSetCollection.objects.all(), widget=SelectWithPop ) 
         
