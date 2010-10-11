@@ -77,8 +77,10 @@ class fsc_partition_linker:
             mkdir_p(top_level_dir)
 
             # Create a symlink to that directory (should skip if exists already)
-            logging.info( '%s -> %s' % get_expansion_path_and_top_level_dir(partition, self.logical_path) )
-            ln(expansion_path, top_level_dir)
+            (expansion_link, top_level_dir) = get_expansion_path_and_top_level_dir(partition, self.logical_path)
+            logging.info( '%s -> %s' % (top_level_dir, expansion_link) )
+            # should be creating the link '/badc/.cmip5_expansionX' (dst), pointing to '/disks/lime1/archive/cmip5' (src)
+            ln(top_level_dir, expansion_link)
 
 class fsc_fileset_dir_maker:
     '''Makes FileSet dirs for all FileSets in a FileSetCollection (defined by logical path), and links
@@ -163,6 +165,8 @@ class allocator:
             filesets.append(fscr.fileset)
             # make a note of is_primary ...means we can handle things in one go later
             filesets[i].is_primary = fscr.is_primary
+            if (filesets[i].is_primary):
+                filesets[i].relative_logical_path = fscr.logical_path
             i += 1
 
 
@@ -187,13 +191,21 @@ class allocator:
                     # algorithm : yes if fileset.overall_final_size <= threshold * partition.available_space
                     #               where partition.available_bytes = capacity_bytes - (sum of all filesets' overall final sizes)
                     if fileset_will_fit(fs, alloc_partition):
+                        logging.info("FileSet %s will fit on partition %s" % (fs, alloc_partition.mountpoint) )                       
                         fs.partition = alloc_partition
+
+                        logging.debug("Saved changes to FileSet %s" % fs)
+                        # Make the directories down to this FileSet dir
+                        fileset_path = os.path.join(self.fsc.logical_path, fs.relative_logical_path)
+                        logging.debug("FileSet path to make = %s" % fileset_path)
+                        mkdir_p(fileset_path)
+                        fs.save()
                     else:
+                        logging.warn("FileSet %s won't fit on partition %s" % (fs, alloc_partition.mountpoint) )
                         # skip this partition ...try the next
                         pass
                     # TODO ...update this partition's availability value to reflect the fact we've just given it a load of data (but not really, yet)
-                    fs.save()
-                    logging.info( "FileSet %s allocated to Partition %s" % (fs, alloc_partition.mountpoint) )
+
                     partitions.append( alloc_partition )
                 else:
                     logging.warn( "FileSet %s already allocated to Partition %s" % (fs, fs.partition.mountpoint) )
@@ -217,26 +229,39 @@ class filesetmaker:
 
         try:
             fsc = FileSetCollection.objects.get(logical_path=self.logical_path)
-            logging.debug("Found FileSetCollection %s" % fsc)
+            logging.debug("Here: Found FileSetCollection %s" % fsc)
             fscr_made = []
+            #size_column = fsc_manager_csv_cols['size']
+            size_column = 6
+            logging.debug("Size column: %d" % size_column)
+            #path_column = fsc_manager_csv_cols['path']
+            path_column = 7
+            logging.debug("Path column: %d" % path_column)
+
             for row in csvReader:
-                # TOCO : skip if FileSet already exists with this relative path in this FSC
-                if ((row[4] is not None) and (row[4] != "")):
-                    (requested_vol,FileSet_relative_logical_path) = (row[3],row[4])
-                    logging.info("Creating FileSet:  %s : %s" % (FileSet_relative_logical_path, requested_vol) )
-                    fs = FileSet(overall_final_size=requested_vol)
-                    logging.info( "%s %s" % (fs, fs.overall_final_size) )
-                    fs.save()
-                    fscr = FileSetCollectionRelation(fileset=fs, fileset_collection=fsc, logical_path=FileSet_relative_logical_path, is_primary=True)
-                    logging.info( "%s %s" % (fscr, fs.label) )
-                    fscr.save() # save method should re-save fs so don't need to explicitly do fs.save() again
-                    fscr_made.append(fscr)
-                    logging.info( "%s %s" % (fscr, fs.label) )
+                #TODO : skip if FileSet already exists with this relative path in this FSC
+                if ((row[path_column] is not None) and (row[path_column] != "")):
+                    (requested_vol,FileSet_relative_logical_path) = (int(row[size_column]),row[path_column])
+                    # check first to see if FileSet already exists with this relative path
+                    fscr_existing = FileSetCollectionRelation.objects.filter(fileset_collection=fsc).filter(logical_path=FileSet_relative_logical_path)
+                    if (fscr_existing.count() == 0):
+                        logging.info("Creating FileSet:  %s : %s" % (FileSet_relative_logical_path, requested_vol) )
+                        fs = FileSet(overall_final_size=requested_vol)
+                        logging.debug("Created FileSet")
+                        fs.save()
+                        logging.debug( "FileSet %s OverallFinalSize %s" % (fs, fs.overall_final_size) )
+                        fscr = FileSetCollectionRelation(fileset=fs, fileset_collection=fsc, logical_path=FileSet_relative_logical_path, is_primary=True)
+                        logging.debug( "FSCR %s Label %s" % (fscr, fs.label) )
+                        fscr.save() # save method should re-save fs so don't need to explicitly do fs.save() again
+                        fscr_made.append(fscr)
+                        logging.info( "Created FSCR %s Label %s" % (fscr, fs.label) )
+                    else:
+                        logging.warn("FileSet with this logical path already exists : " % FileSet_relative_logical_path)
                 else:
-                    logging.warn( "Insufficient info : %s" % row[1] )
+                    logging.warn( "Insufficient info : %s" % row )
                     pass        
         except:
-            logging.error("Could not find FileSetCollection with logical path %s : exiting" % self.logical_path)
+            logging.error("Error processing FileSetCollection %s : exiting" % self.logical_path)
             
         # return a list of the filesetcollectionrelations created
         return fscr_made
