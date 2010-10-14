@@ -65,7 +65,7 @@ class fsc_partition_linker:
     def __init__(self, path):
         self.logical_path = path
         self.fsc = FileSetCollection.objects.get(logical_path=self.logical_path)
-
+        
     def link_fsc_to_partitions(self):
         # Find the partitions belonging to the partitionpool of this FileSetCollection
         partitions = Partition.objects.filter(partition_pool=self.fsc.partitionpool)
@@ -104,20 +104,29 @@ class fsc_fileset_dir_maker:
                     physical_path = os.path.join(expansion_path, fscr.logical_path)
                     if fscr.fileset.partition.expansion_no == 0:
                         # make this dir
+                        logging.info("%s is primary partition : making physical directory" % fscr.fileset.partition)
                         logging.info( "mkdir_p(%s)" % physical_path )
-                        #mkdir_p(physical_path)
+                        mkdir_p(physical_path)
                         # no links to make in this case
                     elif fscr.fileset.partition.expansion_no > 0:
-                        # To make the partent dir of the FileSet, first find the dir of the FileSet
+                        # In this case, we're linking to the fileset on an expansion partition.
+                        # We need to
+                        #    - make the physical directory on the expansion partition.
+                        #    - make a link (in the corresponding parent dir on the primary partition,
+                        #      pointing to this location (via the /badc/.expansion_N link
+                        logging.info("%s is expansion partition : 1st making parent physical directory in primary partition" % fscr.fileset.partition)
                         fs_full_path = os.path.join( top_level_dir, fscr.logical_path )
-                        # Now lop off the FileSet dir to get to the parent
-                        (parent, fs) = os.path.split( fs_full_path )
-                        # make the parent
-                        logging.info( "mkdir_p(%s)" % parent )
-                        #mkdir_p( parent )
-                        # make the symlink (sits in the parent dir ...ie. = fs_full_path) pointing to the expansion dir
-                        logging.info( "ln(%s, %s)" % (physical_path, fs_full_path) )
-                        #ln( physical_path , fs_full_path )
+                        # Now lop off the final FileSet dir to get to the parent
+                        (parent_in_primary, fs) = os.path.split( logical_path )
+                        logging.info("About to make parent in primary partition : %s " % parent_in_primary )
+                        mkdir_p(parent_in_primary)
+                        
+                        logging.info("About to make physical dir in expansion partition : %s" % physical_path )
+                        mkdir_p( physical_path )
+                        
+                        logging.info("About to link from logical to physical path: %s -> %s" % (physical_path, logical_path ) )
+                        logging.info( "ln(%s, %s)" % (physical_path, logical_path) )
+                        ln( physical_path, logical_path )
                     else:
                         logging.error( "Invalid expansion no for partition %s" % fscr.fileset.partition )
                 else:
@@ -198,7 +207,7 @@ class allocator:
                         # Make the directories down to this FileSet dir
                         fileset_path = os.path.join(self.fsc.logical_path, fs.relative_logical_path)
                         logging.debug("FileSet path to make = %s" % fileset_path)
-                        mkdir_p(fileset_path)
+                        #mkdir_p(fileset_path) # NOT HERE ...do this by call to make_fsdirs
                         fs.save()
                     else:
                         logging.warn("FileSet %s won't fit on partition %s" % (fs, alloc_partition.mountpoint) )
@@ -274,9 +283,9 @@ def usage():
     print "\t\tlink_fsc_partitions:"
     print "\t\t\tLink FileSetCollection to Partitions in PartitionPool"
     print "\t\tallocate"
-    print "\t\t\tMake FileSets"
-    print "\t\tmake_filesets"
     print "\t\t\tAllocate Partitions to FileSets"
+    print "\t\tmake_filesets"
+    print "\t\t\tMake FileSets"
     print "\t\tmake_fsdirs"
     print "\t\t\tMake and link directories for FileSets"
     print "\t-p --path"
@@ -288,7 +297,7 @@ def usage():
     
 
 def main():
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], "ha:p:c:", ["help", "action="])
