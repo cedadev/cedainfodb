@@ -224,7 +224,7 @@ class Service(models.Model):
     name = models.CharField(max_length=512, help_text="Name of service")
     active = models.BooleanField(default=False, help_text="Is this service active or has it been decomissioned?")
     description = models.TextField(blank=True, help_text="Longer description if needed")
-    documentation = models.URLField(blank=True, help_text="URL to documentation for service in opman")
+    documentation = models.URLField(verify_exists=False, blank=True, help_text="URL to documentation for service in opman")
     externally_visible = models.BooleanField(default=False, help_text="Whether or not this service is visible outside the RAL firewall")
     deployment_type = models.CharField(max_length=50,       
         choices=(
@@ -235,7 +235,7 @@ class Service(models.Model):
         default="simple",
         help_text="Type of deployment"
     )
-    dependencies = models.ManyToManyField('self', blank=True, help_text="Other services that this one depends on")
+    dependencies = models.ManyToManyField('self', blank=True, null=True, help_text="Other services that this one depends on")
     availability_tolerance = models.CharField(max_length=50,
         choices=(
         ("immediate","must be restored ASAP"),
