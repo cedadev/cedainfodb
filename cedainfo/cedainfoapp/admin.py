@@ -40,7 +40,7 @@ admin.site.register(Host, HostAdmin)
 # Create a custom form, then use it in the ServiceAdmin class
 class ServiceAdminForm(forms.ModelForm):
     host = forms.ModelChoiceField(Host.objects.all().order_by('hostname'))
-    dependencies = forms.ModelMultipleChoiceField(Service.objects.all().order_by('name'))
+    dependencies = forms.ModelMultipleChoiceField(Service.objects.all().order_by('name'), required=False)
     class Meta:
         model = Host
 
