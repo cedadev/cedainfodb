@@ -5,11 +5,11 @@ from django.forms.extras.widgets import SelectDateWidget
 
 import datetime
  
-# make list of years to use in select box for date widget, current year minus 10
+# make list of years to use in select box for date widget, current year minus 10, going forward 5 years
 YEARS = []
-start_year = -10 + datetime.date.today().year
+start_year = -15 + datetime.date.today().year
 i = 0
-while i <= 10:
+while i <= 15:
     YEARS.append(start_year+i)
     i = i + 1
 
