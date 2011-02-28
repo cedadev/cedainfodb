@@ -75,6 +75,8 @@ class Group(models.Model):
     description = models.TextField()
     valid_from = models.DateField() # Default? Allow Blank/Null?
     valid_to = models.DateField() # Default? Allow Blank/Null?
+    comments = models.TextField()
+
     def __unicode__(self):
         return self.name
         
@@ -100,28 +102,44 @@ class Role(models.Model):
     
  
 
-class ConditionsOfUse(models.Model):
+class Conditions(models.Model):
+    # The text of any conditions that need signing up to to get a role in 
+    # a group. THis may be shared text used by a number of groups.
+    #
     # use implicit id as PK
     # ? name?
-    role = models.ForeignKey(Role)
-    group = models.ForeignKey(Group)
-    text = models.TextField() # ?
+    #role = models.ForeignKey(Role)
+    #group = models.ForeignKey(Group)
+    # removing role and group and putting them in ApplicationProcess
+    title = models.TextField() # title of conditions 
+    text = models.TextField() # text of conditions 
+    
     def __unicode__(self):
-        return "%s - %s" % (self.role, self.group)    #?
+        return "%s" % (self.name, )    #?
     
 class Licence(models.Model):
     # use implicit id as PK
     user = models.ForeignKey(User)
     institute = models.ForeignKey(Institute)
-    role = models.ForeignKey(Role, related_name='licence_role')    
-    group = models.ForeignKey(Role, related_name='licence_group')
     start_date = models.DateField(auto_now_add=True)
     end_date = models.DateField() # default = now + N years?
     research = models.TextField()     
     grantref = models.CharField(max_length=50, blank=True, null=True)    
-    conditions = models.ForeignKey(ConditionsOfUse)
+    application_process = models.ForeignKey(ApplicationProcess)
+
     def __unicode__(self):
         return "%s - %s" % (self.role, self.user.lastname)
+
+
+class ApplicationProcess(models.Model):
+    # How to get a role in a group by signing up to a set of conditions
+    role = models.ForeignKey(Role)
+    group = models.ForeignKey(Group)
+    conditions = models.ForeignKey(Conditions)
+    defaultreglength = models.IntegerField()
+    datacentre = models.CharField(max_length=50) 
+    authtype = models.CharField(max_length=50)
+    
 
 # ditched fields
 
