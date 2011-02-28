@@ -117,6 +117,16 @@ class Conditions(models.Model):
     def __unicode__(self):
         return "%s" % (self.name, )    #?
     
+class ApplicationProcess(models.Model):
+    # How to get a role in a group by signing up to a set of conditions
+    role = models.ForeignKey(Role)
+    group = models.ForeignKey(Group)
+    conditions = models.ForeignKey(Conditions)
+    defaultreglength = models.IntegerField()
+    datacentre = models.CharField(max_length=50) 
+    authtype = models.CharField(max_length=50)
+    
+
 class Licence(models.Model):
     # use implicit id as PK
     user = models.ForeignKey(User)
@@ -130,16 +140,6 @@ class Licence(models.Model):
     def __unicode__(self):
         return "%s - %s" % (self.role, self.user.lastname)
 
-
-class ApplicationProcess(models.Model):
-    # How to get a role in a group by signing up to a set of conditions
-    role = models.ForeignKey(Role)
-    group = models.ForeignKey(Group)
-    conditions = models.ForeignKey(Conditions)
-    defaultreglength = models.IntegerField()
-    datacentre = models.CharField(max_length=50) 
-    authtype = models.CharField(max_length=50)
-    
 
 # ditched fields
 

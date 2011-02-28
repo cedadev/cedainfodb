@@ -1,6 +1,6 @@
 
 import psycopg2.psycopg1 as psycopg  #Updated by ASH
-
+import string
 
 from ConfigParser import *
 
@@ -67,6 +67,9 @@ cur.execute(sql)
 records = cur.fetchall()
 
 for rec in records:
+    if rec[2] == 'None': c = country['']
+    else: c = country[rec[2]]
+    
     JSON.write("""
   {
      "model": "userdb.institute",
@@ -78,7 +81,7 @@ for rec in records:
 	"link": "%s"
 	}
   },
-  """ % (rec[0], rec[1], country[rec[2]], rec[3], rec[4]) )
+  """ % (rec[0], rec[1], c, rec[3], rec[4]) )
 
 
 
@@ -100,6 +103,12 @@ records = cur.fetchall()
 for rec in records:
     startdate = ("%s"%rec[26])[0:10]
     if startdate == "None": startdate = "1995-01-01"
+    address = string.join(rec[19:25], ', ')
+    postcode = ''
+    for i in range(24,19,-1):
+        if rec[i]:
+            postcode = rec[i]
+            break
     JSON.write( """
     
   {
@@ -107,42 +116,62 @@ for rec in records:
      "pk":%s,
      "fields": {
         "title": "%s",
-	"surname": "%s",
-	"othernames": "%s",
-        "telephoneno": "%s", 
-        "emailaddress": "%s", 
+	"firstname": "%s",
+	"lastname": "%s",
+        "email": "%s", 
+        "tel": "%s", 
+        "address": "%s",
+        "postcode": "%s",
+        "webpage": "%s",
         "comments": "%s",
         "endorsedby": "%s",
-        "degree": "%s",
-        "field": "%s",
-        "accountid": "%s",
-        "accounttype": "%s", 
-        "encpasswd": "%s",
-        "md5passwd": "%s",
-        "webpage": "%s",
-        "sharedetails": "%s",
-        "datacentre": "%s",
-        "openid_username_component": "%s",
+        "studying_for": "%s",
+        "field_of_study": "%s",
+        "supervisor": "%s",
+        "password_md5": "%s",
+        "startdate": "%s",
+        "reg_source": "%s",
         "openid": "%s",
-        "department": "%s",
-        "address1": "%s",
-        "address2": "%s",
-        "address3": "%s",
-        "address4": "%s",
-        "address5": "%s",
-        "institute": %s,
-	"startdate": "%s"
+        "username": "%s"
 	}
   },
-  """ % (rec[0],rec[1],rec[2],rec[3], 
-        rec[4],rec[5],jsonescape(rec[6]),rec[7], 
-	rec[8],rec[9],rec[10],rec[11],
-	rec[12],rec[13],rec[14],rec[15] == -1,
-	rec[16],rec[17],rec[18],rec[19],
-	rec[20],rec[21],rec[22],rec[23],
-	rec[24],rec[25], startdate)  )
+  """ % (rec[0],rec[1],rec[3],rec[2], 
+        rec[5],rec[4],address,
+        postcode,rec[14],jsonescape(rec[6]),
+        rec[7],rec[8],rec[9],rec[7],
+        rec[13],
+        startdate, rec[16],rec[18],rec[10])  )
 
-# roles (aka groups)
+
+# roles
+    JSON.write( """
+  {
+     "model": "userdb.roles",
+     "pk":1,
+     "fields": {
+        "name": "Get Data",
+	"description": "get data from archive"	}
+  },
+  {
+     "model": "userdb.roles",
+     "pk":2,
+     "fields": {
+        "name": "Authoriser",
+	"description": "authoriser"	}
+  },
+  {
+     "model": "userdb.roles",
+     "pk":3,
+     "fields": {
+        "name": "Membership Veiwer",
+	"description": "Veiw membership"	}
+  },
+  """  )
+
+
+    
+
+#   groups and applicationprocess
 sql = """select datasetid, authtype, grp, grouptype, description,
 source, ukmoform, ordr, comments, directory, metdata, 
 conditions, defaultreglength, datacentre, infourl 
@@ -152,33 +181,41 @@ cur.execute(sql)
 records = cur.fetchall()
 
 i=1
-roles = {}
+groups = {}
 
 for rec in records:
+    # group records
     JSON.write("""
   {
-     "model": "userdb.role",
+     "model": "userdb.group",
      "pk":%s,
      "fields": {
         "name": "%s",
-	"authtype": "%s",
-	"grouptype": "%s",
 	"description": "%s",
-	"source": "%s",
-	"ukmoform": "%s",
-	"comments": "%s",
-	"directory": "%s",
-	"metdata": "%s",
+	"valid_from": "",
+	"valid_to": "",
+	"comments": "%s"
+	}
+  },
+  """ % (i,rec[0], jsonescape(rec[4]), jsonescape(rec[8]) ) )
+
+    # application process records
+    JSON.write("""
+  {
+     "model": "userdb.applicationprocess",
+     "pk":%s,
+     "fields": {
+        "role": "1",
+	"group": "%s",
 	"conditions": "%s",
 	"defaultreglength": "%s",
 	"datacentre": "%s",
-	"infourl": "%s"
+	"authtype": "%s"
 	}
   },
-  """ % (i,rec[0], rec[1], rec[3], jsonescape(rec[4]), 
-         rec[5], rec[6] == -1, jsonescape(rec[8]), rec[9],
-	 rec[10] == -1, rec[11], rec[12], rec[13], rec[14] ) )
-    roles[rec[0]] = i
+  """ % (i,i, rec[11], rec[12], rec[13], rec[1] ) )
+
+    groups[rec[0]] = i
     i = i+1
 
 
@@ -204,27 +241,17 @@ for rec in records:
      "model": "userdb.licence",
      "pk":%s,
      "fields": {
-        "role": "%s",
 	"user": "%s",
-	"ver": "%s",
-	"endorsedby": "%s",
-	"endorseddate": "%s",
+        "institute": "None",
+	"start_date": "%s",
+	"end_date": "%s",
 	"research": "%s",
-	"nercfunded": "%s",
-	"removed": "%s",
-	%s
 	"grantref": "%s",
-	"grantref": "%s",
-	%s
-	"extrainfo": "%s"
+	"application_process": "%s"
 	}
   },
-  """ % (i,roles[rec[1]], rec[0], rec[2], rec[3], 
-         ("%s"%rec[4])[0:10],
-	 jsonescape(rec[5]), 
-	 rec[6] == -1, rec[7] == -1, 
-	 removeddate, jsonescape(rec[9]), rec[10], 
-	 expiredate, jsonescape(rec[11])  ) )
+  """ % (i,rec[0],rec[4],rec[12],jsonescape(rec[5]),rec[9],groups[rec[1]]))
+
 
     i = i+1
 
