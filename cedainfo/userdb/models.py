@@ -36,9 +36,9 @@ class User(models.Model):
             ) 
     firstname = models.CharField(max_length=100)
     lastname = models.CharField(max_length=50)
-    email = models.EmailField(unique=True)     
+    email = models.EmailField()     
     tel = models.CharField(max_length=50, blank=True, null=True) 
-    address = models.TextField()
+    address = models.TextField(blank=True, null=True)
     postcode = models.CharField(max_length=10)
     webpage = models.CharField(max_length=256, blank=True, null=True)    
     comments = models.TextField(blank=True, null=True)
@@ -63,6 +63,7 @@ class User(models.Model):
     reg_source = models.CharField(max_length=50, blank=True, null=True) # where the user registered (choices : as per current table)
     openid = models.CharField(max_length=256, blank=True, null=True)    
     username = models.CharField(max_length=50)
+    institute =  models.ForeignKey(Institute)
     # TODO custom save method:
     #   - if emailaddress or institute are changned, notify helpdesk
 

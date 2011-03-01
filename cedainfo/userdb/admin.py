@@ -29,14 +29,12 @@ class GroupAdmin(admin.ModelAdmin):
 admin.site.register(Group, GroupAdmin)
 
 class LicenceAdmin(admin.ModelAdmin):
-    list_display = ('role', 'user', 'group', 'start_date', 'end_date')
-    list_filter = ('role',)
+    list_display = ('user', 'start_date', 'end_date')
 admin.site.register(Licence, LicenceAdmin)
 
-class ConditionsOfUseAdmin(admin.ModelAdmin):
-    list_display = ('role', 'group', 'text')
-    list_filter = ('role', 'group',)
-admin.site.register(ConditionsOfUse, ConditionsOfUseAdmin)
+class ConditionsAdmin(admin.ModelAdmin):
+    list_display = ('title', 'text')
+admin.site.register(Conditions, ConditionsAdmin)
 
 
 

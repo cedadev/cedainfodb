@@ -29,11 +29,11 @@ def jsonescape(s):
     return s
 
 
-JSON = open("dump.json", 'w')
-JSON.write('[\n')
 
-
+#=================
 #countries
+JSON = open("dump1.country.json", 'w')
+JSON.write('[\n')
 country = {}
 sql = """select name, area, isocode from countries"""
     
@@ -59,8 +59,14 @@ for rec in records:
     country[rec[0]] = i
     i = i+1
 
+# write a dummy end record to get the last comma right and end JSON file
+JSON.write('{"model": "userdb.country", "pk":10000, "fields": { "name": "DELETE ME",	"area": "other", "isocode": "XX"}} ]')
+JSON.close()
 
+#===============
 #institutes
+JSON = open("dump2.institute.json", 'w')
+JSON.write('[\n')
 sql = """select institutekey, name, country, type, link from tbinstitutes"""
     
 cur.execute(sql)
@@ -83,10 +89,16 @@ for rec in records:
   },
   """ % (rec[0], rec[1], c, rec[3], rec[4]) )
 
+# write a dummy end record to get the last comma right and end JSON file
+JSON.write('{"model": "userdb.country", "pk":10000, "fields": { "name": "DELETE ME",	"area": "other", "isocode": "XX"}} ]')
+JSON.close()
 
 
 
+#================
 #users
+JSON = open("dump3.user.json", 'w')
+JSON.write('[\n')
 sql = """select userkey, title, surname, othernames, telephoneno, 
 emailaddress, comments, endorsedby, degree, field, accountid,
 accounttype, encpasswd, md5passwd, webpage, sharedetails, 
@@ -132,7 +144,8 @@ for rec in records:
         "startdate": "%s",
         "reg_source": "%s",
         "openid": "%s",
-        "username": "%s"
+        "username": "%s",
+        "institute": "%s"
 	}
   },
   """ % (rec[0],rec[1],rec[3],rec[2], 
@@ -140,38 +153,52 @@ for rec in records:
         postcode,rec[14],jsonescape(rec[6]),
         rec[7],rec[8],rec[9],rec[7],
         rec[13],
-        startdate, rec[16],rec[18],rec[10])  )
+        startdate, rec[16],rec[18],rec[10],
+	rec[25]  ))
+
+# write a dummy end record to get the last comma right and end JSON file
+JSON.write('{"model": "userdb.country", "pk":10000, "fields": { "name": "DELETE ME",	"area": "other", "isocode": "XX"}} ]')
+JSON.close()
 
 
+#================
 # roles
-    JSON.write( """
+JSON = open("dump4.role.json", 'w')
+
+JSON.write( """[
   {
-     "model": "userdb.roles",
+     "model": "userdb.role",
      "pk":1,
      "fields": {
         "name": "Get Data",
 	"description": "get data from archive"	}
   },
   {
-     "model": "userdb.roles",
+     "model": "userdb.role",
      "pk":2,
      "fields": {
         "name": "Authoriser",
 	"description": "authoriser"	}
   },
   {
-     "model": "userdb.roles",
+     "model": "userdb.role",
      "pk":3,
      "fields": {
         "name": "Membership Veiwer",
 	"description": "Veiw membership"	}
-  },
+  }
+  ]
   """  )
 
+JSON.close()
 
     
-
+#========================
 #   groups and applicationprocess
+JSONg = open("dump5.group.json", 'w')
+JSONg.write('[\n')
+JSONap = open("dump6.appproc.json", 'w')
+JSONap.write('[\n')
 sql = """select datasetid, authtype, grp, grouptype, description,
 source, ukmoform, ordr, comments, directory, metdata, 
 conditions, defaultreglength, datacentre, infourl 
@@ -185,7 +212,7 @@ groups = {}
 
 for rec in records:
     # group records
-    JSON.write("""
+    JSONg.write("""
   {
      "model": "userdb.group",
      "pk":%s,
@@ -200,7 +227,7 @@ for rec in records:
   """ % (i,rec[0], jsonescape(rec[4]), jsonescape(rec[8]) ) )
 
     # application process records
-    JSON.write("""
+    JSONap.write("""
   {
      "model": "userdb.applicationprocess",
      "pk":%s,
@@ -217,6 +244,12 @@ for rec in records:
 
     groups[rec[0]] = i
     i = i+1
+
+# write a dummy end record to get the last comma right and end JSON file
+JSONg.write('{"model": "userdb.country", "pk":10000, "fields": { "name": "DELETE ME",	"area": "other", "isocode": "XX"}} ]')
+JSONg.close()
+JSONap.write('{"model": "userdb.country", "pk":10000, "fields": { "name": "DELETE ME",	"area": "other", "isocode": "XX"}} ]')
+JSONap.close()
 
 
 # Licences
@@ -250,7 +283,7 @@ for rec in records:
 	"application_process": "%s"
 	}
   },
-  """ % (i,rec[0],rec[4],rec[12],jsonescape(rec[5]),rec[9],groups[rec[1]]))
+  """ % (i,rec[0],rec[4],rec[12],jsonescape(rec[5]),jsonescape(rec[9]),groups[rec[1]]))
 
 
     i = i+1
