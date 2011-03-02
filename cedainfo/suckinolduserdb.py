@@ -2,6 +2,11 @@
 import psycopg2.psycopg1 as psycopg  #Updated by ASH
 import string
 
+
+import urllib2
+import re
+
+
 from ConfigParser import *
 
 configdict = ConfigParser()
@@ -17,6 +22,9 @@ conn = psycopg.connect("dbname=%s user=%s password=%s host=%s" % (dbname, user, 
 
 cur = conn.cursor()
 
+tt=''
+for i in range(128,255): tt += chr(i)
+ttable =string.maketrans(tt, " "*127)
 
 def jsonescape(s): 
     if s ==None: s =''
@@ -26,6 +34,12 @@ def jsonescape(s):
     s = s.replace('\v', ' ')
     s = s.replace('"', '\\"')
     s = s.replace("\t", "\\t")
+    s = s.replace("\x92", "'")
+    s = s.replace("\xa0", " ")
+    s = s.replace("\x0e", " ")
+    s = s.translate(ttable)
+    s = unicode(s)
+    s = str(s)
     return s
 
 
@@ -194,11 +208,13 @@ JSON.close()
 
     
 #========================
-#   groups and applicationprocess
+#   groups, conditions and applicationprocess
 JSONg = open("dump5.group.json", 'w')
 JSONg.write('[\n')
 JSONap = open("dump6.appproc.json", 'w')
 JSONap.write('[\n')
+JSONc = open("dump7.conditions.json", 'w')
+JSONc.write('[\n')
 sql = """select datasetid, authtype, grp, grouptype, description,
 source, ukmoform, ordr, comments, directory, metdata, 
 conditions, defaultreglength, datacentre, infourl 
@@ -207,10 +223,40 @@ FROM tbdatasets"""
 cur.execute(sql)
 records = cur.fetchall()
 
+# make default conditions record
+JSONc.write("""{ "model": "userdb.conditions", "pk":%s, "fields": {"title": "%s", "text": "%s"}},
+            """ % (1,'EMPTY conditions', 'No conditions?' ) )
+
 i=1
 groups = {}
+conditioni = 2
+conditions = {}
 
 for rec in records:
+
+
+    conditionsurl = rec[11]
+    conditionsurl = string.replace(conditionsurl,'$HTROOT', 'http://badc.nerc.ac.uk')
+
+    # extract conditions of use from web
+    if conditionsurl not in conditions.keys(): 
+        print "conditions url: %s" % (conditionsurl, )
+        try: f = urllib2.urlopen(conditionsurl)
+        except:
+            conditions[conditionsurl] = 1            
+        else:
+            conditionstext = f.readlines()
+            conditionstext = string.join(conditionstext,'')
+            conditionstext = jsonescape(conditionstext)
+            m = re.search('<title>(.*)</title>', conditionstext, re.I)
+            if m: title = m.group(1)
+            conditions[conditionsurl] = conditioni
+	    conditioni += 1
+            # conditions records
+            JSONc.write("""{ "model": "userdb.conditions", "pk":%s, "fields": {"title": "%s", "text": "%s"}},
+                  """ % (conditions[conditionsurl],title, conditionstext ) )
+
+
     # group records
     JSONg.write("""
   {
@@ -219,8 +265,6 @@ for rec in records:
      "fields": {
         "name": "%s",
 	"description": "%s",
-	"valid_from": "",
-	"valid_to": "",
 	"comments": "%s"
 	}
   },
@@ -240,24 +284,37 @@ for rec in records:
 	"authtype": "%s"
 	}
   },
-  """ % (i,i, rec[11], rec[12], rec[13], rec[1] ) )
+  """ % (i,i, conditions[conditionsurl], rec[12], rec[13], rec[1] ) )
+
+
+    print rec[0], conditionsurl, conditions[conditionsurl]
+
 
     groups[rec[0]] = i
     i = i+1
+
+  
 
 # write a dummy end record to get the last comma right and end JSON file
 JSONg.write('{"model": "userdb.country", "pk":10000, "fields": { "name": "DELETE ME",	"area": "other", "isocode": "XX"}} ]')
 JSONg.close()
 JSONap.write('{"model": "userdb.country", "pk":10000, "fields": { "name": "DELETE ME",	"area": "other", "isocode": "XX"}} ]')
 JSONap.close()
+JSONc.write('{"model": "userdb.country", "pk":10000, "fields": { "name": "DELETE ME",	"area": "other", "isocode": "XX"}} ]')
+JSONc.close()
 
-
+#===================
 # Licences
+JSON = open("dump8.licence.json", 'w')
+JSON.write('[\n')
     
-sql = """select userkey, datasetid, ver, endorsedby, endorseddate,
-research, nercfunded, removed, removeddate, grantref, openpub,
-extrainfo, expiredate 
-FROM tbdatasetjoin"""
+sql = """select dsj.userkey, dsj.datasetid, dsj.ver, dsj.endorsedby, dsj.endorseddate,
+dsj.research, dsj.nercfunded, dsj.removed, dsj.removeddate, dsj.grantref, dsj.openpub,
+dsj.extrainfo, dsj.expiredate, i.name 
+FROM tbdatasetjoin AS dsj, tbusers AS u, tbinstitutes AS i, addresses AS a 
+WHERE dsj.userkey = u.userkey 
+  AND a.addresskey = u.addresskey
+  AND a.institutekey = i.institutekey"""
     
 cur.execute(sql)
 records = cur.fetchall()
@@ -265,17 +322,15 @@ records = cur.fetchall()
 i=0
 
 for rec in records:
-    if rec[8]: removeddate = '"removeddate": "%s",'% ("%s"%rec[8])[0:10] 
-    else: removeddate = ""
-    if rec[12]: expiredate = '"expiredate": "%s",'% ("%s"%rec[12])[0:10] 
-    else: expiredate = ""
+    if rec[12]: expiredate = rec[12] 
+    else: expiredate = "2020-01-01"
     JSON.write("""
   {
      "model": "userdb.licence",
      "pk":%s,
      "fields": {
 	"user": "%s",
-        "institute": "None",
+        "institute": "%s",
 	"start_date": "%s",
 	"end_date": "%s",
 	"research": "%s",
@@ -283,22 +338,17 @@ for rec in records:
 	"application_process": "%s"
 	}
   },
-  """ % (i,rec[0],rec[4],rec[12],jsonescape(rec[5]),jsonescape(rec[9]),groups[rec[1]]))
+  """ % (i,rec[0],jsonescape(rec[13]),
+         rec[4],expiredate,jsonescape(rec[5]),jsonescape(rec[9]),groups[rec[1]]))
 
 
     i = i+1
 
-
 # write a dummy end record to get the last comma right and end JSON file
-JSON.write("""
-  {
-     "model": "userdb.country",
-     "pk":10000,
-     "fields": {
-        "name": "DELETE ME",
-	"area": "other",
-	"isocode": "XX"
-	}
-  }
-]
-""" )
+JSON.write('{"model": "userdb.country", "pk":10000, "fields": { "name": "DELETE ME",	"area": "other", "isocode": "XX"}} ]')
+JSON.close()
+
+
+#=========================
+# priveleges
+

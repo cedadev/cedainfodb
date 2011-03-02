@@ -32,9 +32,12 @@ class LicenceAdmin(admin.ModelAdmin):
     list_display = ('user', 'start_date', 'end_date')
 admin.site.register(Licence, LicenceAdmin)
 
-class ConditionsAdmin(admin.ModelAdmin):
-    list_display = ('title', 'text')
-admin.site.register(Conditions, ConditionsAdmin)
+
+admin.site.register(Conditions)
+
+class ApplicationProcessAdmin(admin.ModelAdmin):
+    list_display = ('role', 'group', 'conditions')
+admin.site.register(ApplicationProcess, ApplicationProcessAdmin)
 
 
 

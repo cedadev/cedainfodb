@@ -74,8 +74,8 @@ class Group(models.Model):
     # use implicit id as PK
     name = models.CharField(max_length=50, unique=True)
     description = models.TextField()
-    valid_from = models.DateField() # Default? Allow Blank/Null?
-    valid_to = models.DateField() # Default? Allow Blank/Null?
+    valid_from = models.DateField(blank=True, null=True) # Default? Allow Blank/Null?
+    valid_to = models.DateField(blank=True, null=True) # Default? Allow Blank/Null?
     comments = models.TextField()
 
     def __unicode__(self):
@@ -112,34 +112,37 @@ class Conditions(models.Model):
     #role = models.ForeignKey(Role)
     #group = models.ForeignKey(Group)
     # removing role and group and putting them in ApplicationProcess
-    title = models.TextField() # title of conditions 
+    title = models.CharField(max_length=500,blank=True, null=True) # title of conditions 
     text = models.TextField() # text of conditions 
     
     def __unicode__(self):
-        return "%s" % (self.name, )    #?
+        return "%s" % (self.title, )    #?
     
 class ApplicationProcess(models.Model):
     # How to get a role in a group by signing up to a set of conditions
     role = models.ForeignKey(Role)
     group = models.ForeignKey(Group)
-    conditions = models.ForeignKey(Conditions)
+    conditions = models.ForeignKey(Conditions, blank=True, null=True)
     defaultreglength = models.IntegerField()
     datacentre = models.CharField(max_length=50) 
     authtype = models.CharField(max_length=50)
+
+    def __unicode__(self):
+        return "%s %s" % (self.role, self.group)    #?
     
 
 class Licence(models.Model):
     # use implicit id as PK
     user = models.ForeignKey(User)
-    institute = models.ForeignKey(Institute)
-    start_date = models.DateField(auto_now_add=True)
-    end_date = models.DateField() # default = now + N years?
+    institute = models.CharField(max_length=200, blank=True, null=True) 
+    start_date = models.DateTimeField(auto_now_add=True)
+    end_date = models.DateTimeField() # default = now + N years?
     research = models.TextField()     
     grantref = models.CharField(max_length=50, blank=True, null=True)    
     application_process = models.ForeignKey(ApplicationProcess)
 
     def __unicode__(self):
-        return "%s - %s" % (self.role, self.user.lastname)
+        return "%s - %s" % (self.user.lastname, self.application_process)
 
 
 # ditched fields
