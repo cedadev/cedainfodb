@@ -73,6 +73,8 @@ ROOT_URLCONF = 'cedainfo.urls'
 
 STATIC_DOC_ROOT = os.path.join(PROJECT_DIR,"cedainfoapp","templates","static")
 
+LOG = 'debug.log'
+
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
