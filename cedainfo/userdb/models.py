@@ -139,10 +139,12 @@ class Licence(models.Model):
     end_date = models.DateTimeField() # default = now + N years?
     research = models.TextField()     
     grantref = models.CharField(max_length=50, blank=True, null=True)    
-    application_process = models.ForeignKey(ApplicationProcess)
+    role = models.ForeignKey(Role)
+    group = models.ForeignKey(Group)
+    conditions = models.ForeignKey(Conditions, blank=True, null=True)
 
     def __unicode__(self):
-        return "%s - %s" % (self.user.lastname, self.application_process)
+        return "%s - %s - %s" % (self.user.lastname, self.role, self.group)
 
 
 # ditched fields

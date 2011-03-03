@@ -29,7 +29,7 @@ class GroupAdmin(admin.ModelAdmin):
 admin.site.register(Group, GroupAdmin)
 
 class LicenceAdmin(admin.ModelAdmin):
-    list_display = ('user', 'start_date', 'end_date')
+    list_display = ('user', 'start_date', 'end_date', 'role')
 admin.site.register(Licence, LicenceAdmin)
 
 

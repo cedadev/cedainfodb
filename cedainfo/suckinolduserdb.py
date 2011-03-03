@@ -231,6 +231,7 @@ i=1
 groups = {}
 conditioni = 2
 conditions = {}
+groupcond = {}
 
 for rec in records:
 
@@ -243,7 +244,8 @@ for rec in records:
         print "conditions url: %s" % (conditionsurl, )
         try: f = urllib2.urlopen(conditionsurl)
         except:
-            conditions[conditionsurl] = 1            
+            conditions[conditionsurl] = 1
+	    groupcond[rec[0]] = 1            
         else:
             conditionstext = f.readlines()
             conditionstext = string.join(conditionstext,'')
@@ -251,11 +253,13 @@ for rec in records:
             m = re.search('<title>(.*)</title>', conditionstext, re.I)
             if m: title = m.group(1)
             conditions[conditionsurl] = conditioni
+	    groupcond[rec[0]]=conditioni
 	    conditioni += 1
             # conditions records
             JSONc.write("""{ "model": "userdb.conditions", "pk":%s, "fields": {"title": "%s", "text": "%s"}},
                   """ % (conditions[conditionsurl],title, conditionstext ) )
-
+    else:
+        groupcond[rec[0]]=conditions[conditionsurl]
 
     # group records
     JSONg.write("""
@@ -302,6 +306,11 @@ JSONap.write('{"model": "userdb.country", "pk":10000, "fields": { "name": "DELET
 JSONap.close()
 JSONc.write('{"model": "userdb.country", "pk":10000, "fields": { "name": "DELETE ME",	"area": "other", "isocode": "XX"}} ]')
 JSONc.close()
+iap = i
+
+print groupcond
+print
+print groups
 
 #===================
 # Licences
@@ -335,11 +344,13 @@ for rec in records:
 	"end_date": "%s",
 	"research": "%s",
 	"grantref": "%s",
-	"application_process": "%s"
+	"role": "%s",
+	"group": "%s",
+	"conditions": "%s"
 	}
   },
   """ % (i,rec[0],jsonescape(rec[13]),
-         rec[4],expiredate,jsonescape(rec[5]),jsonescape(rec[9]),groups[rec[1]]))
+         rec[4],expiredate,jsonescape(rec[5]),jsonescape(rec[9]),1,groups[rec[1]],groupcond[rec[1]] ))
 
 
     i = i+1
@@ -347,8 +358,57 @@ for rec in records:
 # write a dummy end record to get the last comma right and end JSON file
 JSON.write('{"model": "userdb.country", "pk":10000, "fields": { "name": "DELETE ME",	"area": "other", "isocode": "XX"}} ]')
 JSON.close()
-
+ilicence = i
 
 #=========================
 # priveleges
 
+JSON = open("dump9.priv.json", 'w')
+JSON.write('[\n')
+    
+sql = """select p.userkey, p.type, p.datasetid, p.comment, i.name 
+FROM privilege AS P, tbusers AS u, tbinstitutes AS i, addresses AS a 
+WHERE p.userkey = u.userkey 
+  AND a.addresskey = u.addresskey
+  AND a.institutekey = i.institutekey"""
+    
+cur.execute(sql)
+records = cur.fetchall()
+
+# these are more licences. Need to keep i form previous licence block 
+
+for rec in records:
+    expiredate = "2020-01-01"
+    startdate = "2009-01-01"
+    if rec[1] == 'authorise': role = 2
+    elif rec[1] == 'viewusers': role =3
+    else: raise "Unknown role type"
+
+    # licence
+    if rec[2] not in groups.keys(): continue
+    JSON.write("""
+  {
+     "model": "userdb.licence",
+     "pk":%s,
+     "fields": {
+	"user": "%s",
+        "institute": "%s",
+	"start_date": "%s",
+	"end_date": "%s",
+	"research": "%s",
+	"grantref": "%s",
+	"role": "%s",
+	"group": "%s",
+	"conditions": "%s"
+	}
+  },
+  """ % (ilicence,rec[0],jsonescape(rec[4]),
+         startdate,expiredate,jsonescape(rec[3]),'',
+	 role,groups[rec[2]], groupcond[rec[2]]))
+
+
+    ilicence = ilicence+1
+
+# write a dummy end record to get the last comma right and end JSON file
+JSON.write('{"model": "userdb.country", "pk":10000, "fields": { "name": "DELETE ME",	"area": "other", "isocode": "XX"}} ]')
+JSON.close()
