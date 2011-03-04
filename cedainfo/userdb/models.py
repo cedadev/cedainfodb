@@ -39,10 +39,9 @@ class User(models.Model):
     email = models.EmailField()     
     tel = models.CharField(max_length=50, blank=True, null=True) 
     address = models.TextField(blank=True, null=True)
-    postcode = models.CharField(max_length=10)
+    postcode = models.CharField(max_length=10, blank=True, null=True)
     webpage = models.CharField(max_length=256, blank=True, null=True)    
     comments = models.TextField(blank=True, null=True)
-    endorsedby = models.CharField(max_length=50, blank=True, null=True) 
     studying_for = models.CharField(max_length=20, blank=True, null=True,
         choices=(
             ("BS","BS"),
@@ -56,7 +55,24 @@ class User(models.Model):
             ("Other","Other")
         )
     ) 
-    field_of_study = models.CharField(max_length=100, blank=True, null=True) # (choices : as per current table)
+    field = models.CharField(max_length=100, blank=True, null=True,  
+        choices=(
+	    ("Atmospheric Physics","Atmospheric Physics"),
+	    ("Atmospheric Chemistry","Atmospheric Chemistry"),
+	    ("Earth Science","Earth Science"),
+	    ("Marine Science","Marine Science"),
+	    ("Terrestrial and Fresh Water","Terrestrial and Fresh Water"),
+	    ("Earth Observation","Earth Observation"),
+	    ("Polar Science","Polar Science"),
+	    ("Geography","Geography"),
+	    ("Engineering","Engineering"),
+	    ("Medical/Biological Sciences","Medical/Biological Sciences"),
+	    ("Maths/Computing Sciences","Maths/Computing Sciences"),
+	    ("Economics","Economics"),
+	    ("Personal use","Personal use"),
+	    ("Other","Other")
+	)
+    )
     supervisor = models.CharField(max_length=50, blank=True, null=True)
     password_md5 = models.CharField(max_length=50, blank=True, null=True)# md5 encrypted password
     startdate = models.DateField(auto_now_add=True) # date account created
@@ -80,6 +96,12 @@ class Group(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+    def emaillistlink(self):
+        return '''<a href = "/userdb/group/emails/%s">Emails</a>''' %  (self.id,)
+    emaillistlink.allow_tags = True
+
         
 class Role(models.Model):
     # use implicit id as PK
@@ -96,10 +118,6 @@ class Role(models.Model):
     def __unicode__(self):
         return self.name
 
-    def emaillistlink(self):
-        return '''<a href = "/userdb/role/emails/%s">Emails</a> 
-	          <a href = "/admin/userdb/user/?licence__role=%s&licence__removed=0">Users</a>''' %  (self.id, self.id)
-    emaillistlink.allow_tags = True
     
  
 

@@ -61,7 +61,7 @@ urlpatterns = patterns('',
     (r'^userdb/user/edit/(?P<id>\d+)/$', user_form),
     (r'^userdb/user/view/(?P<id>\d+)/$', user_view),
     (r'^userdb/user/licences/(?P<id>\d+)/$', user_licences),
-    (r'^userdb/role/emails/(?P<id>\d+)/$', role_emails),
+    (r'^userdb/group/emails/(?P<id>\d+)/$', group_emails),
     (r'^userdb/role/view/(?P<id>\d+)/$', role_view),
     
 )

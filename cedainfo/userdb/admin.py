@@ -6,7 +6,7 @@ admin.site.register(Country)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('lastname', 'firstname', 'username', 'email', 'startdate')
     search_fields = ['lastname', 'firstname', 'username', 'email']
-    list_filter = ('field_of_study','startdate','reg_source')
+    list_filter = ('field','startdate','reg_source')
 admin.site.register(User, UserAdmin)
 
 
@@ -17,13 +17,13 @@ class InstituteAdmin(admin.ModelAdmin):
 admin.site.register(Institute, InstituteAdmin)
 
 class RoleAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'emaillistlink')
+    list_display = ('name', 'description',)
     search_fields = ['name', 'description']
     #list_filter = ('datacentre',)
 admin.site.register(Role, RoleAdmin)
 
 class GroupAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'valid_from', 'valid_to')
+    list_display = ('name', 'description', 'valid_from', 'valid_to',  'emaillistlink')
     search_fields = ['name', 'description']
     #list_filter = ('valid_from', 'valid_to')
 admin.site.register(Group, GroupAdmin)

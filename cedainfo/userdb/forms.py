@@ -17,6 +17,7 @@ class UserForm(ModelForm):
     
 class UserStatsForm(Form):
     # customise the form a bit
-    Role = ModelChoiceField(queryset= Role.objects.all().order_by('name'))
+    role = ModelChoiceField(queryset= Role.objects.all().order_by('name'))
+    group = ModelChoiceField(queryset= Group.objects.all().order_by('name'))
 
 

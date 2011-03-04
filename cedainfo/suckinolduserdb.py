@@ -150,9 +150,8 @@ for rec in records:
         "postcode": "%s",
         "webpage": "%s",
         "comments": "%s",
-        "endorsedby": "%s",
         "studying_for": "%s",
-        "field_of_study": "%s",
+        "field": "%s",
         "supervisor": "%s",
         "password_md5": "%s",
         "startdate": "%s",
@@ -165,7 +164,7 @@ for rec in records:
   """ % (rec[0],rec[1],rec[3],rec[2], 
         rec[5],rec[4],address,
         postcode,rec[14],jsonescape(rec[6]),
-        rec[7],rec[8],rec[9],rec[7],
+        rec[8],rec[9],rec[7],
         rec[13],
         startdate, rec[16],rec[18],rec[10],
 	rec[25]  ))
@@ -398,13 +397,12 @@ for rec in records:
 	"research": "%s",
 	"grantref": "%s",
 	"role": "%s",
-	"group": "%s",
-	"conditions": "%s"
+	"group": "%s"
 	}
   },
   """ % (ilicence,rec[0],jsonescape(rec[4]),
          startdate,expiredate,jsonescape(rec[3]),'',
-	 role,groups[rec[2]], groupcond[rec[2]]))
+	 role,groups[rec[2]], ))
 
 
     ilicence = ilicence+1
