@@ -39,6 +39,11 @@ class ApplicationProcessAdmin(admin.ModelAdmin):
     list_display = ('role', 'group', 'conditions')
 admin.site.register(ApplicationProcess, ApplicationProcessAdmin)
 
+class LicenceRequestAdmin(admin.ModelAdmin):
+    list_display = ('role', 'group', 'request_date', 'user', 'status')
+    list_filter = ('status', 'request_date')
+admin.site.register(LicenceRequest, LicenceRequestAdmin)
+
 
 
 

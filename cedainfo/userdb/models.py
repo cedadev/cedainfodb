@@ -164,6 +164,22 @@ class Licence(models.Model):
     def __unicode__(self):
         return "%s - %s - %s" % (self.user.lastname, self.role, self.group)
 
+class LicenceRequest(models.Model):
+    # use implicit id as PK
+    user = models.ForeignKey(User)
+    request_date = models.DateTimeField(auto_now_add=True)
+    research = models.TextField()     
+    grantref = models.CharField(max_length=50, blank=True, null=True)    
+    role = models.ForeignKey(Role)
+    group = models.ForeignKey(Group)
+    conditions = models.ForeignKey(Conditions, blank=True, null=True)
+    extrainfo = models.TextField()
+    fromhost = models.CharField(max_length=50, blank=True, null=True) 
+    status = models.CharField(max_length=50, blank=True, null=True) 
+
+    def __unicode__(self):
+        return "%s - %s - %s" % (self.user.lastname, self.role, self.group)
+
 
 # ditched fields
 

@@ -410,3 +410,54 @@ for rec in records:
 # write a dummy end record to get the last comma right and end JSON file
 JSON.write('{"model": "userdb.country", "pk":10000, "fields": { "name": "DELETE ME",	"area": "other", "isocode": "XX"}} ]')
 JSON.close()
+
+
+
+#=========================
+# licence requests
+
+JSON = open("dump10.licencereq.json", 'w')
+JSON.write('[\n')
+    
+sql = """select id, userkey, datasetid, requestdate, research, nercfunded,
+fundingtype, grantref, openpub, extrainfo, fromhost, status
+FROM datasetrequest AS dr 
+""" 
+    
+cur.execute(sql)
+records = cur.fetchall()
+
+
+# these are more licences. Need to keep i form previous licence block 
+
+for rec in records:
+    # licence request
+    if rec[3]: reqdate = rec[3] 
+    else: reqdate = "2000-01-01"
+    if rec[2] not in groups.keys(): continue
+    JSON.write("""
+  {
+     "model": "userdb.licencerequest",
+     "pk":%s,
+     "fields": {
+	"user": "%s",
+        "request_date": "%s",
+	"research": "%s",
+	"grantref": "%s",
+	"role": "%s",
+	"group": "%s",
+	"conditions": "%s",
+	"extrainfo": "%s",
+	"fromhost": "%s",
+	"status": "%s"
+	}
+  },
+  """ % (rec[0], rec[1], reqdate, jsonescape(rec[4]),
+         jsonescape(rec[7]), 1, groups[rec[2]], groupcond[rec[2]] ,
+	 jsonescape(rec[9]),rec[10],rec[11] ))
+
+
+# write a dummy end record to get the last comma right and end JSON file
+JSON.write('{"model": "userdb.country", "pk":10000, "fields": { "name": "DELETE ME",	"area": "other", "isocode": "XX"}} ]')
+JSON.close()
+
