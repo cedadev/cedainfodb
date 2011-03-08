@@ -5,15 +5,10 @@ from django.contrib.admin import widgets
 
 class UserForm(ModelForm):
     # customise the form a bit
-#    dataentity_id = CharField(widget=forms.TextInput(attrs={'size':'60'}))
-#    friendly_name = CharField(widget=forms.TextInput(attrs={'size':'60'}), required=False)
-#    symbolic_name = CharField(widget=forms.TextInput(attrs={'size':'60'}), required=False)
-#    backup_destination = CharField(widget=forms.TextInput(attrs={'size':'60'}), required=False)
-#    notes = CharField(widget=forms.Textarea(attrs={'cols':'60','rows':'10'}), required=False)
-#    recipes_expression = CharField(widget=forms.TextInput(attrs={'size':'60'}), required=False)
-#    recipes_explanation = CharField(widget=forms.Textarea(attrs={'cols':'60','rows':'10'}), required=False)
     class Meta:
         model = User
+        fields = ('title', 'firstname', 'lastname', 'email', 'tel', 'address', 'postcode', 
+	          'webpage', 'studying_for', 'field', 'supervisor', 'openid')
     
 class UserStatsForm(Form):
     # customise the form a bit
@@ -21,3 +16,6 @@ class UserStatsForm(Form):
     group = ModelChoiceField(queryset= Group.objects.all().order_by('name'))
 
 
+class ChangePassword(Form):
+    passwd = CharField(widget=PasswordInput)
+    passwd2 = CharField(widget=PasswordInput)

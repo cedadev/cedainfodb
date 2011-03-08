@@ -1,4 +1,5 @@
 from django.db import models
+import md5
 
 # Create your models here.
 
@@ -85,6 +86,19 @@ class User(models.Model):
 
     def __unicode__(self):
         return "%s %s %s" % (self.title, self.firstname, self.lastname)
+
+    def update_passwd(self, passwd):
+
+        md5password = md5.new(passwd).hexdigest()
+	self.password_md5 = md5password
+	#PasswdUtils::updatePasswd ($user, $CGIpasswd);
+
+        # Write message to log file and send informational message
+        msg = "updated password for accountID=%s userkey=%s (web)" % (self.username, self.pk)
+        #WebRegUtils::write_log_msg(msg)
+        mail_info_msg(user)
+
+	
 
 class Group(models.Model):
     # use implicit id as PK

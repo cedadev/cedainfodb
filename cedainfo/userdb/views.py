@@ -1,7 +1,7 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from cedainfo.userdb.forms import *
 from django.db.models import Count
-import time, datetime
+import time, datetime, re
 # Create your views here.
 
 
@@ -104,16 +104,41 @@ def user_form(request, id):
           form = UserForm(request.POST, instance=user)
           if form.is_valid():
 	     form.save()
+	     return user_view(request, id)
        else:
           form = UserForm(instance=user)
        return render_to_response('user_form.html', {'user': user, 'form': form} )
 
+
+# Change a users password
+def changepassword_form(request, id):
+       user = User.objects.get(pk=id)
+       if request.method == 'POST':
+          form = ChangePassword(request.POST)
+          if form.is_valid():
+	     return user_view(request, id)
+       else:
+          form = ChangePassword()
+       return render_to_response('change_password.html', {'user': user, 'form': form} )
+
+
 # View a user (a la MyBADC)
 # TODO Should be protected so only user can see
 def user_view(request, id):
-       user = User.objects.get(pk=id)
-       licences = Licence.objects.filter(user=user, removed=False)
-       return render_to_response('user_view.html', {'user': user, 'licences':licences} )
+    if re.match('^\d*$', id):
+        user = User.objects.get(pk=id)
+    else:
+        user = User.objects.get(username=id)
+           
+    now = datetime.datetime.now()
+    licences = Licence.objects.filter(user=user, end_date__gte=now, start_date__lte=now)
+    return render_to_response('user_view.html', {'user': user, 'licences':licences} )
+
+# view a licence
+def licence_view(request, id):
+       now = datetime.datetime.now()
+       licence = Licence.objects.get(pk=id)
+       return render_to_response('licence_view.html', {'licence':licence} )
 
 # View a user's licences (like http://badc.nerc.ac.uk/cgi-bin/mybadc/list_datasets.cgi.pl?source=mybadc)
 # TODO Should be protected so only user can see

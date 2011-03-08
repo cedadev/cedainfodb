@@ -1,0 +1,42 @@
+<html>
+<head>
+<title>Licence number: {{ licence.id }}</title>
+</head>
+<body>
+
+<table>
+    <td valign="top">
+	  <table cellpadding="2">
+        <tr>
+          <td><b>Licencee:</b>
+          <td><a href="/userdb/user/view/{{ licence.user.username }}">
+	  {{ licence.user.firstname }} {{ licence.user.lastname }}</a> 
+	  ({{ licence.institute }}) {{ licence.user.id }}
+	</tr>
+        <tr>
+          <td><b>Group:</b>
+          <td> {{ licence.group.description }}
+	</tr>
+        <tr>
+          <td><b>Role</b>
+          <td>{{ licence.role.description }}
+	</tr>
+        <tr>
+          <td><b>Conditions:</b>
+          <td><h1>{{ licence.conditions.title }}</h1> {{ licence.conditions.text|safe }}
+	</tr>
+        <tr>
+          <td><b>Research:</b>
+          <td>{{ licence.research }} 
+	  {% if licence.grantref %}
+	  <i> [Use assosiated with grant reference number: {{ licence.grantref }}]</i> 
+	  {% endif %}
+	</tr>
+        <tr>
+          <td><b>Licence period:</b>
+          <td>{{ licence.start_date }} - {{ licence.end_date }}
+	</tr>
+</table>
+
+</body>
+</html>
