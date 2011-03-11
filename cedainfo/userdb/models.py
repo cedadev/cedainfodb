@@ -107,6 +107,9 @@ class Group(models.Model):
     valid_from = models.DateField(blank=True, null=True) # Default? Allow Blank/Null?
     valid_to = models.DateField(blank=True, null=True) # Default? Allow Blank/Null?
     comments = models.TextField()
+    infourl = models.URLField(blank=True, null=True)
+    datacentre = models.CharField(max_length=50) 
+    
 
     def __unicode__(self):
         return self.name
@@ -146,6 +149,8 @@ class Conditions(models.Model):
     # removing role and group and putting them in ApplicationProcess
     title = models.CharField(max_length=500,blank=True, null=True) # title of conditions 
     text = models.TextField() # text of conditions 
+    version = models.CharField(max_length=50,blank=True, null=True) # title of conditions 
+    comment = models.TextField() # internal annotation 
     
     def __unicode__(self):
         return "%s" % (self.title, )    #?
@@ -156,8 +161,9 @@ class ApplicationProcess(models.Model):
     group = models.ForeignKey(Group)
     conditions = models.ForeignKey(Conditions, blank=True, null=True)
     defaultreglength = models.IntegerField()
-    datacentre = models.CharField(max_length=50) 
     authtype = models.CharField(max_length=50)
+    script = models.CharField(max_length=300, blank=True, null=True)
+    intro_text = models.TextField()  
 
     def __unicode__(self):
         return "%s %s" % (self.role, self.group)    #?
@@ -167,32 +173,37 @@ class Licence(models.Model):
     # use implicit id as PK
     user = models.ForeignKey(User)
     institute = models.CharField(max_length=200, blank=True, null=True) 
-    start_date = models.DateTimeField(auto_now_add=True)
-    end_date = models.DateTimeField() # default = now + N years?
+    email = models.EmailField(blank=True, null=True)     
+    start_date = models.DateTimeField(blank=True, null=True)
+    end_date = models.DateTimeField(blank=True, null=True)
     research = models.TextField()     
-    grantref = models.CharField(max_length=50, blank=True, null=True)    
+    grantref = models.CharField(max_length=50, blank=True, null=True)
+    funding_type =  models.CharField(max_length=100, blank=True, null=True,  
+        choices=( 
+	  ("NERC","NERC"),
+	  ("AHRC","AHRC"),
+	  ("BBSRC","BBSRC"),
+	  ("EPSRC","EPSRC"),
+	  ("ESRC","ESRC"),
+	  ("MRC","MRC"),
+	  ("STFC","STFC"),
+	  ("Non-UK academic funding","Non-UK academic funding"),
+	  ("Government department","Government department"),
+	  ("Charitable trust","Charitable trust"),
+	  ("Commercial","Commercial"),
+	  ("Not funded","Not funded"),
+	  ("Other","Other")))
     role = models.ForeignKey(Role)
     group = models.ForeignKey(Group)
     conditions = models.ForeignKey(Conditions, blank=True, null=True)
-
-    def __unicode__(self):
-        return "%s - %s - %s" % (self.user.lastname, self.role, self.group)
-
-class LicenceRequest(models.Model):
-    # use implicit id as PK
-    user = models.ForeignKey(User)
     request_date = models.DateTimeField(auto_now_add=True)
-    research = models.TextField()     
-    grantref = models.CharField(max_length=50, blank=True, null=True)    
-    role = models.ForeignKey(Role)
-    group = models.ForeignKey(Group)
-    conditions = models.ForeignKey(Conditions, blank=True, null=True)
     extrainfo = models.TextField()
     fromhost = models.CharField(max_length=50, blank=True, null=True) 
     status = models.CharField(max_length=50, blank=True, null=True) 
 
     def __unicode__(self):
         return "%s - %s - %s" % (self.user.lastname, self.role, self.group)
+
 
 
 # ditched fields

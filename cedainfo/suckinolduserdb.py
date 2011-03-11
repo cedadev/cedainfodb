@@ -268,10 +268,12 @@ for rec in records:
      "fields": {
         "name": "%s",
 	"description": "%s",
-	"comments": "%s"
+	"comments": "%s",
+	"infourl": "%s",
+	"datacentre": "%s"
 	}
   },
-  """ % (i,rec[0], jsonescape(rec[4]), jsonescape(rec[8]) ) )
+  """ % (i,rec[0], jsonescape(rec[4]), jsonescape(rec[8]), rec[14], rec[13] ) )
 
     # application process records
     JSONap.write("""
@@ -283,11 +285,10 @@ for rec in records:
 	"group": "%s",
 	"conditions": "%s",
 	"defaultreglength": "%s",
-	"datacentre": "%s",
 	"authtype": "%s"
 	}
   },
-  """ % (i,i, conditions[conditionsurl], rec[12], rec[13], rec[1] ) )
+  """ % (i,i, conditions[conditionsurl], rec[12],  rec[1] ) )
 
 
     print rec[0], conditionsurl, conditions[conditionsurl]
@@ -318,7 +319,7 @@ JSON.write('[\n')
     
 sql = """select dsj.userkey, dsj.datasetid, dsj.ver, dsj.endorsedby, dsj.endorseddate,
 dsj.research, dsj.nercfunded, dsj.removed, dsj.removeddate, dsj.grantref, dsj.openpub,
-dsj.extrainfo, dsj.expiredate, i.name 
+dsj.extrainfo, dsj.expiredate, i.name, u.emailaddress, dsj.fundingtype 
 FROM tbdatasetjoin AS dsj, tbusers AS u, tbinstitutes AS i, addresses AS a 
 WHERE dsj.userkey = u.userkey 
   AND a.addresskey = u.addresskey
@@ -332,6 +333,8 @@ i=0
 for rec in records:
     if rec[12]: expiredate = rec[12] 
     else: expiredate = "2020-01-01"
+    if rec[7] == -1 :status='expired' 
+    else: status='accepted'
     JSON.write("""
   {
      "model": "userdb.licence",
@@ -345,11 +348,18 @@ for rec in records:
 	"grantref": "%s",
 	"role": "%s",
 	"group": "%s",
-	"conditions": "%s"
+	"conditions": "%s",
+	"email": "%s",
+	"funding_type": "%s",
+	"request_date": "%s",
+	"extrainfo": "%s",
+	"fromhost": "%s",
+	"status": "%s"
 	}
   },
   """ % (i,rec[0],jsonescape(rec[13]),
-         rec[4],expiredate,jsonescape(rec[5]),jsonescape(rec[9]),1,groups[rec[1]],groupcond[rec[1]] ))
+         rec[4],expiredate,jsonescape(rec[5]),jsonescape(rec[9]),1,groups[rec[1]],groupcond[rec[1]],
+	 rec[14], rec[15],rec[4],jsonescape(rec[11]), '?', status))
 
 
     i = i+1
@@ -379,6 +389,7 @@ records = cur.fetchall()
 for rec in records:
     expiredate = "2020-01-01"
     startdate = "2009-01-01"
+    reqdate = "2009-01-01"
     if rec[1] == 'authorise': role = 2
     elif rec[1] == 'viewusers': role =3
     else: raise "Unknown role type"
@@ -397,13 +408,14 @@ for rec in records:
 	"research": "%s",
 	"grantref": "%s",
 	"role": "%s",
-	"group": "%s"
+	"group": "%s",
+	"status": "%s",
+	"request_date": "%s"
 	}
   },
   """ % (ilicence,rec[0],jsonescape(rec[4]),
          startdate,expiredate,jsonescape(rec[3]),'',
-	 role,groups[rec[2]], ))
-
+	 role,groups[rec[2]], 'accepted', reqdate))
 
     ilicence = ilicence+1
 
@@ -421,7 +433,8 @@ JSON.write('[\n')
     
 sql = """select id, userkey, datasetid, requestdate, research, nercfunded,
 fundingtype, grantref, openpub, extrainfo, fromhost, status
-FROM datasetrequest AS dr 
+FROM datasetrequest AS dr
+WHERE status <> 'accepted' 
 """ 
     
 cur.execute(sql)
@@ -437,7 +450,7 @@ for rec in records:
     if rec[2] not in groups.keys(): continue
     JSON.write("""
   {
-     "model": "userdb.licencerequest",
+     "model": "userdb.licence",
      "pk":%s,
      "fields": {
 	"user": "%s",
@@ -452,10 +465,11 @@ for rec in records:
 	"status": "%s"
 	}
   },
-  """ % (rec[0], rec[1], reqdate, jsonescape(rec[4]),
+  """ % (ilicence, rec[1], reqdate, jsonescape(rec[4]),
          jsonescape(rec[7]), 1, groups[rec[2]], groupcond[rec[2]] ,
 	 jsonescape(rec[9]),rec[10],rec[11] ))
 
+    ilicence = ilicence+1
 
 # write a dummy end record to get the last comma right and end JSON file
 JSON.write('{"model": "userdb.country", "pk":10000, "fields": { "name": "DELETE ME",	"area": "other", "isocode": "XX"}} ]')
