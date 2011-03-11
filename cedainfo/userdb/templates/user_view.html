@@ -8,53 +8,7 @@
   <tr>
     <td valign="top" width="35%">
 	  <!-- leftmost of 3 major columns -->
-	  <table bgcolor="#eeeeee" width="100%">
-        <tr>
-          <td bgcolor="#5f99ff" align=center><b>Data</b></td>
-        </tr>
-        <tr>
-          <td><a title="List all datasets available and apply for access" href="/data/dataset_index">Apply for datasets</a></td>
-        </tr>
-        <tr>
-          <td><a href="/data/submit.html">Submit data</a></td>
-        </tr>
-        <tr>
-          <td><a href="/cgi-bin/data_browser/data_browser/requests/{{ user.accountid }}" title="Download the data you have requested">My requested data</a></td>
-        </tr>
-      </table>
-      <p>
-      <p>
-      <table bgcolor="#eeeeee" width=100%>
-        <tr>
-          <td colspan="2" bgcolor="#5f99ff" align=center><b>My Licences</b></td>
-        </tr>
-        <tr>
-          <td colspan="2" align="center"><font size=2><em><a href="/cgi-bin/mybadc/list_datasets.cgi.pl">Show details</a></em></font></td>
-        </tr>
-        <tr>
-          <td> 
-            <table width="100%">
-              <tr>
-                <th>Group</th>
-		<th>Role</th>
-                <th>Get Data</th>
-              </tr>
-	      {% for l in licences %}
-              <tr>
-                <td><font size="2"> <a title="Information about this group" 
-		    href="/userdb/licence/view/{{ l.id }}">{{ l.group }}</a></td>
-		<td>{{ l.role }}</font></font></td>
-                <td><font size="2"><a href="{{l.role.directory}}">Get Data</a></font></td>
-              </tr>
-	       {% endfor %}
-            </table>
-            </td>
-        </tr>
-      </table>
-      <script language="javascript" src="/javascript/makeWindows.js"></script>
-    <td valign="top">
-	  <!-- middle of 3 major columns -->
-	  <table cellpadding="2">
+ 	  <table cellpadding="2">
         <tr>
           <td><b>Name:</b></td>
           <td>{{ user }}</td>
@@ -100,10 +54,11 @@
           <td><font size=2><a href="{{ user.openid }}">{{ user.openid }}</a></font></td>
 	</tr>  
       </table>
-	</td>
-    <td valign="top">
-	<!-- rightmost of 3 major columns -->
-	<table border=0 width="100%" bgcolor="#eeeeee">
+
+
+  <table>
+  <tr><td>
+     <table border=0 width="100%" bgcolor="#eeeeee">
         <tr>
           <td colspan=2 bgcolor="#5f99ff" align=center><b>Actions</b>
         <tr>
@@ -112,63 +67,65 @@
           <td><a href="/userdb/user/edit/{{ user.pk }}">Edit user details</a>
         <tr>
           <td><a href="/cgi-bin/mybadc/mybadc.cgi.pl?action=logout">Logout</a>
+     </table>
+   </td>
+   <td>
+     <table bgcolor="#eeeeee" width="100%">
+        <tr>
+          <td bgcolor="#5f99ff" align=center><b>Data</b></td>
+        </tr>
+        <tr>
+          <td><a title="List all datasets available and apply for access" href="/data/dataset_index">Apply for datasets</a></td>
+        </tr>
+        <tr>
+          <td><a href="/data/submit.html">Submit data</a></td>
+        </tr>
+        <tr>
+          <td><a href="/cgi-bin/data_browser/data_browser/requests/{{ user.accountid }}" title="Download the data you have requested">My requested data</a></td>
+        </tr>
       </table>
-      <form method=POST action="/cgi-bin/search/select_search">
-        <input type="hidden" name=badc_only value="y">
-        <input type="hidden" name=year value="any">
-        <table border=0 width="100%" bgcolor="#eeeeee">
-          <tr>
-            <td colspan=2 bgcolor="#5f99ff" align=center><b>Quick search</b>
-          <tr>
-            <td nowrap valign=top><font size=3><b>Search for:</b></font>
-            <td><input name="SEARCH_STRING" type="text" size="15" maxlength="50">
-          <tr>
-            <td align=right><b>in:</b>
-            <td><SELECT NAME="SEARCH_WHAT" SIZE="1">
-                <OPTION value="BADCWEBPAGES" SELECTED>Webpages</OPTION>
-                <OPTION value="MOLES_ALL">Datasets</OPTION>
-                <OPTION value="LINKS">Links</OPTION>
-                <OPTION value="UKMOSTATIONS">UKMO stations</OPTION>
-              </SELECT>
-          <tr>
-            <td>
-            <td><input type=image src="/search/go.gif">
-        </table>
-      </form>
-      <table bgcolor="#eeeeee" width="100%">
+  </td></tr>
+  </table>
+
+    <td valign="top">
+	  <!-- middle of 3 major columns -->
+	        <table bgcolor="#eeeeee" width=100%>
         <tr>
-          <td bgcolor="#5f99ff" align=center><b>Community</b>
+          <td colspan="2" bgcolor="#5f99ff" align=center><b>My Licences</b></td>
+        </tr>
         <tr>
-          <td><a href="http://bscw.badc.nerc.ac.uk/bscw/bscw.cgi">My workspaces</a>
+          <td colspan="2" align="center"><font size=2><em><a href="/cgi-bin/mybadc/list_datasets.cgi.pl">Show details</a></em></font></td>
+        </tr>
         <tr>
-          <td><a title="View any BADC mailing lists you are subscribed to" href="/cgi-bin/mailman/mylists_interface">My mailing lists</a>
-        <tr>
-          <td><a  title="Find other users at your institute" href="/cgi-bin/community/whoswho_at_institutions.cgi.pl?Display=Rutherford%20Appleton%20Laboratory%20(RAL)&source=mybadc">Who's @ my institute?</a>
-        <tr>
-          <td><a title="Find other users who share your field of interest"href="/cgi-bin/community/whoswho_field_list.cgi.pl?Field=Atmospheric%20Physics&source=mybadc">Who's in my field?</a>
-        <tr>
-          <td><a title="Find other users in your country"href="/cgi-bin/community/whoswho_country_list.cgi.pl?Field=UK&source=mybadc">Who's in my country?</a>
+          <td> 
+            <table width="100%">
+              <tr>
+                <th>Related Service or dataset</th>
+		<th>Role</th>
+                <th>Licence details</th>
+              </tr>
+	      {% for l in licences %}
+              <tr>
+                <td><font size="2"><a href="{{l.group.infourl}}">{{ l.group }}</a></font></td>
+		<td>{{ l.role }}</font></font></td>
+                <td><font size="2"> <a title="Veiw licence" 
+		    href="/userdb/licence/view/{{ l.id }}">Licence</a></td>
+              </tr>
+	       {% endfor %}
+            </table>
+            </td>
+        </tr>
       </table>
+
+	</td>
+    <td valign="top">
+	<!-- rightmost of 3 major columns -->
+
+      </table>
+
 </table>
-<p>
-<p>
-<TABLE width="100%" height="25" BORDER="0" CELLSPACING="0"  CELLPADDING="0">
-  <TR>
-    <TD BGCOLOR="#333399"><IMG SRC="/graphics/tabs/bottomleft.jpg"></TD>
-    <TD BGCOLOR="#333399"><a class=menu HREF="/">Home</a>&nbsp;&nbsp;&nbsp; </TD>
-    <TD BGCOLOR="#333399"><a class=menu HREF="/help/contact.html">Contact</a>&nbsp;&nbsp;&nbsp; </TD>
-    <TD BGCOLOR="#333399"><a class=menu HREF="/conditions/badc_anon.html">Disclaimer</a>&nbsp;&nbsp;&nbsp; </TD>
-    <TD BGCOLOR="#333399"><div class=lastm>Last Modified:
-        <script>document.write(document.lastModified);</script>
-      </div></TD>
-    <TD WIDTH="10" bgcolor="#333399" align="right"><IMG SRC="/graphics/tabs/bottomright.jpg"></TD>
-  </TR>
-</TABLE>
-<html>
-<head>
-<title>User stats</title>
-</head>
-<body>
-{{ user }}
+
+
+
 </body>
 </html>
