@@ -96,7 +96,7 @@ class User(models.Model):
         # Write message to log file and send informational message
         msg = "updated password for accountID=%s userkey=%s (web)" % (self.username, self.pk)
         #WebRegUtils::write_log_msg(msg)
-        mail_info_msg(user)
+        #mail_info_msg(user)
 
 	
 

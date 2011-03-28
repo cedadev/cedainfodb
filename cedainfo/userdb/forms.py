@@ -8,7 +8,17 @@ class UserForm(ModelForm):
     class Meta:
         model = User
         fields = ('title', 'firstname', 'lastname', 'email', 'tel', 'address', 'postcode', 
-	          'webpage', 'studying_for', 'field', 'supervisor', 'openid')
+	          'webpage', 'studying_for', 'field', 'supervisor', 'openid', 'institute')
+
+
+class NewUser(ModelForm):
+    # customise the form a bit
+    passwd = CharField(widget=PasswordInput)
+    passwd2 = CharField(widget=PasswordInput)
+    class Meta:
+        model = User
+        fields = ('title', 'firstname', 'lastname', 'email', 'username', 'institute')
+
     
 class UserStatsForm(Form):
     # customise the form a bit

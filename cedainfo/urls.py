@@ -58,12 +58,22 @@ urlpatterns = patterns('',
 
     # userdb
     (r'^userdb/userstats/$', user_stats),
-    (r'^userdb/user/edit/(?P<id>\d+)/$', user_form),
-    (r'^userdb/user/changepassword/(?P<id>\d+)/$', changepassword_form),
-    (r'^userdb/user/view/(?P<id>.*)/$', user_view),
-    (r'^userdb/user/licences/(?P<id>\d+)/$', user_licences),
-    (r'^userdb/group/emails/(?P<id>\d+)/$', group_emails),
+    (r'^userdb/newuser/$', newuser), # TODO
+    (r'^userdb/user/(?P<id>.*)/password/$', changepassword_form),
+   # (r'^userdb/user/(?P<id>\d)/activate$', user_view), # for email activation #TODO
+   # (r'^userdb/user/(?P<id>.*)/requestdir$', makerequestdir), #TODO
+    (r'^userdb/user/(?P<id>.*)/$', user_view),
+   # (r'^userdb/user/(?P<id>.*)/forgroup/(?P<group>.*)$', user_view_forauth), #TODO
+   # (r'^userdb/users/passwdfile/$', passwdfile), # TODO update password file for proftpd
+   # (r'^userdb/users/makefootprintsfile/$', footprintsfile), # TODO update footprints file
+   # (r'^userdb/licences/groupfile/$', groupfile), # TODO update group file for proftpd
+   # (r'^userdb/licences/policyfile/$', policyfile), # TODO update policy file for ESG security
+   # (r'^userdb/licences/forgroup/(?P<group>.*)$', listlicences_forauth), # TODO list licences for authoriser
+    (r'^userdb/licences/forgroup/(?P<group>.*)/emails/$', group_emails),
+   # (r'^userdb/licences/forgroup/(?P<group>)/memview$', listlicences_formemview), # TODO list licences for membership viewer
+   # (r'^userdb/appproc/(?P<id>)$', invoke_appproc), # TODO invoke appication process
+    (r'^userdb/user/licences/(?P<id>\d+)/$', user_licences), # show pending user licences
     (r'^userdb/role/view/(?P<id>\d+)/$', role_view),
-    (r'^userdb/licence/view/(?P<id>\d+)/$', licence_view),
+    (r'^userdb/licence/(?P<user>.*)/(?P<group>.*)/(?P<id>\d+)/$', licence_view),
     
 )

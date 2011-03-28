@@ -84,9 +84,9 @@ def user_stats(request):
 
 
 
-def group_emails(request, id):
+def group_emails(request, group):
        now = datetime.datetime.now()
-       group = Group.objects.get(pk=id)
+       group = Group.objects.get(name=group)
        users = User.objects.filter(licence__end_date__gte=now, licence__start_date__lte=now, licence__group=group)
        emails = users.distinct().values_list('email', flat=True).order_by('email')
 
@@ -110,16 +110,40 @@ def user_form(request, id):
        return render_to_response('user_form.html', {'user': user, 'form': form} )
 
 
+
+# new user
+def newuser(request):
+       if request.method == 'POST':
+	  user = User()
+          form = NewUser(request.POST, instance=user)
+          if form.is_valid():
+	     # make new user
+	     form.save()
+	     user.update_passwd(form.cleaned_data['passwd'])
+	     user.save()
+	     return user_view(request, user.username)
+       else:
+          form = NewUser()
+       return render_to_response('newuser.html', {'form': form} )
+    
+
 # Change a users password
 def changepassword_form(request, id):
-       user = User.objects.get(pk=id)
+       passwordset = False     
+       user = User.objects.get(username=id)
        if request.method == 'POST':
           form = ChangePassword(request.POST)
           if form.is_valid():
-	     return user_view(request, id)
+	     # change password
+	     user.update_passwd(form.cleaned_data['passwd'])
+	     user.save()
+	     passwordset = True
+	  #   return user_view(request, id)
        else:
           form = ChangePassword()
-       return render_to_response('change_password.html', {'user': user, 'form': form} )
+       return render_to_response('change_password.html', {'user': user, 
+                                                          'form': form, 
+							  'passwordset': passwordset } )
 
 
 # View a user (a la MyBADC)
@@ -129,15 +153,26 @@ def user_view(request, id):
         user = User.objects.get(pk=id)
     else:
         user = User.objects.get(username=id)
+       
+    if request.method == 'POST':
+        form = UserForm(request.POST, instance=user)
+        if form.is_valid():
+	    form.save()
+    else:
+        form = UserForm(instance=user)
            
     now = datetime.datetime.now()
     licences = Licence.objects.filter(user=user, end_date__gte=now, start_date__lte=now)
-    return render_to_response('user_view.html', {'user': user, 'licences':licences} )
+    return render_to_response('user_view.html', {'user': user, 'licences':licences, 
+                                                  'form':form} )
 
 # view a licence
-def licence_view(request, id):
+def licence_view(request, user, group, id):
        now = datetime.datetime.now()
        licence = Licence.objects.get(pk=id)
+       if user != licence.user.username: return render_to_response('bad_licence.html', {} )
+       if group != licence.group.name: return render_to_response('bad_licence.html', {} )
+
        return render_to_response('licence_view.html', {'licence':licence} )
 
 # View a user's licences (like http://badc.nerc.ac.uk/cgi-bin/mybadc/list_datasets.cgi.pl?source=mybadc)

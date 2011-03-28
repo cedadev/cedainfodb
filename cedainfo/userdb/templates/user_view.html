@@ -8,63 +8,28 @@
   <tr>
     <td valign="top" width="35%">
 	  <!-- leftmost of 3 major columns -->
- 	  <table cellpadding="2">
-        <tr>
-          <td><b>Name:</b></td>
-          <td>{{ user }}</td>
-	</tr>  
-        <tr>
-          <td><b>Email:</b></td>
-          <td>{{ user.emailaddress }}</td>
-	</tr>  
-        <tr>
-          <td><b>Discipline:</b></td>
-          <td>{{ user.field }}</td>
-	</tr>  
-        <tr>
-          <td><b>Institute:</b></td>
-          <td>{{ user.institute.name }}</td>
-	</tr>  
-        <tr>
-          <td><b>Country:</b></td>
-          <td>{{ user.institute.country }}</td>
-	</tr>  
-        <tr>
-          <td valign="top"><b>Address:</b></td>
-          <td>{{ user.address }}</td>
- 	</tr>  
-       <tr>
-          <td><b>Telephone:</b></td>
-          <td>{{ user.tel }}</td>
-	</tr>  
-        <tr>
-          <td><b>Studying for degree:</b></td>
-          <td>{{ user.studying_for }}</td>
-	</tr>  
-        <tr>
-          <td><b>Supervisor:</b></td>
-          <td>{{ user.supervisor }}</td>
-	</tr>  
-        <tr>
-          <td><b>Personal web page:</b></td>
-          <td><a href="{{ user.webpage }}">{{ user.webpage }}</a></td>
-	</tr>  
-        <tr>
-          <td><b>OpenID: </b></td>
-          <td><font size=2><a href="{{ user.openid }}">{{ user.openid }}</a></font></td>
-	</tr>  
-      </table>
+ 
 
+<form action="." method="post">
+<table>
+{{ form.as_table }}
+</table>
+<input type="submit" value="Submit" />
+</form>
+
+<b>Institute:</b>{{ user.institute.name }} 
+<b>Country:</b>{{ user.institute.country }}
+<b>Type:</b>{{ user.institute.itype }}
+ 
 
   <table>
+  
   <tr><td>
      <table border=0 width="100%" bgcolor="#eeeeee">
         <tr>
           <td colspan=2 bgcolor="#5f99ff" align=center><b>Actions</b>
         <tr>
-          <td><a href="/userdb/user/changepassword/{{ user.pk }}">Change password</a>
-        <tr>
-          <td><a href="/userdb/user/edit/{{ user.pk }}">Edit user details</a>
+          <td><a href="/userdb/user/{{ user.username }}/password/">Change password</a>
         <tr>
           <td><a href="/cgi-bin/mybadc/mybadc.cgi.pl?action=logout">Logout</a>
      </table>
@@ -109,7 +74,7 @@
                 <td><font size="2"><a href="{{l.group.infourl}}">{{ l.group }}</a></font></td>
 		<td>{{ l.role }}</font></font></td>
                 <td><font size="2"> <a title="Veiw licence" 
-		    href="/userdb/licence/view/{{ l.id }}">Licence</a></td>
+		    href="/userdb/licence/{{ user.username }}/{{ l.group.name }}/{{ l.id }}">Licence</a></td>
               </tr>
 	       {% endfor %}
             </table>
