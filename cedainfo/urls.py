@@ -5,6 +5,8 @@ from cedainfoapp.views import *
 from django.conf import settings
 from userdb.views import *
 from userdb.models import *
+from rar.views import *
+from rar.models import *
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -75,5 +77,9 @@ urlpatterns = patterns('',
     (r'^userdb/user/licences/(?P<id>\d+)/$', user_licences), # show pending user licences
     (r'^userdb/role/view/(?P<id>\d+)/$', role_view),
     (r'^userdb/licence/(?P<user>.*)/(?P<group>.*)/(?P<id>\d+)/$', licence_view),
+    
+    #RAR
+    (r'^rar/avail/(?P<id>\d+)/$', avail),
+    
     
 )

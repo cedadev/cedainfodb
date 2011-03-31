@@ -1,0 +1,33 @@
+
+
+
+
+<html>
+  <head>
+    <title>Availbility of {{person.name}}</title>
+  </head>
+
+<body>
+
+<h1>Availbility of {{person.name}}</h1>
+<p>
+Group: {{ group.name }} 
+<p>
+
+<form action="." method="post">
+<table>
+
+ {% for f in forms %}
+   {{ f.as_table }}
+ {% endfor %}
+ 
+</table>
+<input type="submit" value="Submit" />
+</form>
+
+ 
+</body> 
+</html>
+
+
+
