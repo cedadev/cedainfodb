@@ -3,7 +3,7 @@ from django.contrib import admin
 
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'fedid', )
+    list_display = ('name', 'fedid', 'availibility_link' )
 #    search_fields = ['lastname', 'firstname', 'username', 'email']
 #    list_filter = ('field','startdate','reg_source')
 admin.site.register(Person, PersonAdmin)

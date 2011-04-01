@@ -13,6 +13,10 @@ class Person(models.Model):
     def __unicode__(self):
         return self.name
 
+    def availibility_link(self):
+        return '<a href="/rar/avail/%s">Availibility</a>' % self.pk
+    availibility_link.allow_tags = True
+
    
 class Availability(models.Model):
     person =  models.ForeignKey(Person)

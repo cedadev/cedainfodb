@@ -18,13 +18,16 @@ Group: {{ group.name }}
 <table>
 
  {% for f in forms %}
-   {{ f.as_table }}
+ {% cycle 'Jan' 'Feb' 'Mar' 'Apr' 'May' 'Jun' 'Jul' 'Aug' 'Sep' 'Oct' 'Nov' 'Dec'  %}
+   {{ f.value }}
+   {{ f.month }}
  {% endfor %}
  
 </table>
-<input type="submit" value="Submit" />
+<input type="submit" value="Update" />
 </form>
 
+{{ years }}
  
 </body> 
 </html>
