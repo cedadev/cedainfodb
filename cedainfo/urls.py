@@ -7,6 +7,8 @@ from userdb.views import *
 from userdb.models import *
 from rar.views import *
 from rar.models import *
+from allocator.views import *
+from allocator.models import *
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -81,5 +83,6 @@ urlpatterns = patterns('',
     #RAR
     (r'^rar/avail/(?P<id>\d+)/$', avail),
     
-    
+    #allocator   
+    (r'^allocator/partition/(?P<id>\d+)/df$', df),
 )
