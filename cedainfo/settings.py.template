@@ -89,5 +89,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
-    'cedainfo.cedainfoapp',
+    'cedainfo.cedainfoapp',    
+ #   'cedainfo.userdb',
+ #   'cedainfo.rar',
+
 )
