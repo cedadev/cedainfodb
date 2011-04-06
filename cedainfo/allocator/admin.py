@@ -13,7 +13,7 @@ class PartitionAdmin(admin.ModelAdmin):
                     # 'exists',
 		     'meter',
 		     'mountpoint','host','used_bytes','capacity_bytes',
-                   # 'allocated','list_allocated',
+                    'allocated','list_allocated',
 		     'links',)
     list_filter = ('status',)
     formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }

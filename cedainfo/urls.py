@@ -7,8 +7,6 @@ from userdb.views import *
 from userdb.models import *
 from rar.views import *
 from rar.models import *
-from allocator.views import *
-from allocator.models import *
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -48,15 +46,8 @@ urlpatterns = patterns('',
     #(r'^dataentity/index/$', list_detail.object_list, dataentity_info),
     (r'^dataentity/index/$', dataentity_list),
     (r'^dataentity/review/$', dataentities_for_review),
-    (r'^dataentity/filesets/$', dataentity_fileset_view), # TODO there's probably a better url for this...
     (r'^fileset/index/$', fileset_list),
-    (r'^filesetcollection/index/$', filesetcollection_list),
-    (r'^filesetcollection/index/extended/$', filesetcollection_list_extended),
-    (r'^filesetcollection/(?P<id>\d+)/$', filesetcollection_view),
-    (r'^filesetcollection/setup$', filesetcollection_setup),
-    (r'^filesetcollection/link$', filesetcollection_link_fsc_partition),
-    (r'^filesetcollection/allocate$', filesetcollection_allocate),
-    (r'^filesetcollection/make_filesets$', filesetcollection_make_filesets),
+    (r'^partition/(?P<id>\d+)/df$', df),
 
     (r'^rack/services/(?P<rack_id>\d+)$', services_by_rack),
 
@@ -84,5 +75,4 @@ urlpatterns = patterns('',
     (r'^rar/avail/(?P<id>\d+)/$', avail),
     
     #allocator   
-    (r'^allocator/partition/(?P<id>\d+)/df$', df),
 )

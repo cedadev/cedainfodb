@@ -65,7 +65,8 @@ class Partition(models.Model):
         # meter for 
 	if self.capacity_bytes == 0: return "No capacity set"
 	used = self.used_bytes*100/self.capacity_bytes
-        s = '<img src="https://chart.googleapis.com/chart?chs=150x50&cht=gom&chd=t:%s&chls=3|3,5,5|15|10">' % used
+	alloc = self.allocated()*100/self.capacity_bytes
+        s = '<img src="https://chart.googleapis.com/chart?chs=150x50&cht=gom&chco=99FF99,999900,FF0000&chd=t:%s|%s&chls=3|3,5,5|15|10">' % (used, alloc)
 	return s
     meter.allow_tags = True
 

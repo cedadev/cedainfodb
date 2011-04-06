@@ -8,17 +8,13 @@ class BigIntegerInput(forms.TextInput):
         attrs.setdefault('size', 80)
         super(BigIntegerInput, self).__init__(*args, **kwargs)
 
-admin.site.register(CurationCategory)
-admin.site.register(BackupPolicy)
+# don't need to edit curation cat
+#admin.site.register(CurationCategory)
+
 admin.site.register(AccessStatus)
 admin.site.register(Person)
-#admin.site.register(Service)
 admin.site.register(HostHistory)
-admin.site.register(FileSetCollectionRelation)
-admin.site.register(PartitionPool)
-admin.site.register(FileSetBackupLog)
 admin.site.register(ServiceBackupLog)
-admin.site.register(FileSetAllocationPlan)
 
 # customise the Host admin interface
 class HostAdmin(admin.ModelAdmin):
@@ -66,27 +62,19 @@ class DataEntityAdmin(admin.ModelAdmin):
 admin.site.register(DataEntity, DataEntityAdmin)
 
 class PartitionAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__','mountpoint','expansion_no','host','partition_pool','used_bytes','capacity_bytes',)
-    list_filter = ('partition_pool','expansion_no')
+    list_display = ('__unicode__',
+                    # 'exists',
+		     'meter',
+		     'mountpoint','host','used_bytes','capacity_bytes',
+                    'allocated','list_allocated',
+		     'links',)
+    list_filter = ('status',)
     formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
     search_fields = ['mountpoint','host',]
 admin.site.register(Partition, PartitionAdmin)
 
-# Create an inline form to manage FileSetCollection memberships (to be used in FileSetCollection & FileSet Admins)
-class FileSetCollectionRelationInline(admin.TabularInline):
-    model = FileSetCollectionRelation
-    extra = 1
-
-class FileSetCollectionAdmin(admin.ModelAdmin):
-    #inlines = (FileSetCollectionRelationInline,) # probably too many filesets for this to work well
-    list_display = ('logical_path', 'partitionpool',)
-    list_filter = ('partitionpool',)
-admin.site.register(FileSetCollection,FileSetCollectionAdmin)
-
 class FileSetAdmin(admin.ModelAdmin):
-    list_display = ('label','partition',)
-    inlines = (FileSetCollectionRelationInline,)
-    formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
+    list_display = ('logical_path','partition','storage_pot', 'spot_exists', 'logical_path_exists')
     formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
 admin.site.register(FileSet,FileSetAdmin)
 
@@ -94,10 +82,6 @@ class FileSetSizeMeasurementAdmin(admin.ModelAdmin):
     formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
 admin.site.register(FileSetSizeMeasurement,FileSetSizeMeasurementAdmin)
 
-#class NodeListTagAdmin(admin.ModelAdmin):
-#    list_display=('name',)
-#    list_filter=('tag',)
-#admin.site.register(NodeListTag, NodeListTagAdmin)
 admin.site.register(NodeList)
 admin.site.register(HostList)
 admin.site.register(RackList)    

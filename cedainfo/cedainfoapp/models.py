@@ -1,5 +1,7 @@
 from django.db import models
 from datetime import datetime
+import os
+import subprocess
 
 # Needed for BigInteger fix
 from django.db.models.fields import IntegerField
@@ -81,20 +83,6 @@ class Host(models.Model):
     def __unicode__(self):
         return u'%s' % self.hostname
 
-class PartitionPool(models.Model):
-    '''Container for paritions that are grouped together, often associated with a particular FileSetCollection'''
-    label = models.CharField(max_length=50, blank=True, default='newpool')
-    purpose = models.CharField(
-        max_length=50, 
-        help_text="Single or general purpose partition pool. General = to contain only 1 partition, for multiple FileSetCollections. Single = For a single FileSetCollection, using multiple Partitions.",
-        choices=(
-            ("general","general"),
-            ("single","single"),
-        ),
-        default="general"
-       )
-    def __unicode__(self):
-        return u'%s (%s)' % (self.label, self.purpose) 
 
 class Partition(models.Model):
     '''Filesystem equipped with standard directory structure for archive storage'''
@@ -103,12 +91,69 @@ class Partition(models.Model):
     used_bytes = BigIntegerField(default=0, help_text="\"Used\" value from df, i.e. no. of bytes used. May be populated by script.")
     capacity_bytes = BigIntegerField(default=0, help_text="\"Available\" value from df, i.e. no. of bytes total. May be populated by script.")
     last_checked = models.DateTimeField(null=True, blank=True, help_text="Last time df was run against this partition & size values updated")
-    partition_pool = models.ForeignKey(PartitionPool, null=True, blank=True, help_text="Unique pool that this partition belongs to.")
-    expansion_no = models.IntegerField(help_text="0 for primary, 1 to N for expansion number", default=0)
+    status = models.CharField(max_length=50,       
+              choices=(("Blank","Blank"),
+                 ("Allocating","Allocating"),
+                 ("Closed","Closed"),
+                 ("Migrating","Migrating"),
+                 ("Retired","Retired")) )
+
+    def df(self):
+        """Report disk usage.
+           Return a dictionary with total, used, available. Sizes are reported
+           in blocks of 1024 bytes."""
+        if os.path.ismount(self.mountpoint):
+            output = subprocess.Popen(['/bin/df', '-B 1024', self.mountpoint],
+                                     stdout=subprocess.PIPE).communicate()[0]
+            lines = output.split('\n')
+	    if len(lines) == 3: dev, blocks_total, blocks_used, blocks_available, used, mount = lines[1].split()
+	    if len(lines) == 4: blocks_total, blocks_used, blocks_available, used, mount = lines[2].split()
+            self.capacity_bytes = int(blocks_total)*1024
+            self.used_bytes = int(blocks_used)*1024
+	    self.last_checked = datetime.now()
+	    self.save() 
+        return      
+
+    def exists(self):
+        return os.path.ismount(self.mountpoint)  
+    exists.boolean = True
+
+    def list_allocated(self):
+        # list allocation for admin interface
+        s = ''
+        allocs = FileSet.objects.filter(partition=self)
+	for a in allocs:
+	    s += '<a href="/admin/cedainfoapp/fileset/%s">%s</a> ' % (a.pk,a.logical_path)
+	return s
+    list_allocated.allow_tags = True
+	
+    def meter(self):
+        # meter for 
+	if self.capacity_bytes == 0: return "No capacity set"
+	used = self.used_bytes*100/self.capacity_bytes
+	alloc = self.allocated()*100/self.capacity_bytes
+        s = '<img src="https://chart.googleapis.com/chart?chs=150x50&cht=gom&chco=99FF99,999900,FF0000&chd=t:%s|%s&chls=3|3,5,5|15|10">' % (used, alloc)
+	return s
+    meter.allow_tags = True
+
+    def allocated(self):
+        # find total allocated space
+	total = 0
+        allocs = FileSet.objects.filter(partition=self)
+	for a in allocs: total += a.overall_final_size
+	return total
+
+    def links(self):
+        # links to actions for partions
+	s = '<a href="/partition/%s/df">update df</a> ' % (self.pk,)
+	return s
+    links.allow_tags = True
+
     def __unicode__(self):
         tb_remaining = (self.capacity_bytes - self.used_bytes) / (1024**4)
         return u'%s (%d %s)' % (self.mountpoint, tb_remaining, 'Tb free')
     __unicode__.allow_tags = True # seem to need this in order to use __unicode__ as one of the fields in list_display in the admin view (see http://docs.djangoproject.com/en/dev/ref/contrib/admin/#django.contrib.admin.ModelAdmin.list_display)
+
 
 class CurationCategory(models.Model):
     '''Category indicating whether CEDA is the primary or secondary archive (or other status) for a dataset'''
@@ -143,48 +188,46 @@ class Person(models.Model):
         return u'%s' % self.name
 
 class FileSet(models.Model):
-    '''Non-overlapping subtree of archive directory hierarchy.
+    ''' subtree of archive directory hierarchy.
     Collection of all filesets taken together should exactly represent 
     all files in the archive. Must never span multiple filesystems.'''
-    label = models.CharField(max_length=1024, blank=True, default='unallocated', help_text="Initially unallocated, indicating not belonging to FileSetCollection. Then set by save method of FileSetCollectionRelation to hold path within FSCR.")
-    monthly_growth = BigIntegerField(null=True, blank=True, help_text="Monthly growth in bytes (estimated by data scientist)") # monthly growth in bytes
-    overall_final_size = BigIntegerField(null=True, blank=True, help_text="Overall final size in bytes. Estimate from data scientist.") # Additional data still expected (as yet uningested) in bytes
+    logical_path = models.CharField(max_length=1024, blank=True, default='unallocated', help_text="Initially unallocated, indicating not belonging to FileSetCollection. Then set by save method of FileSetCollectionRelation to hold path within FSCR.")
+    overall_final_size = BigIntegerField(help_text="Overall final size in bytes. Estimate from data scientist.") # Additional data still expected (as yet uningested) in bytes
     notes = models.TextField(blank=True)
-    current_backup_policy = models.ForeignKey(BackupPolicy, null=True, blank=True, help_text="Current policy which is intended to be applied to this dataset (look in backup log for record of what actually got applied)")
-    partition = models.ForeignKey(Partition, blank=True, null=True, help_text="Actual partition where this FileSet is physically stored")
+    partition = models.ForeignKey(Partition, blank=True, null=True, limit_choices_to = {'status': 'Allocating'},help_text="Actual partition where this FileSet is physically stored")
+    storage_pot = models.CharField(max_length=1024, blank=True, default='unallocated', help_text="dd")
+
     def __unicode__(self):
-        return u'%s : %s' % (self.id, self.label)
+        return u'%s' % (self.logical_path,)
     # TODO custom save method (for when assigning a partition) : check that FileSet size
 
-class FileSetCollection(models.Model):
-    '''Group of fileSets handled together'''
-    fileset = models.ManyToManyField(FileSet, through='FileSetCollectionRelation')
-    logical_path = models.CharField(max_length=1024, help_text="Logical path to the root of this FileSetCollection. Omit trailing slash.")
-    partitionpool = models.ForeignKey(PartitionPool, help_text="PartitionPool to which this FileSetCollection is allocated. Must be provided if any of the FileSets in the FileSetCollection are primary.", null=True, blank=True)
-    # TODO : should really have monthly_growth / still_expected size estimates for files in the top level of the FileSetCollection (e.g. ancillary files), but for now will assume they are trivial in size (compared to FileSets)
-    def __unicode__(self):
-        return u'%d : %s' % (self.id, self.logical_path)
+    def storage_path(self):
+        return os.path.normpath(self.partition.mountpoint+'/'+self.storage_pot+'/'+self.logical_path) 
 
-class FileSetCollectionRelation(models.Model):
-    '''Documents the relationship of a fileSet with a FileSetCollection.
-       A FileSet's relationship with a FileSetCollection can be:
-        - primary : this is where the data are actually stored
-        - secondary : symlink to the physical instance of the FileSet (and e.g. would be skipped in backups)
-    '''
-    fileset = models.ForeignKey(FileSet)
-    fileset_collection = models.ForeignKey(FileSetCollection)
-    logical_path = models.CharField(max_length=1024, blank=True, help_text="Location, relative to the FileSetCollection root, of this FileSet (NB: not the directory in which this resides). Omit leading and trailing slash.")
-    is_primary = models.BooleanField(default='True', help_text="Whether or not the presence of this FileSet in this FileSetCollection represents where the FileSet is physically stored [True] (or whether it is just a symlink [False])")
-    def __unicode__(self):
-        return u'%s' % (self.logical_path)
+    def spot_path(self): 
+        return os.path.normpath(self.partition.mountpoint+'/'+self.storage_pot) 
     
-    def save(self):
-        '''Set the label field of the fileset to be the logical path of this filesetcollectionrelation'''
-        #TODO Need to impose uniqueness constraint : a given FileSet can only have ONE FileSetCollectionMembership that is primary (i.e. can only be stored physically in one place).
-        self.fileset.label = self.logical_path
-        self.fileset.save()
-        super(FileSetCollectionRelation, self).save() # Call the "real" save() method
-        
+    def make_spot(self):
+        if self.partition:
+	    if not os.path.exists(self.spot_path()): 
+	        # make spot path
+		# os.mkdir(self.spot_path())
+		return "os.mkdir(%s)" %self.spot_path()
+
+    def spot_exists(self):
+        return os.path.exists(self.spot_path())    
+    spot_exists.boolean = True
+
+    def logical_path_exists(self):
+        return os.path.exists(self.logical_path)
+    logical_path_exists.boolean = True
+
+    def status(self):
+        s= "spot exists:%s (%s), " % (os.path.exists(self.spot_path()),self.spot_path())    
+        s += "logical path exists:%s (%s), " % (os.path.exists(self.logical_path),self.logical_path)    
+        return s
+
+       
 
 class DataEntity(models.Model):
     '''Collection of data treated together. Has corresponding MOLES DataEntity record.'''
@@ -268,16 +311,6 @@ class HostHistory(models.Model):
     def __unicode__(self):
         return u'%s|%s' % (self.host, self.date)
 
-class FileSetBackupLog(models.Model):
-    '''Backup history for a FileSet'''
-    fileset = models.ForeignKey(FileSet, help_text="FileSet being backed up")
-    subdirectory = models.CharField(max_length=2048, help_text="Subdirectory backed up (default: '.' i.e. whole directory)")
-    backup_policy = models.ForeignKey(BackupPolicy, help_text="Backup policy implemented for this backup event")
-    date = models.DateTimeField(help_text="Date and time of backup")
-    success = models.BooleanField(default=False, help_text="Success (True) or Failure (False) of backup event")
-    comment = models.TextField(blank=True, help_text="Additional comment(s)")
-    def __unicode__(self):
-        return u'%s|%s' % (self.data_entity, self.date)  
     
 class ServiceBackupLog(models.Model):
     '''Backup history for a Service'''
@@ -298,17 +331,4 @@ class FileSetSizeMeasurement(models.Model):
     def __unicode__(self):
         return u'%s|%s' % (self.date, self.fileset)
 
-class FileSetAllocationPlan(models.Model):
-    '''Future plan of allocation of a particular FileSet to a Partition
-    Most common use case = migrating between partitions, e.g. if one partition has run
-    out of space for a given fileset.
-    '''
-    fileset = models.ForeignKey(FileSet, help_text="FileSet to allocate to a Parition")
-    partition = models.ForeignKey(Partition, help_text="Proposed Partition for allocation")
-    allocated_space = BigIntegerField(help_text="Estimate of volume required (bytes)") # maximum over the entire period that this allocation represents
-    start_date = models.DateTimeField(help_text="Proposed start date for this allocation. SHould be after Host.arrival_date for that partition")
-    end_date = models.DateTimeField(help_text="Proposed end date for this allocation. Should be before Host.planned_end_of_life for that partition")
-    notes = models.TextField(blank=True, help_text="Additional notes")
-    def __unicode__(self):
-        return u'%s|%s' % (self.fileset, self.partition)
         

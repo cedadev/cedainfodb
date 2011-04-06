@@ -54,21 +54,4 @@ class MultipleSelectWithPop(SelectMultiple):
         return html+popupplus
 # end of popupplus stuff
 
-# Subclass ModelChoiceForm with custom label_from_instance method to use custom label showing FileSetCollection AND PartitionPool
-class FSCPPModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        pool = 'None'
-        if ( obj.partitionpool is not None and obj.partitionpool != '' ):
-            pool = obj.partitionpool
-        return "FileSetCollection: %s PartitionPool: %s" % ( obj.logical_path, pool )
-
-class FileSetCollectionLinkForm(Form):
-    filesetcollection = FSCPPModelChoiceField( queryset=FileSetCollection.objects.all(), widget=SelectWithPop )
-
-class FileSetMakerForm(Form):
-    filesetcollection = ModelChoiceField( queryset=FileSetCollection.objects.all() )
-    file = FileField()
-    
-class FileSetCollectionAllocationForm(Form):
-    filesetcollection = FSCPPModelChoiceField( queryset=FileSetCollection.objects.all(), widget=SelectWithPop ) 
-        
+       

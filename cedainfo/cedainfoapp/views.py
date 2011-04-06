@@ -3,7 +3,7 @@
 from django.db.models import Q
 from cedainfo.cedainfoapp.models import *
 from cedainfo.cedainfoapp.forms import *
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import redirect, render_to_response, get_object_or_404
 from django.views.generic import list_detail
 from django.core.urlresolvers import reverse
 
@@ -176,124 +176,7 @@ def fileset_list(request):
         template_object_name = "fileset",
     )
 
-def dataentity_fileset_view(request):
-    '''Complete list of dataentities and their component filesets'''
-    de_list = DataEntity.objects.all()
-    # build a dictionary of these de objects, containing their filesets
-    de_dict = dict()
-    for de in de_list:
-        fs_list = de.fileset.all()
-        de_dict[ de ] = fs_list
-    return render_to_response('cedainfoapp/dataentity_fileset_list.html', {'de_dict': de_dict} )
 
-def filesetcollection_list(request):
-    o = request.GET.get('o', 'id') # default order is ascending id
-    qs = FileSetCollection.objects.order_by(o)
-    # Use the object_list view.
-    return list_detail.object_list(
-        request,
-        queryset = qs,
-        template_name = "cedainfoapp/filesetcollection_list.html",
-        template_object_name = "filesetcollection",
-    )
-    
-def filesetcollection_list_extended(request):
-    '''Full view of filesetcollections, meant to be functional replacement for table on Dan's volume planning Wiki page
-       http://proj.badc.rl.ac.uk/badc/wiki/VolumePlanning'''
-    # Columns:
-    # FileSetCollection (loosely one-to-one with DataEntity (via logical_path) )
-    # For each Partition in PartitionPool associated with this FileSetCollection:
-    #   Partition
-    #   Partition.Host.arrival_date
-    #   Parition.capacity_bytes
-    #   Parition.Host.planned_end_of_life
-    #   FileSetCollection total current size (sum of most recent primary FSSMs for this fileset)
-    #   FileSet.monthly_growth (TODO ...group by partition)
-    #   FileSet.overall_total_size (TODO ...group by partition)
-    #   contact (...needs to come from DataEntity(filter=same logical path as fileset).responsible_officer
-    #   Derived field : FSC won't drow too big before end of machine warranty period
-    #   Derived field : Escess / Deficit
-
-    o = request.GET.get('o', 'id') # default order is ascending id
-    fsc_list = FileSetCollection.objects.order_by(o)
-    fsc_count = 0
-    my_fsc_list = []
-    for fsc in fsc_list:
-        # add some dynamic attributes to make things easier in the template
-        fsc.partitions = Partition.objects.filter(partition_pool=fsc.partitionpool)
-        for partition in fsc.partitions:
-            partition.filesets = FileSet.objects.filter(partition=partition)
-        fscr_list = FileSetCollectionRelation.objects.filter(fileset_collection=fsc)
-        fsc.size_all_filesets_incl_nonprimary_sum = 0
-        fsc.size_all_filesets_primaryonly_sum = 0
-        fsc.num_filesets_unallocated = 0
-        for fscr in fscr_list:
-            try:
-                fssm = FileSetSizeMeasurement.objects.filter(fileset=fscr.fileset).order_by('-date')
-                if fssm != None:
-                    size = fssm[0].size
-                else:
-                    size = 0
-            except:
-                size = 0 # NB sets size to zero if no measurement found.
-            fsc.size_all_filesets_incl_nonprimary_sum += size
-            if fscr.is_primary:
-                fsc.size_all_filesets_primaryonly_sum += size
-            fsc_count += 1
-            # filesets that belong to this filesetcollection (have an fscr) but no partition allocated
-            if (fscr.fileset.partition is None) or (fscr.fileset.partition == ''):
-                fsc.num_filesets_unallocated += 1
-
-        my_fsc_list.append(fsc)
-
-    return render_to_response('cedainfoapp/filesetcollection_list_extended.html', 
-        {
-            'filesetcollection_list': my_fsc_list,
-        }
-    )
-    
-
-
-# Show total storage requirements for a FileSetCollection, calculated with and without non-primary FileSet members.
-def filesetcollection_view(request, id):
-    # Get this FileSetCollection
-    fsc = FileSetCollection.objects.get(pk=id)
-    # Get the FileSetCollectionMemberships associated with this FileSetCollection
-    # These will be the fileset's we're interested in
-    fscr_list = FileSetCollectionRelation.objects.filter(fileset_collection=fsc)
-
-    # Use dynamic atributes to aggregate sizes of all filesets within filesetcollection
-    # ...with and without non-primary filesets
-    fsc.size_all_filesets_incl_nonprimary_sum = 0
-    fsc.size_all_filesets_primaryonly_sum = 0
-    fsc_count=0
-    for fscr in fscr_list:
-        try:
-            fssm = FileSetSizeMeasurement.objects.filter(fileset=fscr.fileset).order_by('-date')
-            if fssm != None:
-                size = fssm[0].size
-            else:
-                size = 0
-        except:
-            size = 0 # NB sets size to zero if no measurement found.
-        fscr_list[fsc_count].fileset.current_size = size #???
-        fsc.size_all_filesets_incl_nonprimary_sum += size
-        if fscr.is_primary:
-            fsc.size_all_filesets_primaryonly_sum += size
-        fsc_count += 1
-    
-    return render_to_response('cedainfoapp/filesetcollection_view.html', {'fsc': fsc, 'fscr_list': fscr_list} )
-
-def partitionpool_list(request):
-    o = request.GET.get('o', 'id') # default order is ascending id
-    qs = PartitionPool.objects.order_by(o)
-    # Use the object_list view.
-    return list_detail.object_list(
-        request,
-        queryset = qs,
-        template_name = "cedainfoapp/partitionpool_list.html",
-        template_object_name = "partitionpool",
-    )
     
 def partition_list(request):
     o = request.GET.get('o', 'id') # default order is ascending id
@@ -332,103 +215,11 @@ def nodelist(request):
 
     return render_to_response('cedainfoapp/nodelist_view.txt', {'hostlist_list': hostlist_list, 'racklist_list': racklist_list}, mimetype="text/plain")  
 
-#### Methods to setup filesetcollections
 
-def filesetcollection_setup(request):
-# Workflow for setting up new FileSetCollection
-
-    return render_to_response('cedainfoapp/filesetcollection_setup.html', )
-
-from fsc_manager import *
-
-def filesetcollection_link_fsc_partition(request):
     
-    #Choose or create a filesetcollection to link with a ParitionPool
-    form = None
-    disabled = None
-    status = None
-    if request.method=='POST':
-        # Must have come from a form submission ...process the form
-        form = FileSetCollectionLinkForm(request.POST)
-        if form.is_valid():
-            fsc = form.cleaned_data['filesetcollection']
-            logging.debug("Got fsc from form : %s" % fsc)
-            if fsc.partitionpool is not None:
-                if Partition.objects.filter(partition_pool=fsc.partitionpool).count() < 1:
-                    # Parition pool has no partitions
-                    status = "Selected PartitionPool has no Partitions associated with it : please try again"
-                else:
-                    try:
-                        tool = fsc_partition_linker(fsc.logical_path)
-                        logging.info("About to link filesetcollection to partitionpool")
-                        tool.link_fsc_to_partitions()
-                        status = "Done"
-                    except:
-                        status = "Error"
-            else:
-                # No partitionpool attached to this FSC
-                status = "Selected FileSetCollection has no ParitionPool : please try again"
-    else:
-        # First time loading page is via GET, from a link
-        form = FileSetCollectionLinkForm()
+# do df for a partition and redirect back to partitions list
+def df(request, id):
+    part = Partition.objects.get(pk=id)
+    part.df()
+    return redirect('/admin/cedainfoapp/partition/%s' % id)
 
-    return render_to_response('cedainfoapp/filesetcollection_link.html', {'form': form, 'status': status})
-
-def filesetcollection_make_filesets(request):
-    '''Parse a CSV File to define filesets & their estimated sizes'''
-    status = None
-    fs_made = []
-    if request.method == 'POST':
-        form = FileSetMakerForm(request.POST, request.FILES)
-        if form.is_valid():
-            try:
-                # do something
-                logging.info("Setting up tool for making FileSets")
-                fsc = form.cleaned_data['filesetcollection']
-                logging.info("Got FileSetCollection %s from form" % fsc)
-                file = form.cleaned_data['file']
-                logging.info("Got File %s from form" % file)
-                tool = filesetmaker(fsc.logical_path)
-                logging.info("Made tool")
-                fs_made = tool.make_filesets_from_csv( file )
-                logging.info("Made FileSets")
-                status = 'success : %d filesets made' % len(fs_made)
-            except:
-                status = "Error"
-    else:
-        form = FileSetMakerForm()
-
-    return render_to_response('cedainfoapp/filesetcollection_make_filesets.html', {'form': form, 'status': status, 'fs_made': fs_made})
-
-def filesetcollection_allocate(request):
-    
-    #Choose or create a filesetcollection to perform allocations on
-    form = None
-    disabled = None
-    status = None
-    if request.method=='POST':
-        # Must have come from a form submission ...process the form
-        form = FileSetCollectionAllocationForm(request.POST)
-        if form.is_valid():
-            fsc = form.cleaned_data['filesetcollection']
-            logging.debug("Got fsc from form : %s" % fsc)
-            if fsc.partitionpool is not None:
-                if Partition.objects.filter(partition_pool=fsc.partitionpool).count() < 1:
-                    # Parition pool has no partitions
-                    status = "Selected PartitionPool has no Partitions associated with it : please try again"
-                else:
-                    try:
-                        tool = allocator(fsc.logical_path)
-                        logging.info("About to allocate filesets for filesetcollection ")
-                        tool.allocate_round_robin()
-                        status = "Done"
-                    except:
-                        status = "Error"
-            else:
-                # No partitionpool attached to this FSC
-                status = "Selected FileSetCollection has no ParitionPool : please try again"
-    else:
-        # First time loading page is via GET, from a link
-        form = FileSetCollectionAllocationForm()
-
-    return render_to_response('cedainfoapp/filesetcollection_allocate.html', {'form': form, 'status': status})
