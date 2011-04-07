@@ -71,6 +71,12 @@ class PartitionAdmin(admin.ModelAdmin):
     list_filter = ('status',)
     formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
     search_fields = ['mountpoint','host',]
+    actions=['update_df']
+    
+    def update_df(self, request, queryset):
+        for i in queryset.all():
+            i.df()
+    update_df.short_description = "Do a df on selected partitions"
 admin.site.register(Partition, PartitionAdmin)
 
 class FileSetAdmin(admin.ModelAdmin):
