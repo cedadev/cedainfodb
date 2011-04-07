@@ -80,18 +80,27 @@ class PartitionAdmin(admin.ModelAdmin):
 admin.site.register(Partition, PartitionAdmin)
 
 class FileSetAdmin(admin.ModelAdmin):
-    list_display = ('logical_path','partition_display','spot_display', 'spot_exists', 'logical_path_exists')
+    list_display = ('logical_path','partition_display','spot_display', 'spot_exists', 'logical_path_exists',)
+    readonly_fields = ('partition','migrate_to', 'storage_pot')
+    # TODO : add size history graph
     formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
-    actions=['bulk_allocate']
+    actions=['bulk_allocate','bulk_du',]
     
     def bulk_allocate(self, request, queryset):
         for fs in queryset.all():
             fs.allocate()
     bulk_allocate.short_description = "Allocate partitions"
+    
+    def bulk_du(self, request, queryset):
+        for fs in queryset.all():
+            fs.du()
+    bulk_du.short_description = "Measure size of selected FileSet(s)"
 admin.site.register(FileSet,FileSetAdmin)
 
 class FileSetSizeMeasurementAdmin(admin.ModelAdmin):
     formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
+    list_display = ('fileset','date', 'size')
+    list_filter = ('fileset',)
 admin.site.register(FileSetSizeMeasurement,FileSetSizeMeasurementAdmin)
 
 admin.site.register(NodeList)

@@ -1,7 +1,8 @@
 from django.db import models
 from datetime import datetime
-import os
+import os, sys
 import subprocess
+import string
 
 # Needed for BigInteger fix
 from django.db.models.fields import IntegerField
@@ -142,7 +143,18 @@ class Partition(models.Model):
         allocs = FileSet.objects.filter(partition=self)
 	for a in allocs: total += a.overall_final_size
 	return total
-
+    
+    def used_by_filesets(self):
+        # find total allocated space
+        total = 0
+        filesets = FileSet.objects.filter(partition=self)
+        # for each fileset, find most recent FileSetSizeMeasurement
+        
+        for fs in filesets:
+            fssms = FileSetSizeMeasurement.objects.filter(fileset=fs).order_by('-date')[0]
+            total += fssms.size 
+        return total
+            
     def links(self):
         # links to actions for partions
 	s = '<a href="/partition/%s/df">update df</a> ' % (self.pk,)
@@ -210,21 +222,22 @@ class FileSet(models.Model):
     
     def make_spot(self, prefix='archive'):
         # create a storage pot and link 
-	if self.storage_pot != '': return  #can't make a spot if it already exists in the db
-	if self.logical_path_exists(): return #can't make a spot if logical path exists  
+        if self.storage_pot != '': return  #can't make a spot if it already exists in the db
+        if self.logical_path_exists(): return #can't make a spot if logical path exists  
         if not self.partition: return #can't make a spot if no partition 
 
         spotname = "%s/spot-%s" % (prefix,self.pk)
         self.storage_pot = spotname
         try:
-	    os.mkdir(self.spot_path()) # make spot directory
-	    os.makedirs(self.storage_path())
-	    os.symlink(self.storage_path(), self.logical_path)
-	except:
-	    return ("os.mkdir(%s)" % self.spot_path(),
-	            "os.makedirs(%s)" % self.storage_path(),
-		    "os.symlink(%s, %s)" % (self.storage_path(),self.logical_path) )
-	self.save()
+            os.mkdir(self.spot_path()) # make spot directory
+            os.makedirs(self.storage_path())
+            os.symlink(self.storage_path(), self.logical_path)
+        except:
+            return ("os.mkdir(%s)" % self.spot_path(),
+            "os.makedirs(%s)" % self.storage_path(),
+            "os.symlink(%s, %s)" % (self.storage_path(),self.logical_path),
+            sys.exc_value )
+        self.save()
 
     def spot_display(self):
         if self.storage_pot: return "%s" % self.storage_pot
@@ -254,12 +267,42 @@ class FileSet(models.Model):
     def allocate(self):
         # find partion for this fileset
         if self.partition: return # return if already allocated
-	
-        partitions = Partition.objects.filter(status='Allocating')
-	# TO DO this just picks the first at the moment
-	self.partition = partitions[0]
-	self.save()
 
+        partitions = Partition.objects.filter(status='Allocating')
+        # TO DO this just picks the first at the moment
+        self.partition = partitions[0]
+        self.save()
+    
+    def du(self):
+        '''Report disk usage of FileSet by creating as FileSetSizeMeasurement.'''
+        if self.spot_exists() and os.path.ismount(self.partition.mountpoint):
+            output = subprocess.Popen(['/bin/du', '-sk', self.spot_path],
+            stdout=subprocess.PIPE).communicate()[0]
+            lines = output.split('\n')
+            if len(lines) == 3: size, path = lines[0].split()
+            fssm = FileSetSizeMeasurement(fileset=self, date=datetime.now(), size=int(size)*1024)
+            fssm.save() 
+        return      
+
+    # TODO...
+    #def size_history(self):
+    #    # display graph of size history for fileset
+    #    fssms = FileSetSizeMeasurements.filter(fileset=self).order_by('date')
+    #    size_values = fssms.values_list('size', flat=True)
+    #    size_values = map(str, size_values)
+    #    size_values = string.join(size_values,',')
+        
+    #    date_values = fssms.values_list('date', flat=True)
+    #    date_values = map(str, date_values)
+    #    date_values = string.join(date_values,',')
+        
+        #if self.capacity_bytes == 0: return "No measurements"
+        #used = self.used_bytes*100/self.capacity_bytes
+        #alloc = self.allocated()*100/self.capacity_bytes
+    #    s = '<img src="https://chart.googleapis.com/chart?chs=150x50&cht=gom&chco=99FF99,999900,FF0000&chd=t:|&chls=3#|3,5,5|15|10">'
+    #    return s
+    #size_history.allow_tags = True
+        
 class DataEntity(models.Model):
     '''Collection of data treated together. Has corresponding MOLES DataEntity record.'''
     dataentity_id = models.CharField(help_text="MOLES data entity id", max_length=255, unique=True)
