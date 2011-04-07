@@ -196,6 +196,7 @@ class FileSet(models.Model):
     notes = models.TextField(blank=True)
     partition = models.ForeignKey(Partition, blank=True, null=True, limit_choices_to = {'status': 'Allocating'},help_text="Actual partition where this FileSet is physically stored")
     storage_pot = models.CharField(max_length=1024, blank=True, default='unallocated', help_text="dd")
+    migrate_to = models.ForeignKey(Partition, blank=True, null=True, limit_choices_to = {'status': 'Allocating'},help_text="Target partition for migration")
 
     def __unicode__(self):
         return u'%s' % (self.logical_path,)
