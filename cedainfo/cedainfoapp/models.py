@@ -195,7 +195,7 @@ class FileSet(models.Model):
     overall_final_size = BigIntegerField(help_text="Overall final size in bytes. Estimate from data scientist.") # Additional data still expected (as yet uningested) in bytes
     notes = models.TextField(blank=True)
     partition = models.ForeignKey(Partition, blank=True, null=True, limit_choices_to = {'status': 'Allocating'},help_text="Actual partition where this FileSet is physically stored")
-    storage_pot = models.CharField(max_length=1024, blank=True, default='unallocated', help_text="dd")
+    storage_pot = models.CharField(max_length=1024, blank=True, default='', help_text="dd")
     migrate_to = models.ForeignKey(Partition, blank=True, null=True, limit_choices_to = {'status': 'Allocating'},help_text="Target partition for migration", related_name='fileset_migrate_to_partition')
 
     def __unicode__(self):
@@ -208,12 +208,29 @@ class FileSet(models.Model):
     def spot_path(self): 
         return os.path.normpath(self.partition.mountpoint+'/'+self.storage_pot) 
     
-    def make_spot(self):
-        if self.partition:
-	    if not os.path.exists(self.spot_path()): 
-	        # make spot path
-		# os.mkdir(self.spot_path())
-		return "os.mkdir(%s)" %self.spot_path()
+    def make_spot(self, prefix='archive'):
+        # create a storage pot and link 
+	if self.storage_pot != '': return  #can't make a spot if it already exists in the db
+	if self.logical_path_exists(): return #can't make a spot if logical path exists  
+        if not self.partition: return #can't make a spot if no partition 
+
+        spotname = "%s/spot-%s" % (prefix,self.pk)
+        self.storage_pot = spotname
+        try:
+	    os.mkdir(self.spot_path()) # make spot directory
+	    os.makedirs(self.storage_path())
+	    os.symlink(self.storage_path(), self.logical_path)
+	except:
+	    return ("os.mkdir(%s)" % self.spot_path(),
+	            "os.makedirs(%s)" % self.storage_path(),
+		    "os.symlink(%s, %s)" % (self.storage_path(),self.logical_path) )
+	self.save()
+
+    def spot_display(self):
+        if self.storage_pot: return "%s" % self.storage_pot
+        else: return '<a href="/fileset/%s/makespot">Create Storage</a>' % self.pk
+    spot_display.allow_tags = True
+    spot_display.short_description = 'Storage pot'
 
     def spot_exists(self):
         return os.path.exists(self.spot_path())    
@@ -228,7 +245,20 @@ class FileSet(models.Model):
         s += "logical path exists:%s (%s), " % (os.path.exists(self.logical_path),self.logical_path)    
         return s
 
-       
+    def partition_display(self):
+        if self.partition: return "%s" % self.partition
+        else: return '<a href="/fileset/%s/allocate">Allocate</a>' % self.pk
+    partition_display.allow_tags = True
+    partition_display.short_description = 'Partition'
+    
+    def allocate(self):
+        # find partion for this fileset
+        if self.partition: return # return if already allocated
+	
+        partitions = Partition.objects.filter(status='Allocating')
+	# TO DO this just picks the first at the moment
+	self.partition = partitions[0]
+	self.save()
 
 class DataEntity(models.Model):
     '''Collection of data treated together. Has corresponding MOLES DataEntity record.'''

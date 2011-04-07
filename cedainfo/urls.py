@@ -47,6 +47,8 @@ urlpatterns = patterns('',
     (r'^dataentity/index/$', dataentity_list),
     (r'^dataentity/review/$', dataentities_for_review),
     (r'^fileset/index/$', fileset_list),
+    (r'^fileset/(?P<id>\d+)/allocate$', allocate),
+    (r'^fileset/(?P<id>\d+)/makespot$', makespot),
     (r'^partition/(?P<id>\d+)/df$', df),
 
     (r'^rack/services/(?P<rack_id>\d+)$', services_by_rack),

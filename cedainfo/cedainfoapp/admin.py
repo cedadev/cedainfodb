@@ -80,8 +80,14 @@ class PartitionAdmin(admin.ModelAdmin):
 admin.site.register(Partition, PartitionAdmin)
 
 class FileSetAdmin(admin.ModelAdmin):
-    list_display = ('logical_path','partition','storage_pot', 'spot_exists', 'logical_path_exists')
+    list_display = ('logical_path','partition_display','spot_display', 'spot_exists', 'logical_path_exists')
     formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
+    actions=['bulk_allocate']
+    
+    def bulk_allocate(self, request, queryset):
+        for fs in queryset.all():
+            fs.allocate()
+    bulk_allocate.short_description = "Allocate partitions"
 admin.site.register(FileSet,FileSetAdmin)
 
 class FileSetSizeMeasurementAdmin(admin.ModelAdmin):

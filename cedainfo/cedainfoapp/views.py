@@ -223,3 +223,17 @@ def df(request, id):
     part.df()
     return redirect('/admin/cedainfoapp/partition')
 
+# do allocation of a fileset to a partition 
+def allocate(request, id):
+    fs = FileSet.objects.get(pk=id)
+    fs.allocate()
+    return redirect('/admin/cedainfoapp/fileset')
+
+# create storage pot and link archive 
+def makespot(request, id):
+    fs = FileSet.objects.get(pk=id)
+    error = fs.make_spot()
+    if error: 
+        return render_to_response('cedainfoapp/spotcreationerror.html', {'error':error})  
+    else:
+        return redirect('/admin/cedainfoapp/fileset')
