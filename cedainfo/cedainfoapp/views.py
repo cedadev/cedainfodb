@@ -221,5 +221,5 @@ def nodelist(request):
 def df(request, id):
     part = Partition.objects.get(pk=id)
     part.df()
-    return redirect('/admin/cedainfoapp/partition/%s' % id)
+    return redirect('/admin/cedainfoapp/partition')
 
