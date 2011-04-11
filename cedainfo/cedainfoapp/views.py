@@ -227,7 +227,7 @@ def df(request, id):
 def allocate(request, id):
     fs = FileSet.objects.get(pk=id)
     fs.allocate()
-    return redirect('/admin/cedainfoapp/fileset')
+    return redirect(request.META['HTTP_REFERER'])
 
 # create storage pot and link archive 
 def makespot(request, id):

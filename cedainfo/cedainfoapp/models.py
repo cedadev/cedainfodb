@@ -133,7 +133,7 @@ class Partition(models.Model):
 	if self.capacity_bytes == 0: return "No capacity set"
 	used = self.used_bytes*100/self.capacity_bytes
 	alloc = self.allocated()*100/self.capacity_bytes
-        s = '<img src="https://chart.googleapis.com/chart?chs=150x50&cht=gom&chco=99FF99,999900,FF0000&chd=t:%s|%s&chls=3|3,5,5|15|10">' % (used, alloc)
+        s = '<img src="https://chart.googleapis.com/chart?chs=150x50&cht=gom&chco=99FF99,999900,FF0000&chd=t:%s|%s&chls=3|3,5,5|15|10"> %s%% Used, %s%% Allocated ' % (used, alloc,used, alloc)
 	return s
     meter.allow_tags = True
 
@@ -250,10 +250,10 @@ class FileSet(models.Model):
     logical_path_exists.boolean = True
 
     def partition_display(self):
-        if self.partition: return "%s" % self.partition
+        if self.partition: return "Partition Set" 
         else: return '<a href="/fileset/%s/allocate">Allocate</a>' % self.pk
     partition_display.allow_tags = True
-    partition_display.short_description = 'Partition'
+    partition_display.short_description = 'Allocate Partition'
     
     def allocate(self):
         # find partion for this fileset
