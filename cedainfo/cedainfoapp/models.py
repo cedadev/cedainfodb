@@ -215,11 +215,8 @@ class FileSet(models.Model):
     # TODO custom save method (for when assigning a partition) : check that FileSet size
 
     def storage_path(self):
-        return os.path.normpath(self.partition.mountpoint+'/'+self.storage_pot+'/'+self.logical_path) 
-
-    def spot_path(self): 
         return os.path.normpath(self.partition.mountpoint+'/'+self.storage_pot) 
-    
+
     def make_spot(self, prefix='archive'):
         # create a storage pot and link 
         if self.storage_pot != '': return  #can't make a spot if it already exists in the db
@@ -229,14 +226,13 @@ class FileSet(models.Model):
         spotname = "%s/spot-%s" % (prefix,self.pk)
         self.storage_pot = spotname
         try:
-            os.mkdir(self.spot_path()) # make spot directory
             os.makedirs(self.storage_path())
-            os.symlink(self.storage_path(), self.logical_path)
         except:
-            return ("os.mkdir(%s)" % self.spot_path(),
-            "os.makedirs(%s)" % self.storage_path(),
-            "os.symlink(%s, %s)" % (self.storage_path(),self.logical_path),
-            sys.exc_value )
+            return ("os.makedirs(%s)" % self.storage_path(), sys.exc_value )
+        try:
+	    os.symlink(self.storage_path(), self.logical_path)
+        except: 
+            return ("os.symlink(%s, %s)" % (self.storage_path(),self.logical_path),sys.exc_value )
         self.save()
 
     def spot_display(self):
@@ -246,17 +242,12 @@ class FileSet(models.Model):
     spot_display.short_description = 'Storage pot'
 
     def spot_exists(self):
-        return os.path.exists(self.spot_path())    
+        return os.path.exists(self.storage_path())    
     spot_exists.boolean = True
 
     def logical_path_exists(self):
         return os.path.exists(self.logical_path)
     logical_path_exists.boolean = True
-
-    def status(self):
-        s= "spot exists:%s (%s), " % (os.path.exists(self.spot_path()),self.spot_path())    
-        s += "logical path exists:%s (%s), " % (os.path.exists(self.logical_path),self.logical_path)    
-        return s
 
     def partition_display(self):
         if self.partition: return "%s" % self.partition
@@ -267,11 +258,43 @@ class FileSet(models.Model):
     def allocate(self):
         # find partion for this fileset
         if self.partition: return # return if already allocated
-
-        partitions = Partition.objects.filter(status='Allocating')
-        # TO DO this just picks the first at the moment
-        self.partition = partitions[0]
-        self.save()
+	
+        # if its already a link to a '/disks/'
+	if os.path.islink(self.logical_path): 
+            # get storage path
+            linkpath = os.readlink(self.logical_path)
+	    if linkpath[0:7] == '/disks/': # look like it is already allocated
+	        # find mount point
+	        p = linkpath
+	        oldspot = ''
+	        while 1: 
+                    head, tail = os.path.split(p)
+	            oldspot = os.path.join(tail, oldspot) 	
+	            if os.path.ismount(head): 
+		        self.partition = Partition.objects.get(mountpoint=head)
+			self.storage_pot = oldspot
+			self.notes += 'allocated from pre-existing links to /disks/'
+			self.save()
+			return		 
+	            p = head
+		    
+        else:
+	    partitions = Partition.objects.filter(status='Allocating')
+            # find the fullest partition which can accomidate the file set
+	    allocated_partition = None
+	    fullest_space = 10e40
+	    for p in partitions:
+	        partition_free_space = 0.95 * p.capacity_bytes - p.allocated()
+		# if this partition could accommidate file set...
+		if partition_free_space > self.overall_final_size:
+		    # ... and its the fullest so far  
+		    if partition_free_space < fullest_space:
+		        allocated_partition = p
+			fullest_space = partition_free_space
+		
+            self.partition = allocated_partition
+	    self.notes += 'Allocated by algorythum'
+            self.save()
     
     def du(self):
         '''Report disk usage of FileSet by creating as FileSetSizeMeasurement.'''
