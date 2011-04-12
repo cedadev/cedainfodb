@@ -130,11 +130,23 @@ class Partition(models.Model):
 	
     def meter(self):
         # meter for 
-	if self.capacity_bytes == 0: return "No capacity set"
-	used = self.used_bytes*100/self.capacity_bytes
-	alloc = self.allocated()*100/self.capacity_bytes
-        s = '<img src="https://chart.googleapis.com/chart?chs=150x50&cht=gom&chco=99FF99,999900,FF0000&chd=t:%s|%s&chls=3|3,5,5|15|10"> %s%% Used, %s%% Allocated ' % (used, alloc,used, alloc)
-	return s
+        if self.capacity_bytes == 0: return "No capacity set"
+        used = self.used_bytes*100/self.capacity_bytes
+        alloc = self.allocated()*100/self.capacity_bytes
+        # Find the set of most recent FileSetSizeMeasurements for FileSets on this Partition
+        filesetsum = 0
+        filesets = FileSet.objects.filter(partition=self)
+        for fs in filesets:
+            try:
+                fssm = FileSetSizeMeasurement.objects.filter(fileset=fs).order_by('-date')[0]
+                filesetsum += fssm.size
+            except:
+                filesetsum += 0
+        # Turn this into a percentage of capacity
+        filesetsum = filesetsum*100/self.capacity_bytes
+        #s = '<img src="https://chart.googleapis.com/chart?chs=150x50&cht=gom&chco=99FF99,999900,FF0000&chd=t:%s|%s&chls=3|3,5,5|15|10"> %s%% Used, %s%% Allocated ' % (used, alloc,used, alloc)
+        s = '<img src="http://chart.googleapis.com/chart?chxt=y&cht=bhs&chd=t:%s,%s,%s&chco=FF0000|00FF00|0000FF&chls=1.0&chs=200x100&chxl=0:|SumOfFileSets|Allocated|UsedCapacity&chm=N*f0*%s,000000,0,-1,11">' % (used, alloc, filesetsum,'%')
+        return s
     meter.allow_tags = True
 
     def allocated(self):
