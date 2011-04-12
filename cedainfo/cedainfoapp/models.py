@@ -311,14 +311,19 @@ class FileSet(models.Model):
     def du(self):
         '''Report disk usage of FileSet by creating as FileSetSizeMeasurement.'''
         if self.spot_exists() and os.path.ismount(self.partition.mountpoint):
-            output = subprocess.Popen(['/bin/du', '-sk', self.spot_path],
-            stdout=subprocess.PIPE).communicate()[0]
+            output = subprocess.Popen(['/bin/du', '-sk', self.storage_path()],stdout=subprocess.PIPE).communicate()[0]
             lines = output.split('\n')
-            if len(lines) == 3: size, path = lines[0].split()
+            if len(lines) == 2: size, path = lines[0].split()
             fssm = FileSetSizeMeasurement(fileset=self, date=datetime.now(), size=int(size)*1024)
             fssm.save() 
         return      
 
+    def links(self):
+        # links to actions for filesets
+        s = '<a href="/fileset/%s/du">du</a> ' % (self.pk,)
+        return s
+    links.allow_tags = True
+    
     # TODO...
     #def size_history(self):
     #    # display graph of size history for fileset
@@ -328,7 +333,7 @@ class FileSet(models.Model):
     #    size_values = string.join(size_values,',')
         
     #    date_values = fssms.values_list('date', flat=True)
-    #    date_values = map(str, date_values)
+    #    date_values = map(datetime.toordinal, date_values)
     #    date_values = string.join(date_values,',')
         
         #if self.capacity_bytes == 0: return "No measurements"
