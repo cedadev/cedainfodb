@@ -237,3 +237,9 @@ def makespot(request, id):
         return render_to_response('cedainfoapp/spotcreationerror.html', {'error':error})  
     else:
         return redirect('/admin/cedainfoapp/fileset')
+        
+# do du for a fileset and redirect back to filesets list
+def du(request, id):
+    fs = FileSet.objects.get(pk=id)
+    fs.du()
+    return redirect('/admin/cedainfoapp/fileset')
