@@ -221,7 +221,7 @@ class FileSet(models.Model):
     partition = models.ForeignKey(Partition, blank=True, null=True, limit_choices_to = {'status': 'Allocating'},help_text="Actual partition where this FileSet is physically stored")
     storage_pot = models.CharField(max_length=1024, blank=True, default='', help_text="dd")
     migrate_to = models.ForeignKey(Partition, blank=True, null=True, limit_choices_to = {'status': 'Allocating'},help_text="Target partition for migration", related_name='fileset_migrate_to_partition')
-    secondary_partition = models.ForeignKey(Partition, blank=True, null=True}, help_text="Target for secondary disk copy", related_name='fileset_secondary_partition')
+    secondary_partition = models.ForeignKey(Partition, blank=True, null=True, help_text="Target for secondary disk copy", related_name='fileset_secondary_partition')
     dmf_backup = models.BooleanField(default=False, help_text="Backup to DMF")
     sd_backup = models.BooleanField(default=False, help_text="Backup to Storage-D")
 
