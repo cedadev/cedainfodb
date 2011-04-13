@@ -1,0 +1,9 @@
+<h4> Partition Visulisation</h4>
+
+Partition: <a href="/admin/cedainfoapp/partition/{{part.pk}}">{{part}}</a>
+
+<p>
+{% for fs in filesets %}
+<a href="/admin/cedainfoapp/fileset/{{fs.pk}}"><font size="{{fs.vis}} {{fs.size}}">{{fs}}</font></a>
+{% endfor %}
+</p>

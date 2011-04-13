@@ -215,6 +215,16 @@ def nodelist(request):
 
     return render_to_response('cedainfoapp/nodelist_view.txt', {'hostlist_list': hostlist_list, 'racklist_list': racklist_list}, mimetype="text/plain")  
 
+def partition_vis(request, id):
+    part = Partition.objects.get(pk=id)
+    filesets = FileSet.objects.filter(partition=part)
+    for f in filesets:
+        alloc = f.overall_final_size*100/part.capacity_bytes
+        #f.vis = '|' * alloc
+        f.vis = alloc
+        f.size = f.current_size()
+    return render_to_response('cedainfoapp/partition_vis.html', 
+               {'part': part, 'filesets': filesets})  
 
     
 # do df for a partition and redirect back to partitions list
@@ -222,6 +232,12 @@ def df(request, id):
     part = Partition.objects.get(pk=id)
     part.df()
     return redirect('/admin/cedainfoapp/partition')
+
+# do du for a fileset and redirect back to fileset list
+def du(request, id):
+    fileset = FileSet.objects.get(pk=id)
+    fileset.du()
+    return redirect('/admin/cedainfoapp/fileset')
 
 # do allocation of a fileset to a partition 
 def allocate(request, id):
