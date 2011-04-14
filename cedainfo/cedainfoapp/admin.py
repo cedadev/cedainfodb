@@ -100,11 +100,11 @@ class FileSetAdmin(admin.ModelAdmin):
     bulk_du.short_description = "Measure size of selected FileSet(s)"
 admin.site.register(FileSet,FileSetAdmin)
 
-class FileSetSizeMeasurementAdmin(admin.ModelAdmin):
-    formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
-    list_display = ('fileset','date', 'size')
-    list_filter = ('fileset',)
-admin.site.register(FileSetSizeMeasurement,FileSetSizeMeasurementAdmin)
+#class FileSetSizeMeasurementAdmin(admin.ModelAdmin):
+#    formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
+#    list_display = ('fileset','date', 'size')
+#    list_filter = ('fileset',)
+#admin.site.register(FileSetSizeMeasurement,FileSetSizeMeasurementAdmin)
 
 admin.site.register(NodeList)
 admin.site.register(HostList)
