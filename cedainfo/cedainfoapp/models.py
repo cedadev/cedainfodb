@@ -332,7 +332,7 @@ class FileSet(models.Model):
     def last_size(self):
         # display most recent FileSetSizeMeasurement
         try:
-            fssm = FileSetSizeMeasurements.objects.filter(fileset=self).order_by('-date')[0]
+            fssm = FileSetSizeMeasurement.objects.filter(fileset=self).order_by('-date')[0]
             return '%s (%s)' % (fssm.size, fssm.date)
         except:
             return 'No size measured'
