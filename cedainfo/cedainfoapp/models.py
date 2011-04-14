@@ -257,6 +257,8 @@ class FileSet(models.Model):
     spot_display.short_description = 'Storage pot'
 
     def spot_exists(self):
+        if self.storage_pot == '':
+            return False
         return os.path.exists(self.storage_path())    
     spot_exists.boolean = True
 
