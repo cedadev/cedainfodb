@@ -11,8 +11,10 @@ class BigIntegerInput(forms.TextInput):
 # don't need to edit curation cat
 #admin.site.register(CurationCategory)
 
-admin.site.register(AccessStatus)
+# don't need to change in admin interface
+#admin.site.register(AccessStatus)
 admin.site.register(Person)
+
 admin.site.register(HostHistory)
 admin.site.register(ServiceBackupLog)
 
