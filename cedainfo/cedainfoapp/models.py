@@ -215,8 +215,8 @@ class FileSet(models.Model):
     ''' subtree of archive directory hierarchy.
     Collection of all filesets taken together should exactly represent 
     all files in the archive. Must never span multiple filesystems.'''
-    logical_path = models.CharField(max_length=1024, blank=True, default='unallocated', help_text="Initially unallocated, indicating not belonging to FileSetCollection. Then set by save method of FileSetCollectionRelation to hold path within FSCR.")
-    overall_final_size = BigIntegerField(help_text="Overall final size in bytes. Estimate from data scientist.") # Additional data still expected (as yet uningested) in bytes
+    logical_path = models.CharField(max_length=1024, blank=True, default='/badc/NNNN', help_text="e.g. /badc/acsoe")
+    overall_final_size = BigIntegerField(help_text="The allocation given to a fileset is an estimate of the final size on disk. If the dataset is going to grow indefinitely then estimate the size for 4 years ahead. Filesets can't be bigger than a single partition, but in order to aid disk managment they should no exceed 20% of the size of a partition.") # Additional data still expected (as yet uningested) in bytes
     notes = models.TextField(blank=True)
     partition = models.ForeignKey(Partition, blank=True, null=True, limit_choices_to = {'status': 'Allocating'},help_text="Actual partition where this FileSet is physically stored")
     storage_pot = models.CharField(max_length=1024, blank=True, default='', help_text="dd")
