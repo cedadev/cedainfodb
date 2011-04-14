@@ -231,13 +231,13 @@ def partition_vis(request, id):
 def df(request, id):
     part = Partition.objects.get(pk=id)
     part.df()
-    return redirect('/admin/cedainfoapp/partition')
+    return redirect(request.META['HTTP_REFERER'])
 
 # do du for a fileset and redirect back to fileset list
 def du(request, id):
     fileset = FileSet.objects.get(pk=id)
     fileset.du()
-    return redirect('/admin/cedainfoapp/fileset')
+    return redirect(request.META['HTTP_REFERER'])
 
 # do allocation of a fileset to a partition 
 def allocate(request, id):
@@ -252,10 +252,5 @@ def makespot(request, id):
     if error: 
         return render_to_response('cedainfoapp/spotcreationerror.html', {'error':error})  
     else:
-        return redirect('/admin/cedainfoapp/fileset')
+        return redirect(request.META['HTTP_REFERER'])
         
-# do du for a fileset and redirect back to filesets list
-def du(request, id):
-    fs = FileSet.objects.get(pk=id)
-    fs.du()
-    return redirect('/admin/cedainfoapp/fileset')
