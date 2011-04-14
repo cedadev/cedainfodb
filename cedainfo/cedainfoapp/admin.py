@@ -74,7 +74,7 @@ class PartitionAdmin(admin.ModelAdmin):
 		     'links',)
     list_filter = ('status',)
     formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
-    search_fields = ['mountpoint','host',]
+    search_fields = ['mountpoint']
     actions=['update_df']
     
     def update_df(self, request, queryset):
