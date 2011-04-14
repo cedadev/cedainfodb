@@ -329,6 +329,15 @@ class FileSet(models.Model):
         return s
     links.allow_tags = True
     
+    def last_size(self):
+        # display most recent FileSetSizeMeasurement
+        try:
+            fssm = FileSetSizeMeasurements.filter(fileset=self).order_by('date')[0]
+            return '%s (%s)' % (fssm.size, fssm.date)
+        except:
+            return 'No size measured'
+    last_size.allow_tags = True
+    
     # TODO...
     #def size_history(self):
     #    # display graph of size history for fileset
