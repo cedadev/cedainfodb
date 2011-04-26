@@ -33,8 +33,8 @@ if __name__=="__main__":
     
     filesets = FileSet.objects.all()
     for f in filesets:
-        print "Doing du of fileset: %s ... " % f, 
+        print "Doing du of fileset: %s ... " % f 
         f.du()
-	print "Done"
+	print "            ... Done"
  
 
