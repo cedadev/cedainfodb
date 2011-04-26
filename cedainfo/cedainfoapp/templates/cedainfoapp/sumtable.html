@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}
+Storage Summary
+{% endblock %}
+
+{% block header %}
+    <h2>Storage Summary</h2>
+{% endblock %}
+
+{% block content %}
+
+<table border="1">
+  <tr>
+    <th>Status</th>
+    <th>npart</th>
+    <th>Used</th>
+    <th>Allocated</th>
+    <th>Allocation Used</th>
+    <th>Capacity</th>
+  </tr>
+  {% for row in sumtable %}
+  <tr>
+    <td>{{row.status}}</td>
+    <td>{{row.npart}}</td>
+    <td>{{row.used|filesizeformat }}</td>
+    <td>{{row.allocated|filesizeformat}}</td>
+    <td>{{row.allocused|filesizeformat}}</td>
+    <td>{{row.capacity|filesizeformat}}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% endblock %}

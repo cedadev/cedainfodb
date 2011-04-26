@@ -89,6 +89,7 @@ class FileSetAdmin(admin.ModelAdmin):
     readonly_fields = ('partition','migrate_to', 'storage_pot', 'secondary_partition')
     # TODO : add size history graph
     formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
+    search_fields = ['logical_path']
     actions=['bulk_allocate','bulk_du',]
     
     def bulk_allocate(self, request, queryset):

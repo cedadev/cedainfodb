@@ -254,3 +254,25 @@ def makespot(request, id):
     else:
         return redirect(request.META['HTTP_REFERER'])
         
+# create storage pot and link archive 
+def storagesummary(request):
+    parts = Partition.objects.all()
+    sumtable = [{'status':'Blank', 'npart':0, 'used':0, 'allocated':0, 'allocused':0, 'capacity':0},
+                {'status':'Allocating', 'npart':0, 'used':0, 'allocated':0, 'allocused':0, 'capacity':0},
+		{'status':'Closed', 'npart':0, 'used':0, 'allocated':0, 'allocused':0, 'capacity':0},
+                {'status':'Migrating', 'npart':0, 'used':0, 'allocated':0, 'allocused':0, 'capacity':0},
+                {'status':'Retired', 'npart':0, 'used':0, 'allocated':0, 'allocused':0, 'capacity':0},
+                ]
+    index = {}
+    for i in range(len(sumtable)): index[sumtable[i]['status']] = i
+      
+    for part in parts:
+        i = index[part.status]
+	sumtable[i]["npart"] += 1
+	sumtable[i]["used"] += part.used_bytes
+	sumtable[i]["allocated"] += part.allocated()
+	sumtable[i]["allocused"] += part.used_by_filesets()
+	sumtable[i]["capacity"] += part.capacity_bytes
+ 
+    return render_to_response('cedainfoapp/sumtable.html', {'sumtable':sumtable})  
+        

@@ -54,6 +54,7 @@ urlpatterns = patterns('',
     (r'^partition/(?P<id>\d+)/vis$', partition_vis),
 
     (r'^rack/services/(?P<rack_id>\d+)$', services_by_rack),
+    (r'^storagesummary$', storagesummary),
 
     # userdb
     (r'^userdb/userstats/$', user_stats),

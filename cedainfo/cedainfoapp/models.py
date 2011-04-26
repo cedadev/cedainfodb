@@ -163,8 +163,8 @@ class Partition(models.Model):
         # for each fileset, find most recent FileSetSizeMeasurement
         
         for fs in filesets:
-            fssms = FileSetSizeMeasurement.objects.filter(fileset=fs).order_by('-date')[0]
-            total += fssms.size 
+            fssms = FileSetSizeMeasurement.objects.filter(fileset=fs).order_by('-date')
+	    if len(fssms) > 0: total += fssms[0].size 
         return total
             
     def links(self):
@@ -316,7 +316,7 @@ class FileSet(models.Model):
     def du(self):
         '''Report disk usage of FileSet by creating as FileSetSizeMeasurement.'''
         if self.spot_exists() and os.path.ismount(self.partition.mountpoint):
-            output = subprocess.Popen(['/bin/du', '-sk', self.storage_path()],stdout=subprocess.PIPE).communicate()[0]
+            output = subprocess.Popen(['/usr/bin/du', '-sk', self.storage_path()],stdout=subprocess.PIPE).communicate()[0]
             lines = output.split('\n')
             if len(lines) == 2: size, path = lines[0].split()
             fssm = FileSetSizeMeasurement(fileset=self, date=datetime.now(), size=int(size)*1024)
