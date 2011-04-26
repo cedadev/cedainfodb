@@ -1,6 +1,7 @@
 import getopt, sys
 import os, errno
-import csv
+import datetime
+from datetime import timedelta
 
 from django.core.management import setup_environ
 import settings
@@ -33,8 +34,19 @@ if __name__=="__main__":
     
     filesets = FileSet.objects.all()
     for f in filesets:
-        print "Doing du of fileset: %s ... " % f 
-        f.du()
-	print "            ... Done"
+        fssm = FileSetSizeMeasurement.objects.filter(fileset=f).order_by('-date')
+	if len(fssm) == 0:
+            print "Doing du of fileset: %s ... [FIRST TIME] " % f 
+            f.du()
+	    print "            ... Done"
+	    continue
+	
+	lastdu = fssm[0].date
+	if datetime.now() - lastdu > timedelta(days=10): 
+            print "Doing du of fileset: %s ... " % f 
+            f.du()
+	    print "            ... Done"
+	else: 
+	    print "      SKIPPIG %s (done in last 10 days)" % f
  
 
