@@ -12,7 +12,7 @@ class BigIntegerInput(forms.TextInput):
 #admin.site.register(CurationCategory)
 
 # don't need to change in admin interface
-#admin.site.register(AccessStatus)
+admin.site.register(AccessStatus)
 admin.site.register(Person)
 
 admin.site.register(HostHistory)
@@ -84,7 +84,7 @@ class PartitionAdmin(admin.ModelAdmin):
 admin.site.register(Partition, PartitionAdmin)
 
 class FileSetAdmin(admin.ModelAdmin):
-    list_display = ('logical_path','overall_final_size','partition', 'partition_display','spot_display', 'spot_exists', 'logical_path_exists','last_size','links',)
+    list_display = ('logical_path','overall_final_size','partition', 'partition_display','spot_display', 'spot_exists', 'logical_path_exists','last_size','responsible','links',)
     list_filter = ('partition',)
     readonly_fields = ('partition','migrate_to', 'storage_pot', 'secondary_partition')
     # TODO : add size history graph

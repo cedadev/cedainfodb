@@ -172,6 +172,7 @@ class Partition(models.Model):
 	s = '<a href="/partition/%s/df">update df</a> ' % (self.pk,)
 	return s
     links.allow_tags = True
+    
 
     def __unicode__(self):
         tb_remaining = (self.capacity_bytes - self.used_bytes) / (1024**4)
@@ -322,6 +323,13 @@ class FileSet(models.Model):
             fssm = FileSetSizeMeasurement(fileset=self, date=datetime.now(), size=int(size)*1024)
             fssm.save() 
         return      
+
+    def responsible(self):
+	des = DataEntity.objects.order_by("-logical_path")
+	for de in des:
+	    if de.logical_path == self.logical_path[0:len(de.logical_path)]:
+	        return de.responsible_officer
+	return None	
 
     def links(self):
         # links to actions for filesets
