@@ -343,8 +343,31 @@ class FileSet(models.Model):
 			fullest_space = partition_free_space
 		
             self.partition = allocated_partition
-	    self.notes += 'Allocated by algorythum'
+	    self.notes += '\nAllocated partition %s (%s)' % (self.partition, datetime.now())
             self.save()
+
+    def allocate_m(self):
+        # find partion for migration
+        if self.storage_pot == '': return  #can't migrate a spot does not already exists in the db
+        if not self.partition: return #can't migrate a spot if no partition 
+        if self.migrate_to: return #already got a migration partition 
+
+	partitions = Partition.objects.filter(status='Allocating')
+        # find the fullest partition which can accomidate the file set
+	allocated_partition = None
+	fullest_space = 10e40
+	for p in partitions:
+	    partition_free_space = 0.95 * p.capacity_bytes - p.allocated()
+            # if this partition could accommidate file set...
+	    if partition_free_space > self.overall_final_size:
+		# ... and its the fullest so far  
+		if partition_free_space < fullest_space:
+		    allocated_partition = p
+		    fullest_space = partition_free_space
+		
+        self.migrate_to = allocated_partition
+	self.notes += '\nAllocated migration partition %s (%s)' % (self.migrate_to, datetime.now())
+        self.save()
     
     def du(self):
         '''Report disk usage of FileSet by creating as FileSetSizeMeasurement.'''
