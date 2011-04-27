@@ -47,6 +47,6 @@ if __name__=="__main__":
             f.du()
 	    print "            ... Done"
 	else: 
-	    print "      SKIPPIG %s (done in last 10 days)" % f
+	    print "      SKIPPING %s (done in last 10 days)" % f
  
 

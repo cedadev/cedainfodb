@@ -216,7 +216,7 @@ class FileSet(models.Model):
     ''' subtree of archive directory hierarchy.
     Collection of all filesets taken together should exactly represent 
     all files in the archive. Must never span multiple filesystems.'''
-    logical_path = models.CharField(max_length=1024, blank=True, default='/badc/NNNN', help_text="e.g. /badc/acsoe")
+    logical_path = models.CharField(max_length=1024, blank=True, default='/badc/NNNN', help_text="e.g. /badc/acsoe", unique=True)
     overall_final_size = BigIntegerField(help_text="The allocation given to a fileset is an estimate of the final size on disk. If the dataset is going to grow indefinitely then estimate the size for 4 years ahead. Filesets can't be bigger than a single partition, but in order to aid disk managment they should no exceed 20% of the size of a partition.") # Additional data still expected (as yet uningested) in bytes
     notes = models.TextField(blank=True)
     partition = models.ForeignKey(Partition, blank=True, null=True, limit_choices_to = {'status': 'Allocating'},help_text="Actual partition where this FileSet is physically stored")
@@ -250,6 +250,38 @@ class FileSet(models.Model):
         except: 
             return ("os.symlink(%s, %s)" % (self.storage_path(),self.logical_path),sys.exc_value )
         self.save()
+
+    def migrate_spot(self):
+        if self.storage_pot == '': return  #can't migrate a spot does not already exists in the db
+        if not self.partition: return #can't migrate a spot if no partition 
+        if not self.migrate_to: return #can't migrate a spot if no migration partition 
+	if os.path.islink(self.logical_path): return #can't migrate a spot if logical path is not a link
+       
+        # copy 
+	# some sort of rsync
+	
+	# verify
+	# some sort of rsync
+	
+	
+	# re point to new partition
+	self.partition = self.migrate_to
+	# delete link
+	os.unlink(self.logical_path)
+	# remake link to new partition
+        try:
+	    os.symlink(self.storage_path(), self.logical_path)
+        except: 
+            return ("os.symlink(%s, %s)" % (self.storage_path(),self.logical_path),sys.exc_value )
+        #reset migrat to partition 
+	self.migrate_to = None
+        self.save()
+	
+	
+	# delete
+	# some sort of rsync
+	
+	
 
     def spot_display(self):
         if self.storage_pot: return "%s" % self.storage_pot
