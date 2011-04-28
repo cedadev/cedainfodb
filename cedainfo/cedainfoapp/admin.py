@@ -8,6 +8,33 @@ class BigIntegerInput(forms.TextInput):
         attrs.setdefault('size', 80)
         super(BigIntegerInput, self).__init__(*args, **kwargs)
 
+BYTE_UNIT_SUFFIXES = {
+    'b':   1,                          # byte
+    'kb':   1024,                       # kilobyte
+    'Mb':   1024*1024,                  # megabyte
+    'Gb':   1024*1024*1024,             # gigabyte
+    'Tb':   1024*1024*1024*1024,        # terabyte
+    'Pb':   1024*1024*1024*1024,        # petabyte
+    'Eb':   1024*1024*1024*1024*1024,   # exabyte
+}
+
+class ByteSizeField(forms.CharField):
+
+    def clean(self, value):
+        try:
+            # If it's a number followed by a suffix e.g. "4.23 Mb", split it & look at the suffix to determine the factor.
+            if len(value.split()) > 1:
+                (size, suffix) = value.split()
+                # Find the matching suffix and multiply value by corresponding factor
+                value = int( float(size) * BYTE_UNIT_SUFFIXES[suffix] )
+                return value
+            else:
+                return int(value)
+        except:
+            raise ValidationError(u"Enter a value either as an integer number of bytes, or as a number followed by the suffix 'b', 'Mb', 'Gb', 'Tb', 'Pb, 'Eb'")
+
+        
+        
 # don't need to edit curation cat
 #admin.site.register(CurationCategory)
 
@@ -65,7 +92,14 @@ class DataEntityAdmin(admin.ModelAdmin):
     search_fields = ['dataentity_id','symbolic_name',]
 admin.site.register(DataEntity, DataEntityAdmin)
 
+class PartitionAdminForm(forms.ModelForm):
+    used_bytes = ByteSizeField()
+    capacity_bytes = ByteSizeField()    
+    class Meta:
+        model = Partition
+
 class PartitionAdmin(admin.ModelAdmin):
+    form = PartitionAdminForm
     list_display = ('__unicode__',
                     # 'exists',
 		     'meter',
@@ -73,7 +107,7 @@ class PartitionAdmin(admin.ModelAdmin):
                     'allocated','list_allocated',
 		     'links',)
     list_filter = ('status',)
-    formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
+    formfield_overrides = { ByteSizeField: {'widget': BigIntegerInput} }
     search_fields = ['mountpoint']
     actions=['update_df']
     
@@ -83,12 +117,18 @@ class PartitionAdmin(admin.ModelAdmin):
     update_df.short_description = "Do a df on selected partitions"
 admin.site.register(Partition, PartitionAdmin)
 
+class FileSetAdminForm(forms.ModelForm):
+    overall_final_size = ByteSizeField()    
+    class Meta:
+        model = FileSet
+
 class FileSetAdmin(admin.ModelAdmin):
+    
     list_display = ('logical_path','overall_final_size','partition', 'partition_display','spot_display', 'spot_exists', 'logical_path_exists','last_size','responsible','links',)
     list_filter = ('partition',)
     readonly_fields = ('partition','migrate_to', 'storage_pot', 'secondary_partition')
     # TODO : add size history graph
-    formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
+    formfield_overrides = { ByteSizeField: {'widget': BigIntegerInput} }
     search_fields = ['logical_path']
     actions=['bulk_allocate','bulk_du',]
     
@@ -104,7 +144,7 @@ class FileSetAdmin(admin.ModelAdmin):
 admin.site.register(FileSet,FileSetAdmin)
 
 #class FileSetSizeMeasurementAdmin(admin.ModelAdmin):
-#    formfield_overrides = { BigIntegerField: {'widget': BigIntegerInput} }
+#    formfield_overrides = { ByteSizeField: {'widget': BigIntegerInput} }
 #    list_display = ('fileset','date', 'size')
 #    list_filter = ('fileset',)
 #admin.site.register(FileSetSizeMeasurement,FileSetSizeMeasurementAdmin)
