@@ -255,47 +255,46 @@ class FileSet(models.Model):
         self.save()
 
     def migrate_spot(self):
-        if self.storage_pot == '': return  #can't migrate a spot does not already exists in the db
-        if not self.partition: return #can't migrate a spot if no partition 
-        if not self.migrate_to: return #can't migrate a spot if no migration partition 
-	if os.path.islink(self.logical_path): return #can't migrate a spot if logical path is not a link
+        if self.storage_pot == '': raise "can't migrate a spot does not already exists in the db"
+        if not self.partition: raise "can't migrate a spot if no partition"
+        if not self.migrate_to: raise "can't migrate a spot if no migration partition" 
+	if not os.path.islink(self.logical_path): raise "can't migrate a spot if logical path is not a link"
        
-        # copy 
-	goodcopy = self._migration_copy
-	if not goodcopy: raise "Initial rsync failed"
+        # copy - exceptions raised if fail
+	self._migration_copy()
 		
 	# delete link and remake link to new partition
 	if os.readlink(self.logical_path) != self.migrate_path(): #may be tring again after failing
 	    os.unlink(self.logical_path)
 	    os.symlink(self.migrate_path(), self.logical_path)
 
-	# copy again
-	goodcopy = self._migration_copy
-	if not goodcopy: raise "Error on second rsync failed"
+	# copy again - exceptions raised if fail
+	self._migration_copy()
 	
-	# verify	
-        goodcopy = _verify_copy(self)
-	if not goodcopy: raise "diff failed - could not verify copy"
+	# verify - exceptions raised if fail	
+        self._verify_copy()
 
 	# delete
+        pass
 
 	# upgade fs with new partition info on success
+	self.notes += '\nMigrated %s -> %s (%s)' % (self.partition, self.migrate_to, datetime.now())
 	self.partition = self.migrate_to
  	self.migrate_to = None
         self.save()
 	
 	
     def _migration_copy(self):	
-        # copy - return true is copy is ok
-	rsynccmd = 'rsync -av %s/ %s' % (storage_path(),migrate_path())      
-        exitstatus = subprocess.check_call(rsynccmd.split())
-        return exitstatus == 0
+        # copy - exception  copy is ok
+	rsynccmd = 'rsync -av %s/ %s' % (self.storage_path(),self.migrate_path())
+	print ">>> %s" %rsynccmd      
+        subprocess.check_call(rsynccmd.split())
 	
     def _verify_copy(self):	
         # copy - return true is copy is ok
-	diffcmd = 'diff -r -q --unidirectional-new-file %s %s' % (storage_path(),migrate_path())      
-        exitstatus = subprocess.check_call(rsynccmd.split())
-        return exitstatus == 0
+	diffcmd = 'diff -r -q --unidirectional-new-file %s %s' % (self.storage_path(),self.migrate_path())      
+	print ">>> %s" %diffcmd      
+        subprocess.check_call(diffcmd.split())
 
 
     def spot_display(self):
