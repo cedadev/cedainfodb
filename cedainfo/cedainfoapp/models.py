@@ -270,15 +270,21 @@ class FileSet(models.Model):
 
 	# copy again - exceptions raised if fail
 	self._migration_copy()
-	
-	# verify - exceptions raised if fail	
+		
+	# verify and log - exceptions raised if fail	
         self._verify_copy()
 
-	# delete
-        pass
+	# mark for deletion - write a file in the spot directory 
+	# showing the migration is complete with regard to the CEDA info tool  
+        DOC = open(os.path.join(self.storage_path(),'MIGRATED.txt'), 'w')
+	DOC.write("""This storage directory has been migrated and can be deleted.
+	
+	Migrated %s -> %s (%s)
+	Storage pot: %s
+	Logical path: %s""" % (self.partition, self.migrate_to, datetime.utcnow(), self.storage_pot, self.logical_path))
 
 	# upgade fs with new partition info on success
-	self.notes += '\nMigrated %s -> %s (%s)' % (self.partition, self.migrate_to, datetime.now())
+	self.notes += '\nMigrated %s -> %s (%s)' % (self.partition, self.migrate_to, datetime.utcnow())
 	self.partition = self.migrate_to
  	self.migrate_to = None
         self.save()
@@ -312,6 +318,33 @@ class FileSet(models.Model):
     def logical_path_exists(self):
         return os.path.exists(self.logical_path)
     logical_path_exists.boolean = True
+
+    def logical_path_right(self):
+        if not os.path.exists(self.logical_path): return False
+	if not os.path.islink(self.logical_path): 
+	    return False
+	else:
+	    linkpath = os.readlink(self.logical_path)
+	    if linkpath == self.storage_path(): return True
+	    else: return False
+
+    def status(self):
+        "return text showing fileset status"
+        if not self.partition:
+	    if self.migrate_to or self.storage_pot: return '<font color="#ff0000">Migrate to/Storage pot are set before partition?</font>'
+            elif not self.logical_path_exists(): return '<font color="#bbbb00">New</font>'
+	    elif os.path.islink(self.logical_path):
+                linkpath = os.readlink(self.logical_path)
+	        if linkpath[0:7] == '/disks/': return '<font color="#bbbb00">New (Can allocate from existing link)</font>'
+	    else: return '<font color="#ff0000">Logical path exists</font>'
+		
+        else:
+	    if not self.storage_pot and not self.logical_path_exists(): return '<font color="#bbbb00">Ready for storage creation</font>'
+	    elif self.logical_path_right():
+	        if self.migrate_to: return '<font color="#bbbb00">File set marked for migration</font>'
+                else: return '<font color="#00bb00">Normal</font>'
+	    else: return '<font color="#ff0000">Link error</font>'
+    status.allow_tags = True
 
     def partition_display(self):
         if self.partition: return "Partition Set" 
@@ -357,7 +390,7 @@ class FileSet(models.Model):
 			fullest_space = partition_free_space
 		
             self.partition = allocated_partition
-	    self.notes += '\nAllocated partition %s (%s)' % (self.partition, datetime.now())
+	    self.notes += '\nAllocated partition %s (%s)' % (self.partition, datetime.utcnow())
             self.save()
 
     def allocate_m(self):
