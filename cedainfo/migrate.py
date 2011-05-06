@@ -34,9 +34,9 @@ if __name__=="__main__":
     
     filesets = FileSet.objects.all()
     for f in filesets:
-        print f
-        if f.migrate_to:
-	    print "MIGRATING %s -> %s" % (f.partition, f.migrate_to) 
+         if f.migrate_to:
+	    print "MIGRATING %s" % (f.logical_path) 
+	    print "     %s -> %s" % (f.partition, f.migrate_to) 
 	    f.migrate_spot()
  
 

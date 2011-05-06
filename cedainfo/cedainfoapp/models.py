@@ -3,6 +3,8 @@ from datetime import datetime
 import os, sys
 import subprocess
 import string
+import md5
+import time
 
 # Needed for BigInteger fix
 from django.db.models.fields import IntegerField
@@ -272,7 +274,8 @@ class FileSet(models.Model):
 	self._migration_copy()
 		
 	# verify and log - exceptions raised if fail	
-        self._verify_copy()
+        self.checkm_log()
+	self._verify_copy()
 
 	# mark for deletion - write a file in the spot directory 
 	# showing the migration is complete with regard to the CEDA info tool  
@@ -296,11 +299,58 @@ class FileSet(models.Model):
 	print ">>> %s" %rsynccmd      
         subprocess.check_call(rsynccmd.split())
 	
+    def checkm_log(self):
+        LOG = open('/tmp/checkm.%s.log' % self.pk,'w')
+	LOG.write('#%checkm_0.7\n')
+	LOG.write('# manifest file for %s\n' % self.logical_path)
+	LOG.write('# scaning path %s\n' % self.storage_path())
+	LOG.write('# generated %s\n' % datetime.utcnow())
+	LOG.write('# Filename|Algorithm|Digest\n')
+        self._checkm_log(self.storage_path(), LOG)
+	
+    def _checkm_log(self, directory, LOG):
+	# recursive function to make checkm log file
+        reldir = directory[len(self.storage_path())+1:]
+        names = os.listdir(directory)
+        # look for diectories and recurse
+	for n in names:
+            path = os.path.join(directory,n)    
+            if os.path.isdir(path) and not os.path.islink(path):
+                self._checkm_log(path, LOG)
+        # for each file 
+        for n in names:
+            path = os.path.join(directory,n)     
+            relpath = os.path.join(reldir,n)                     
+            # if path is reg file
+            if os.path.isfile(path): 
+                F=open(path)
+                m=md5.new()
+                while 1:
+                    buf= F.read(1024*1024)
+                    m.update(buf)
+                    if buf=="": break
+                LOG.write("%s|md5|%s\n" % (relpath,m.hexdigest()))	
+
     def _verify_copy(self):	
-        # copy - return true is copy is ok
-	diffcmd = 'diff -r -q --unidirectional-new-file %s %s' % (self.storage_path(),self.migrate_path())      
-	print ">>> %s" %diffcmd      
-        subprocess.check_call(diffcmd.split())
+        # copy - raise an exception if copy is bad
+	# assumes /tmp/checkm.<pk>.log is an upto date checkm file
+        LOG = open('/tmp/checkm.%s.log' % self.pk)
+	while 1:
+	    line = LOG.readline()
+	    if line == '': break
+	    if line[0] == '#': continue
+	    relpath,alg,checksum = line.split('|')
+	    checksum = checksum.strip()
+	    newpath = os.path.join(self.migrate_path(), relpath)
+            if not os.path.isfile(newpath): raise "Not regular file"
+	     
+            F=open(newpath)
+            m=md5.new()
+            while 1:
+                buf= F.read(1024*1024)
+                m.update(buf)
+                if buf=="": break
+	    if m.hexdigest() != checksum: raise "checksums do not match"
 
 
     def spot_display(self):
