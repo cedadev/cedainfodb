@@ -131,7 +131,7 @@ class Partition(models.Model):
     list_allocated.allow_tags = True
 	
     def meter(self):
-        # meter for 
+        # graphic meter for partition
         if self.capacity_bytes == 0: return "No capacity set"
         used = self.used_bytes*100/self.capacity_bytes
         alloc = self.allocated()*100/self.capacity_bytes
@@ -147,7 +147,8 @@ class Partition(models.Model):
         # Turn this into a percentage of capacity
         filesetsum = filesetsum*100/self.capacity_bytes
         #s = '<img src="https://chart.googleapis.com/chart?chs=150x50&cht=gom&chco=99FF99,999900,FF0000&chd=t:%s|%s&chls=3|3,5,5|15|10"> %s%% Used, %s%% Allocated ' % (used, alloc,used, alloc)
-        s = '<img src="http://chart.googleapis.com/chart?chxt=y&cht=bhs&chd=t:%s,%s,%s&chco=FF0000|00FF00|0000FF&chls=1.0&chs=200x100&chxl=0:|SumOfFileSets|Allocated|UsedCapacity&chm=N*f0*%%,000000,0,-1,11" alt="U:%s%% A:%s%% F:%s%%" title="U:%s%% A:%s%% F:%s%%">' % (used, alloc, filesetsum,used, alloc, filesetsum,used, alloc, filesetsum)
+
+        s = '<img src="https://chart.googleapis.com/chart?cht=bho&chs=200x60&chd=t:100,%s|%s,%s&chco=ffcccc|ccccff,ff3333|3333ff&chbh=20&chxt=y&chxl=0:|Allocated|Used" alt="U:%s%% A:%s%% F:%s%%" title="U:%s%% A:%s%% F:%s%%">' % (alloc,used,  filesetsum,used, alloc, filesetsum,used, alloc, filesetsum)
         return s
     meter.allow_tags = True
 
