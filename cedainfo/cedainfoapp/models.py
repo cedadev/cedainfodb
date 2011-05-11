@@ -500,23 +500,32 @@ class FileSet(models.Model):
     last_size.allow_tags = True
     
     # TODO...
-    #def size_history(self):
-    #    # display graph of size history for fileset
-    #    fssms = FileSetSizeMeasurements.filter(fileset=self).order_by('date')
-    #    size_values = fssms.values_list('size', flat=True)
-    #    size_values = map(str, size_values)
-    #    size_values = string.join(size_values,',')
-        
-    #    date_values = fssms.values_list('date', flat=True)
-    #    date_values = map(datetime.toordinal, date_values)
-    #    date_values = string.join(date_values,',')
-        
-        #if self.capacity_bytes == 0: return "No measurements"
-        #used = self.used_bytes*100/self.capacity_bytes
-        #alloc = self.allocated()*100/self.capacity_bytes
-    #    s = '<img src="https://chart.googleapis.com/chart?chs=150x50&cht=gom&chco=99FF99,999900,FF0000&chd=t:|&chls=3#|3,5,5|15|10">'
-    #    return s
-    #size_history.allow_tags = True
+#    def size_history(self):
+#        # display graph of size history for fileset
+#        fssms = FileSetSizeMeasurement.objects.filter(fileset=self).order_by('date')
+#        size_values = fssms.values_list('size', flat=True)
+#	if len(size_values) == 0:return "No measurements"
+#        size_values = map(str, size_values)
+#        size_values = string.join(size_values,',')
+#        
+#        date_values = fssms.values_list('date', flat=True)
+#        date_values = map(datetime.toordinal, date_values)
+#	chartrange = "chxr=0,%s,%s" % ( min(date_values),max(date_values))
+#        date_values = map(str, date_values)
+#        date_values = string.join(date_values,',')
+#	chartdata = "chd=%s|%s" % (date_values,size_values)
+#
+#        s = '<img src="https://chart.googleapis.com/chart?chs=150x50&cht=lxy&%s&%s">' % (chartdata, chartrange)
+#        return s
+#        date_values = string.join(date_values,',')
+#	return date_values 
+#        
+#        if self.capacity_bytes == 0: return "No measurements"
+#        used = self.used_bytes*100/self.capacity_bytes
+#        alloc = self.allocated()*100/self.capacity_bytes
+#        s = '<img src="https://chart.googleapis.com/chart?chs=150x50&cht=gom&chco=99FF99,999900,FF0000&chd=t:|&chls=3#|3,5,5|15|10">'
+#        return s
+#    size_history.allow_tags = True
         
 class DataEntity(models.Model):
     '''Collection of data treated together. Has corresponding MOLES DataEntity record.'''

@@ -124,7 +124,8 @@ class FileSetAdminForm(forms.ModelForm):
 
 class FileSetAdmin(admin.ModelAdmin):
     
-    list_display = ('logical_path','overall_final_size','partition', 'partition_display','spot_display','status','last_size','responsible','links',)
+    list_display = ('logical_path','overall_final_size','partition', 'partition_display',
+        'spot_display','status','last_size','responsible','links',)
     list_filter = ('partition',)
     readonly_fields = ('partition',
 #        'migrate_to', 
