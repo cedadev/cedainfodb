@@ -147,8 +147,11 @@ class Partition(models.Model):
         # Turn this into a percentage of capacity
         filesetsum = filesetsum*100/self.capacity_bytes
         #s = '<img src="https://chart.googleapis.com/chart?chs=150x50&cht=gom&chco=99FF99,999900,FF0000&chd=t:%s|%s&chls=3|3,5,5|15|10"> %s%% Used, %s%% Allocated ' % (used, alloc,used, alloc)
-
-        s = '<img src="https://chart.googleapis.com/chart?cht=bho&chs=200x60&chd=t:100,%s|%s,%s&chco=ffcccc|ccccff,ff3333|3333ff&chbh=20&chxt=y&chxl=0:|Allocated|Used" alt="U:%s%% A:%s%% F:%s%%" title="U:%s%% A:%s%% F:%s%%">' % (alloc,used,  filesetsum,used, alloc, filesetsum,used, alloc, filesetsum)
+        #http://chart.googleapis.com/chart?cht=bhg&chco=ffcccc|ccccff&chs=200x65&chd=t1:100,74|50,82&chbh=20&chxt=y&chxl=0:|Allocated|Used&chm=v,ff0000,1,0,14|v,000ff0,1,2,14
+        #s = '<img src=""> %s%% Used, %s%% Allocated ' % (used, alloc,used, alloc)
+	googlechart = 'http://chart.googleapis.com/chart?cht=bhg&chco=ffcccc|ccccff&chs=200x70&chd=t1:100,%s|%s,%s&chbh=20&chxt=y,x&chxl=0:|Allocated|Used&chma=5,10,5,5&chxr=1,0,110&chds=0,110&chxtc=1,-100&chxs=1,,8&chm=v,ff0000,1,0,14|v,000ff0,1,2,14' % (alloc,used,filesetsum)
+	
+        s = '<img src="%s" alt="U:%s%% A:%s%% F:%s%%" title="U:%s%% A:%s%% F:%s%%">' % (googlechart,used, alloc,  filesetsum,used, alloc, filesetsum)
         return s
     meter.allow_tags = True
 
