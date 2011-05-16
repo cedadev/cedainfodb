@@ -497,9 +497,9 @@ class FileSet(models.Model):
         # display most recent FileSetSizeMeasurement
         try:
             fssm = FileSetSizeMeasurement.objects.filter(fileset=self).order_by('-date')[0]
-            return '%s (%s)' % (fssm.size, fssm.date)
+            return fssm
         except:
-            return 'No size measured'
+            return None
     last_size.allow_tags = True
     
     # TODO...
@@ -630,6 +630,6 @@ class FileSetSizeMeasurement(models.Model):
     size = BigIntegerField(help_text="Size in bytes") # in bytes
     no_files = BigIntegerField(null=True, blank=True, help_text="Number of files") 
     def __unicode__(self):
-        return u'%s|%s' % (self.date, self.fileset)
+        return u'%s (%s)' % (self.size, self.date)
 
         

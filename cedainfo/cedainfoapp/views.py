@@ -167,13 +167,21 @@ def home(request):
 def fileset_list(request):
     '''Barebones list of filesets'''
     o = request.GET.get('o', 'id') # default order is ascending id
-    qs = FileSet.objects.order_by(o)
+    search = request.GET.get('search', '') # default order is ascending id
+    qs = FileSet.objects.filter(logical_path__contains=search).order_by(o)
     # Use the object_list view.
+    totalalloc=0
+    totaldu=0
+    for fs in qs:
+        lastsize = fs.last_size()
+        if lastsize: totaldu += lastsize.size
+	totalalloc += fs.overall_final_size
     return list_detail.object_list(
         request,
         queryset = qs,
         template_name = "cedainfoapp/fileset_list.html",
         template_object_name = "fileset",
+        extra_context = {"totaldu" : totaldu, "totalalloc" : totalalloc}
     )
 
 

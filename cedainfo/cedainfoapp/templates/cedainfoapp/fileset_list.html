@@ -11,6 +11,12 @@ FileSet list
 {% block content %}
 <p>View list in <a href="/admin/cedainfoapp/fileset/">admin interface</a></p>
 
+<form name="input" method="get">
+Logical path search: <input type="text" name="search" />
+<input type="submit" value="Go" />
+</form>
+
+<br/>
 <table border="1">
 	    <tr>
 			<th><a href="?o=id">Id</a></th>
@@ -22,7 +28,16 @@ FileSet list
 	    	    <td><a href="/fileset/{{fs.id}}">{{fs.id}}</a></td>
 	    	    <td><a href="/fileset/{{fs.id}}">{{fs.logical_path}}</a></td>
 	    	    <td><a href="/admin/cedainfoapp/fileset/{{fs.id}}">{{fs.id}}</a></td>
+	    	    <td>{{fs.overall_final_size|filesizeformat}}</td>
+	    	    <td>{{fs.last_size.size|filesizeformat}}</td>
 			</tr>
         {% endfor %}
+  <tr>
+    <td></td>
+     <td>Total</td>
+     <td></td>
+     <td>{{totalalloc|filesizeformat}}</td>
+     <td>{{totaldu|filesizeformat}}</td>
+  </tr>
 	</table>
 {% endblock %}
