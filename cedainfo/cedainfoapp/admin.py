@@ -144,6 +144,20 @@ class FileSetAdmin(admin.ModelAdmin):
         for fs in queryset.all():
             fs.du()
     bulk_du.short_description = "Measure size of selected FileSet(s)"
+
+    # extra context for admin view TODO!!!!
+    def change_view(self, request, object_id, extra_context=None):
+    
+        fssms = FileSetSizeMeasurement.objects.filter(fileset=object_id)
+	#.objects.filter(fileset=self).order_by('date')
+	#fssms = fssms.get()
+#	for in
+#        size_values = fssms.values_list('size', flat=True)
+#        date_values = fssms.values_list('date', flat=True)    
+        my_context = {'xx': 'MyContect', 'fssms':fssms}
+        return super(FileSetAdmin, self).change_view(request, object_id,
+            extra_context=my_context)
+
 admin.site.register(FileSet,FileSetAdmin)
 
 #class FileSetSizeMeasurementAdmin(admin.ModelAdmin):

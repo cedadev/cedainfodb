@@ -30,6 +30,10 @@ Logical path search: <input type="text" name="search" />
 	    	    <td><a href="/admin/cedainfoapp/fileset/{{fs.id}}">{{fs.id}}</a></td>
 	    	    <td>{{fs.overall_final_size|filesizeformat}}</td>
 	    	    <td>{{fs.last_size.size|filesizeformat}}</td>
+	    	    <td>
+<img
+src="http://chart.googleapis.com/chart?cht=bhg&chco=ffcccc|ccccff&chs=200x60&chd=t:{{fs.last_size.size}}&chbh=20&chxt=y,x&chxl=0:|Allocated&chma=5,10,5,5&chxr=1,0,{{fs.overall_final_size}}&chds=0,{{fs.overall_final_size}}"/>
+		    </td>
 			</tr>
         {% endfor %}
   <tr>
