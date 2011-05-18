@@ -34,6 +34,7 @@ urlpatterns = patterns('',
     (r'^hosts/(?P<subset>\w+)$', host_list),
     #   - detail view of 1 host, by id
     (r'^host/(?P<host_id>\d+)/$', host_detail),
+    (r'^host/(?P<host>.*)/mountscript/()$', mount_script),
     # Recreate the SDDCS "nodelist" file as a view
     (r'^nodelist$', nodelist),
 

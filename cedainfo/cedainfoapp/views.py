@@ -6,6 +6,7 @@ from cedainfo.cedainfoapp.forms import *
 from django.shortcuts import redirect, render_to_response, get_object_or_404
 from django.views.generic import list_detail
 from django.core.urlresolvers import reverse
+import re
 
 import datetime
 
@@ -290,3 +291,66 @@ def storagesummary(request):
  
     return render_to_response('cedainfoapp/sumtable.html', {'sumtable':sumtable})  
         
+	
+	
+# create mountscript for a host 
+def mount_script(request, host):
+    host = Host.objects.get(hostname=host)
+    host.mounts = '/badc(ro,ftproot,automount) /neodc(rw,automount) /badc(ftpmount) /neodc(ftpmount,rw)'
+    mounts = host.mounts
+    mounts = mounts.split()
+    ftpmount_partitions = set()
+    mount_partitions = {}
+    automount_partitions = set()
+    
+    # ftpmounts
+    for mount in mounts:
+        m = re.search('(.*)\((.*)\)',mount)
+        if not m: raise "mount option not of form /xxx/yyy(mount options)"
+	path, options = m.groups(1)
+	options = options.split(',')
+	if 'ftpmount' not in options: continue
+	rw = False
+	if 'rw' in options: rw = True 
+	
+        filesets = FileSet.objects.filter(logical_path__startswith=path)
+	for fs in filesets:
+	    partition = fs.partition.mountpoint
+	    ftpmount_partitions.add((partition,rw))
+
+    # remove ro partition mounts if rw one exists
+    discard_list = []
+    for part, rw in ftpmount_partitions:
+        if rw == True: discard_list.append(part)    
+    for part in discard_list: ftpmount_partitions.discard((part,False))    
+
+    # automounts
+    for mount in mounts:
+        m = re.search('(.*)\((.*)\)',mount)
+        if not m: raise "mount option not of form /xxx/yyy(mount options)"
+	path, options = m.groups(1)
+	options = options.split(',')
+	if 'automount' not in options: continue
+	rw = False
+	if 'rw' in options: rw = True 
+	
+        filesets = FileSet.objects.filter(logical_path__startswith=path)
+	for fs in filesets:
+	    partition = fs.partition.mountpoint
+	    if partition[:7] == "/disks/": 
+	        partition = partition[7:] # remove disks
+	    else: continue # can't deal with automount things that are not in disks 
+	    automount_partitions.add((partition,rw,fs.partition.host))
+
+    # remove ro partition mounts if rw one exists
+    discard_list = []
+    for part, rw, host in automount_partitions:
+        if rw == True: discard_list.append((part,False,host))    
+    for p in discard_list: automount_partitions.discard(p)    
+           
+   # raise ""	
+	
+    return render_to_response('cedainfoapp/mountscript.html', {'host':host, 'filesets':filesets,
+        'ftpmount_partitions':ftpmount_partitions,
+        'automount_partitions':automount_partitions,
+	 }, mimetype="text/plain")  
