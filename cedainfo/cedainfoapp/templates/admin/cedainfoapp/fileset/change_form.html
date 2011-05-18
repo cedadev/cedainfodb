@@ -47,9 +47,6 @@
 
 {% block after_field_sets %}{% endblock %}
 
-{{ object_id }}
-{{ context }}
-{{ xx }}
 {{ fssms }}
 
     <script type='text/javascript' src='https://www.google.com/jsapi'></script>
@@ -59,28 +56,26 @@
       function drawChart() {
         var data = new google.visualization.DataTable();
         data.addColumn('date', 'Date');
-        data.addColumn('number', 'Sold Pencils');
+        data.addColumn('number', 'Total Size (du)');
         data.addColumn('string', 'title1');
         data.addColumn('string', 'text1');
-        data.addColumn('number', 'Sold Pens');
+        data.addColumn('number', 'Allocation');
         data.addColumn('string', 'title2');
         data.addColumn('string', 'text2');
         data.addRows([
-          [new Date(2008, 1 ,1), 30000, undefined, undefined, 406645, undefined, undefined],
-          [new Date(2008, 1 ,2), 14445, undefined, undefined, 20374, undefined, undefined],
-          [new Date(2008, 1 ,3), 55022, undefined, undefined, 50766, undefined, undefined],
-          [new Date(2008, 1 ,4), 75284, undefined, undefined, 14334, 'Out of Stock','Ran out of stock on pens at 4pm'],
-          [new Date(2008, 1 ,5), 41476, 'Bought Pens','Bought 200k pens', 66467, undefined, undefined],
-          [new Date(2008, 1 ,6), 33322, undefined, undefined, 39463, undefined, undefined]
+{% for fssm in fssms %}
+          [new Date({{fssm.date.year}}, {{fssm.date.month|add:-1}} ,{{fssm.date.day}}), {{fssm.size}}, undefined, undefined, {{fssm.fileset.overall_final_size}}, undefined, undefined],
+{% endfor %}
         ]);
 
         var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
         chart.draw(data, {displayAnnotations: true});
       }
     </script>
-    // Note how you must specify the size of the container element explicitly!
+
     <div id='chart_div' style='width: 700px; height: 240px;'></div>
 
+      }
 
 
 {% for inline_admin_formset in inline_admin_formsets %}

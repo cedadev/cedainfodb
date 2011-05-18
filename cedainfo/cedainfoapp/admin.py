@@ -40,7 +40,12 @@ class ByteSizeField(forms.CharField):
 
 # don't need to change in admin interface
 admin.site.register(AccessStatus)
-admin.site.register(Person)
+
+class PersonAdmin(admin.ModelAdmin):
+   ordering = ('name',)
+   list_display = ('name', 'username', 'email')
+   
+admin.site.register(Person, PersonAdmin)
 
 admin.site.register(HostHistory)
 admin.site.register(ServiceBackupLog)
@@ -87,7 +92,7 @@ admin.site.register(Rack, RackAdmin)
 # customise the DataEntity admin interface
 class DataEntityAdmin(admin.ModelAdmin):
     list_display = ('dataentity_id','symbolic_name','responsible_officer','last_reviewed','recipes_expression',)
-    list_filter = ('curation_category','responsible_officer','last_reviewed','access_status','availability_priority','availability_failover',)
+    list_filter = ('friendly_name', 'curation_category','responsible_officer','last_reviewed','access_status','availability_priority','availability_failover',)
     ordering = ('dataentity_id','symbolic_name','responsible_officer','last_reviewed')
     search_fields = ['dataentity_id','symbolic_name',]
 admin.site.register(DataEntity, DataEntityAdmin)

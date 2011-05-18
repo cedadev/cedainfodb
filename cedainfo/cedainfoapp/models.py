@@ -558,6 +558,10 @@ class DataEntity(models.Model):
         help_text="Remember to set date of next review if \"to be reviewed\""
     )
     next_review = models.DateField(null=True, blank=True, help_text="Date of next dataset review")
+
+    friendly_name.alphabetic_filter = True
+    
+    
     def __unicode__(self):
         return u'%s (%s)' % (self.dataentity_id, self.symbolic_name)
 
