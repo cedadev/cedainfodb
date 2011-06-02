@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://gotw.nerc.ac.uk/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://gotw.nerc.ac.uk/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://gotw.nerc.ac.uk/">
+      <s:element name="GetGrantReferenceNumbers">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetGrantReferenceNumbersResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetGrantReferenceNumbersResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetGrantReferenceNumbersByDate">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="since" type="s:dateTime" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetGrantReferenceNumbersByDateResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetGrantReferenceNumbersByDateResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDataByGrantReferenceNumber">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="refno" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDataByGrantReferenceNumberResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetDataByGrantReferenceNumberResult" type="tns:Project" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="Project">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="ReferenceNumber" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Title" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Abstract" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="LeadInvestigator" type="tns:Investigator" />
+          <s:element minOccurs="0" maxOccurs="1" name="CoInvestigators" type="tns:ArrayOfInvestigator" />
+          <s:element minOccurs="0" maxOccurs="1" name="Institution" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Department" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="State" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="JesState" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Type" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ProgrammeType" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ProgrammeName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ScienceAreas" type="tns:ArrayOfString" />
+          <s:element minOccurs="0" maxOccurs="1" name="OverallClassification" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="PRC" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="StartDate" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="EndDate" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="Value" type="s:int" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Investigator">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Name" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Institution" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Department" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfInvestigator">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Investigator" nillable="true" type="tns:Investigator" />
+        </s:sequence>
+      </s:complexType>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="GetGrantReferenceNumbersSoapIn">
+    <wsdl:part name="parameters" element="tns:GetGrantReferenceNumbers" />
+  </wsdl:message>
+  <wsdl:message name="GetGrantReferenceNumbersSoapOut">
+    <wsdl:part name="parameters" element="tns:GetGrantReferenceNumbersResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetGrantReferenceNumbersByDateSoapIn">
+    <wsdl:part name="parameters" element="tns:GetGrantReferenceNumbersByDate" />
+  </wsdl:message>
+  <wsdl:message name="GetGrantReferenceNumbersByDateSoapOut">
+    <wsdl:part name="parameters" element="tns:GetGrantReferenceNumbersByDateResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetDataByGrantReferenceNumberSoapIn">
+    <wsdl:part name="parameters" element="tns:GetDataByGrantReferenceNumber" />
+  </wsdl:message>
+  <wsdl:message name="GetDataByGrantReferenceNumberSoapOut">
+    <wsdl:part name="parameters" element="tns:GetDataByGrantReferenceNumberResponse" />
+  </wsdl:message>
+  <wsdl:portType name="GotwSoap">
+    <wsdl:operation name="GetGrantReferenceNumbers">
+      <wsdl:input message="tns:GetGrantReferenceNumbersSoapIn" />
+      <wsdl:output message="tns:GetGrantReferenceNumbersSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetGrantReferenceNumbersByDate">
+      <wsdl:input message="tns:GetGrantReferenceNumbersByDateSoapIn" />
+      <wsdl:output message="tns:GetGrantReferenceNumbersByDateSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDataByGrantReferenceNumber">
+      <wsdl:input message="tns:GetDataByGrantReferenceNumberSoapIn" />
+      <wsdl:output message="tns:GetDataByGrantReferenceNumberSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="GotwSoap" type="tns:GotwSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetGrantReferenceNumbers">
+      <soap:operation soapAction="http://gotw.nerc.ac.uk/GetGrantReferenceNumbers" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetGrantReferenceNumbersByDate">
+      <soap:operation soapAction="http://gotw.nerc.ac.uk/GetGrantReferenceNumbersByDate" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDataByGrantReferenceNumber">
+      <soap:operation soapAction="http://gotw.nerc.ac.uk/GetDataByGrantReferenceNumber" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="GotwSoap12" type="tns:GotwSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetGrantReferenceNumbers">
+      <soap12:operation soapAction="http://gotw.nerc.ac.uk/GetGrantReferenceNumbers" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetGrantReferenceNumbersByDate">
+      <soap12:operation soapAction="http://gotw.nerc.ac.uk/GetGrantReferenceNumbersByDate" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDataByGrantReferenceNumber">
+      <soap12:operation soapAction="http://gotw.nerc.ac.uk/GetDataByGrantReferenceNumber" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Gotw">
+    <wsdl:port name="GotwSoap" binding="tns:GotwSoap">
+      <soap:address location="http://gotw.nerc.ac.uk/facadeservice/gotw.asmx" />
+    </wsdl:port>
+    <wsdl:port name="GotwSoap12" binding="tns:GotwSoap12">
+      <soap12:address location="http://gotw.nerc.ac.uk/facadeservice/gotw.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
