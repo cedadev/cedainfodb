@@ -81,6 +81,7 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(PROJECT_DIR,"cedainfoapp","templates"),
+    os.path.join(PROJECT_DIR,"profinfo","templates"),
 )
 
 INSTALLED_APPS = (
@@ -89,7 +90,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
-    'cedainfo.cedainfoapp',    
+    'cedainfo.cedainfoapp', 
+    'cedainfo.proginfo',   
  #   'cedainfo.userdb',
  #   'cedainfo.rar',
 
