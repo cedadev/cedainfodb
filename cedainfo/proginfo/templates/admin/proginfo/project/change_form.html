@@ -1,0 +1,63 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+
+
+{% block object-tools %}
+{% if change %}{% if not is_popup %}
+  <ul class="object-tools">
+    <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
+    <li><a href="/project/{{ object_id }}/help" class="historylink">Help</a></li>
+    <li><a href="/project/{{ object_id }}/DMP" class="historylink">DMP</a></li>
+    <li><a href="/programme/" class="historylink">List Programmes</a> &gt; </li> 
+    <li><a href="/admin/proginfo/programme/{{ original.prog.id }}">{{ original.prog.name }}</a></li>
+    {% if has_absolute_url %}
+        <li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">
+            {% trans "View on site" %}</a>
+        </li>
+    {% endif%}
+  </ul>
+{% endif %}{% endif %}
+{% endblock %}
+
+
+<!-- list linked products -->
+{% block after_field_sets %}
+Data products:  
+{% if data_list %}
+    <table>
+    {% for data in data_list %}
+        <tr>
+	  <td><a href="/admin/proginfo/dataproduct/{{ data.id }}">{{ data.DPT }}</td>
+	  <td>{{ data.contact1 }}</td>
+	  <td>{{ data.status }}</td>
+	  <td>{{ data.deliverydate }}</td>
+	</tr>
+    {% endfor %}
+    </table>
+{% else %}
+    <p>No data products.</p>
+{% endif %}
+<a href="/project/{{ object_id }}/add_data">Add data products</a> 
+{% endblock %}
+
+
+
+<!-- Notes for projects -->
+{% block sidebar %}
+<h3>Notes:</h3>
+<b>If you add a note you will lose unsaved changes to project info!</b>
+<ul> <li>
+  <form action="/project/{{ object_id }}/add_proj_note" method="post">
+  <textarea rows="2" cols="100" name="notetext"></textarea>
+  <input type="submit" value="Add note" />
+  </form> </li> 
+{% autoescape off %}
+ {% if note_list %}
+    {% for n in note_list %}
+        <li>{{ n }}  ({{ n.added|date:"Y-m-d"  }} {{ n.who }})</li>
+    {% endfor %}
+ {% endif %}
+{% endautoescape %} 
+</ul>
+{% endblock %}

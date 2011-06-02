@@ -1,0 +1,110 @@
+<h1>Data product Help</h1>
+
+Back to <a href="/admin/proginfo/dataproduct/{{ data.id }}">editing</a> the "{{ data.DPT }}" data product.
+
+
+
+States for data products
+ 
+
+<p>Data products are the component parts of a data set. 
+They are consistent, and coherent. The will generally come form one data production tool or a consistant group of
+tools.</p>
+
+<p>Below are the attributes needed for data products and what they mean.
+
+<table>
+<tr><td><b>Attribute name</b></td><td><b>Meaning</b></td><td><b>Value in for this data product</b></td><tr>
+<tr> 
+  <td>DPT</td>
+  <td>A name for the data production tool.</td>  
+  <td>{{ data.DPT }}</td>
+</tr>
+<tr> 
+  <td>Numobs</td>
+  <td>Number of observation sites or platforms. Multipule sites means more metadata records.</td>  
+  <td>{{ data.Numobs }}</td>
+</tr>
+<tr> 
+  <td>Numact</td>
+  <td>Number of activities assosiated with the DPT. This could be number of campaigns. 
+        Multipule activites means more metadata records.</td>  
+  <td>{{ data.Numact }}</td>
+<tr> 
+  <td>Datavol</td>
+  <td>Expected final data volume in TB. Small volumes should be listed as 0. If the dataset is going to grow for an indefinit period then the estimate should be for the 5 years worth of data.</td>  
+  <td>{{ data.Numact }}</td>
+</tr>
+<tr> 
+  <td>Contact1</td>
+  <td>A data contact person, often the name of the person producing the data.</td>  
+  <td>{{ data.Contact1 }}</td>
+</tr>
+<tr> 
+  <td>Contact2</td>
+  <td>A secondary data contact person.</td>  
+  <td>{{ data.Contact2 }}</td>
+</tr>
+<tr> 
+  <td>Deliverydate</td>
+  <td>The expected date of last data arrival at the archive.</td>  
+  <td>{{ data.Deliverydate }}</td>
+</tr>
+<tr> 
+  <td>Formats</td>
+  <td>A short note on the expected formats of the data.</td>  
+  <td>{{ data.formats }}</td>
+</tr>
+<tr> 
+  <td>IPR</td>
+  <td>A short note on interlectual property right issues for this data.</td>  
+  <td>{{ data.ipr }}</td>
+</tr>
+<tr> 
+  <td>Versions</td>
+  <td>A short note on versioning issues for this data.</td>  
+  <td>{{ data.versions }}</td>
+</tr>
+<tr> 
+  <td>Numparameters</td>
+  <td>Number of expected parameters.</td>  
+  <td>{{ data.Numparameters }}</td>
+</tr>
+<tr> 
+  <td>Preservation</td>
+  <td>The intended preservation. For example, "keep for 5 year after project ends" or "keep indefinately".</td>  
+  <td>{{ data.Preservation }}</td>
+</tr>
+<tr> 
+  <td>Unresponsive</td>
+  <td>If the data contacts are unresponsive then this flag should be ticked.</td>  
+  <td>{{ data.Unresponsive }}</td>
+</tr>
+<tr> 
+  <td>Proj</td>
+  <td>This is the link to the project generating the data. </td>  
+  <td>{{ data.proj }}</td>
+</tr>
+<tr> 
+  <td>Status</td>
+  <td>The current state of the data product. 
+   <ul>
+     <li>Undefined: Data products have a loose or indeterminate description.  </li>
+     <li>Defined: Data products have firm parameters ? known size, feature type, DPT, etc. </li>
+     <li>In production: Data products are being produced by the project, but none has yet been delivered. </li>
+     <li>Delivery: Data products are being delivered, but are not yet complete. </li>
+     <li>Archived: The data product is complete and not more is expected. </li>
+   </ul>
+  </td>  
+  <td>{{ data.status }}</td>
+</tr>
+<tr> 
+  <td>Notes</td>
+  <td>Add notes about the data products by typing text in the box and clicking "Add note". Text starting
+  with http:// will appear as links, text starting with Q followed by a number will be a displayed as
+  a link to a query (e.g. Q17), and text starting with a # then a number (e.g. #5000) links to a CEDA
+  ticket.</td>  
+  <td></td>
+</tr>
+</table>
+

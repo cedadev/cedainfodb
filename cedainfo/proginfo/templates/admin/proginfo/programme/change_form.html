@@ -1,0 +1,64 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+{% block object-tools %}
+{% if change %}{% if not is_popup %}
+  <ul class="object-tools">
+    <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
+    <li><a href="/programme/{{ object_id }}/help" class="historylink">Help</a></li>
+    <li><a href="/programme/{{ object_id }}/DMP" class="historylink">DMP</a></li>
+    <li><a href="/programme/{{ object_id }}/cost" class="historylink">Costs</a></li>
+    <li><a href="/programme/" class="historylink">List Programmes</a></li>
+    {% if has_absolute_url %}
+        <li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">
+            {% trans "View on site" %}</a>
+        </li>
+    {% endif%}
+  </ul>
+{% endif %}{% endif %}
+{% endblock %}
+
+
+<!-- list projects in programme -->
+{% block after_field_sets %}
+Projects:  
+{% if proj_list %}
+    <table>
+    {% for p in proj_list %}
+        <tr>
+	  <td><a href="/admin/proginfo/project/{{ p.id }}">{{ p.title }}</td>
+	  <td>{{ p.PI }}</td>
+	  <td>{{ p.status }}</td>
+	  <td>{{ p.enddate }}</td>
+	  <td>{{ p.dpstatus }}</td>
+	</tr>
+    {% endfor %}
+    </table>
+    
+{% else %}
+    <p> <ul><li>No projects.</li></ul></p>
+{% endif %}
+<a href="/programme/{{ object_id }}/add_proj">Add new project</a> 
+
+{% endblock %}
+
+
+
+<!-- Notes for projects -->
+{% block sidebar %}
+<h3>Notes:</h3>
+<b>If you add a note you will lose unsaved changes to programme info!</b>
+<ul> <li>
+  <form action="/programme/{{ object_id }}/add_prog_note" method="post">
+  <textarea rows="2" cols="100" name="notetext"></textarea>
+  <input type="submit" value="Add note" />
+  </form> </li> 
+{% autoescape off %}
+ {% if note_list %}
+    {% for n in note_list %}
+        <li>{{ n }}  ({{ n.added|date:"Y-m-d"  }} {{ n.who }})</li>
+    {% endfor %}
+ {% endif %}
+{% endautoescape %} 
+</ul>
+{% endblock %}
+

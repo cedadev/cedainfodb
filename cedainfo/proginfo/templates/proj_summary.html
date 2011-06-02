@@ -1,0 +1,45 @@
+
+back to <a href="/admin/proginfo/project/{{ proj.id }}">edit</a>
+
+
+<h1>{{ proj.title }}</h1>		
+
+
+Grant: ({{ proj.grant }}) 
+
+This project is part of: <a href="/admin/proginfo/programme/{{ proj.prog.id }}">{{ proj.prog.name }}</a> 
+
+
+project timing:  {{ proj.StartDate }} - {{ proj.EndDate }}
+
+<h2>Data products</h2>
+{% if data_list %}
+	<table border=2> 
+	    <tr>
+	        <th>Data Product</th>
+		<th>Contact</th>
+		<th>Data Volume (TB)</th>
+		<th>Delivery date</th>
+		<th>Issues</th>
+		<th>Preservation plan</th>
+	    </tr>
+
+         {% for data in data_list %}
+	        <tr>
+		    <td>{{ data.DPT }}</td>
+		    <td>{{ data.contact1 }}</td>
+		    <td>{{ data.datavol }}</td>
+		    <td>{{ data.deliverydate }}</td>
+		    <td>{{ data.format }} {{ data.ipr }} {{ data.versions }}</td>
+		    <td>{{ data.preservation }}</td>
+		</tr>
+        {% endfor %}
+        </table>
+	
+    
+    
+{% else %}
+    <p>No data.</p>
+{% endif %}
+
+

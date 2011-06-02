@@ -1,0 +1,108 @@
+<h1>Project Help</h1>
+
+Back to <a href="/admin/proginfo/project/{{ proj.id }}">editing</a> the "{{ proj.title }}" project.
+
+<p>Projects are activities supported by programmes. They have specific science aims.</p>
+
+<p>The tool here is designed to record a minimum information to scope and track the project. Below are the attributes needed and what they mean.
+
+<table>
+<tr><td><b>Attribute name</b></td><td><b>Meaning</b></td><td><b>Value in for this project</b></td><tr>
+<tr> 
+  <td>Grant</td>
+  <td>A grant number or reference. This should be the lead split for a multi-institute grant.</td>  
+  <td>{{ proj.grant }}</td>
+</tr>
+<tr> 
+  <td>Title</td>
+  <td>The full title or long name of the project.</td>  
+  <td>{{ proj.title }}</td>
+</tr>
+<tr> 
+  <td>Desc</td>
+  <td>A short description of the project. This can come from the grants on the web system.</td>  
+  <td>{{ proj.desc|truncatewords:30  }}</td>
+</tr>
+<tr> 
+  <td>StartDate</td>
+  <td>The start date of the project.</td>  
+  <td>{{ proj.Startdate  }}</td>
+</tr>
+<tr> 
+  <td>EndDate</td>
+  <td>The end date of the project.</td>  
+  <td>{{ proj.Enddate }}</td>
+</tr>
+<tr> 
+  <td>PI</td>
+  <td>The Principle investigatior. The person responsible for the project as a whole.</td>  
+  <td>{{ proj.sciSupContact }}</td>
+</tr>
+<tr> 
+  <td>CoI1</td>
+  <td>A Co-Investorgator. This is the project contact who can act as deputy for the PI.</td>  
+  <td>{{ proj.CoI1 }}</td>
+</tr>
+<tr> 
+  <td>CoI2</td>
+  <td>A Co-Investorgator. As CoI1.</td>  
+  <td>{{ proj.CoI2 }}</td>
+</tr>
+<tr> 
+  <td>Cost</td>
+  <td>The financal size of the project in k. This gives us an idea of the scale and 
+  how many people we need to talk to.</td>  
+  <td>{{ proj.cost }}</td>
+</tr>
+<tr> 
+  <td>Thirdpartydata</td>
+  <td>Data requested by the project to help the project work. For example, data from the Met Office.</td>  
+  <td>{{ proj.Thirdparydata|truncatewords:30 }} ...</td>
+</tr>
+<tr> 
+  <td>Services</td>
+  <td>Projects may need some development work or other things that will incur extra costs. These should be brifly
+  described here.</td>  
+  <td>{{ proj.Services }}</td>
+</tr>
+<tr> 
+  <td>Status</td>
+  <td>The current status of the project. 
+   <ul>
+   
+     <li>Not scoped: A project has only some simple details like the PI name and title. </li>
+     <li>Scoping: Acquiring details and listing data products. </li>
+     <li>Unresponsive: The PI has not responded to the scoping questions (see notes on contacting PIs).</li>
+     <li>Active: The project has been included in an SC approved DMP.</li>
+     <li>Complete: All data are archived or there is agreement that no data is expected. 
+          The project must also be over to be complete.</li>
+   </ul>
+</td>  
+  <td>{{ proj.state }}</td>
+</tr>
+<tr> 
+  <td>Prog</td>
+  <td>This is the link to the funding programme supporting the project. </td>  
+  <td>{{ proj.prog }}</td>
+</tr>
+<tr> 
+  <td>Unresponsive</td>
+  <td>If the PI and Co-I's contacts are unresponsive then this flag should be ticked.</td>  
+  <td>{{ proj.Unresponsive }}</td>
+</tr>
+<tr> 
+  <td>Data products</td>
+  <td>This is the list of assosiated data products. To add another data product click on "Add data products". To
+  edit an existing data products click on items from the list.</td>  
+  <td></td>
+</tr>
+<tr> 
+  <td>Notes</td>
+  <td>Add notes about the project by typing text in the box and clicking "Add note". Text starting
+  with http:// will appear as links, text starting with Q followed by a number will be a displayed as
+  a link to a query (e.g. Q17), and text starting with a # then a number (e.g. #5000) links to a CEDA
+  ticket.</td>  
+  <td></td>
+</tr>
+</table>
+

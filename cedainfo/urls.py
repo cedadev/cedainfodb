@@ -7,6 +7,8 @@ from userdb.views import *
 from userdb.models import *
 from rar.views import *
 from rar.models import *
+from proginfo.views import *
+from proginfo.models import *
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -80,5 +82,22 @@ urlpatterns = patterns('',
     #RAR
     (r'^rar/avail/(?P<id>\d+)/$', avail),
     
-    #allocator   
+    # scisup proginfo tool
+    (r'^programme/$', index),
+    (r'^programme/(?P<prog_id>\d+)/add_proj$', add_proj),
+    (r'^programme/(?P<prog_id>\d+)/DMP$', prog_DMP),
+    (r'^programme/(?P<prog_id>\d+)/cost$', prog_cost),
+    (r'^programme/(?P<prog_id>\d+)/add_prog_note$', add_prog_note),
+    (r'^programme/(?P<prog_id>\d+)/help$', prog_help),
+    (r'^project/(?P<proj_id>\d+)/add_proj_note$', add_proj_note),
+    (r'^project/(?P<proj_id>\d+)/add_data$', add_data),
+    (r'^project/(?P<proj_id>\d+)/DMP$', proj_DMP),
+    (r'^project/(?P<proj_id>\d+)/summary$', proj_summary),
+    (r'^project/(?P<proj_id>\d+)/help$', proj_help),
+    (r'^dataproduct/(?P<data_id>\d+)/add_data_note$', add_data_note),
+    (r'^dataproduct/(?P<data_id>\d+)/help$', data_help),
+
+    (r'^newprojects$', newprojects),
+    (r'^newproj$', add_proj_gotw),
+   
 )

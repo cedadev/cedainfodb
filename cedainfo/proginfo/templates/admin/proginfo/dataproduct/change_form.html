@@ -1,0 +1,43 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+
+{% block object-tools %}
+{% if change %}{% if not is_popup %}
+  <ul class="object-tools">
+    <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
+    <li><a href="/dataproduct/{{ object_id }}/help" class="historylink">Help</a></li>
+    <li><a href="/programme/" class="historylink">List Programmes</a> &gt; </li> 
+    <li><a href="/admin/proginfo/programme/{{ original.proj.prog.id }}">{{ original.proj.prog.name }}</a> &gt; </li> 
+    <li><a href="/admin/proginfo/project/{{ original.proj.id }}">
+           {{ original.proj.title|truncatewords:8 }}</a></li>
+    {% if has_absolute_url %}
+        <li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">
+            {% trans "View on site" %}</a>
+        </li>
+    {% endif%}
+  </ul>
+{% endif %}{% endif %}
+{% endblock %}
+
+
+
+
+<!-- Notes for dataproducts -->
+{% block sidebar %}
+<h3>Notes:</h3>
+<b>If you add a note you will lose unsaved changes to data product info!</b>
+<ul> <li>
+  <form action="/dataproduct/{{ object_id }}/add_data_note" method="post">
+  <textarea rows="2" cols="100" name="notetext"></textarea>
+  <input type="submit" value="Add note" />
+  </form> </li> 
+{% autoescape off %}
+ {% if note_list %}
+    {% for n in note_list %}
+        <li>{{ n }}  ({{ n.added|date:"Y-m-d"  }} {{ n.who }})</li>
+    {% endfor %}
+ {% endif %}
+{% endautoescape %} 
+</ul>
+{% endblock %}
