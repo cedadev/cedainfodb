@@ -293,47 +293,70 @@ def storagesummary(request):
         
 	
 	
-# create mountscript for a host 
-def mount_script(request, host):
+# create ftp mount script for a host - chroot jail mounting 
+def ftpmount_script(request, host):
     host = Host.objects.get(hostname=host)
-    host.mounts = '/badc(ro,ftproot,automount) /neodc(rw,automount) /badc(ftpmount) /neodc(ftpmount,rw)'
-    mounts = host.mounts
-    mounts = mounts.split()
+    mounts = host.ftpmountpoints
+    if mounts == None: mounts = []
+    else: mounts = mounts.split()
     ftpmount_partitions = set()
-    mount_partitions = {}
-    automount_partitions = set()
+    filesets = []
+    mountlinks = []
     
     # ftpmounts
     for mount in mounts:
-        m = re.search('(.*)\((.*)\)',mount)
-        if not m: raise "mount option not of form /xxx/yyy(mount options)"
-	path, options = m.groups(1)
-	options = options.split(',')
-	if 'ftpmount' not in options: continue
-	rw = False
-	if 'rw' in options: rw = True 
+	rw = True
+	path = mount
+        if mount[-4:] == "(ro)": 
+	    rw = False
+	    path = mount[:-4]
 	
         filesets = FileSet.objects.filter(logical_path__startswith=path)
 	for fs in filesets:
 	    partition = fs.partition.mountpoint
-	    ftpmount_partitions.add((partition,rw))
-
+	    ftpmount_partitions.add((partition,rw,fs.partition.host))
+	    
+	primefileset = FileSet.objects.filter(logical_path=path)
+	primefileset = primefileset.all()[0]
+	
+	mountlinks.append((path, primefileset.storage_path())) 
+	    
     # remove ro partition mounts if rw one exists
     discard_list = []
-    for part, rw in ftpmount_partitions:
-        if rw == True: discard_list.append(part)    
-    for part in discard_list: ftpmount_partitions.discard((part,False))    
+    for part, rw, parthost in ftpmount_partitions:
+        if rw == True: discard_list.append((part,False,parthost) )   
+    for part in discard_list: ftpmount_partitions.discard(part)    
 
+	
+    return render_to_response('cedainfoapp/ftpmountscript.html', {'host':host, 
+        'filesets':filesets,
+        'ftpmount_partitions':ftpmount_partitions,
+	'mountlinks': mountlinks,
+	 }, mimetype="text/plain")  
+
+# create auto mount script for a host 
+def automount_script(request, host):
+    host = Host.objects.get(hostname=host)
+    mounts = host.mountpoints
+    if mounts == None: mounts = []
+    else: mounts = mounts.split()
+    automount_partitions = set()
+    filesets = []
+    
     # automounts
     for mount in mounts:
-        m = re.search('(.*)\((.*)\)',mount)
-        if not m: raise "mount option not of form /xxx/yyy(mount options)"
-	path, options = m.groups(1)
-	options = options.split(',')
-	if 'automount' not in options: continue
-	rw = False
-	if 'rw' in options: rw = True 
-	
+	rw = True
+	path = mount
+        if mount[-4:] == "(ro)": 
+	    rw = False
+	    path = mount[:-4]
+
+	rw = True
+	path = mount
+        if mount[-4:] == "(ro)": 
+	    rw = False
+	    path = mount[:-4]
+		
         filesets = FileSet.objects.filter(logical_path__startswith=path)
 	for fs in filesets:
 	    partition = fs.partition.mountpoint
@@ -348,9 +371,7 @@ def mount_script(request, host):
         if rw == True: discard_list.append((part,False,host))    
     for p in discard_list: automount_partitions.discard(p)    
            
-   # raise ""	
-	
-    return render_to_response('cedainfoapp/mountscript.html', {'host':host, 'filesets':filesets,
-        'ftpmount_partitions':ftpmount_partitions,
+    return render_to_response('cedainfoapp/mountscript.html', {'host':host, 
+        'filesets':filesets,
         'automount_partitions':automount_partitions,
 	 }, mimetype="text/plain")  

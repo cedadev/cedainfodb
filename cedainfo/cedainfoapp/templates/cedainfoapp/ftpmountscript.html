@@ -1,0 +1,21 @@
+# ftp mount script for {{host.hostname}}
+# ftp mounts =  {{host.mountpoints}}
+
+
+# create ftproot directory if not there 
+{% if ftpmount_partitions %} 
+if [ ! -d /ftproot ]; then mkdir /ftproot; fi
+if [ ! -d /ftproot/disks ]; then mkdir /ftproot/disks; fi
+{% endif %}
+
+
+ 
+# ftpmounts
+#  make a directory in /ftproot/disks if it does not exist then
+#  mount the directory if not mounted
+
+{% for p in ftpmount_partitions %}
+if [ ! -d /ftproot{{p.0}} ]; then mkdir /ftproot{{p.0}}; fi 
+mount |grep /ftproot{{p.0}} || mount -o {{p.1|yesno:"rw,ro" }},bg,soft {{p.2}}:{{p.0}} /ftproot{{p.0}}
+{% endfor %}
+

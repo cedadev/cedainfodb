@@ -64,7 +64,8 @@ class Host(models.Model):
     arrival_date = models.DateField(null=True,blank=True, help_text="Date host was installed (physical) / created (virtual)")
     planned_end_of_life = models.DateField(null=True,blank=True, help_text="Date foreseen for retirement of machine (if physical machine)")
     retired_on = models.DateField(null=True,blank=True, help_text="Date host was retired (leave blank if still in service)")
- #   mounts = models.CharField(max_length=512,blank=True, help_text="logical mount points: e.g. /badc(ro) mounts all the disks needed to mount all filesets on /badc (read only)")
+    mountpoints = models.CharField(max_length=512,blank=True, help_text="logical mount points: This is used to generate an auto mount script for the machine e.g. /badc(ro) mounts all filesets on /badc (read only). The default is read-write")
+    ftpmountpoints = models.CharField(max_length=512,blank=True, help_text="logical ftp mount points: This is used to make a mount script that has chroot jailed mount points for ftp e.g. /badc(ro) mounts all the disks needed to mount all filesets on /badc (read only)")
     notes = models.TextField(blank=True, help_text="Additional notes")
     host_type = models.CharField(
         max_length=50,
