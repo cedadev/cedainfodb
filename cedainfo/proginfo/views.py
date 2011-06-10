@@ -6,7 +6,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 
 import sys
 sys.path.append('../utils')
-from gotw.client import GotwClient
+# from gotw.client import GotwClient
 import datetime
 
 # The views are only the ones not included in the admin interface

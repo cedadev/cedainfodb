@@ -106,15 +106,15 @@ class PartitionAdminForm(forms.ModelForm):
 class PartitionAdmin(admin.ModelAdmin):
     form = PartitionAdminForm
     list_display = ('__unicode__',
-                    # 'exists',
+                    # 'exists', 
 		     'meter',
-		     'mountpoint','host','used_bytes','capacity_bytes',
-                    'allocated','list_allocated',
+		     'mountpoint','host','status','list_allocated',
 		     'links',)
     list_filter = ('status',)
     formfield_overrides = { ByteSizeField: {'widget': BigIntegerInput} }
     search_fields = ['mountpoint']
     actions=['update_df']
+    list_editable=['status']
     
     def update_df(self, request, queryset):
         for i in queryset.all():

@@ -135,8 +135,9 @@ class Partition(models.Model):
     def meter(self):
         # graphic meter for partition
         if self.capacity_bytes == 0: return "No capacity set"
-        used = self.used_bytes*100/self.capacity_bytes
-        alloc = self.allocated()*100/self.capacity_bytes
+        used = self.used_bytes
+	current_allocated = self.allocated()
+        alloc = current_allocated*100/self.capacity_bytes
         # Find the set of most recent FileSetSizeMeasurements for FileSets on this Partition
         filesetsum = 0
         filesets = FileSet.objects.filter(partition=self)
@@ -144,17 +145,33 @@ class Partition(models.Model):
             try:
                 fssm = FileSetSizeMeasurement.objects.filter(fileset=fs).order_by('-date')[0]
                 filesetsum += fssm.size
-            except:
+            except: 
                 filesetsum += 0
         # Turn this into a percentage of capacity
-        filesetsum = filesetsum*100/self.capacity_bytes
-        #s = '<img src="https://chart.googleapis.com/chart?chs=150x50&cht=gom&chco=99FF99,999900,FF0000&chd=t:%s|%s&chls=3|3,5,5|15|10"> %s%% Used, %s%% Allocated ' % (used, alloc,used, alloc)
-        #http://chart.googleapis.com/chart?cht=bhg&chco=ffcccc|ccccff&chs=200x65&chd=t1:100,74|50,82&chbh=20&chxt=y&chxl=0:|Allocated|Used&chm=v,ff0000,1,0,14|v,000ff0,1,2,14
-        #s = '<img src=""> %s%% Used, %s%% Allocated ' % (used, alloc,used, alloc)
-	googlechart = 'http://chart.googleapis.com/chart?cht=bhg&chco=ffcccc|ccccff&chs=200x70&chd=t1:100,%s|%s,%s&chbh=20&chxt=y,x&chxl=0:|Allocated|Used&chma=5,10,5,5&chxr=1,0,110&chds=0,110&chxtc=1,-100&chxs=1,,8&chm=v,ff0000,1,0,14|v,000ff0,1,2,14' % (alloc,used,filesetsum)
-	
-        s = '<img src="%s" alt="U:%s%% A:%s%% F:%s%%" title="U:%s%% A:%s%% F:%s%%">' % (googlechart,used, alloc,  filesetsum,used, alloc, filesetsum)
-        return s
+        fssumpercent = filesetsum*100/self.capacity_bytes
+	#work out units for capacity for axis (full axis is 110%)
+	if self.capacity_bytes < 1000: unit="B"; scale= 1.0 
+	elif  self.capacity_bytes < 1000000: unit="kB"; scale =  0.001
+	elif  self.capacity_bytes < 1000000000: unit="MB";  scale =  0.000001
+	elif  self.capacity_bytes < 1000000000000: unit="GB"; scale= 0.000000001
+	elif  self.capacity_bytes < 1000000000000000: unit="TB";  scale = 0.000000000001
+	else: unit="PB"; scale = 0.000000000000001
+	googlechart = 'http://chart.googleapis.com/chart?cht=bhg&chco=ffcccc|ccccff&chs=300x70&chbh=20&chxt=y,x&chxl=0:|Allocated|Used&chma=5,10,5,5&chxtc=1,-100&chxs=1,,8|0,,9'
+	googlechart += '&chd=t1:%s,%s|%s,%s' % (self.capacity_bytes*scale, current_allocated*scale,used*scale,filesetsum*scale)# add data
+	googlechart += '&chxr=1,0,%s&chds=0,%s' % (1.2*self.capacity_bytes*scale, 1.2*self.capacity_bytes*scale) # add data and axis range
+	googlechart += '&chm=v,ff0000,1,0,11|v,000ff0,1,2,11|N*f1*%s,000000,1,-1,10,,b:0:4|N*f1*%s,666666,0,-1,10,,b:0:-8' % (unit,unit)# add labels with unit
+        #extra annotations
+	if current_allocated > self.capacity_bytes: googlechart += '|AOver-allocated,ff0000,0,1,12'
+        if used*0.95 > filesetsum and filesetsum > 0: googlechart += '|AUnallocate+data,ff0000,1,1,12'
+        if used > self.capacity_bytes *0.995 : googlechart += '|ADisk+full,ff0000,1,0,12'
+ 	#googlechart = 'http://chart.googleapis.com/chart?cht=bhg&chco=ffcccc|ccccff&chs=200x70&chd=t1:100,%s|%s,%s&chbh=20&chxt=y,x&chxl=0:|Allocated|Used&chma=5,10,5,5&chxr=1,0,%s&chds=0,110&chxtc=1,-100&chxs=1,,8&chm=v,ff0000,1,0,14|v,000ff0,1,2,14' % (alloc,used,fssumpercent,axislength)
+	#s = '<table><tr><td>' 
+        s = '<img src="%s">' % (googlechart,)
+        #s = s+ '</td><td>'
+        #s = s + '%3.4g of %3.4g Used. %3.4g of %3.4g Allocated (%s)' % (self.used_bytes*unitfactor, self.capacity_bytes*unitfactor, 
+	#          filesetsum*unitfactor, current_allocated*unitfactor, unit)
+	#s =s + '</td></tr></table>'	   
+	return s
     meter.allow_tags = True
 
     def allocated(self):
