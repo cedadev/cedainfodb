@@ -185,6 +185,15 @@ def fileset_list(request):
         extra_context = {"totaldu" : totaldu, "totalalloc" : totalalloc}
     )
 
+def underallocated_fs(request):
+    qs = FileSet.objects.all()
+    filesets = []
+    # Use the object_list view.
+    for fs in qs:
+        lastsize = fs.last_size() 
+        if lastsize and (lastsize.size > fs.overall_final_size): filesets.append(fs)
+    return render_to_response('cedainfoapp/underallocated.html', 
+           {'filesets': filesets})  
 
     
 def partition_list(request):

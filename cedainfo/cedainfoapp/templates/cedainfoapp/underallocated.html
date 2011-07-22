@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}
+FileSet list
+{% endblock %}
+
+{% block header %}
+    <h2>Under allocated FileSets </h2>
+{% endblock %}
+
+{% block content %}
+<p>View list in <a href="/admin/cedainfoapp/fileset/">admin interface</a></p>
+
+<br/>
+<table border="1">
+	    <tr>
+			<th><a href="?o=id">Id</a></th>
+			<th><a href="?o=logical_path">Logical Path</a></th>
+			<th>Admin</th>
+			</tr>
+	    {% for fs in filesets %}
+		    <tr>
+	    	    <td><a href="/fileset/{{fs.id}}">{{fs.id}}</a></td>
+	    	    <td><a href="/fileset/{{fs.id}}">{{fs.logical_path}}</a></td>
+	    	    <td><a href="/admin/cedainfoapp/fileset/{{fs.id}}">{{fs.id}}</a></td>
+	    	    <td>{{fs.overall_final_size|filesizeformat}}</td>
+	    	    <td>{{fs.last_size.size|filesizeformat}}</td>
+	    	    <td>
+<img
+src="http://chart.googleapis.com/chart?cht=bhg&chco=ffcccc|ccccff&chs=200x60&chd=t:{{fs.last_size.size}}&chbh=20&chxt=y,x&chxl=0:|Allocated&chma=5,10,5,5&chxr=1,0,{{fs.overall_final_size}}&chds=0,{{fs.overall_final_size}}"/>
+		    </td>
+			</tr>
+        {% endfor %}
+  <tr>
+    <td></td>
+     <td>Total</td>
+     <td></td>
+     <td>{{totalalloc|filesizeformat}}</td>
+     <td>{{totaldu|filesizeformat}}</td>
+  </tr>
+	</table>
+{% endblock %}
