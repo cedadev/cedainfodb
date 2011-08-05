@@ -214,7 +214,7 @@ class CurationCategory(models.Model):
 
 class BackupPolicy(models.Model):
     '''Backup policy'''
-    tool = models.CharField(max_length=45, help_text="e.g. DMF / rsync / tape")
+    tool = models.CharField(max_length=45, help_text="e.g. DMF /  / tape")
     destination = models.CharField(max_length=1024, blank=True, help_text="Path made up of e.g. dmf:/path_within_dmf, rsync:/path_to_nas_box, tape:/tape_number")
     frequency = models.CharField(max_length=45, help_text="Daily, weekly, monthly...")
     type = models.CharField(max_length=45, help_text="Full, incremental, versioned")
@@ -321,6 +321,16 @@ class FileSet(models.Model):
 	rsynccmd = 'rsync -av %s/ %s' % (self.storage_path(),self.migrate_path())
 	print ">>> %s" %rsynccmd      
         subprocess.check_call(rsynccmd.split())
+
+    def secondary_copy_command(self):	
+        '''make an rsync command to create a secondary copy'''
+	if not self.secondary_partition: return ''
+        host = self.partition.host.hostname
+	frompath = self.storage_path()
+	topath = "badc@%s:%s" % (self.secondary_partition.host.hostname,
+	       os.path.normpath(self.secondary_partition.mountpoint+'/backup/'+self.storage_pot))
+	rsynccmd = 'ssh %s rsync -Puva --delete %s %s' % (host, frompath, topath)
+	return rsynccmd
 	
     def checkm_log(self):
         LOG = open('/tmp/checkm.%s.log' % self.pk,'w')
@@ -521,33 +531,6 @@ class FileSet(models.Model):
             return None
     last_size.allow_tags = True
     
-    # TODO...
-#    def size_history(self):
-#        # display graph of size history for fileset
-#        fssms = FileSetSizeMeasurement.objects.filter(fileset=self).order_by('date')
-#        size_values = fssms.values_list('size', flat=True)
-#	if len(size_values) == 0:return "No measurements"
-#        size_values = map(str, size_values)
-#        size_values = string.join(size_values,',')
-#        
-#        date_values = fssms.values_list('date', flat=True)
-#        date_values = map(datetime.toordinal, date_values)
-#	chartrange = "chxr=0,%s,%s" % ( min(date_values),max(date_values))
-#        date_values = map(str, date_values)
-#        date_values = string.join(date_values,',')
-#	chartdata = "chd=%s|%s" % (date_values,size_values)
-#
-#        s = '<img src="https://chart.googleapis.com/chart?chs=150x50&cht=lxy&%s&%s">' % (chartdata, chartrange)
-#        return s
-#        date_values = string.join(date_values,',')
-#	return date_values 
-#        
-#        if self.capacity_bytes == 0: return "No measurements"
-#        used = self.used_bytes*100/self.capacity_bytes
-#        alloc = self.allocated()*100/self.capacity_bytes
-#        s = '<img src="https://chart.googleapis.com/chart?chs=150x50&cht=gom&chco=99FF99,999900,FF0000&chd=t:|&chls=3#|3,5,5|15|10">'
-#        return s
-#    size_history.allow_tags = True
         
 class DataEntity(models.Model):
     '''Collection of data treated together. Has corresponding MOLES DataEntity record.'''

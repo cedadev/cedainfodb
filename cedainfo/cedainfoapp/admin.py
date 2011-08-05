@@ -134,7 +134,7 @@ class FileSetAdmin(admin.ModelAdmin):
     list_filter = ('partition',)
     readonly_fields = ('partition',
 #        'migrate_to', 
-        'storage_pot', 'secondary_partition')
+        'storage_pot', )
     # TODO : add size history graph
     formfield_overrides = { ByteSizeField: {'widget': BigIntegerInput} }
     search_fields = ['logical_path', 'notes']

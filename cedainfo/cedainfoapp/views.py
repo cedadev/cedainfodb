@@ -300,7 +300,14 @@ def storagesummary(request):
  
     return render_to_response('cedainfoapp/sumtable.html', {'sumtable':sumtable})  
         
-	
+# make list of rsync commands for makeing a secondary copies
+def make_secondary_copies(request):
+    filesets = FileSet.objects.all()
+    output = ''
+    for f in filesets:
+         rsynccmd = f.secondary_copy_command()
+	 if rsynccmd: output = "%s%s\n" % (output,rsynccmd)	
+    return render_to_response('cedainfoapp/make_secondary_copies.txt', {'cmds':output}, mimetype="text/plain")  
 	
 # create ftp mount script for a host - chroot jail mounting 
 def ftpmount_script(request, host):
