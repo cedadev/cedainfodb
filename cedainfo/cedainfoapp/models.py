@@ -137,6 +137,7 @@ class Partition(models.Model):
         if self.capacity_bytes == 0: return "No capacity set"
         used = self.used_bytes
 	current_allocated = self.allocated()
+	current_secondary_allocated = self.secondary_allocated()
         alloc = current_allocated*100/self.capacity_bytes
         # Find the set of most recent FileSetSizeMeasurements for FileSets on this Partition
         filesetsum = 0
@@ -147,6 +148,14 @@ class Partition(models.Model):
                 filesetsum += fssm.size
             except: 
                 filesetsum += 0
+        secondaryfilesetsum = 0
+        secondaryfilesets = FileSet.objects.filter(secondary_partition=self)
+        for fs in secondaryfilesets:
+            try:
+                fssm = FileSetSizeMeasurement.objects.filter(fileset=fs).order_by('-date')[0]
+                secondaryfilesetsum += fssm.size
+            except: 
+                secondaryfilesetsum += 0
         # Turn this into a percentage of capacity
         fssumpercent = filesetsum*100/self.capacity_bytes
 	#work out units for capacity for axis (full axis is 110%)
@@ -156,10 +165,12 @@ class Partition(models.Model):
 	elif  self.capacity_bytes < 1000000000000: unit="GB"; scale= 0.000000001
 	elif  self.capacity_bytes < 1000000000000000: unit="TB";  scale = 0.000000000001
 	else: unit="PB"; scale = 0.000000000000001
-	googlechart = 'http://chart.googleapis.com/chart?cht=bhg&chco=ffcccc|ccccff&chs=300x70&chbh=20&chxt=y,x&chxl=0:|Allocated|Used&chma=5,10,5,5&chxtc=1,-100&chxs=1,,8|0,,9'
-	googlechart += '&chd=t1:%s,%s|%s,%s' % (self.capacity_bytes*scale, current_allocated*scale,used*scale,filesetsum*scale)# add data
+	googlechart = 'http://chart.googleapis.com/chart?cht=bhs&chco=ff0000|0000ff|aaaaff,ffaaaa|00ff00|aaffaa&chs=300x80&chbh=16&chxt=y,x&chxl=0:|Allocated|du|Used(df)&chma=5,10,5,5&chxtc=1,-100&chxs=1,,8|0,,9'
+	googlechart += '&chd=t:%s,%s,%s|%s,%s,%s' % (used*scale,filesetsum*scale,current_allocated*scale,
+	     (self.capacity_bytes-used)*scale, secondaryfilesetsum*scale, current_secondary_allocated*scale)
+#	googlechart += '&chd=t1:%s,%s|%s,%s' % (self.capacity_bytes*scale, current_allocated*scale,used*scale,filesetsum*scale)# add data
 	googlechart += '&chxr=1,0,%s&chds=0,%s' % (1.2*self.capacity_bytes*scale, 1.2*self.capacity_bytes*scale) # add data and axis range
-	googlechart += '&chm=v,ff0000,1,0,11|v,000ff0,1,2,11|N*f1*%s,000000,1,-1,10,,b:0:4|N*f1*%s,666666,0,-1,10,,b:0:-8' % (unit,unit)# add labels with unit
+	googlechart += '&chm=N*f1*TB,000000,1,-1,10,,b:0:4|N*f1*TB,000000,0,-1,10,,b:0:-8'
         #extra annotations
 	if current_allocated > self.capacity_bytes: googlechart += '|AOver-allocated,ff0000,0,1,12'
         if used*0.95 > filesetsum and filesetsum > 0: googlechart += '|AUnallocate+data,ff0000,1,1,12'
@@ -178,6 +189,13 @@ class Partition(models.Model):
         # find total allocated space
 	total = 0
         allocs = FileSet.objects.filter(partition=self)
+	for a in allocs: total += a.overall_final_size
+	return total
+
+    def secondary_allocated(self):
+        # find total allocated space to secondary copies
+	total = 0
+        allocs = FileSet.objects.filter(secondary_partition=self)
 	for a in allocs: total += a.overall_final_size
 	return total
     
