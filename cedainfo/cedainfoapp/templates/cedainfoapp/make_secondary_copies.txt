@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# Script Name: make_secondary_copies
+#
+# Author:  CedaInfoDB
+# Purpose: Make secondary disk copies of all filesets that need it
+# History: created on: {{date}}
+
+{{cmds}}
