@@ -45,6 +45,7 @@ if __name__=="__main__":
     # if spot exists?
     if os.path.exists(new_fs.storage_path()) : 
         raise "storage dir already exists? (%s)" % str(new_fs.storage_path())
+    new_fs.save() 
     
     # rename the break dir as the spot
     os.rename(breakpath, new_fs.storage_path())
