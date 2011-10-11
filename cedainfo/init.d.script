@@ -6,6 +6,7 @@
 # description: CEDAinfo database 
 # processname: cedainfo
 
+PYTHON="/usr/local/bin/python2.7"
 PROJDIR="/home/badc/software/infrastructure/cedainfo/cedainfo"
 PIDFILE="$PROJDIR/cedainfo.pid"
 SOCKET="/var/www/fastcgi/cedadb.sock"
@@ -34,7 +35,18 @@ start ()
    fi
    
       umask 007
-      /usr/local/bin/python2.5 manage.py runfcgi socket=$SOCKET daemonize=true pidfile=$PIDFILE
+
+      CMD="$PYTHON manage.py runfcgi socket=$SOCKET daemonize=true pidfile=$PIDFILE"
+#
+#     Run as user 'badc'
+#
+      if [ $(whoami) != 'badc' ]
+      then
+         su badc -c "$CMD" ;
+      else
+         $CMD
+      fi
+      
       #
       # For some reason umask does not seem to work, so we wait a few seconds then change the permission on the created socket file
       #
