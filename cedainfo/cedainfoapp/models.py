@@ -465,10 +465,10 @@ class FileSet(models.Model):
 	        # find mount point
 	        p = linkpath
 	        oldspot = ''
-	        while 1: 
+ 	        while 1: 
                     head, tail = os.path.split(p)
 	            oldspot = os.path.join(tail, oldspot) 	
-	            if os.path.ismount(head): 
+	            if os.path.ismount(os.path.realpath(head)): 
 		        self.partition = Partition.objects.get(mountpoint=head)
 			self.storage_pot = oldspot
 			self.notes += 'allocated from pre-existing links to /disks/'
