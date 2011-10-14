@@ -85,9 +85,12 @@ class Host(models.Model):
     hypervisor = models.ForeignKey('self', blank=True, null=True, help_text="If host_type=virtual_server, give the name of the hypervisor which contains this one.")
     #tag = models.ManyToManyField(NodeListTag, null=True, blank=True, help_text="tag for nodelist")
     hostlist = models.ManyToManyField(HostList, null=True, blank=True, help_text="list(s) this host belongs to")
+    
     def __unicode__(self):
         return u'%s' % self.hostname
 
+    def partitions(self):
+        return Partition.objects.filter(host = self)
 
 class Partition(models.Model):
     '''Filesystem equipped with standard directory structure for archive storage'''
@@ -107,7 +110,7 @@ class Partition(models.Model):
         """Report disk usage.
            Return a dictionary with total, used, available. Sizes are reported
            in blocks of 1024 bytes."""
-        if os.path.ismount(self.mountpoint):
+        if os.path.ismount(os.path.realpath(self.mountpoint)):
             output = subprocess.Popen(['/bin/df', '-B 1024', self.mountpoint],
                                      stdout=subprocess.PIPE).communicate()[0]
             lines = output.split('\n')
@@ -165,17 +168,17 @@ class Partition(models.Model):
 	elif  self.capacity_bytes < 1000000000000: unit="GB"; scale= 0.000000001
 	elif  self.capacity_bytes < 1000000000000000: unit="TB";  scale = 0.000000000001
 	else: unit="PB"; scale = 0.000000000000001
-	googlechart = 'http://chart.googleapis.com/chart?cht=bhs&chco=ff0000|0000ff|aaaaff,ffaaaa|00ff00|aaffaa&chs=300x80&chbh=16&chxt=y,x&chxl=0:|Allocated|du|Used(df)&chma=5,10,5,5&chxtc=1,-100&chxs=1,,8|0,,9'
-	googlechart += '&chd=t:%s,%s,%s|%s,%s,%s' % (used*scale,filesetsum*scale,current_allocated*scale,
-	     (self.capacity_bytes-used)*scale, secondaryfilesetsum*scale, current_secondary_allocated*scale)
+	googlechart = 'http://chart.googleapis.com/chart?cht=bhs&chco=0000ff|9999ff,00ff00|99ff99|aa1fff,ff0000,ffcccc&chs=300x80&chbh=16&chxt=y,x&chxl=0:|Allocated|Used&chma=5,10,5,5&chxtc=1,-100&chxs=1,,8|0,,9'
+	googlechart += '&chd=t:%s,%s|%s,%s|%s,0|%s,0' % (filesetsum*scale, current_allocated*scale, secondaryfilesetsum*scale, current_secondary_allocated*scale, (used-filesetsum-secondaryfilesetsum)*scale,  (self.capacity_bytes-used)*scale)
 #	googlechart += '&chd=t1:%s,%s|%s,%s' % (self.capacity_bytes*scale, current_allocated*scale,used*scale,filesetsum*scale)# add data
 	googlechart += '&chxr=1,0,%s&chds=0,%s' % (1.2*self.capacity_bytes*scale, 1.2*self.capacity_bytes*scale) # add data and axis range
-	googlechart += '&chm=N*f1*TB,000000,1,-1,10,,b:0:4|N*f1*TB,000000,0,-1,10,,b:0:-8'
+#	googlechart += '&chm=N*f1*TB,000000,1,-1,10,,b:0:4|N*f1*TB,000000,0,-1,10,,b:0:-8'
         #extra annotations
-	if current_allocated > self.capacity_bytes: googlechart += '|AOver-allocated,ff0000,0,1,12'
-        if used*0.95 > filesetsum and filesetsum > 0: googlechart += '|AUnallocate+data,ff0000,1,1,12'
-        if used > self.capacity_bytes *0.995 : googlechart += '|ADisk+full,ff0000,1,0,12'
+#	if current_allocated > self.capacity_bytes: googlechart += '|AOver-allocated,ff0000,0,1,12'
+#        if used*0.95 > filesetsum and filesetsum > 0: googlechart += '|AUnallocate+data,ff0000,1,1,12'
+#        if used > self.capacity_bytes *0.995 : googlechart += '|ADisk+full,ff0000,1,0,12'
  	#googlechart = 'http://chart.googleapis.com/chart?cht=bhg&chco=ffcccc|ccccff&chs=200x70&chd=t1:100,%s|%s,%s&chbh=20&chxt=y,x&chxl=0:|Allocated|Used&chma=5,10,5,5&chxr=1,0,%s&chds=0,110&chxtc=1,-100&chxs=1,,8&chm=v,ff0000,1,0,14|v,000ff0,1,2,14' % (alloc,used,fssumpercent,axislength)
+        #http://chart.googleapis.com/chart?cht=bhs&chco=0000ff|9999ff,00ff00|99ff99|aa1fff,ff0000,ffcccc&chs=300x80&chbh=16&chxt=y,x&chxl=0:|Allocated|Used&chma=5,10,5,5&chxtc=1,-100&chxs=1,,8|0,,9&chd=t:4,5|5,6|3,0|5,0&chxr=1,0,33.5998328242&chds=0,33.5998328242
 	#s = '<table><tr><td>' 
         s = '<img src="%s">' % (googlechart,)
         #s = s+ '</td><td>'
@@ -519,7 +522,7 @@ class FileSet(models.Model):
     
     def du(self):
         '''Report disk usage of FileSet by creating as FileSetSizeMeasurement.'''
-        if self.spot_exists() and os.path.ismount(self.partition.mountpoint):
+        if self.spot_exists() and os.path.ismount(os.path.realpath(self.partition.mountpoint)):
             output = subprocess.Popen(['/usr/bin/du', '-sk', self.storage_path()],stdout=subprocess.PIPE).communicate()[0]
             lines = output.split('\n')
             if len(lines) == 2: size, path = lines[0].split()
