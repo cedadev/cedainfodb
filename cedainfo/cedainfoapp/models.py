@@ -170,21 +170,8 @@ class Partition(models.Model):
 	else: unit="PB"; scale = 0.000000000000001
 	googlechart = 'http://chart.googleapis.com/chart?cht=bhs&chco=0000ff|9999ff,00ff00|99ff99|aa1fff,ff0000,ffcccc&chs=300x80&chbh=16&chxt=y,x&chxl=0:|Allocated|Used&chma=5,10,5,5&chxtc=1,-100&chxs=1,,8|0,,9'
 	googlechart += '&chd=t:%s,%s|%s,%s|%s,0|%s,0' % (filesetsum*scale, current_allocated*scale, secondaryfilesetsum*scale, current_secondary_allocated*scale, (used-filesetsum-secondaryfilesetsum)*scale,  (self.capacity_bytes-used)*scale)
-#	googlechart += '&chd=t1:%s,%s|%s,%s' % (self.capacity_bytes*scale, current_allocated*scale,used*scale,filesetsum*scale)# add data
 	googlechart += '&chxr=1,0,%s&chds=0,%s' % (1.2*self.capacity_bytes*scale, 1.2*self.capacity_bytes*scale) # add data and axis range
-#	googlechart += '&chm=N*f1*TB,000000,1,-1,10,,b:0:4|N*f1*TB,000000,0,-1,10,,b:0:-8'
-        #extra annotations
-#	if current_allocated > self.capacity_bytes: googlechart += '|AOver-allocated,ff0000,0,1,12'
-#        if used*0.95 > filesetsum and filesetsum > 0: googlechart += '|AUnallocate+data,ff0000,1,1,12'
-#        if used > self.capacity_bytes *0.995 : googlechart += '|ADisk+full,ff0000,1,0,12'
- 	#googlechart = 'http://chart.googleapis.com/chart?cht=bhg&chco=ffcccc|ccccff&chs=200x70&chd=t1:100,%s|%s,%s&chbh=20&chxt=y,x&chxl=0:|Allocated|Used&chma=5,10,5,5&chxr=1,0,%s&chds=0,110&chxtc=1,-100&chxs=1,,8&chm=v,ff0000,1,0,14|v,000ff0,1,2,14' % (alloc,used,fssumpercent,axislength)
-        #http://chart.googleapis.com/chart?cht=bhs&chco=0000ff|9999ff,00ff00|99ff99|aa1fff,ff0000,ffcccc&chs=300x80&chbh=16&chxt=y,x&chxl=0:|Allocated|Used&chma=5,10,5,5&chxtc=1,-100&chxs=1,,8|0,,9&chd=t:4,5|5,6|3,0|5,0&chxr=1,0,33.5998328242&chds=0,33.5998328242
-	#s = '<table><tr><td>' 
         s = '<img src="%s">' % (googlechart,)
-        #s = s+ '</td><td>'
-        #s = s + '%3.4g of %3.4g Used. %3.4g of %3.4g Allocated (%s)' % (self.used_bytes*unitfactor, self.capacity_bytes*unitfactor, 
-	#          filesetsum*unitfactor, current_allocated*unitfactor, unit)
-	#s =s + '</td></tr></table>'	   
 	return s
     meter.allow_tags = True
 
@@ -203,11 +190,21 @@ class Partition(models.Model):
 	return total
     
     def used_by_filesets(self):
-        # find total allocated space
+        # find total allocated space used
         total = 0
         filesets = FileSet.objects.filter(partition=self)
         # for each fileset, find most recent FileSetSizeMeasurement
-        
+        for fs in filesets:
+            fssms = FileSetSizeMeasurement.objects.filter(fileset=fs).order_by('-date')
+	    if len(fssms) > 0: total += fssms[0].size 
+        return total
+
+    def secondary_used_by_filesets(self):
+        # find total allocated space used by secondary copies
+        total = 0
+        filesets = FileSet.objects.filter(secondary_partition=self)
+        # for each fileset, find most recent FileSetSizeMeasurement
+        # NOTE: this is primary fileset measurement assumes copies are the same size
         for fs in filesets:
             fssms = FileSetSizeMeasurement.objects.filter(fileset=fs).order_by('-date')
 	    if len(fssms) > 0: total += fssms[0].size 

@@ -17,6 +17,8 @@ Storage Summary
     <th>Used</th>
     <th>Allocated</th>
     <th>Allocation Used</th>
+    <th>Secondary Allocated</th>
+    <th>Secondary Allocation Used</th>
     <th>Capacity</th>
   </tr>
   {% for row in sumtable %}
@@ -26,6 +28,8 @@ Storage Summary
     <td>{{row.used|filesizeformat }}</td>
     <td>{{row.allocated|filesizeformat}}</td>
     <td>{{row.allocused|filesizeformat}}</td>
+    <td>{{row.sec_allocated|filesizeformat}}</td>
+    <td>{{row.sec_allocused|filesizeformat}}</td>
     <td>{{row.capacity|filesizeformat}}</td>
   </tr>
   {% endfor %}
