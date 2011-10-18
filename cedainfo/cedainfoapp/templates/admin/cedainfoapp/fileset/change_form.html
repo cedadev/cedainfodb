@@ -1,4 +1,4 @@
-{% extends "admin/change_list.html" %}
+{% extends "admin/change_form.html" %}
 {% load i18n admin_modify adminmedia %}
 
 
@@ -20,7 +20,7 @@
 {% endfor %}
 
 {% block after_field_sets %} 
-{{ fssms }}
+{{ original.overall_final_size|filesizeformat }} used of  {{ original.used_by_filesets|filesizeformat }}
 
     <script type='text/javascript' src='https://www.google.com/jsapi'></script>
     <script type='text/javascript'>

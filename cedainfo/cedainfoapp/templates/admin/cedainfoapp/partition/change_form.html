@@ -53,7 +53,12 @@
     {% include inline_admin_formset.opts.template %}
 {% endfor %}
 
-{% block after_related_objects %}{% endblock %}
+{% block after_related_objects %}
+{{ original.meter|safe }} <br>
+{{ original.list_allocated|safe }}
+
+
+{% endblock %}
 
 {% submit_row %}
 

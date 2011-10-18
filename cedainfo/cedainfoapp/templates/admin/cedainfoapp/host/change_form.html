@@ -53,7 +53,13 @@
     {% include inline_admin_formset.opts.template %}
 {% endfor %}
 
-{% block after_related_objects %}{% endblock %}
+{% block after_related_objects %}
+  <ul>
+  {% for p in original.partitions %}
+     <li><a href="/admin/cedainfoapp/partition/{{p.id}}">{{ p.mountpoint }}</a> {{ p.meter|safe}}</li>
+  {% endfor %}
+  </ul>
+{% endblock %}
 
 {% submit_row %}
 

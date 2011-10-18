@@ -56,6 +56,7 @@ urlpatterns = patterns('',
     (r'^fileset/(?P<id>\d+)/allocate$', allocate),
     (r'^fileset/(?P<id>\d+)/makespot$', makespot),
     (r'^fileset/(?P<id>\d+)/du$', du),
+    (r'^partition/$', partition_list),
     (r'^partition/(?P<id>\d+)/df$', df),
     (r'^partition/(?P<id>\d+)/vis$', partition_vis),
 

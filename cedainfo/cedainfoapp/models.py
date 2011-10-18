@@ -129,7 +129,14 @@ class Partition(models.Model):
     def list_allocated(self):
         # list allocation for admin interface
         s = ''
-        allocs = FileSet.objects.filter(partition=self)
+
+        allocs = FileSet.objects.filter(partition=self).order_by('-overall_final_size')
+        if len(allocs) >0: s += 'Primary File Sets (biggest first): '
+	for a in allocs:
+	    s += '<a href="/admin/cedainfoapp/fileset/%s">%s</a> ' % (a.pk,a.logical_path)
+
+        allocs = FileSet.objects.filter(secondary_partition=self).order_by('-overall_final_size')
+        if len(allocs) >0: s += 'Secondary File Sets (biggest first): '
 	for a in allocs:
 	    s += '<a href="/admin/cedainfoapp/fileset/%s">%s</a> ' % (a.pk,a.logical_path)
 	return s
@@ -143,22 +150,8 @@ class Partition(models.Model):
 	current_secondary_allocated = self.secondary_allocated()
         alloc = current_allocated*100/self.capacity_bytes
         # Find the set of most recent FileSetSizeMeasurements for FileSets on this Partition
-        filesetsum = 0
-        filesets = FileSet.objects.filter(partition=self)
-        for fs in filesets:
-            try:
-                fssm = FileSetSizeMeasurement.objects.filter(fileset=fs).order_by('-date')[0]
-                filesetsum += fssm.size
-            except: 
-                filesetsum += 0
-        secondaryfilesetsum = 0
-        secondaryfilesets = FileSet.objects.filter(secondary_partition=self)
-        for fs in secondaryfilesets:
-            try:
-                fssm = FileSetSizeMeasurement.objects.filter(fileset=fs).order_by('-date')[0]
-                secondaryfilesetsum += fssm.size
-            except: 
-                secondaryfilesetsum += 0
+        filesetsum = self.used_by_filesets()
+        secondaryfilesetsum = self.secondary_used_by_filesets()
         # Turn this into a percentage of capacity
         fssumpercent = filesetsum*100/self.capacity_bytes
 	#work out units for capacity for axis (full axis is 110%)

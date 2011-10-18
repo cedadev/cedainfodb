@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}
+Partition list
+{% endblock %}
+
+{% block header %}
+<h2>Partitions {{subset}}</h2>
+{% endblock %}
+
+{% block content %}
+
+[<a href="?filter=overfill">Over filled</a>]
+[<a href="?filter=overalloc">Over allocated</a>]
+[<a href="?filter=unalloc">Unallocated data on partition</a>]
+
+	<table border="1">
+	    <tr>
+		<th>Partition id</th>
+		<th>Mount point</th>
+        <th>Used</th>
+        <th>Capacity</th>
+        <th>Status</th>
+        <th>Primary Allocated</th>
+        <th>Secondary Allocated</th>
+        <th>Primary allocation used</th>
+        <th>Secondary allocation used</th>
+        <th>Used, but unallocated</th>
+        </tr>
+	    {% for part in partitions %}
+		    <tr>
+	            <td><a href="/admin/cedainfoapp/partition/{{part.id}}">{{part.id}}</a></td>
+	            <td>{{part.mountpoint}}</td>
+	            <td>{{part.used_bytes|filesizeformat}}</td>
+	            <td>{{part.capacity_bytes|filesizeformat}}</td>
+	            <td>{{part.status}}</td>
+	            <td>{{part.allocated|filesizeformat}}</td>
+	            <td>{{part.secondary_allocated|filesizeformat}}</td>
+	            <td>{{part.used_by_filesets|filesizeformat}}</td>
+	            <td>{{part.secondary_used_by_filesets|filesizeformat}}</td>
+	            <td>{{part.used_bytes|filesizeformat}} - {{part.allocated|add:part.secondary_allocated|filesizeformat}}</td>
+			</tr>
+        {% endfor %}
+	</table>
+{% endblock %}
+
+

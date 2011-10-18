@@ -198,14 +198,28 @@ def underallocated_fs(request):
     
 def partition_list(request):
     o = request.GET.get('o', 'id') # default order is ascending id
-    qs = Partition.objects.order_by(o)
+    partfilter = request.GET.get('filter', None) # default order is ascending id
+    partitions = Partition.objects.order_by(o)
+    filtered_partitions = []
+    # list overfilled partitions
+    if partfilter == 'overfill': 
+        for p in partitions:
+            if 100.0* p.used_bytes/(p.capacity_bytes+1) > 98.0 and p.status != 'Retired' :filtered_partitions.append(p)
+    # list overallocated partitions
+    elif partfilter == 'overalloc': 
+        for p in partitions:
+            allocated = p.allocated() + p.secondary_allocated()
+            if 100.0* allocated/(p.capacity_bytes+1) > 99.0 and p.status != 'Retired' :filtered_partitions.append(p)
+    # list unalloced files on partition
+    elif partfilter == 'unalloc': 
+        for p in partitions:
+            unalloc = p.used_bytes - p.used_by_filesets() + p.secondary_used_by_filesets()
+            if 100.0* unalloc/(p.capacity_bytes+1) > 1.0 and p.status != 'Retired' :filtered_partitions.append(p)
+    else: filtered_partitions = partitions
+           
     # Use the object_list view.
-    return list_detail.object_list(
-        request,
-        queryset = qs,
-        template_name = "cedainfoapp/partition_list.html",
-        template_object_name = "partition",
-    )
+    return render_to_response('cedainfoapp/partition_list.html', {'partitions': filtered_partitions,})    
+
     
 def nodelist(request):
     hostlist_list = HostList.objects.all()
