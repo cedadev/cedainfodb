@@ -10,14 +10,6 @@ import time
 from django.db.models.fields import IntegerField
 from django.conf import settings
 
-# BigInteger fix as per http://www.mattwaite.com/posts/2009/mar/10/django-and-really-big-numbers/
-class BigIntegerField(IntegerField):
-    empty_strings_allowed=False
-    def get_internal_type(self):
-        return "BigIntegerField"    
-    def db_type(self):
-        return 'bigint' # Will this work with non-postgres?
-
 # Create your models here.
 
 # Tags to help in creation of SDDCS nodelist view
@@ -96,8 +88,8 @@ class Partition(models.Model):
     '''Filesystem equipped with standard directory structure for archive storage'''
     mountpoint = models.CharField(blank=True,max_length=1024, help_text="E.g. /disks/machineN", unique=True)
     host = models.ForeignKey(Host, blank=True, null=True, help_text="Host on which this partition resides")
-    used_bytes = BigIntegerField(default=0, help_text="\"Used\" value from df, i.e. no. of bytes used. May be populated by script.")
-    capacity_bytes = BigIntegerField(default=0, help_text="\"Available\" value from df, i.e. no. of bytes total. May be populated by script.")
+    used_bytes = models.BigIntegerField(default=0, help_text="\"Used\" value from df, i.e. no. of bytes used. May be populated by script.")
+    capacity_bytes = models.BigIntegerField(default=0, help_text="\"Available\" value from df, i.e. no. of bytes total. May be populated by script.")
     last_checked = models.DateTimeField(null=True, blank=True, help_text="Last time df was run against this partition & size values updated")
     status = models.CharField(max_length=50,       
               choices=(("Blank","Blank"),
@@ -253,7 +245,7 @@ class FileSet(models.Model):
     Collection of all filesets taken together should exactly represent 
     all files in the archive. Must never span multiple filesystems.'''
     logical_path = models.CharField(max_length=1024, blank=True, default='/badc/NNNN', help_text="e.g. /badc/acsoe", unique=True)
-    overall_final_size = BigIntegerField(help_text="The allocation given to a fileset is an estimate of the final size on disk. If the dataset is going to grow indefinitely then estimate the size for 4 years ahead. Filesets can't be bigger than a single partition, but in order to aid disk managment they should no exceed 20% of the size of a partition.") # Additional data still expected (as yet uningested) in bytes
+    overall_final_size = models.BigIntegerField(help_text="The allocation given to a fileset is an estimate of the final size on disk. If the dataset is going to grow indefinitely then estimate the size for 4 years ahead. Filesets can't be bigger than a single partition, but in order to aid disk managment they should no exceed 20% of the size of a partition.") # Additional data still expected (as yet uningested) in bytes
     notes = models.TextField(blank=True)
     partition = models.ForeignKey(Partition, blank=True, null=True, limit_choices_to = {'status': 'Allocating'},help_text="Actual partition where this FileSet is physically stored")
     storage_pot = models.CharField(max_length=1024, blank=True, default='', help_text="dd")
@@ -644,8 +636,8 @@ class FileSetSizeMeasurement(models.Model):
     '''Date-stampted size measurement of a FileSet'''
     fileset = models.ForeignKey(FileSet, help_text="FileSet that was measured")
     date = models.DateTimeField(default=datetime.now, help_text="Date and time of measurement")
-    size = BigIntegerField(help_text="Size in bytes") # in bytes
-    no_files = BigIntegerField(null=True, blank=True, help_text="Number of files") 
+    size = models.BigIntegerField(help_text="Size in bytes") # in bytes
+    no_files = models.BigIntegerField(null=True, blank=True, help_text="Number of files") 
     def __unicode__(self):
         return u'%s (%s)' % (self.size, self.date)
 
