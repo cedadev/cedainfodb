@@ -1,4 +1,5 @@
 from django.db import models
+#from django.contrib.gis.db import models
 from datetime import datetime
 import os, sys
 import subprocess
@@ -640,5 +641,71 @@ class FileSetSizeMeasurement(models.Model):
     no_files = models.BigIntegerField(null=True, blank=True, help_text="Number of files") 
     def __unicode__(self):
         return u'%s (%s)' % (self.size, self.date)
+        
+class File(models.Model):
+    '''Individual file'''
+    logical_path = models.CharField(max_length=2048)
+    fileset = models.ForeignKey(FileSet)
+    def __unicode__(self):
+        return self.logical_path
+    
+class FileState(models.Model):
+    '''Recorded state of a file, from an audit or ingest inspection'''
+    file = models.ForeignKey(File)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    audit = models.ForeignKey('Audit')
+    filestate_time = models.DateTimeField( default=datetime.now() )
+    size = models.BigIntegerField()
+    checksum = models.CharField(max_length=127)
+    deleted = models.BooleanField(default=False)
+    filetype = models.ForeignKey('FileType', null=True, blank=True)
+    
+class Audit(models.Model):
+    '''A record of inspecting a fileset'''
+    fileset = models.ForeignKey(FileSet)
+    starttime = models.DateTimeField()
+    endtime = models.DateTimeField()
+    auditstate = models.ForeignKey('AuditState')
+    corrupted_files = models.BigIntegerField(null=True, blank=True)
+    new_files = models.BigIntegerField(null=True, blank=True)
+    deleted_files = models.BigIntegerField(null=True, blank=True)
+    modified_files = models.BigIntegerField(null=True, blank=True)
+    unchanges_files = models.BigIntegerField(null=True, blank=True)
+    def __unicode__(self):
+        return 'Audit of %s started %s' % (self.fileset, self.starttime)
 
+class CodeList(models.Model):
+    
+    name = models.CharField(max_length=127)
+    description = models.TextField(blank=True)
+    def __unicode__(self):
+        return self.name
+    class Meta:
+        abstract = True
+    
+class AuditState(CodeList):
+    '''Codelist for audit states'''
+    pass
+    
+class FileSetStatus(CodeList):
+    '''Codelist of fileset status'''
+    pass
+    
+class FileType(CodeList):
+    '''Codelist of file types'''
+    pass
+    
+#class SpatioTemp(models.Model):
+#    '''spatiotemporal coverage of a file'''
+#    file = models.ForeignKey(File)
+#    geom = models.GeometryField(null=True, blank=True)
+#    start_time = models.DateTimeField(null=True, blank=True)
+#    end_time = models.DateTimeField(null=True, blank=True)
+#    vert_extent_lower = models.IntegerField(null=True, blank=True)
+#    vert_extend_upper = models.IntegerField(null=True, blank=True)
+#    objects = models.GeoManager()
+#    def __unicode__(self):
+#        return 'spatiotemp for file %s' % self.file
+    
         

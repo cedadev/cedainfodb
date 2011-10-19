@@ -1,4 +1,5 @@
 from django.contrib import admin
+#from django.contrib.gis import admin
 from cedainfo.cedainfoapp.models import *
 from django import forms
 
@@ -173,4 +174,15 @@ admin.site.register(FileSet,FileSetAdmin)
 
 admin.site.register(NodeList)
 admin.site.register(HostList)
-admin.site.register(RackList)    
+admin.site.register(RackList) 
+
+admin.site.register(File)   
+admin.site.register(FileState)
+admin.site.register(Audit)
+admin.site.register(AuditState)
+admin.site.register(FileSetStatus)
+admin.site.register(FileType)
+
+#class SpatioTempAdmin(admin.OSMGeoAdmin):
+#    pass
+#admin.site.register(SpatioTemp, SpatioTempAdmin)
