@@ -20,7 +20,7 @@
 {% endfor %}
 
 {% block after_field_sets %} 
-{{ original.overall_final_size|filesizeformat }} used of  {{ original.used_by_filesets|filesizeformat }}
+{{ original.last_size.size|filesizeformat }} used of {{ original.overall_final_size|filesizeformat }} allocated.
 
     <script type='text/javascript' src='https://www.google.com/jsapi'></script>
     <script type='text/javascript'>

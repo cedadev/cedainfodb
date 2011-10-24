@@ -195,6 +195,27 @@ class Partition(models.Model):
             fssms = FileSetSizeMeasurement.objects.filter(fileset=fs).order_by('-date')
 	    if len(fssms) > 0: total += fssms[0].size 
         return total
+
+    def use_summary(self):
+        # find use info for total allocated space, etc,
+	use = {'prime_alloc_used':0, 'second_alloc_used':0, 'unalloc_used':0, 'empty':0, 'prime_alloc': 0, 'second_alloc': 0, 'unallocated':0}
+        prime_allocs = FileSet.objects.filter(partition=self)
+        second_allocs = FileSet.objects.filter(secondary_partition=self)
+	for a in prime_allocs: 
+            use['prime_alloc'] += a.overall_final_size
+            last_size = a.last_size()
+            if last_size != None: use['prime_alloc_used'] += a.last_size().size
+	for a in second_allocs: 
+            use['second_alloc'] += a.overall_final_size
+            last_size = a.last_size()
+            if last_size != None: use['second_alloc_used'] += a.last_size().size
+        use['unallocated'] = self.capacity_bytes - use['prime_alloc'] - use['second_alloc']
+        use['unalloc_used'] = self.used_bytes - use['prime_alloc_used'] - use['second_alloc_used']
+        use['empty'] = self.capacity_bytes - self.used_bytes
+	return use
+
+
+
             
     def links(self):
         # links to actions for partions

@@ -204,7 +204,9 @@ def partition_list(request):
     # list overfilled partitions
     if partfilter == 'overfill': 
         for p in partitions:
-            if 100.0* p.used_bytes/(p.capacity_bytes+1) > 98.0 and p.status != 'Retired' :filtered_partitions.append(p)
+            if 100.0* p.used_bytes/(p.capacity_bytes+1) > 98.0 and p.status != 'Retired' : 
+                filtered_partitions.append(p)
+                p.used_copy = p.use_summary() 
     # list overallocated partitions
     elif partfilter == 'overalloc': 
         for p in partitions:
