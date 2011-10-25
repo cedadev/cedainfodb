@@ -410,4 +410,10 @@ def automount_script(request, host):
     return render_to_response('cedainfoapp/mountscript.html', {'host':host, 
         'filesets':filesets,
         'automount_partitions':automount_partitions,
-	 }, mimetype="text/plain")  
+	 }, mimetype="text/plain")
+     
+def makeaudit(request, id):
+    '''Make an audit for a fileset'''
+    fileset = FileSet.objects.get(pk=id)
+    fileset.make_audit()
+    return redirect(request.META['HTTP_REFERER'])

@@ -176,12 +176,7 @@ admin.site.register(NodeList)
 admin.site.register(HostList)
 admin.site.register(RackList) 
 
-admin.site.register(File)   
-admin.site.register(FileState)
-admin.site.register(Audit)
-admin.site.register(AuditState)
-admin.site.register(FileSetStatus)
-admin.site.register(FileType)
+
 
 #class SpatioTempAdmin(admin.OSMGeoAdmin):
 #    pass

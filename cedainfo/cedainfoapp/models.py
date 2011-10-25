@@ -4,8 +4,9 @@ from datetime import datetime
 import os, sys
 import subprocess
 import string
-import md5
+import hashlib
 import time
+import audit.models
 
 # Needed for BigInteger fix
 from django.db.models.fields import IntegerField
@@ -262,6 +263,7 @@ class Person(models.Model):
     def __unicode__(self):
         return u'%s' % self.name
 
+        
 class FileSet(models.Model):
     ''' subtree of archive directory hierarchy.
     Collection of all filesets taken together should exactly represent 
@@ -275,7 +277,13 @@ class FileSet(models.Model):
     secondary_partition = models.ForeignKey(Partition, blank=True, null=True, help_text="Target for secondary disk copy", related_name='fileset_secondary_partition')
     dmf_backup = models.BooleanField(default=False, help_text="Backup to DMF")
     sd_backup = models.BooleanField(default=False, help_text="Backup to Storage-D")
-    status = models.ForeignKey('FileSetStatus', null=True, blank=True, help_text="e.g. growing")
+    status = models.CharField(help_text="e.g. growing", 
+        choices=(
+            ("incomplete","incomplete"),
+            ("complete","complete"),
+        ),
+        default="incomplete",
+    )
     
     def __unicode__(self):
         return u'%s' % (self.logical_path,)
@@ -383,7 +391,7 @@ class FileSet(models.Model):
             # if path is reg file
             if os.path.isfile(path): 
                 F=open(path)
-                m=md5.new()
+                m=hashlib.md5()
                 while 1:
                     buf= F.read(1024*1024)
                     m.update(buf)
@@ -404,7 +412,7 @@ class FileSet(models.Model):
             if not os.path.isfile(newpath): raise "Not regular file"
 	     
             F=open(newpath)
-            m=md5.new()
+            m=hashlib.md5()
             while 1:
                 buf= F.read(1024*1024)
                 m.update(buf)
@@ -557,6 +565,17 @@ class FileSet(models.Model):
             return None
     last_size.allow_tags = True
     
+    def make_audit(self):
+        '''Make an audit for this FileSet'''
+        myaudit = audit.models.Audit(
+            fileset_logical_path = self.logical_path,
+            fileset = self
+            #auditstate set by default to "not started"
+        )
+        myaudit.save()
+        #audit.start()
+    
+
         
 class DataEntity(models.Model):
     '''Collection of data treated together. Has corresponding MOLES DataEntity record.'''
@@ -664,60 +683,7 @@ class FileSetSizeMeasurement(models.Model):
     def __unicode__(self):
         return u'%s (%s)' % (self.size, self.date)
         
-class File(models.Model):
-    '''Individual file'''
-    logical_path = models.CharField(max_length=2048)
-    fileset = models.ForeignKey(FileSet, null=True, blank=True, on_delete=models.SET_NULL)
-    def __unicode__(self):
-        return self.logical_path
-    
-class FileState(models.Model):
-    '''Recorded state of a file, from an audit or ingest inspection'''
-    file = models.ForeignKey(File)
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
-    audit = models.ForeignKey('Audit')
-    filestate_time = models.DateTimeField( default=datetime.now() )
-    size = models.BigIntegerField()
-    checksum = models.CharField(max_length=127)
-    deleted = models.BooleanField(default=False)
-    filetype = models.ForeignKey('FileType', null=True, blank=True)
-    
-class Audit(models.Model):
-    '''A record of inspecting a fileset'''
-    fileset_logical_path = models.CharField(max_length=1024, help_text="logical path of the fileset, set as a record when the audit was created")
-    fileset = models.ForeignKey(FileSet, help_text="FileSet which this audit related to at time of creation", on_delete=models.SET_NULL, null=True, blank=True)
-    starttime = models.DateTimeField()
-    endtime = models.DateTimeField()
-    auditstate = models.ForeignKey('AuditState')
-    corrupted_files = models.BigIntegerField(null=True, blank=True)
-    new_files = models.BigIntegerField(null=True, blank=True)
-    deleted_files = models.BigIntegerField(null=True, blank=True)
-    modified_files = models.BigIntegerField(null=True, blank=True)
-    unchanges_files = models.BigIntegerField(null=True, blank=True)
-    def __unicode__(self):
-        return 'Audit of %s started %s' % (self.fileset, self.starttime)
 
-class CodeList(models.Model):
-    
-    name = models.CharField(max_length=127)
-    description = models.TextField(blank=True)
-    def __unicode__(self):
-        return self.name
-    class Meta:
-        abstract = True
-    
-class AuditState(CodeList):
-    '''Codelist for audit states'''
-    pass
-    
-class FileSetStatus(CodeList):
-    '''Codelist of fileset status'''
-    pass
-    
-class FileType(CodeList):
-    '''Codelist of file types'''
-    pass
     
 #class SpatioTemp(models.Model):
 #    '''spatiotemporal coverage of a file'''
