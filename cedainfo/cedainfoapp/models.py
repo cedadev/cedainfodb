@@ -301,7 +301,14 @@ class FileSet(models.Model):
         if self.logical_path_exists(): return #can't make a spot if logical path exists  
         if not self.partition: return #can't make a spot if no partition 
 
-        spotname = "%s/spot-%s" % (prefix,self.pk)
+        #spot tail
+        head, spottail = os.path.split(self.logical_path)
+        if spottail == '': head, spottail = os.path.split(head)
+
+        # if project space 
+        if self.logical_path[0:16] == '/project_spaces/': spotname = "%s/spot-%s-%s" % ('project_spaces',self.pk, spottail)
+        else: spotname = "%s/spot-%s-%s" % (prefix,self.pk, spottail)
+
         self.storage_pot = spotname
         try:
             os.makedirs(self.storage_path())
@@ -310,7 +317,9 @@ class FileSet(models.Model):
         try:
 	    os.symlink(self.storage_path(), self.logical_path)
         except: 
-            return ("os.symlink(%s, %s)" % (self.storage_path(),self.logical_path),sys.exc_value )
+            # remove spot dir that was make correctly, but is inconsistant because link not made
+            os.rmdir(self.storage_path())
+            return ("os.symlink(%s, %s) \n (removed spot dir for consistancy)" % (self.storage_path(),self.logical_path),sys.exc_value )
         self.save()
 
     def migrate_spot(self):
@@ -493,7 +502,8 @@ class FileSet(models.Model):
 	            p = head
 		    
         else:
-	    partitions = Partition.objects.filter(status='Allocating')
+            if self.logical_path[0:16] == '/project_spaces/': partitions = Partition.objects.filter(status='Allocating_ps')
+            else: partitions = Partition.objects.filter(status='Allocating')
             # find the fullest partition which can accomidate the file set
 	    allocated_partition = None
 	    fullest_space = 10e40
