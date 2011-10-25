@@ -275,7 +275,8 @@ class FileSet(models.Model):
     secondary_partition = models.ForeignKey(Partition, blank=True, null=True, help_text="Target for secondary disk copy", related_name='fileset_secondary_partition')
     dmf_backup = models.BooleanField(default=False, help_text="Backup to DMF")
     sd_backup = models.BooleanField(default=False, help_text="Backup to Storage-D")
-
+    status = models.ForeignKey('FileSetStatus', null=True, blank=True, help_text="e.g. growing")
+    
     def __unicode__(self):
         return u'%s' % (self.logical_path,)
     # TODO custom save method (for when assigning a partition) : check that FileSet size
@@ -666,7 +667,7 @@ class FileSetSizeMeasurement(models.Model):
 class File(models.Model):
     '''Individual file'''
     logical_path = models.CharField(max_length=2048)
-    fileset = models.ForeignKey(FileSet)
+    fileset = models.ForeignKey(FileSet, null=True, blank=True, on_delete=models.SET_NULL)
     def __unicode__(self):
         return self.logical_path
     
@@ -684,7 +685,8 @@ class FileState(models.Model):
     
 class Audit(models.Model):
     '''A record of inspecting a fileset'''
-    fileset = models.ForeignKey(FileSet)
+    fileset_logical_path = models.CharField(max_length=1024, help_text="logical path of the fileset, set as a record when the audit was created")
+    fileset = models.ForeignKey(FileSet, help_text="FileSet which this audit related to at time of creation", on_delete=models.SET_NULL, null=True, blank=True)
     starttime = models.DateTimeField()
     endtime = models.DateTimeField()
     auditstate = models.ForeignKey('AuditState')
