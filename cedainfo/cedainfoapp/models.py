@@ -272,7 +272,7 @@ class FileSet(models.Model):
     overall_final_size = models.BigIntegerField(help_text="The allocation given to a fileset is an estimate of the final size on disk. If the dataset is going to grow indefinitely then estimate the size for 4 years ahead. Filesets can't be bigger than a single partition, but in order to aid disk managment they should no exceed 20% of the size of a partition.") # Additional data still expected (as yet uningested) in bytes
     notes = models.TextField(blank=True)
     partition = models.ForeignKey(Partition, blank=True, null=True, limit_choices_to = {'status': 'Allocating'},help_text="Actual partition where this FileSet is physically stored")
-    storage_pot = models.CharField(max_length=1024, blank=True, default='', help_text="dd")
+    storage_pot = models.CharField(max_length=1024, blank=True, default='', help_text="The directory under which the data is hold")
     migrate_to = models.ForeignKey(Partition, blank=True, null=True, limit_choices_to = {'status': 'Allocating'},help_text="Target partition for migration", related_name='fileset_migrate_to_partition')
     secondary_partition = models.ForeignKey(Partition, blank=True, null=True, help_text="Target for secondary disk copy", related_name='fileset_secondary_partition')
     dmf_backup = models.BooleanField(default=False, help_text="Backup to DMF")
@@ -291,6 +291,12 @@ class FileSet(models.Model):
 
     def storage_path(self):
         return os.path.normpath(self.partition.mountpoint+'/'+self.storage_pot) 
+
+    def secondary_storage_path(self):
+        if self.secondary_partition: 
+	    return os.path.normpath(self.secondary_partition.mountpoint+'/backup/'+self.storage_pot)
+	else:
+	    return None 
 
     def migrate_path(self):
         return os.path.normpath(self.migrate_to.mountpoint+'/'+self.storage_pot) 
@@ -370,8 +376,7 @@ class FileSet(models.Model):
 	if not self.secondary_partition: return ''
         host = self.partition.host.hostname
 	frompath = self.storage_path()
-	topath = "badc@%s:%s" % (self.secondary_partition.host.hostname,
-	       os.path.normpath(self.secondary_partition.mountpoint+'/backup/'+self.storage_pot))
+	topath = "badc@%s:%s" % (self.secondary_partition.host.hostname,self.secondary_storage_path())
 	rsynccmd = 'ssh %s rsync -Puva --delete %s %s' % (host, frompath, topath)
 	return rsynccmd
 	

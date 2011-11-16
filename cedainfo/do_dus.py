@@ -8,7 +8,9 @@ from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
-from cedainfoapp.models import *
+from audit.models import *
+from cedainfoapp.models import FileSet, Partition
+
 
 def usage():
     print "Cron script to du all filesets"

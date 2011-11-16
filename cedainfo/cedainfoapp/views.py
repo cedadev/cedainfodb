@@ -293,6 +293,7 @@ def storagesummary(request):
     parts = Partition.objects.all()
     sumtable = [{'status':'Blank',      'npart':0, 'used':0, 'allocated':0, 'allocused':0, 'sec_allocated':0, 'sec_allocused':0, 'capacity':0},
                 {'status':'Allocating', 'npart':0, 'used':0, 'allocated':0, 'allocused':0, 'sec_allocated':0, 'sec_allocused':0, 'capacity':0},
+                {'status':'Allocating_ps', 'npart':0, 'used':0, 'allocated':0, 'allocused':0, 'sec_allocated':0, 'sec_allocused':0, 'capacity':0},
 		{'status':'Closed',     'npart':0, 'used':0, 'allocated':0, 'allocused':0, 'sec_allocated':0, 'sec_allocused':0, 'capacity':0},
                 {'status':'Migrating',  'npart':0, 'used':0, 'allocated':0, 'allocused':0, 'sec_allocated':0, 'sec_allocused':0, 'capacity':0},
                 {'status':'Retired',    'npart':0, 'used':0, 'allocated':0, 'allocused':0, 'sec_allocated':0, 'sec_allocused':0, 'capacity':0},
@@ -310,13 +311,13 @@ def storagesummary(request):
 	sumtable[i]["sec_allocated"] += part.secondary_allocated()
 	sumtable[i]["sec_allocused"] += part.secondary_used_by_filesets()
 	sumtable[i]["capacity"] += part.capacity_bytes
-	sumtable[5]["npart"] += 1
-	sumtable[5]["used"] += part.used_bytes
-	sumtable[5]["allocated"] += part.allocated()
-	sumtable[5]["allocused"] += part.used_by_filesets()
-	sumtable[5]["sec_allocated"] += part.secondary_allocated()
-	sumtable[5]["sec_allocused"] += part.secondary_used_by_filesets()
-	sumtable[5]["capacity"] += part.capacity_bytes
+	sumtable[6]["npart"] += 1
+	sumtable[6]["used"] += part.used_bytes
+	sumtable[6]["allocated"] += part.allocated()
+	sumtable[6]["allocused"] += part.used_by_filesets()
+	sumtable[6]["sec_allocated"] += part.secondary_allocated()
+	sumtable[6]["sec_allocused"] += part.secondary_used_by_filesets()
+	sumtable[6]["capacity"] += part.capacity_bytes
  
     return render_to_response('cedainfoapp/sumtable.html', {'sumtable':sumtable})  
         
