@@ -86,6 +86,9 @@ class Host(models.Model):
     def partitions(self):
         return Partition.objects.filter(host = self)
 
+    class Meta:
+       ordering = ['hostname']	
+
 class Partition(models.Model):
     '''Filesystem equipped with standard directory structure for archive storage'''
     mountpoint = models.CharField(blank=True,max_length=1024, help_text="E.g. /disks/machineN", unique=True)
