@@ -672,6 +672,18 @@ class Service(models.Model):
             theHost = self.host
         return u'%s (%s)' % (self.name, theHost)
 
+    def summary(self):
+       '''Returns a summary string extracted from the start of the full description text'''
+           
+       SummaryLength = 60
+       summary = self.description.strip()
+       summary = ' '.join(summary.split())
+       
+       if len(summary) > SummaryLength:
+          summary = summary[0:SummaryLength-1] + '...'
+    
+       return summary
+	  	       
 class HostHistory(models.Model):
     '''Entries detailing history of changes to a Host'''
     host = models.ForeignKey(Host, help_text="Host name")
