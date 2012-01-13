@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}
+FileSet Complete?
+{% endblock %}
+
+{% block header %}
+    <h2>Fileset Complete? </h2>
+{% endblock %}
+
+{% block content %}
+<p>Marking a fileset as complete means that the fileset is not expected to have any 
+additions, modifications or deletions. This is not easy to reverse and may have 
+consequences for backup, audit and other archive tasks.</p>
+
+<a href="/fileset/{{fileset.pk}}/markcomplete?confirm=1">Mark fileset as complete</a>
+<a href="/admin/cedainfoapp/fileset/{{fileset.pk}}">Back to fileset without completeing it</a>
+
+
+{% endblock %}

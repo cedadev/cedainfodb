@@ -333,6 +333,12 @@ def storagesummary(request):
 	sumtable[6]["capacity"] += part.capacity_bytes
  
     return render_to_response('cedainfoapp/sumtable.html', {'sumtable':sumtable})  
+
+
+def storaged_spotlist(request):
+#    filesets = FileSet.objects.filter(logical_path__startswith='/badc')
+    filesets = FileSet.objects.filter(sd_backup=True)
+    return render_to_response('cedainfoapp/storage-d_spotlist.html', {'filesets':filesets})  
         
 # make list of rsync commands for makeing a secondary copies
 def make_secondary_copies(request):

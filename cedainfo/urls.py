@@ -64,6 +64,7 @@ urlpatterns = patterns('',
 
     (r'^rack/services/(?P<rack_id>\d+)$', services_by_rack),
     (r'^storagesummary$', storagesummary),
+    (r'^storage-d/spotlist$', storaged_spotlist),
 
     # userdb
     (r'^userdb/userstats/$', user_stats),
