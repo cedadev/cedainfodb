@@ -275,37 +275,38 @@ class FileSet(models.Model):
     overall_final_size = models.BigIntegerField(help_text="The allocation given to a fileset is an estimate of the final size on disk. If the dataset is going to grow indefinitely then estimate the size for 4 years ahead. Filesets can't be bigger than a single partition, but in order to aid disk managment they should no exceed 20% of the size of a partition.") # Additional data still expected (as yet uningested) in bytes
     notes = models.TextField(blank=True)
     partition = models.ForeignKey(Partition, blank=True, null=True, limit_choices_to = {'status': 'Allocating'},help_text="Actual partition where this FileSet is physically stored")
-    storage_pot = models.CharField(max_length=1024, blank=True, default='', help_text="The directory under which the data is hold")
+    storage_pot_type = models.CharField(max_length=64, blank=True, default='archive', 
+            help_text="The 'type' directory under which the data is held. This is archive for archive data and project_space for project space etc. DO NOT CHANGE AFTER SPOT CREATION", 
+	    choices=(("archive","archive"),
+                 ("project_spaces","project_spaces"),
+                 ("group_workspace","group_workspace")) )
+    storage_pot = models.CharField(max_length=1024, blank=True, default='', help_text="The directory under which the data is held")
     migrate_to = models.ForeignKey(Partition, blank=True, null=True, limit_choices_to = {'status': 'Allocating'},help_text="Target partition for migration", related_name='fileset_migrate_to_partition')
     secondary_partition = models.ForeignKey(Partition, blank=True, null=True, help_text="Target for secondary disk copy", related_name='fileset_secondary_partition')
     dmf_backup = models.BooleanField(default=False, help_text="Backup to DMF")
     sd_backup = models.BooleanField(default=False, help_text="Backup to Storage-D")
-    status = models.CharField(help_text="e.g. growing", 
-        choices=(
-            ("incomplete","incomplete"),
-            ("complete","complete"),
-        ),
-        default="incomplete",
-    )
+    complete = models.BooleanField(default=False, help_text="Is the fileset complete. If this is set then we are not anticipating the files to change, be deleted or added to.")
+    complete_date = models.DateField(null=True, blank=True, help_text="Date when fileset was set to complete.")
     
     def __unicode__(self):
         return u'%s' % (self.logical_path,)
     # TODO custom save method (for when assigning a partition) : check that FileSet size
 
     def storage_path(self):
-        return os.path.normpath(self.partition.mountpoint+'/'+self.storage_pot) 
+        return os.path.normpath(self.partition.mountpoint+'/'+self.storage_pot_type+'/'+self.storage_pot) 
 
     def secondary_storage_path(self):
         if self.secondary_partition: 
-	    return os.path.normpath(self.secondary_partition.mountpoint+'/backup/'+self.storage_pot)
+	    return os.path.normpath(self.secondary_partition.mountpoint+'/backup/'+self.storage_pot_type+'/'+self.storage_pot)
 	else:
 	    return None 
 
     def migrate_path(self):
-        return os.path.normpath(self.migrate_to.mountpoint+'/'+self.storage_pot) 
+        return os.path.normpath(self.migrate_to.mountpoint+'/'+self.storage_pot_type+'/'+self.storage_pot) 
 
-    def make_spot(self, prefix='archive'):
-        # create a storage pot and link 
+    def make_spot(self):
+        # create a storage pot and link
+	if self.storage_pot_type == '': return # need a spot type 
         if self.storage_pot != '': return  #can't make a spot if it already exists in the db
         if self.logical_path_exists(): return #can't make a spot if logical path exists  
         if not self.partition: return #can't make a spot if no partition 
@@ -314,9 +315,8 @@ class FileSet(models.Model):
         head, spottail = os.path.split(self.logical_path)
         if spottail == '': head, spottail = os.path.split(head)
 
-        # if project space 
-        if self.logical_path[0:16] == '/project_spaces/': spotname = "%s/spot-%s-%s" % ('project_spaces',self.pk, spottail)
-        else: spotname = "%s/spot-%s-%s" % (prefix,self.pk, spottail)
+        # icreate spot name 
+        spotname = "%s/spot-%s-%s" % (self.storage_pot_type,self.pk, spottail)
 
         self.storage_pot = spotname
         try:
@@ -358,8 +358,8 @@ class FileSet(models.Model):
 	DOC.write("""This storage directory has been migrated and can be deleted.
 	
 	Migrated %s -> %s (%s)
-	Storage pot: %s
-	Logical path: %s""" % (self.partition, self.migrate_to, datetime.utcnow(), self.storage_pot, self.logical_path))
+	Storage pot: %s/%s
+	Logical path: %s""" % (self.partition, self.migrate_to, datetime.utcnow(), self.storage_pot_type, self.storage_pot, self.logical_path))
 
 	# upgade fs with new partition info on success
 	self.notes += '\nMigrated %s -> %s (%s)' % (self.partition, self.migrate_to, datetime.utcnow())
@@ -384,7 +384,7 @@ class FileSet(models.Model):
 	return rsynccmd
 	
     def checkm_log(self):
-        LOG = open('/tmp/checkm.%s.log' % self.pk,'w')
+        LOG = open('/tmp/checkm.%s.log' % self.storage_pot,'w')
 	LOG.write('#%checkm_0.7\n')
 	LOG.write('# manifest file for %s\n' % self.logical_path)
 	LOG.write('# scaning path %s\n' % self.storage_path())
@@ -418,7 +418,7 @@ class FileSet(models.Model):
     def _verify_copy(self):	
         # copy - raise an exception if copy is bad
 	# assumes /tmp/checkm.<pk>.log is an upto date checkm file
-        LOG = open('/tmp/checkm.%s.log' % self.pk)
+        LOG = open('/tmp/checkm.%s.log' % self.storage_pot)
 	while 1:
 	    line = LOG.readline()
 	    if line == '': break
@@ -496,21 +496,18 @@ class FileSet(models.Model):
             linkpath = os.readlink(self.logical_path)
 	    if linkpath[0:7] == '/disks/': # look like it is already allocated
 	        # find mount point
-	        p = linkpath
-	        oldspot = ''
- 	        while 1: 
-                    head, tail = os.path.split(p)
-	            oldspot = os.path.join(tail, oldspot) 	
-	            if os.path.ismount(os.path.realpath(head)): 
-		        self.partition = Partition.objects.get(mountpoint=head)
-			self.storage_pot = oldspot
-			self.notes += 'allocated from pre-existing links to /disks/'
-			self.save()
-			return		 
-	            p = head
+		linkbits = linkpath.split('/')
+		if len(linkbits) != 5: raise "Not able to split %s into /disks/partition/spot_type/spotname" % linkpath
+		junk, disks, partition, spottype, spotname = linkbits 
+		mountpoint = '/disks/%s' % partition
+		self.partition = Partition.objects.get(mountpoint=mountpoint)
+	        self.storage_pot = spotname
+		self.notes += 'allocated from pre-existing links to /disks/'
+		self.save()
+		return		 
 		    
         else:
-            if self.logical_path[0:16] == '/project_spaces/': partitions = Partition.objects.filter(status='Allocating_ps')
+            if self.storage_pot_type == 'project_spaces': partitions = Partition.objects.filter(status='Allocating_ps')
             else: partitions = Partition.objects.filter(status='Allocating')
             # find the fullest partition which can accomidate the file set
 	    allocated_partition = None
@@ -528,28 +525,30 @@ class FileSet(models.Model):
 	    self.notes += '\nAllocated partition %s (%s)' % (self.partition, datetime.utcnow())
             self.save()
 
-    def allocate_m(self):
-        # find partion for migration
-        if self.storage_pot == '': return  #can't migrate a spot does not already exists in the db
-        if not self.partition: return #can't migrate a spot if no partition 
-        if self.migrate_to: return #already got a migration partition 
+# migration allocation don by hand at the moment
 
-	partitions = Partition.objects.filter(status='Allocating')
-        # find the fullest partition which can accomidate the file set
-	allocated_partition = None
-	fullest_space = 10e40
-	for p in partitions:
-	    partition_free_space = 0.95 * p.capacity_bytes - p.allocated()
-            # if this partition could accommidate file set...
-	    if partition_free_space > self.overall_final_size:
-		# ... and its the fullest so far  
-		if partition_free_space < fullest_space:
-		    allocated_partition = p
-		    fullest_space = partition_free_space
-		
-        self.migrate_to = allocated_partition
-	self.notes += '\nAllocated migration partition %s (%s)' % (self.migrate_to, datetime.now())
-        self.save()
+    #def allocate_m(self):
+    #    # find partion for migration
+    #    if self.storage_pot == '': return  #can't migrate a spot does not already exists in the db
+    #    if not self.partition: return #can't migrate a spot if no partition 
+    #    if self.migrate_to: return #already got a migration partition 
+
+#	partitions = Partition.objects.filter(status='Allocating')
+#        # find the fullest partition which can accomidate the file set
+#	allocated_partition = None
+#	fullest_space = 10e40
+#	for p in partitions:
+#	    partition_free_space = 0.95 * p.capacity_bytes - p.allocated()
+#            # if this partition could accommidate file set...
+#	    if partition_free_space > self.overall_final_size:
+#		# ... and its the fullest so far  
+#		if partition_free_space < fullest_space:
+#		    allocated_partition = p
+#		    fullest_space = partition_free_space
+#		
+#        self.migrate_to = allocated_partition
+#	self.notes += '\nAllocated migration partition %s (%s)' % (self.migrate_to, datetime.now())
+#        self.save()
     
     def du(self):
         '''Report disk usage of FileSet by creating as FileSetSizeMeasurement.'''
@@ -683,7 +682,11 @@ class Service(models.Model):
           summary = summary[0:SummaryLength-1] + '...'
     
        return summary
-	  	       
+
+    def documentationLink (self):
+    
+       return self.documentation
+       	  	       
 class HostHistory(models.Model):
     '''Entries detailing history of changes to a Host'''
     host = models.ForeignKey(Host, help_text="Host name")

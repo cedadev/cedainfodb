@@ -70,17 +70,22 @@ admin.site.register(Host, HostAdmin)
 # For the service admin we need a form with hosts listed in alphabetical order.
 # Create a custom form, then use it in the ServiceAdmin class
 class ServiceAdminForm(forms.ModelForm):
-    host = forms.ModelChoiceField(Host.objects.all().order_by('hostname'))
-    class Meta:
-        model = Host
+   pass
+#    host = forms.ModelChoiceField(Host.objects.all().order_by('hostname'))
+#    lemons = forms.CharField(max_length=80, label='snow')
+#   documentationLink = forms.CharField(max_length=80, label='snow 2')
+    
+#    class Meta:
+#        model = Service
 
 class ServiceAdmin(admin.ModelAdmin):
     form = ServiceAdminForm
     list_display = ('name', 'summary', 'host', 'active')
+    list_editable=('active',)
     list_filter = ('host', 'active')
     search_fields = ('description', 'name')
     ordering = ('name',)
-    filter_horizontal= ('dependencies',)    
+    filter_horizontal= ('dependencies',)   
 admin.site.register(Service, ServiceAdmin)
 
 # customise the Rack admin interface
@@ -135,7 +140,7 @@ class FileSetAdmin(admin.ModelAdmin):
     list_filter = ('partition',)
     readonly_fields = ('partition',
 #        'migrate_to', 
-        'storage_pot', )
+        'storage_pot', 'complete', 'complete_date')
     # TODO : add size history graph
     formfield_overrides = { ByteSizeField: {'widget': BigIntegerInput} }
     search_fields = ['logical_path', 'notes']

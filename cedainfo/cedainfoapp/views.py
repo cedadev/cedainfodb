@@ -273,6 +273,19 @@ def du(request, id):
     fileset.du()
     return redirect(request.META['HTTP_REFERER'])
 
+
+def markcomplete(request, id):
+    fileset = FileSet.objects.get(pk=id)
+    confirm = request.GET.get('confirm', None) 
+    if confirm != None:
+        fileset.complete=True
+	fileset.complete_date = datetime.datetime.now()
+	fileset.save()
+	return redirect('/admin/cedainfoapp/fileset/%s' %id)
+    else:
+        return render_to_response('cedainfoapp/fileset_markcomplete.html', {'fileset': fileset})  
+ 
+
 # do allocation of a fileset to a partition 
 def allocate(request, id):
     fs = FileSet.objects.get(pk=id)
