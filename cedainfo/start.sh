@@ -1,23 +1,12 @@
 #!/bin/bash
 #
-# Script to start and stop cedainfo Django server, suitable for use as an init.d script
+# Script to start and stop cedainfodb. This is suitable as using as an "init.d" script, but must be run as user 'badc'
 #
-### BEGIN INIT INFO
-# Provides:			cedainfodb
-# Required-Start:		
-# Should-Start:			
-# Should-Stop:			
-# Required-Stop:		
-# Default-Start:		3 5
-# Default-Stop:			0 1 2 6
-# Short-Description:		cedainfodb Django application
-# Description:			Starts cedainfodb Django application
-### END INIT INFO
 
 PYTHON="/usr/local/bin/python2.7"
-PROJDIR="/home/badc/software/infrastructure/cedainfo_releases/development/cedainfo"
+PROJDIR="/home/badc/software/infrastructure/cedainfo/cedainfo"
 PIDFILE="$PROJDIR/cedainfo.pid"
-SOCKET="/var/www/fastcgi/cedadb_dev.sock"
+SOCKET="/var/www/fastcgi/cedadb.sock"
 
 APP="cedainfo Django server"
 
