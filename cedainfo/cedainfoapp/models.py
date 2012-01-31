@@ -99,6 +99,7 @@ class Partition(models.Model):
     status = models.CharField(max_length=50,       
               choices=(("Blank","Blank"),
                  ("Allocating","Allocating"),
+                 ("Allocating_ps","Allocating_ps"),
                  ("Closed","Closed"),
                  ("Migrating","Migrating"),
                  ("Retired","Retired")) )
@@ -316,7 +317,7 @@ class FileSet(models.Model):
         if spottail == '': head, spottail = os.path.split(head)
 
         # icreate spot name 
-        spotname = "%s/spot-%s-%s" % (self.storage_pot_type,self.pk, spottail)
+        spotname = "spot-%s-%s" % (self.pk, spottail)
 
         self.storage_pot = spotname
         try:
