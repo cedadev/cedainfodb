@@ -337,7 +337,7 @@ def storagesummary(request):
 
 def storaged_spotlist(request):
 #    filesets = FileSet.objects.filter(logical_path__startswith='/badc')
-    filesets = FileSet.objects.filter(sd_backup=True)
+    filesets = FileSet.objects.filter(sd_backup=True, storage_pot__isnull=False ).exclude(storage_pot='')
     return render_to_response('cedainfoapp/storage-d_spotlist.html', {'filesets':filesets}, mimetype="text/plain")  
         
 # make list of rsync commands for makeing a secondary copies
