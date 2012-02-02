@@ -107,5 +107,5 @@ urlpatterns = patterns('',
     (r'^newprojects$', newprojects),
     (r'^newproj$', add_proj_gotw),
 
-    (r'^userdbadmin/', include('cedainfo.adminapp.urls')),   
+    (r'^udbadmin/', include('cedainfo.udbadmin.urls')),   
 )

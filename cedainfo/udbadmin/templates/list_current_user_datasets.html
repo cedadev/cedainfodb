@@ -1,0 +1,42 @@
+
+<h3>Curent datasets</h3>
+
+<table border="0" cellspacing="5">
+
+<tr><td><b>Userkey:</b></td><td>{{ user.userkey }}</td></tr>
+<tr><td><b>Name:</b></td><td>{{ user.displayName }}</td></tr>
+<tr><td><b>Current datasets:</b></td><td>  {{ datasets|length }} </td></tr>
+</table>
+
+<table cellspacing="0" border="1">
+<thead>
+<tr>
+<p>
+
+
+{% for header in headers %}
+   <th{{ header.class_attr }}>
+     {% if header.sortable %}<a href="{{ header.url|escape }}" title="Click to sort by this column">{% endif %}
+     {{ header.text }}
+     {% if header.sortable %}</a>{% endif %}
+   </th>{% endfor %}
+
+</tr>
+</thead>
+
+<tbody>
+  {% for dataset in datasets %}<tr class="{% cycle odd,even %}">
+    <td><a href="{{ dataset.datasetid.get_absolute_url|escape }}" title="Click to view dataset details">{{ dataset.datasetid|escape }}</a></td>
+    <td>{{ dataset.ver|escape }}</td>
+    <td>{{ dataset.endorseddate|date:"d-M-Y" }}</td>
+    <td>{{ dataset.expiredate|date:"d-M-Y" }}</td>
+    <td>{{ dataset.endorsedby|escape }}</td>
+    <td>{{ dataset.nercfunded|yesno:"Yes,No" }}</td>
+    <td>{{ dataset.research|escape }}</td>
+  </tr>
+  {% endfor %}
+
+</tbody>
+</table>
+
+<p>
