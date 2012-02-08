@@ -1,7 +1,8 @@
 from django.contrib import admin
-from cedainfo.udbadmin.models import *
+from django.forms import *
+from models import *
 from django.utils.safestring import mark_safe
-
+from forms import *
 
 from django.contrib.auth.models import User as SiteUser
 from django.contrib.sites.models import Site
@@ -26,13 +27,32 @@ class DatasetjoinAdmin(admin.ModelAdmin):
 
 admin.site.register(Datasetjoin, DatasetjoinAdmin)
 
+
+
 class DatasetAdmin(admin.ModelAdmin):
+
+   form = DatasetForm
+#
+#    This overrides all fields in this form
+#
+   formfield_overrides = {
+       models.CharField: {'widget': TextInput(attrs={'size':'50'})},
+   }
+
+
    list_display = ('datasetid', 'authtype', 'grp', 'description', 'datacentre')
    list_filter = ('datacentre', 'authtype')
-   exclude = ('grouptype', 'source')
-
-   search_fields =['datasetid']
-   
+#   exclude = ('grouptype', 'source', 'ukmoform')
+   fields = ('datasetid', 'authtype', 'grp', 'description', 'directory', 'conditions', 'defaultreglength', 'datacentre', 'infourl', 'comments')
+   search_fields =['datasetid', 'description']
+#
+#     Set datasetid to be read-only on edit form but allow entry on create form
+#
+   def get_readonly_fields(self, request, obj = None):
+       if obj: #In edit mode
+           return ('datasetid',) + self.readonly_fields
+       return self.readonly_fields   
+       
 admin.site.register(Dataset, DatasetAdmin)
 
 
@@ -81,16 +101,23 @@ class UserAdmin(admin.ModelAdmin):
          a = 'Details: '
          a += ' <a href="/%s/user/datasets/current/%s">Current datasets</a> |' % (self._meta.app_label, self.userkey)
          a += ' <a href="/%s/user/datasets/removed/%s">Removed datasets</a>' % (self._meta.app_label, self.userkey)
-         a += '<p>'
+         a += '<p/>'
 	 
+	 a+= '<ul>'
 	 for dataset in datasets:
-            a +=  str(dataset.datasetid) + '<br>'
-	 
+            a +=  '<li>' + str(dataset.datasetid)
+	 a+='</ul>'
+	    
 	 return mark_safe(a)
 	 
     showDatasets.short_description = 'Datasets'
     	 
-    list_display = ('userkey', 'title', 'othernames', 'surname', 'accountid', 'emailaddress', 'startdate', 'field')
+    def startdate (self):
+       return self.startdate.strftime('%d-%b-%Y')
+
+    startdate.admin_order_field = 'startdate' 
+           	     	 
+    list_display = ('userkey', 'title', 'othernames', 'surname', 'accountid', 'emailaddress', startdate, 'field', 'datasetCount')
     list_filter = ('title', 'degree', 'field','startdate','datacenter')
     search_fields = ['surname', 'othernames', 'accountid', 'emailaddress']
     list_per_page = 200
@@ -107,9 +134,60 @@ class UserAdmin(admin.ModelAdmin):
  
 
 admin.site.register(User, UserAdmin)
-#admin.site.register(Tbinstitutes)
+
+class DatasetrequestAdmin(admin.ModelAdmin):
+
+   def has_add_permission(self, request, obj=None):
+       return False
+   def has_delete_permission(self, request, obj=None):
+       return False
+
+   def requestdate (self):
+       return self.requestdate.strftime('%d-%b-%Y')
+       	 
+   requestdate.admin_order_field = 'requestdate' 
+      
+   list_display = ('accountid', 'datasetid', requestdate, 'research', 'nercfunded', 'status')
+   list_filter = ('status', 'datasetid',)
+   readonly_fields = ('datasetid', 'userkey')
+   search_fields =['research']
+
+admin.site.register(Datasetrequest, DatasetrequestAdmin)
 
 
+class PrivilegeAdmin(admin.ModelAdmin):
+
+   def has_add_permission(self, request, obj=None):
+       return True
+   def has_delete_permission(self, request, obj=None):
+       return True
+       	 
+      
+   list_display = ('userkey', 'accountid', 'type', 'datasetid', 'comment')
+   list_filter = ('type', 'datasetid')
+   
+   readonly_fields = ('userkey', 'accountid')
+   fields = ('userkey', 'accountid', 'type', 'datasetid', 'comment')
+#   exclude = ('id',)
+
+admin.site.register(Privilege, PrivilegeAdmin)
+
+
+class DatasetexpirenotificationAdmin(admin.ModelAdmin):
+
+   def has_add_permission(self, request, obj=None):
+       return False
+   def has_delete_permission(self, request, obj=None):
+       return False
+       	 
+      
+   list_display = ('userkey', 'datasetid', 'ver', 'date', 'emailaddress')
+   list_filter = ('date', 'datasetid')
+   
+   readonly_fields = ('id', 'userkey', 'datasetid', 'ver', 'date', 'emailaddress', 'extrainfo')
+#   fields = ('userkey', 'accountid', 'type', 'datasetid', 'comment')
+
+admin.site.register(Datasetexpirenotification, DatasetexpirenotificationAdmin)
 #
 # Remove 'delete selected' option on list page
 #

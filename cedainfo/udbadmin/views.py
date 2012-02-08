@@ -28,6 +28,10 @@ REMOVED_DATASET_HEADERS = (
     ('Research', 'research'),
 )
 
+
+def home(request):
+    return render_to_response('home.html', locals())
+    
 def list_current_user_datasets(request, userkey):
 
     user = User.objects.get(userkey=userkey)
