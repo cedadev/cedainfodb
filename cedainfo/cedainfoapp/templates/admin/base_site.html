@@ -1,0 +1,20 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {% trans 'CEDA database administration' %}{% endblock %}
+
+{% block branding %}
+
+<h1 id="site-name"><A  HREF="http://badc.nerc.ac.uk"><IMG border="0" SRC="http://badc.nerc.ac.uk/graphics/logos/badc-logo-onblue-30.gif"></A>
+{% trans 'CEDA database administration' %}
+</h1>
+{% endblock %}
+
+
+{% block nav-global %}
+ &nbsp; <a href="/">CEDAinfoDB</a>
+| <a href="http://team.ceda.ac.uk/trac/ceda/wiki/UserDB">UserDB</a>
+| &nbsp; <a href="http://team.ceda.ac.uk">CEDA Team Trac</a>
+
+<p>
+{% endblock %}

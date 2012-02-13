@@ -1,4 +1,152 @@
-<h1>User database home page</h1>
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>User database administration</h1>
+
+<form method=get action="http://team.ceda.ac.uk/cgi-bin/userdb/authorise_user_pending_datasets.cgi.pl">
+Authorise datasets for user with userKey/account name:
+<input type=text name=accountid size=8>
+<input type=submit value="Go"> 
+&nbsp; <a href="http://team.ceda.ac.uk/cgi-bin/userdb/list_pending_users.cgi.pl">List all pending dataset requests</a>
+&nbsp; <a href="http://team.ceda.ac.uk/cgi-bin/userdb/add_user_datasets.cgi.pl">Add datasets</a>
+</form>
 
 
-<a href="/admin/udbadmin/user">Users</a>
+<ul>
+
+<li><a href="http://team.ceda.ac.uk/trac/ceda/wiki/ExpireDatasets">ExpireDatasets</a>
+
+<li>List all users: <a href="http://team.ceda.ac.uk/cgi-bin/userdb/list_all_users.cgi.pl">By userkey</a> |
+<a href="http://team.ceda.ac.uk/cgi-bin/userdb/list_users_bydate.cgi.pl">By start date (most recent first)</a> |
+<a href="http://team.ceda.ac.uk/cgi-bin/userdb/list_tornado_users.cgi.pl">Users with unix accounts</a> |
+<a href="http://team.ceda.ac.uk/cgi-bin/userdb/list_active_users.cgi.pl">Active users</a>
+
+
+<form action="http://team.ceda.ac.uk/cgi-bin/userdb/search_users.cgi.pl">
+Search for: 
+
+<input type="text" name="search" size=12>
+<input type=submit value=Go>
+&nbsp; 
+in
+<input type=radio name=field value=surname checked>Surname
+&nbsp;
+<input type=radio name=field value=othernames>Othernames
+&nbsp;
+<input type=radio name=field value=emailaddress>Email address
+&nbsp;
+<input type=radio name=field value=accountid>AccountID
+
+<p>
+<font size=-1 color=blue>
+<em>Search is <b>not</b> case sensitive. Use * to match 0 or more characters.</em>
+</font>
+</form>
+<p>
+
+
+<li>
+<form method=get action="http://team.ceda.ac.uk/cgi-bin/userdb/display_user_details.cgi.pl">
+List details for user with userKey/account name:
+<input type=text name=userkey size=8>
+<input type=submit value="Go">
+</form>
+<p>
+
+<li>
+<form method=get action="http://team.ceda.ac.uk/cgi-bin/userdb/edit_user_details.cgi.pl">
+Edit details for user with userKey/account name:
+<input type=text name=userkey size=8>
+
+<input type=submit value="Go">
+</form>
+<p>
+
+<li><form method=POST action="http://team.ceda.ac.uk/cgi-bin/userdb/make_user_request_dir">
+Create user requests directory for given user. Enter user name:
+  <input type=text name=user><input type=submit value="Go">
+</form>
+<p>
+
+<LI><A HREF="http://team.ceda.ac.uk/cgi-bin/userdb/list_dataset_info.cgi.pl">
+List dataset registration information</A>  &nbsp;  <a href="http://team.ceda.ac.uk/cgi-bin/userdb/table_edit/edit_table.py?TableName=tbdatasets">Edit dataset registration information</a>
+<p>
+
+<LI><a href="green_folder/">Green Folder</a> - includes list of project participants, who may be granted access to specific data sets (e.g. coapec, namblex)
+<P>
+
+<LI><A HREF="http://team.ceda.ac.uk/cgi-bin/userdb/list_dataset_users.cgi.pl">
+List users by dataset</A> &nbsp; &nbsp; 
+<a href="http://team.ceda.ac.uk/cgi-bin/userdb/list_dataset_emails.cgi.pl">List email addresses for a dataset</a>
+<p>
+<LI><A HREF="http://team.ceda.ac.uk/cgi-bin/userdb/change_web_passwd.cgi.pl">
+Change password of web account</A>
+
+<p>
+<li>
+<a href="http://team.ceda.ac.uk/cgi-bin/userdb/list_all_active_institutes.cgi.pl">
+List active institutes for given dataset
+</a> 
+
+<p>
+<li><a href="http://team.ceda.ac.uk/cgi-bin/userdb/list_all_institutes.cgi.pl">
+List all institutes in database</a>
+<p>
+<li><a href="http://team.ceda.ac.uk/cgi-bin/pgweb/main.cgi.pl?db=userdb">View contents of tables in database</a> 
+<p>
+<li>Register a user. To register a user yourself, use the registration form on the BADC website. Use a made-up email address, such as 'rubbish@rl.ac.uk'. This will allow you to make the registration without the user getting any emails. Once you have completed the registration, edit the users details and insert the correct email address.
+
+<P>
+<li><a href="http://team.ceda.ac.uk/cgi-bin/userdb/update_passwd_file.cgi.pl">Update passwd file</a> &nbsp; 
+<a href="http://team.ceda.ac.uk/cgi-bin/userdb/update_group_file.cgi.pl">Update group file</a>
+
+</ul>
+
+
+
+
+
+<h3>Some useful userdb queries</h3>
+
+The following are a set of useful queries that you can run/modify if you click the above View contents of tables in database link above:
+
+<ol>
+<li>Not sure what this one does...
+
+<pre>
+select 
+userkey from tbdatasetjoin 
+where removed != -1 and fundingtype = 'NERC'
+group by userkey;
+</pre>
+
+<li>Select all LINK research descriptions, institute names and dataset IDs:
+
+<pre>
+SELECT tbdatasetjoin.research, tbinstitutes.name, 
+tbdatasetjoin.datasetid 
+FROM tbdatasetjoin, tbusers, tbinstitutes, addresses 
+WHERE tbdatasetjoin.datasetid = 'link' 
+AND tbusers.userkey = tbdatasetjoin.userkey 
+AND tbusers.addresskey = addresses.addresskey 
+AND addresses.institutekey = tbinstitutes.institutekey;
+</pre>
+
+<li>Select all RAPID-related (from multiple datasets) users that are not funded by NERC and don't have ".ac.uk" e-mails:
+
+<pre>
+SELECT tbusers.emailaddress, tbdatasetjoin.research, tbinstitutes.name, 
+tbdatasetjoin.datasetid 
+FROM tbdatasetjoin, tbusers, tbinstitutes, addresses 
+WHERE tbdatasetjoin.datasetid like '%rapid%' 
+AND tbinstitutes.name != 'Rutherford Appleton Laboratory (RAL)' 
+AND tbusers.emailaddress not like '%ac.uk%' 
+AND tbdatasetjoin.fundingtype != 'NERC' 
+AND tbusers.userkey = tbdatasetjoin.userkey 
+AND tbusers.addresskey = addresses.addresskey 
+AND addresses.institutekey = tbinstitutes.institutekey;
+</pre>
+
+
+{% endblock %}

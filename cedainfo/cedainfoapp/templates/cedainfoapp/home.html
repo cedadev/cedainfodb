@@ -1,35 +1,45 @@
-{% extends "base.html" %}
+{% extends "base_site.html" %}
+
 
 {% block title %}
 CEDA Information Database
 {% endblock %}
 
-{% block header %}
-<h2>Welcome to the CEDA Information Database</h2>
-{% endblock %}
+
 
 {% block content %}
-	<p>Available views:</p>
-	<ul>
-		<li>Data Entities
+
+<h2>CEDAinfoDB</h2>
+ 
+The CEDAinfoDB contains various internal data related to the administration of datasets and services. To view the
+tables in the CEDAinfoDB using the django admin interface, use the <a href="/admin">Home</a> link on the bar above.
+               
+    	        <ul>
+		<li><h4>Data Entities</h4>
 			<ul>
 				<li><a href="/dataentity/index">List of all data entities</a></li>
 				<li><a href="/dataentity/search">Search dataentities</a></li>
 				<li><a href="/dataentity/add">Add a new data entity</a></li>
 			</ul>
 		</li>
-		<li>Hosts
+                <p/>
+
+		<li><h4>Hosts</h4>
 			<ul>
 				<li><a href="/hosts/">List of all hosts</a></li>
 				<li><a href="/hosts/active">List of all active hosts</a></li>
 			</ul>
 		</li>
-		<li>Racks / Servers / Services
+                <p/>
+
+		<li><h4>Racks / Servers / Services</h4>
 			<ul>
 				<li><a href="/rack/services/1">Services</a></li>
 			</ul>
 		</li>
-		<li>Storage
+                <p/>
+
+		<li><h4>Storage</h4>
 			<ul>
 				<li><a href="/fileset/index">list filesets</a></li>
 				<li><a href="/fileset/second_copy_rsyncs">rsync jobs for second copy</a></li>
@@ -38,6 +48,6 @@ CEDA Information Database
 				<li><a href="/storagesummary">Storage Summary</a></li>
 			</ul>
 		</li>
-		<li><a href="/admin">Admin Interface</a></li>
-	</ul>
+                </ul>
+
 {% endblock %}
