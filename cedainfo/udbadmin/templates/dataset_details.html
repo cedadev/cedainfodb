@@ -1,5 +1,7 @@
-<html>
-<body>
+{% extends "base_site.html" %}
+
+{% block content %}
+
 <h1>Dataset details</h1>
 <table border="1">
 <tr><td><b>DatasetID:</b></td> <td>{{ dataset.datasetid }}</td>
@@ -15,5 +17,5 @@
 <tr><td><b>Comments:</b></td> <td>{{ dataset.comments }}</td>
 
 </table>
-</body>
-</html>
+
+{% endblock %}
