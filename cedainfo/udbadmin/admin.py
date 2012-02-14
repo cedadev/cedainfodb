@@ -147,9 +147,30 @@ class DatasetrequestAdmin(admin.ModelAdmin):
        	 
    requestdate.admin_order_field = 'requestdate' 
       
-   list_display = ('accountid', 'datasetid', requestdate, 'research', 'nercfunded', 'status')
-   list_filter = ('status', 'datasetid',)
-   readonly_fields = ('datasetid', 'userkey')
+   def accountidLink(self):
+      return mark_safe('<a href="/admin/%s/user/%s" title="View user details">%s</a>' % (self._meta.app_label, self.userkey, self.accountid()) )
+
+   accountidLink.allow_tags = True         
+   accountidLink.admin_order_field = 'userkey__accountid'
+   accountidLink.short_description = 'AccountID'
+               
+   def authoriseLink(self):
+      return mark_safe('<img src="http://badc.nerc.ac.uk/graphics/misc/tick.gif">')
+   authoriseLink.allow_tags = True
+   authoriseLink.short_description = 'Authorise'
+      	       
+   def nerc(self):
+      if self.nercfunded:
+         return "Yes"
+      else:
+         return "No"
+   nerc.admin_order_field = 'nercfunded'
+	 	 	       
+   list_display = ('id', accountidLink, 'datasetid', requestdate, 'research', nerc, 'status')
+   list_filter = ('status', 'nercfunded', 'requestdate', 'datasetid',)
+   readonly_fields = ('id', 'userkey', 'datasetid', 'requestdate', 'research', 'nercfunded', 'fundingtype', 
+                     'grantref', 'openpub', 'extrainfo', 'fromhost', 'status')
+		      
    search_fields =['research']
 
 admin.site.register(Datasetrequest, DatasetrequestAdmin)
