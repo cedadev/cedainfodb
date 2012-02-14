@@ -240,7 +240,8 @@ class Datasetrequest(models.Model):
     class Meta:
         db_table = u'datasetrequest'
 	managed  = False
-
+        ordering = ['-requestdate']
+	
 class Privilege(models.Model):
     id      = models.IntegerField(primary_key=True)
     userkey =  models.ForeignKey(User, db_column='userkey')
