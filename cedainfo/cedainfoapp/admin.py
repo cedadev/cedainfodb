@@ -3,6 +3,18 @@ from django.contrib import admin
 from cedainfo.cedainfoapp.models import *
 from django import forms
 
+
+def prettySize(size):
+   '''Returns file size in human readable format'''
+   
+   suffixes = [("B",2**10), ("K",2**20), ("M",2**30), ("G",2**40), ("T",2**50)]
+   for suf, lim in suffixes:
+      if size > lim:
+         continue
+      else:
+         return round(size/float(lim/2**10),2).__str__()+suf
+
+
 class BigIntegerInput(forms.TextInput):
     def __init__(self, *args, **kwargs):
         attrs = kwargs.setdefault('attrs', {})
@@ -129,18 +141,51 @@ class PartitionAdmin(admin.ModelAdmin):
 admin.site.register(Partition, PartitionAdmin)
 
 class FileSetAdminForm(forms.ModelForm):
-    overall_final_size = ByteSizeField()    
+
+#    overall_final_size = ByteSizeField()
+    overall_final_size = forms.CharField(widget=forms.TextInput(attrs={'size': '25'})) 
+#
+#      This is a copy of the help text in the models.py file. Must be a better way of doing this...
+#    
+    overall_final_size.help_text = "The allocation given to a fileset is an estimate of the final size on disk. If the dataset is going to grow indefinitely then estimate the size for 4 years ahead. Filesets can't be bigger than a single partition, but in order to aid disk managment they should no exceed 20% of the size of a partition."
+
     class Meta:
         model = FileSet
-
+	
+	    
 class FileSetAdmin(admin.ModelAdmin):
+    form = FileSetAdminForm
     
-    list_display = ('logical_path','overall_final_size','partition', 'partition_display',
+    
+    def niceOverallFinalSize(self):
+       return prettySize(self.overall_final_size)
+
+    niceOverallFinalSize.admin_order_field = 'overall_final_size'
+    niceOverallFinalSize.short_description = 'Overall final size'     
+     
+    list_display = ('logical_path', niceOverallFinalSize, 'partition', 'partition_display',
         'spot_display','status','last_size','responsible','links',)
     list_filter = ('partition',)
     readonly_fields = ('partition',
 #        'migrate_to', 
-        'storage_pot', 'complete', 'complete_date')
+        'storage_pot', 'complete', 'complete_date', niceOverallFinalSize)
+	
+    fields = (
+    'logical_path', 
+    'overall_final_size',
+    niceOverallFinalSize,
+    'notes',
+    'partition',
+    'storage_pot_type',
+    'storage_pot',
+    'migrate_to',
+    'secondary_partition',
+    'dmf_backup',
+    'sd_backup',
+    'complete',
+    'complete_date',  
+    )	
+    
     # TODO : add size history graph
     formfield_overrides = { ByteSizeField: {'widget': BigIntegerInput} }
     search_fields = ['logical_path', 'notes']
