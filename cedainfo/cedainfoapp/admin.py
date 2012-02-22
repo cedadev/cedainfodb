@@ -147,7 +147,7 @@ class FileSetAdminForm(forms.ModelForm):
 #
 #      This is a copy of the help text in the models.py file. Must be a better way of doing this...
 #    
-    overall_final_size.help_text = "The allocation given to a fileset is an estimate of the final size on disk. If the dataset is going to grow indefinitely then estimate the size for 4 years ahead. Filesets can't be bigger than a single partition, but in order to aid disk managment they should no exceed 20% of the size of a partition."
+    overall_final_size.help_text = "The allocation given to a fileset is an estimate of the final size on disk. If the dataset is going to grow indefinitely then estimate the size for 4 years ahead. Filesets can't be bigger than a single partition, but in order to aid disk managment they should not exceed 20% of the size of a partition."
 
     class Meta:
         model = FileSet

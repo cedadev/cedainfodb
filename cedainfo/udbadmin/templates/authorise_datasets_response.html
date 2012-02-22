@@ -1,0 +1,29 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+<center><a href="{{request.path}}">Return to dataset authorisation page</a></center>
+<p/>
+
+The following updates have been made:
+<p/>
+<ul>
+{% for line in infoString %}
+   <li>{{line}}<br>
+{% endfor %}
+</ul>
+<p/>
+
+{% if mailmsg %}
+   <b>The following mail message has been sent to the user:</b><br>
+      <font size="1"><em>Sent using script {{cmd }}</em></font>
+   <p>
+
+   <center><table><tr><td bgcolor="#ECECEC"><pre>
+   {{ mailmsg }}
+   </pre></td></tr></table>
+{% endif %}
+<p/>
+<center><a href="{{request.path}}">Return to dataset authorisation page</a></center>
+
+
+{% endblock %}

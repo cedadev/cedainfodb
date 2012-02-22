@@ -7,9 +7,8 @@ from forms import *
 from django.contrib.auth.models import User as SiteUser
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import Group
-admin.site.unregister(SiteUser)
-admin.site.unregister(Group)
-
+#admin.site.unregister(SiteUser)
+#admin.site.unregister(Group)
 
 
 class DatasetjoinAdmin(admin.ModelAdmin):
@@ -85,10 +84,24 @@ class UserAdmin(admin.ModelAdmin):
     
        removedDatasets = len(self.datasets(removed=True))
        currentDatasets = len(self.datasets(removed=False))
+       pendingDatasets = len(self.datasetRequests(status='pending'))
        
-       a = '<a href="http://team.ceda.ac.uk/cgi-bin/userdb/edit_user_details.cgi.pl?userkey=%s">Team editor</a>|' % self.userkey
-       a += ' <a href="/%s/user/datasets/current/%s">Current datasets (%s)</a>|' % (self._meta.app_label, self.userkey, currentDatasets)
-       a += ' <a href="/%s/user/datasets/removed/%s">Removed datasets (%s)</a>|' % (self._meta.app_label, self.userkey, removedDatasets)
+       nextUserkey     = self.nextUserkey()
+       previousUserkey = self.previousUserkey()
+       latestUserkey   = User.objects.maxUserkey()
+       firstUserkey    = User.objects.minUserkey()
+       
+       
+       a = '<table border="0"><tr><td>'
+       a += ' <a href="/%s/user/datasets/current/%s">Current datasets (%s)</a> | ' % (self._meta.app_label, self.userkey, currentDatasets)
+       a += ' <a href="/%s/user/datasets/removed/%s">Removed datasets (%s)</a> | ' % (self._meta.app_label, self.userkey, removedDatasets)
+       a += ' <a href="/%s/authorise/%s">Pending datasets (%s)</a>' % (self._meta.app_label, self.userkey, pendingDatasets)
+       a += '</td><td>&nbsp;</td><td><b>User navigation</b>: '
+       a += '<a href="/admin/udbadmin/user/%s">First</a> | ' % firstUserkey              
+       a += '<a href="/admin/udbadmin/user/%s">Previous</a> | ' % previousUserkey       
+       a += '<a href="/admin/udbadmin/user/%s">Next</a> | ' % nextUserkey
+       a += '<a href="/admin/udbadmin/user/%s">Last</a>' % latestUserkey       
+       a += '</td></tr></table>'
        return mark_safe(a)
        
     links.short_description = 'Related pages'
@@ -100,7 +113,8 @@ class UserAdmin(admin.ModelAdmin):
 
          a = 'Details: '
          a += ' <a href="/%s/user/datasets/current/%s">Current datasets</a> |' % (self._meta.app_label, self.userkey)
-         a += ' <a href="/%s/user/datasets/removed/%s">Removed datasets</a>' % (self._meta.app_label, self.userkey)
+         a += ' <a href="/%s/user/datasets/removed/%s">Removed datasets</a> |' % (self._meta.app_label, self.userkey)
+         a += ' <a href="/%s/authorise/%s">Pending datasets</a>' % (self._meta.app_label, self.userkey)	 
          a += '<p/>'
 	 
 	 a+= '<ul>'
@@ -131,8 +145,6 @@ class UserAdmin(admin.ModelAdmin):
 #    list_editable = ('accountid','title')
 
 
- 
-
 admin.site.register(User, UserAdmin)
 
 class DatasetrequestAdmin(admin.ModelAdmin):
@@ -155,7 +167,8 @@ class DatasetrequestAdmin(admin.ModelAdmin):
    accountidLink.short_description = 'AccountID'
                
    def authoriseLink(self):
-      return mark_safe('<img src="http://badc.nerc.ac.uk/graphics/misc/tick.gif">')
+      url = "/%s/authorise/%s" % (self._meta.app_label, self.userkey)
+      return mark_safe('<a href="%s"><img src="http://badc.nerc.ac.uk/graphics/misc/tick.gif"></a>' % url)
    authoriseLink.allow_tags = True
    authoriseLink.short_description = 'Authorise'
       	       
@@ -166,7 +179,7 @@ class DatasetrequestAdmin(admin.ModelAdmin):
          return "No"
    nerc.admin_order_field = 'nercfunded'
 	 	 	       
-   list_display = ('id', accountidLink, 'datasetid', requestdate, 'research', nerc, 'status')
+   list_display = ('id', accountidLink, authoriseLink, 'datasetid', requestdate, 'research', nerc, 'status')
    list_filter = ('status', 'nercfunded', 'requestdate', 'datasetid',)
    readonly_fields = ('id', 'userkey', 'datasetid', 'requestdate', 'research', 'nercfunded', 'fundingtype', 
                      'grantref', 'openpub', 'extrainfo', 'fromhost', 'status')

@@ -1,10 +1,11 @@
 from django.db import models
 import md5
-import choices
-
 from django.db.models.base import ModelBase
+from django.db.models import Max, Min
 
+from datetime import datetime, timedelta
 
+import choices
 
 class Dataset(models.Model):
     datasetid = models.CharField(max_length=40, primary_key=True)
@@ -31,6 +32,7 @@ class Dataset(models.Model):
         return self.datasetid
  
     def get_absolute_url(self):
+       '''Return url for viewing details.'''    
        return "/%s/dataset/details/%s" % (self._meta.app_label, self.datasetid)
        
     class Meta:
@@ -67,6 +69,18 @@ class Addresses(models.Model):
         db_table = u'addresses'
 	managed  = False
 
+class UserManager(models.Manager):
+   '''Contains class methods for User class.'''
+   
+   def maxUserkey (self):       
+      '''Returns the maximum userkey value'''
+
+      return User.objects.aggregate(Max('userkey'))['userkey__max']
+      
+   def minUserkey (self):       
+      '''Returns the minimum userkey value'''
+
+      return User.objects.aggregate(Min('userkey'))['userkey__min']
 
 class User (models.Model):
     userkey = models.AutoField(primary_key=True)
@@ -182,15 +196,37 @@ class User (models.Model):
 
     datasetCount.short_description='Datasets'
            
-    def datasetRequests(self):
-        requests=self.datasetrequest_set.all()
-	   
-        return requests
- 
-          
-    def __unicode__(self):
-        return str(self.userkey)
+    def datasetRequests(self, status=''):
+        '''Return users entries in datasetRequests table. Optionally only returns entries for given status.'''    
 
+        if status:
+           requests=self.datasetrequest_set.all().filter(status__exact=status)
+	else:
+	   requests=self.datasetrequest_set.all()
+
+        return requests
+
+    def nextUserkey (self):	   
+	'''Returns the next userkey value'''
+	
+	if self.userkey == User.objects.maxUserkey():
+	   return self.userkey
+	else:
+	   next = self.userkey + 1
+	   
+	   if next == 0: next = 1   
+	   return next
+
+    def previousUserkey (self):      
+       '''Returns the previous userkey value'''
+       return self.userkey -1
+  
+ 	   
+    def __unicode__(self):
+ 	 return str(self.userkey)
+
+    objects = UserManager() 
+    
     class Meta:
         ordering = ['-userkey']
         db_table = u'tbusers'
@@ -198,6 +234,22 @@ class User (models.Model):
 	get_latest_by = 'startdate'
 
 
+class DatasetJoinManager(models.Manager):
+   '''Contains class methods for DatasetJoin table class.'''
+   
+   def getDatasetVersion (self, userkey, datasetid):       
+      '''Returns the version number to use for registering the given dataset to the given user.'''
+
+#
+#          Find the maximum version number already used for this dataset for this user and increment. 
+#
+      q = Datasetjoin.objects.filter(userkey=userkey).filter(datasetid=datasetid).aggregate(Max('ver'))
+      
+      if q['ver__max'] != None:
+         return q['ver__max'] + 1
+      else:
+         return 0
+	 	 
 class Datasetjoin(models.Model):
     id =      models.AutoField(primary_key=True)
     userkey = models.ForeignKey(User, db_column='userkey')
@@ -206,7 +258,7 @@ class Datasetjoin(models.Model):
     endorsedby = models.CharField(max_length=50)
     endorseddate = models.DateTimeField()
     research = models.CharField(max_length=1500)
-    nercfunded = models.BooleanField()
+    nercfunded = models.IntegerField()
     removed = models.IntegerField()
     removeddate = models.DateTimeField()
     fundingtype = models.CharField(max_length=40)
@@ -218,7 +270,17 @@ class Datasetjoin(models.Model):
         db_table = u'tbdatasetjoin'
 	managed  = False
 
+    objects = DatasetJoinManager() 
+
 class Datasetrequest(models.Model):
+#
+#      Define allowed states for requests
+#
+    ACCEPTED = 'accepted'
+    REJECTED = 'rejected'
+    JUNK     = 'junk'
+    PENDING  = 'pending'
+    
     id = models.IntegerField(primary_key=True)
     userkey = models.ForeignKey(User, db_column='userkey')
     datasetid = models.ForeignKey(Dataset, db_column='datasetid')
@@ -233,10 +295,40 @@ class Datasetrequest(models.Model):
     status = models.CharField(max_length=12)
     
     def accountid (self):
+       '''Return user accountid associated with this request.'''
        return self.userkey.accountid
   
     accountid.admin_order_field = 'userkey__accountid'
            
+  	   
+    def accept (self, endorsedby='', expireDate=''):
+         '''Accept the dataset request'''        
+#
+#               Set 'version' to appropriate value by finding highest version number for this user and this dataset and incrementing
+#
+	 version = Datasetjoin.objects.getDatasetVersion(self.userkey, self.datasetid)
+#
+#               Create new entry in datasetjoin table, copying values from datasetreqest
+#	 
+       	 b = Datasetjoin(userkey=self.userkey, datasetid=self.datasetid, ver=version, nercfunded=0, removed=0, endorsedby=endorsedby, research=self.research, endorseddate=datetime.now(), fundingtype = self.fundingtype, grantref=self.grantref, openpub=self.openpub, extrainfo=self.extrainfo, expiredate=expireDate)
+	 b.save()
+	 
+         self.status = self.ACCEPTED
+	 self.save()
+
+    def reject (self):
+         '''Reject the dataset request'''        
+	 
+         self.status = self.REJECTED
+	 self.save()
+
+    def junk (self):
+         '''Junk the dataset request'''        
+	 
+         self.status = self.JUNK
+	 self.save()
+	   
+	   
     class Meta:
         db_table = u'datasetrequest'
 	managed  = False
@@ -276,3 +368,4 @@ class Datasetexpirenotification(models.Model):
     class Meta:
         db_table = u'datasetexpirenotification'
         managed = False
+

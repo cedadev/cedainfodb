@@ -17,7 +17,7 @@ DATASET_HEADERS = (
     ('Research', 'research'),
 )
 
-REMOVED_DATASET_HEADERS = (
+REMOVED_DATASET_HEADERS = ( 
     ('Dataset', 'datasetid'),
     ('Version', 'ver'),
     ('Endorsed', 'endorseddate'),

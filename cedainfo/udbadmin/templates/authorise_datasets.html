@@ -1,0 +1,184 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>Authorise datasets</h1>
+
+<table border="1" cellspacing="5">
+
+<tr><td><b>Userkey:</b></td><td><a href="/admin/udbadmin/user/{{user.userkey}}" title="View/edit user details">{{user.userkey}}</a></td></tr>
+<tr><td><b>Name:</b></td><td>{{ user.displayName }}</td></tr>
+<tr><td><b>AccountID:</b></td><td>{{ user.accountid }}</td></tr>
+<tr><td><b>Start date:</b></td><td>{{ user.startdate }}</td></tr>
+
+</table>
+
+
+<p>
+
+<h2>Pending requests</h2>
+
+<font size="1">
+<a href="/admin/udbadmin/datasetrequest/?userkey={{user.userkey}}">View all entries in requests table for this user</a>
+</font>
+{% if requests %}
+
+   <form method="post" action="">
+   </font>
+
+   <p>
+   <table cellspacing="0" border="1">
+   <thead>
+   <tr>
+   <th>Request ID</th>
+   <th>Date</th>
+   <th>DatasetID</th>
+   <th>Research</th>
+   <th>NERC?</th>
+   <th>Accept</th>
+   <th>Reject</th>
+   <th>Junk</th>
+   </tr>
+   </thead>
+
+   <tbody>
+     {% for request in requests %}
+       <tr>
+       <td><a href="/admin/udbadmin/datasetrequest/{{ request.id|escape }}" title="Click to view request details">{{ request.id }}</a></td>
+       <td>{{ request.requestdate|date:"d-M-Y" }}</td>
+       <td><a href="{{ request.datasetid.get_absolute_url|escape }}" title="Click to view dataset details">{{ request.datasetid|escape }}</a></td>
+
+       <td>{{ request.research|escape }}</td>
+       <td>{{ request.nercfunded|yesno:"Yes,No" }}</td>
+      <td><input type=radio name="id_{{request.id}}" value="accept">
+      <td><input type=radio name="id_{{request.id}}" value="reject">
+      <td bgcolor="red"><input type=radio  name="id_{{request.id}}" value="junk">
+
+     </tr>
+     {% endfor %}
+
+   </tbody>
+   </table>
+   <p/>
+
+   <center>
+   <table border>
+   <tr><td><b>Select your name:</b><td>
+   <select name="name" size="1">
+   <option value=-1>
+   {% for a in authorisors %}
+
+       {% if a.get_full_name %}
+	  {% ifequal a.get_full_name request.user.get_full_name %}
+	     <option selected="selected">{{a.get_full_name}}
+	  {% else %}
+	     <option>{{a.get_full_name}}
+	  {% endifequal %}
+       {% endif %}
+
+   {% endfor %}
+
+   </select>
+   <tr><td><b>Expire dataset in: <b><td><select name=expiremonths size=1>";
+
+   <option value=0 selected>Dataset default
+   <option value=1>1 Month
+   <option value=6>6 Months
+   <option value=12>1 Year
+   <option value=24>2 Years
+   <option value=36>3 Years
+   <option value=48>4 Years
+   <option value=60>5 Years
+   <option value=-1>Never
+   </select>
+   <tr><td><b>E-mail user </b><td><input name="emailuser" type="checkbox" value="yes" checked>
+   </table>
+
+   <p/>
+
+   <input type="reset">
+   <input type="submit" value="Submit">
+   </center>
+
+   </form>
+{% else %}
+   <blockquote>User has no pending requests</blockquote>
+{% endif %}
+
+<p/>
+
+<h2>Current datasets</h2>
+
+{% if datasets %}
+
+   <table cellspacing="0" border="1">
+   <thead>
+   <tr>
+   <th>DatasetID</th>
+   <th>Version</th>
+   <th>Endorsed Date</th>
+   <th>Expire Date</th>
+   <th>Endorsed by</th>
+   <th>NERC?</th>
+   <th>Research</th>
+   </tr>
+   </thead>
+
+   <tbody>
+     {% for dataset in datasets %}<tr class="{% cycle odd,even %}">
+       <td><a href="{{ dataset.datasetid.get_absolute_url|escape }}" title="Click to view dataset details">{{ dataset.datasetid|escape }}</a></td>
+       <td>{{ dataset.ver|escape }}</td>
+       <td>{{ dataset.endorseddate|date:"d-M-Y" }}</td>
+       <td>{{ dataset.expiredate|date:"d-M-Y" }}</td>
+       <td>{{ dataset.endorsedby|escape }}</td>
+       <td>{{ dataset.nercfunded|yesno:"Yes,No" }}</td>
+       <td>{{ dataset.research|escape }}</td>
+     </tr>
+     {% endfor %}
+
+   </tbody>
+   </table>
+{% else %}
+   <blockquote>User has no datasets</blockquote>
+{% endif %}
+
+<h2>Removed datasets</h2>
+
+{% if removed_datasets %}
+
+   <table cellspacing="0" border="1">
+
+   <thead>
+   <tr>
+   <th>DatasetID</th>
+   <th>Version</th>
+   <th>Endorsed Date</th>
+   <th>Expire Date</th>
+   <th>Removed Date</th>
+   <th>Endorsed by</th>
+   <th>NERC?</th>
+   <th>Research</th>
+   </tr>
+   </thead>
+
+
+   <tbody>
+     {% for dataset in removed_datasets %}<tr class="{% cycle odd,even %}">
+       <td><a href="{{ dataset.datasetid.get_absolute_url|escape }}" title="Click to view dataset details">{{ dataset.datasetid|escape }}</a></td>
+       <td>{{ dataset.ver|escape }}</td>
+       <td>{{ dataset.endorseddate|date:"d-M-Y" }}</td>
+       <td>{{ dataset.expiredate|date:"d-M-Y" }}</td>
+       <td>{{ dataset.removeddate|date:"d-M-Y" }}</td>
+       <td>{{ dataset.endorsedby|escape }}</td>
+       <td>{{ dataset.nercfunded|yesno:"Yes,No" }}</td>
+       <td>{{ dataset.research|escape }}</td>
+     </tr>
+     {% endfor %}
+
+   </tbody>
+   </table>
+{% else %}
+   <blockquote>User has no removed datasets</blockquote>
+{% endif %}
+
+{% endblock %}
