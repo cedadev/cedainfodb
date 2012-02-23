@@ -55,7 +55,7 @@ Data products:
 {% autoescape off %}
  {% if note_list %}
     {% for n in note_list %}
-        <li>{{ n }}  ({{ n.added|date:"Y-m-d"  }} {{ n.who }})</li>
+        <li><pre>{{ n }} </pre> ({{ n.added|date:"Y-m-d"  }} {{ n.who }})</li>
     {% endfor %}
  {% endif %}
 {% endautoescape %} 
