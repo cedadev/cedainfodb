@@ -1,7 +1,13 @@
 from django.forms import *
 from models import *
 from django.contrib.admin import widgets
+import choices
 
+class UdjForm(forms.Form):
+   fundingtype = ChoiceField(choices=choices.FUNDING_TYPES)
+   nercfunded  = ChoiceField(choices=choices.NERC_FUNDED)
+   openpub     = ChoiceField(choices=choices.OPEN_PUBLICATION)
+   removed     = ChoiceField(choices=((0, "No"), (-1, "Yes")))
 
 class DatasetForm(ModelForm):
     # customise the form a bit

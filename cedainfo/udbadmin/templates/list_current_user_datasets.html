@@ -2,12 +2,20 @@
 
 {% block content %}
 
-<h3>Curent datasets</h3>
+<h1>Curent datasets</h1>
+<p/>
+<form method="post">
+
+<table border="1" cellspacing="5">
+<tr><td><b>Userkey:</b></td><td><a href="/admin/udbadmin/user/{{user.userkey}}" title="View/edit user details">{{user.userkey}}</a></td></tr>
+<tr><td><b>Name:</b></td><td>{{ user.displayName }}</td></tr>
+<tr><td><b>AccountID:</b></td><td>{{ user.accountid }}</td></tr>
+<tr><td><b>Start date:</b></td><td>{{ user.startdate }}</td></tr>
+</table>
+
+<p/>
 
 <table border="0" cellspacing="5">
-
-<tr><td><b>Userkey:</b></td><td>{{ user.userkey }}</td></tr>
-<tr><td><b>Name:</b></td><td>{{ user.displayName }}</td></tr>
 <tr><td><b>Current datasets:</b></td><td>  {{ datasets|length }} </td></tr>
 </table>
 
@@ -17,18 +25,21 @@
 <p>
 
 
+<th/>
 {% for header in headers %}
    <th{{ header.class_attr }}>
      {% if header.sortable %}<a href="{{ header.url|escape }}" title="Click to sort by this column">{% endif %}
      {{ header.text }}
      {% if header.sortable %}</a>{% endif %}
    </th>{% endfor %}
-
+<th>Remove</th>
 </tr>
+
 </thead>
 
 <tbody>
   {% for dataset in datasets %}<tr class="{% cycle odd,even %}">
+    <td><a href="/udbadmin/udj/{{dataset.id}}">Edit</a></td>
     <td><a href="{{ dataset.datasetid.get_absolute_url|escape }}" title="Click to view dataset details">{{ dataset.datasetid|escape }}</a></td>
     <td>{{ dataset.ver|escape }}</td>
     <td>{{ dataset.endorseddate|date:"d-M-Y" }}</td>
@@ -36,12 +47,16 @@
     <td>{{ dataset.endorsedby|escape }}</td>
     <td>{{ dataset.nercfunded|yesno:"Yes,No" }}</td>
     <td>{{ dataset.research|escape }}</td>
+    <td align="center"><input name="remove" value="{{dataset.id}}" type="checkbox"></td>
   </tr>
   {% endfor %}
 
 </tbody>
 </table>
 
-<p>
+<p/>
 
+<center><input type="submit" value="Remove selected datasets"></center>
+
+</form>
 {% endblock %}

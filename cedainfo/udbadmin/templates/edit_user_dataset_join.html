@@ -1,0 +1,64 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>Edit datasest registration information</h1>
+<p/>
+<table border="1" cellspacing="5">
+<tr><td><b>Userkey:</b></td><td><a href="/admin/udbadmin/user/{{user.userkey}}" title="View/edit user details">{{user.userkey}}</a></td></tr>
+<tr><td><b>Name:</b></td><td>{{ user.displayName }}</td></tr>
+<tr><td><b>AccountID:</b></td><td>{{ user.accountid }}</td></tr>
+<tr><td><b>Start date:</b></td><td>{{ user.startdate }}</td></tr>
+</table>
+
+<p/>
+
+<form method="post">
+
+<table border="1">
+<tr><td><b>Dataset:</b></td> <td> <a href="/udbadmin/dataset/details/{{ udj.datasetid }}" title="View dataset details">{{ udj.datasetid }}</a> </td></tr>
+<tr><td><b>Version:</b></td><td>{{ udj.ver }}</td></tr>
+
+<tr><td><b>Endorsed by:</b></td><td>
+{{udj.endorsedby}}
+&nbsp; 
+<em>Change to:</em>
+<select name="changeendorsedby" size="1">
+<option value="" selected="y">
+{% for a in authorisors %}
+   <option>{{a.get_full_name}}
+{% endfor %}
+</select>
+</td>
+</tr>
+  
+<tr><td><b>Endorsed date:</b></td><td><input type="text" name="endorseddate" value="{{udj.endorseddate|date:'Y-m-d   H:i'}}"></td></tr>
+<tr><td><b>Research:</b></td><td><textarea name="research" rows="4" cols="80">{{ udj.research }}</textarea></td></tr>
+<tr><td><b>Funding type:</b><td>{{myform.fundingtype}}</td></tr>
+<tr><td><b>NERC Funded:</b></td><td>{{ myform.nercfunded }}</td></tr>
+<tr><td><b>Grant reference:</b></td><td><input type="text" name="grantref" value="{{ udj.grantref }}"></td></tr>
+
+<tr><td><b>Open publication</b></td><td>
+
+{{myform.openpub}}
+
+</td></tr>
+
+<tr><td><b>Expire date:</b></td><td><input type="text" name="expiredate" value="{{ udj.expiredate|date:'Y-m-d'}}" size="11"></td></tr>
+
+<tr><td><b>Extra Info:</b></td><td><textarea name="extrainfo" rows="4" cols="80">{{udj.extrainfo}}</textarea></td></tr>
+
+
+
+   <tr><td><b>Removed</b></td><td>{{ myform.removed }}
+&nbsp; <b>Date removed:</b> {{udj.removeddate|date:'Y-m-d   H:i'}}</td></tr>
+</table>
+<p/>
+
+<center>
+<input type="submit" value="Update">
+</center>
+</form>
+
+
+{% endblock %}

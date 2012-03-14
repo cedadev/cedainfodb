@@ -261,7 +261,7 @@ class Datasetjoin(models.Model):
     nercfunded = models.IntegerField()
     removed = models.IntegerField()
     removeddate = models.DateTimeField()
-    fundingtype = models.CharField(max_length=40)
+    fundingtype = models.CharField(max_length=40, choices=choices.FUNDING_TYPES)
     grantref = models.CharField(max_length=40)
     openpub = models.CharField(max_length=1) # This field type is a guess.
     extrainfo = models.CharField(max_length=3000)
@@ -287,7 +287,7 @@ class Datasetrequest(models.Model):
     requestdate = models.DateTimeField()
     research = models.CharField(max_length=1500)
     nercfunded = models.IntegerField()
-    fundingtype = models.CharField(max_length=40)
+    fundingtype = models.CharField(max_length=40, choices=choices.FUNDING_TYPES)
     grantref = models.CharField(max_length=40)
     openpub = models.TextField() # This field type is a guess.
     extrainfo = models.CharField(max_length=1000)
