@@ -4,6 +4,7 @@ from django.db.models.base import ModelBase
 from django.db.models import Max, Min
 
 from datetime import datetime, timedelta
+from pytz import timezone
 
 import choices
 
@@ -266,6 +267,12 @@ class Datasetjoin(models.Model):
     openpub = models.CharField(max_length=1) # This field type is a guess.
     extrainfo = models.CharField(max_length=3000)
     expiredate = models.DateTimeField()
+    
+    def removeDataset(self):
+       self.removed = -1
+       self.removeddate = datetime.now(timezone('Europe/London'))
+       self.save()
+       
     class Meta:
         db_table = u'tbdatasetjoin'
 	managed  = False
@@ -310,7 +317,7 @@ class Datasetrequest(models.Model):
 #
 #               Create new entry in datasetjoin table, copying values from datasetreqest
 #	 
-       	 b = Datasetjoin(userkey=self.userkey, datasetid=self.datasetid, ver=version, nercfunded=0, removed=0, endorsedby=endorsedby, research=self.research, endorseddate=datetime.now(), fundingtype = self.fundingtype, grantref=self.grantref, openpub=self.openpub, extrainfo=self.extrainfo, expiredate=expireDate)
+       	 b = Datasetjoin(userkey=self.userkey, datasetid=self.datasetid, ver=version, nercfunded=0, removed=0, endorsedby=endorsedby, research=self.research, endorseddate=datetime.now(timezone('Europe/London')), fundingtype = self.fundingtype, grantref=self.grantref, openpub=self.openpub, extrainfo=self.extrainfo, expiredate=expireDate)
 	 b.save()
 	 
          self.status = self.ACCEPTED

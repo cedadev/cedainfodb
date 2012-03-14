@@ -1,7 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import *
 from django.contrib.auth.models import User as SiteUser
-from datetime import datetime
+from datetime import *
+from pytz import *
 
 from udbadmin.models import *
 from udbadmin.forms import *
@@ -44,10 +45,8 @@ def list_current_user_datasets(request, userkey):
     if request.method == 'POST':
        for removeID in request.POST.getlist('remove'):
           udj = Datasetjoin.objects.get(id=removeID)
-	  udj.removed = -1
-	  udj.removeddate = datetime.now()
-	  udj.save()
-
+	  udj.removeDataset()
+	  
     user = User.objects.get(userkey=userkey)
 
     sort_headers = SortHeaders(request, DATASET_HEADERS)
@@ -104,8 +103,7 @@ def edit_user_dataset_join (request, id):
          udj.endorsedby = changeendorsedby
 
       if udj.removed == 0 and request.POST.get('removed') == "-1":
-         udj.removed = -1
-	 udj.removeddate = datetime.now()
+         udj.removeDataset()
       if udj.removed == -1 and request.POST.get('removed') == '0':
          udj.removed = 0
 	 udj.removeddate = None

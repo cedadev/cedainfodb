@@ -109,11 +109,15 @@
 
 <h2>Current datasets</h2>
 
+<form method="post">
+<input type="hidden" name="remove_datasets" value="y">
+
 {% if datasets %}
 
    <table cellspacing="0" border="1">
    <thead>
    <tr>
+   <th/>
    <th>DatasetID</th>
    <th>Version</th>
    <th>Endorsed Date</th>
@@ -121,11 +125,13 @@
    <th>Endorsed by</th>
    <th>NERC?</th>
    <th>Research</th>
+   <th>Remove</th>
    </tr>
    </thead>
 
    <tbody>
      {% for dataset in datasets %}<tr class="{% cycle odd,even %}">
+       <td><a href="/udbadmin/udj/{{dataset.id}}">Edit</a></td>
        <td><a href="{{ dataset.datasetid.get_absolute_url|escape }}" title="Click to view dataset details">{{ dataset.datasetid|escape }}</a></td>
        <td>{{ dataset.ver|escape }}</td>
        <td>{{ dataset.endorseddate|date:"d-M-Y" }}</td>
@@ -133,14 +139,21 @@
        <td>{{ dataset.endorsedby|escape }}</td>
        <td>{{ dataset.nercfunded|yesno:"Yes,No" }}</td>
        <td>{{ dataset.research|escape }}</td>
+       <td align="center"><input name="remove" value="{{dataset.id}}" type="checkbox"></td>
      </tr>
      {% endfor %}
 
    </tbody>
    </table>
+
+   <p/>
+   <center><input type="submit" value="Remove selected datasets"></center>
 {% else %}
    <blockquote>User has no datasets</blockquote>
 {% endif %}
+
+
+</form>
 
 <h2>Removed datasets</h2>
 
@@ -150,6 +163,7 @@
 
    <thead>
    <tr>
+   <th/>
    <th>DatasetID</th>
    <th>Version</th>
    <th>Endorsed Date</th>
@@ -161,9 +175,9 @@
    </tr>
    </thead>
 
-
    <tbody>
      {% for dataset in removed_datasets %}<tr class="{% cycle odd,even %}">
+       <td><a href="/udbadmin/udj/{{dataset.id}}">Edit</a></td>
        <td><a href="{{ dataset.datasetid.get_absolute_url|escape }}" title="Click to view dataset details">{{ dataset.datasetid|escape }}</a></td>
        <td>{{ dataset.ver|escape }}</td>
        <td>{{ dataset.endorseddate|date:"d-M-Y" }}</td>
