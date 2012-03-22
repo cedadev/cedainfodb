@@ -68,7 +68,7 @@ class HostAdmin(admin.ModelAdmin):
     list_display = ('hostname','ip_addr','host_type','hypervisor','rack')
     list_filter = ('supplier','planned_end_of_life', 'retired_on','host_type','rack','hostlist')
     ordering = ('hostname','planned_end_of_life')
-    search_fields = ['hostname',]
+    search_fields = ['hostname', 'notes']
 
     # for the "hypervisor" field, restrict the list of available hosts to those with host_type="hypervisor_server"
     def formfield_for_foreignkey(self, db_field, request, **kwargs):

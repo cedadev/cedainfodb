@@ -11,8 +11,14 @@ CEDA Information Database
 
 <h2>CEDAinfoDB</h2>
  
-The CEDAinfoDB contains various internal data related to the administration of datasets and services. To view the
-tables in the CEDAinfoDB using the django admin interface, use the <a href="/admin">Home</a> link on the bar above.
+The CEDAinfoDB contains various internal data related to the administration of datasets and services. The interface uses both
+customised database views and the Django admin interface. The admin interface can be accessed using the link below, or using
+the <a href="/admin">Home</a> link on the bar above.
+
+<p>
+<p>
+
+<a href="/admin">View using Django admin interface</a>
                
     	        <ul>
 		<li><h4>Data Entities</h4>
@@ -27,14 +33,18 @@ tables in the CEDAinfoDB using the django admin interface, use the <a href="/adm
 		<li><h4>Hosts</h4>
 			<ul>
 				<li><a href="/hosts/">List of all hosts</a></li>
+                                <li><a href="/admin/cedainfoapp/host">Searchable list of hosts</a></li>
 				<li><a href="/hosts/active">List of all active hosts</a></li>
+                                <li><a href="/admin/cedainfoapp/host/add">Add new host</a></li>
 			</ul>
 		</li>
                 <p/>
 
 		<li><h4>Racks / Servers / Services</h4>
 			<ul>
-				<li><a href="/rack/services/1">Services</a></li>
+                                <li><a href="/admin/cedainfoapp/service">Searchable list of services</a></li>
+				<li><a href="/rack/services/1">List services by rack and server</a></li>
+                                <li><a href="/admin/cedainfoapp/service/add">Add new service</a></li>
 			</ul>
 		</li>
                 <p/>
