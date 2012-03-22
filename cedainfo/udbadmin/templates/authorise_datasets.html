@@ -1,3 +1,9 @@
+	<SCRIPT LANGUAGE="JavaScript" SRC="/static/javascript/calendar/CalendarPopup.js"></SCRIPT>
+	<SCRIPT LANGUAGE="JavaScript" SRC="/static/javascript/calendar/AnchorPosition.js"></SCRIPT>
+	<SCRIPT LANGUAGE="JavaScript" SRC="/static/javascript/calendar/date.js"></SCRIPT>
+	<SCRIPT LANGUAGE="JavaScript" SRC="/static/javascript/calendar/PopupWindow.js"></SCRIPT>
+
+
 {% extends "base_site.html" %}
 
 {% block content %}
@@ -91,6 +97,15 @@
    <option value=60>5 Years
    <option value=-1>Never
    </select>
+or on: 
+
+<SCRIPT LANGUAGE="JavaScript" ID="jscal1x">
+   var cal1x = new CalendarPopup();
+</SCRIPT>
+
+   <input type="text" size="10" name="userexpiredate">
+   <A HREF="#" onClick="cal1x.select(document.forms[0].userexpiredate,'anchor1x','dd/MM/yyyy'); return false;"  NAME="anchor1x" ID="anchor1x">Choose date</A>
+
    <tr><td><b>E-mail user </b><td><input name="emailuser" type="checkbox" value="yes" checked>
    </table>
 

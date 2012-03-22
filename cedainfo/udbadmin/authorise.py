@@ -24,6 +24,7 @@ def authorise_datasets(request, userkey):
 	emailuser      = request.POST.get('emailuser', 'no')
 
 	datasetsAdded = 0
+	changes = 0
 
 	infoString = []
 
@@ -32,6 +33,7 @@ def authorise_datasets(request, userkey):
    #             Process any form parameters associated with requests
    #     
            if name.startswith('id_'):
+              changes += 1
    #
    #                   Extract the request identifier number from the parameter value and make a datasetRequest object
    #
@@ -44,7 +46,16 @@ def authorise_datasets(request, userkey):
 		 dataset = Dataset.objects.get(datasetid=datasetRequest.datasetid)
 
         	 if expireMonths == 0:
-	            expireDate = datetime.now() + relativedelta(months=dataset.defaultreglength)
+                    userExpireDate = request.POST.get('userexpiredate', '')
+		    
+		    if userExpireDate:
+		       try:
+		          expireDate = datetime.strptime(userExpireDate, '%d/%m/%Y')
+		       except:
+		          return HttpResponse ("Invalid date string: '%s'. Use format 'dd/mm/yyyy'" % userExpireDate)   
+                    else:
+		       expireDate = datetime.now() + relativedelta(months=dataset.defaultreglength)
+		       
 		 else:
 	            expireDate = datetime.now() + relativedelta(months=expireMonths)
 
@@ -62,6 +73,8 @@ def authorise_datasets(request, userkey):
 	      else:
 		 pass      
 
+        if changes == 0:
+	   return HttpResponse ("No updates requested")
    #
    #        If any datasets have been added then email user if requested
    #
