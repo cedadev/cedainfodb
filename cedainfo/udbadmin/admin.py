@@ -132,7 +132,7 @@ class UserAdmin(admin.ModelAdmin):
     startdate.admin_order_field = 'startdate' 
            	     	 
     list_display = ('userkey', 'title', 'othernames', 'surname', 'accountid', 'emailaddress', startdate, 'field', 'datasetCount')
-    list_filter = ('title', 'degree', 'field','startdate','datacenter')
+    list_filter = ('title', 'degree', 'accounttype', 'field','startdate','datacenter')
     search_fields = ['surname', 'othernames', 'accountid', 'emailaddress']
     list_per_page = 200
     
@@ -191,18 +191,21 @@ admin.site.register(Datasetrequest, DatasetrequestAdmin)
 
 class PrivilegeAdmin(admin.ModelAdmin):
 
-   def has_add_permission(self, request, obj=None):
-       return True
-   def has_delete_permission(self, request, obj=None):
-       return True
-       	 
-      
-   list_display = ('userkey', 'accountid', 'type', 'datasetid', 'comment')
+   
+   form = PrivilegeForm
+
+
+   def accountidLink(self):
+      return mark_safe('<a href="/admin/%s/user/%s" title="View user details">%s</a>' % (self._meta.app_label, self.userkey, self.accountid()) )
+
+   accountidLink.allow_tags = True         
+   accountidLink.admin_order_field = 'userkey__accountid'
+   accountidLink.short_description = 'AccountID'
+        
+   list_display = (id, 'userkey', accountidLink, 'type', 'datasetid', 'comment')
    list_filter = ('type', 'datasetid')
    
-   readonly_fields = ('userkey', 'accountid')
-   fields = ('userkey', 'accountid', 'type', 'datasetid', 'comment')
-#   exclude = ('id',)
+   fields = ('userkey',  'type', 'datasetid', 'comment')
 
 admin.site.register(Privilege, PrivilegeAdmin)
 

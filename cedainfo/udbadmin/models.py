@@ -38,6 +38,7 @@ class Dataset(models.Model):
        
     class Meta:
         db_table = u'tbdatasets'
+        ordering = ['datasetid']
         managed  = False
  
 
@@ -342,7 +343,7 @@ class Datasetrequest(models.Model):
         ordering = ['-requestdate']
 	
 class Privilege(models.Model):
-    id      = models.IntegerField(primary_key=True)
+    id      = models.AutoField(primary_key=True)
     userkey =  models.ForeignKey(User, db_column='userkey')
     type    = models.CharField(max_length=25,
                choices=(
@@ -352,7 +353,7 @@ class Privilege(models.Model):
     )
     
     datasetid = models.ForeignKey(Dataset, db_column='datasetid')
-    comment = models.CharField(max_length=200)
+    comment = models.CharField(max_length=200, blank=True)
 
     def accountid (self):
        return self.userkey.accountid

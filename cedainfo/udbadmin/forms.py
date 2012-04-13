@@ -19,3 +19,10 @@ class DatasetForm(ModelForm):
         model = Dataset
 #	fields = ('datasetid', 'authtype', 'grp', 'description', 'directory', 'conditions', 'defaultreglength', 'datacentre', 'infourl', 'comments')
 
+
+class PrivilegeForm(ModelForm):
+
+    comment = CharField(required=False, widget=forms.Textarea(attrs={'rows':'4', 'cols': '50'}))
+
+    class Meta:
+       model = Privilege
