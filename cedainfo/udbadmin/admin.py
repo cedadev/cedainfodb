@@ -106,6 +106,15 @@ class UserAdmin(admin.ModelAdmin):
        
     links.short_description = 'Related pages'
 
+    def password (self):
+          
+       a = '<a target="_blank" href="http://team.ceda.ac.uk/cgi-bin/userdb/change_web_passwd.cgi.pl?accountid=%s">Change</a> | ' % self.userkey
+       a += '<a target="_blank" href="http://team.ceda.ac.uk/cgi-bin/userdb/reset_passwd.cgi.pl?accountid=%s">Reset password and email user</a>' % self.userkey
+       
+       return mark_safe(a)
+       
+    password.short_description = 'Password'
+
     def showDatasets (self):
          
 	 datasets = self.datasets(removed=False)
@@ -137,10 +146,10 @@ class UserAdmin(admin.ModelAdmin):
     list_per_page = 200
     
 #    exclude = ('encpasswd', 'md5passwd', 'onlinereg')
-    readonly_fields = (showDatasets, 'datacenter', 'userkey', 'address', 'accountid', 'addresskey', 'startdate', 'openid', 'encpasswd', 'md5passwd', 'institute', links)
+    readonly_fields = (showDatasets, 'datacenter', 'userkey', 'address', 'accountid', 'addresskey', 'startdate', 'openid', 'encpasswd', 'md5passwd', 'institute', links, password)
 
     fields = (links, 'userkey', 'title', 'surname', 'othernames', 'emailaddress',
-               'webpage', 'telephoneno', 'accountid', 'openid', 'accounttype', 
+               'webpage', 'telephoneno', 'accountid', 'openid', 'accounttype',  password, 
 	       'degree', 'endorsedby', 'field', 'startdate', showDatasets, 'datacenter', 'institute', 'address', 'comments')
 #    list_editable = ('accountid','title')
 
