@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="storage_pot">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="spot_id"/>
+                <xs:sequence>
+                    <xs:element name="aggregations">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element maxOccurs="unbounded" name="aggregation">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element name="aggregation_id"/>
+                                            <xs:element name="storagedCurrentStatus"/>
+                                            <xs:element minOccurs="0" name="timeToArchive"/>
+                                            <xs:element maxOccurs="unbounded" name="file">
+                                                <xs:complexType>
+                                                  <xs:sequence>
+                                                  <xs:element name="file_id"/>
+                                                  <xs:element name="file_name"/>
+                                                  <xs:element name="file_size"/>
+                                                  </xs:sequence>
+                                                </xs:complexType>
+                                            </xs:element>
+                                        </xs:sequence>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
