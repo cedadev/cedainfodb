@@ -339,7 +339,19 @@ def storaged_spotlist(request):
 #    filesets = FileSet.objects.filter(logical_path__startswith='/badc')
     filesets = FileSet.objects.filter(sd_backup=True, storage_pot__isnull=False ).exclude(storage_pot='')
     return render_to_response('cedainfoapp/storage-d_spotlist.html', {'filesets':filesets}, mimetype="text/plain")  
-        
+
+def detailed_spotlist(request):
+    '''detailed table of spots including latest FSSM for each one'''
+    filesets = FileSet.objects.filter(sd_backup=True, storage_pot__isnull=False ).exclude(storage_pot='')
+    for fs in filesets:
+        # find FSSMs for this fs ordered by date
+        fssms = FileSetSizeMeasurement.objects.filter(fileset=fs).order_by('-date')
+        if (len(fssms) > 0):
+            fs.latest_size = fssms[len(fssms)-1]
+        else:
+            fs.latest_suze = 0
+    return render_to_response('cedainfoapp/detailed_spotlist.html', {'filesets':filesets}, mimetype="text/plain")  
+    
 # make list of rsync commands for makeing a secondary copies
 def make_secondary_copies(request):
     filesets = FileSet.objects.all()
