@@ -1,6 +1,9 @@
 from django.http import HttpResponse
 from django.shortcuts import *
 from django.contrib.auth.models import User as SiteUser
+from django.contrib.auth.decorators import login_required
+
+
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import os
@@ -8,7 +11,7 @@ from subprocess import *
 
 from models import *
 
-
+@login_required()
 def authorise_datasets(request, userkey):
 
    if request.method == 'POST':

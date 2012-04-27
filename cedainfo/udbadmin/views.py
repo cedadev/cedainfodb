@@ -1,8 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import *
 from django.contrib.auth.models import User as SiteUser
-from datetime import *
-from pytz import *
+from django.contrib.auth.decorators import login_required
 
 from udbadmin.models import *
 from udbadmin.forms import *
@@ -34,10 +33,14 @@ REMOVED_DATASET_HEADERS = (
 )
 
 
+@login_required()
 def home(request):
+    user = request.user
     return render_to_response('home.html', locals())
     
+@login_required()
 def list_current_user_datasets(request, userkey):
+    user = request.user
 
 #
 #      Remove any datasets requested
@@ -47,25 +50,28 @@ def list_current_user_datasets(request, userkey):
           udj = Datasetjoin.objects.get(id=removeID)
 	  udj.removeDataset()
 	  
-    user = User.objects.get(userkey=userkey)
+    cedauser = User.objects.get(userkey=userkey)
 
     sort_headers = SortHeaders(request, DATASET_HEADERS)
     headers = list(sort_headers.headers())
-    datasets=user.datasetjoin_set.all().filter(removed__exact=0).order_by(sort_headers.get_order_by())
+    datasets=cedauser.datasetjoin_set.all().filter(removed__exact=0).order_by(sort_headers.get_order_by())
 
     return render_to_response('list_current_user_datasets.html', locals())
 
+@login_required()
 def list_removed_user_datasets(request, userkey):
-
-    user = User.objects.get(userkey=userkey)
+    user = request.user
+    
+    cedauser = User.objects.get(userkey=userkey)
 
     sort_headers = SortHeaders(request, REMOVED_DATASET_HEADERS)
     headers = list(sort_headers.headers())
-    datasets=user.datasetjoin_set.all().filter(removed__exact=-1).order_by(sort_headers.get_order_by())
+    datasets=cedauser.datasetjoin_set.all().filter(removed__exact=-1).order_by(sort_headers.get_order_by())
 
     return render_to_response('list_removed_user_datasets.html', locals())
 
 
+@login_required()
 def dataset_details(request, datasetid):
 #
 #    Displays dataset details read-only
@@ -75,11 +81,15 @@ def dataset_details(request, datasetid):
    except:
       return HttpResponse('not found')
       
+   user = request.user   
    return render_to_response('dataset_details.html', locals())
 
-
+@login_required()
 def edit_user_dataset_join (request, id):
 
+   if not request.user.is_authenticated():
+      return HttpResponseRedirect('/admin/login/')
+      
    try:
       udj = Datasetjoin.objects.get(id=id) 
       user = udj.userkey
