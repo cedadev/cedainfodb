@@ -1,8 +1,7 @@
 # Django settings for cedainfo project.
 
 import os
-# get the current working dir (used for relative location of template dirs)
-PROJECT_DIR = os.path.dirname(__file__)
+PROJECT_DIR= os.path.dirname(__file__) 
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -13,14 +12,38 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+LOGIN_REDIRECT_URL = "/admin"
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'cedainfo',                      # Or path to database file if using sqlite3.
+        'USER': 'cedainfo',                      # Not used with sqlite3.
+        'PASSWORD': 'ler239b',                  # Not used with sqlite3.
+        'HOST': 'bora.badc.rl.ac.uk',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    },
+
+    'userdb': {
+        'ENGINE': 'postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'userdb',                      # Or path to database file if using sqlite3.
+        'USER': 'badc',                      # Not used with sqlite3.
+        'PASSWORD': 'rtp569w',                  # Not used with sqlite3.
+        'HOST': 'bora.badc.rl.ac.uk',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    }
+
+}
+DATABASE_ROUTERS = ['dbrouter.DatabaseAppsRouter']
+DATABASE_APPS_MAPPING= {'udbadmin': 'userdb'}
+#DATABASE_ENGINE = 'postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 #DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'xxxxxx'             # Or path to database file if using sqlite3.
+#DATABASE_NAME = 'cedainfo'             # Or path to database file if using sqlite3.
 #DATABASE_NAME = 'sqlite3.db'             # Or path to database file if using sqlite3.
-DATABASE_USER = 'cedainfo'             # Not used with sqlite3.
-DATABASE_PASSWORD = 'xxxxxx'         # Not used with sqlite3.
-DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+#DATABASE_USER = 'cedainfo'             # Not used with sqlite3.
+#DATABASE_PASSWORD = 'ler239b'         # Not used with sqlite3.
+#DATABASE_HOST = 'bora.badc.rl.ac.uk'             # Set to empty string for localhost. Not used with sqlite3.
+#DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -41,12 +64,12 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = os.path.join(PROJECT_DIR,"cedainfoapp","templates","static")
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = '/static/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -71,10 +94,6 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'cedainfo.urls'
 
-STATIC_DOC_ROOT = os.path.join(PROJECT_DIR,"cedainfoapp","templates","static")
-
-LOG = 'debug.log'
-
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -90,9 +109,25 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
-    'cedainfo.cedainfoapp', 
-    'cedainfo.proginfo',   
- #   'cedainfo.userdb',
- #   'cedainfo.rar',
-
+    'cedainfo.cedainfoapp',
+    'cedainfo.proginfo',
+    'cedainfo.udbadmin',
+    'cedainfo.audit',
 )
+
+# ----------------------------------------------------
+# Local customisations follow
+#
+import logging
+logging.basicConfig(
+level = logging.DEBUG,
+    format = '%(name)s %(module)s %(levelname)s [%(asctime)s] %(message)s',
+)
+LOG=logging.getLogger('cedadb')
+
+# columns for CSV parser in fsc_manager.py
+fsc_manager_csv_cols = {
+    'size' : 0,
+    'path' : 1
+}
+
