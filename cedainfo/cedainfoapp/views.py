@@ -6,6 +6,8 @@ from cedainfo.cedainfoapp.forms import *
 from django.shortcuts import redirect, render_to_response, get_object_or_404
 from django.views.generic import list_detail
 from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required
+
 import re
 
 import datetime
@@ -15,6 +17,7 @@ logging=settings.LOG
 # use generic view list_detail.object_list for Hosts (see urls.py)
 
 # host_list view: optionally includes subsetting (e.g. in_pool or not yet retired)
+@login_required()
 def host_list(request, subset=None):
     o = request.GET.get('o', 'id') # default order is ascending id
     # define the queryset, using the subset if available
@@ -31,6 +34,7 @@ def host_list(request, subset=None):
     )    
 
 # host_detail view: includes details of host, plus services and history entries for that host
+@login_required()
 def host_detail(request, host_id):
     url=reverse('cedainfo.cedainfoapp.views.host_list',args=(None,))
     try:
@@ -44,6 +48,7 @@ def host_detail(request, host_id):
        
 
 # search by dataentity_id for DataEntity objects (their internal id field is distinct from the MOLES dataentity_id field which links them to the MOLES catalogue)
+@login_required()
 def dataentity_search(request):
     query = request.GET.get('q', '')
     if query:
@@ -56,10 +61,11 @@ def dataentity_search(request):
 	results = DataEntity.objects.filter(qset).distinct()
     else:
         results = []
-    return render_to_response('cedainfoapp/search_dataentity.html', {"results" : results, "query": query})
+    return render_to_response('cedainfoapp/search_dataentity.html', {"results" : results, "query": query, "user": request.user})
 
 # find a dataentity & go straight to it
 # TODO : handle things better when we can't find it
+@login_required()
 def dataentity_find(request, dataentity_id):
     url=reverse('cedainfo.cedainfoapp.views.dataentity_search')
     if dataentity_id:
@@ -80,6 +86,7 @@ def dataentity_find(request, dataentity_id):
     return render_to_response('cedainfoapp/edit_dataentity.html', {'dataentity': dataentity, 'form': form} )
 
 # Edit a dataentity
+@login_required()
 def dataentity_detail_form(request, id):
     url=reverse('cedainfo.cedainfoapp.views.dataentity_search')
     try:
@@ -97,11 +104,12 @@ def dataentity_detail_form(request, id):
 
 
 # Add a new dataentity
+@login_required()
 def dataentity_add(request, dataentity_id):
     if (dataentity_id==''):
         # blank id ...can't make a new dataentity object
        message="Unable to create dataentity with blank dataentity_id. Add a string to the end of the URL representing the id, e.g. .../dataentity/add/newid"
-       return render_to_response('error.html',{'message':message})
+       return render_to_response('error.html',{'message':message, 'user': request.user})
     else:  
         # make a new dataentity using this new id
         dataentity = DataEntity(dataentity_id=dataentity_id, access_status=AccessStatus.objects.get(pk=2) ) # TODO : add defaults / dummy values...
@@ -112,8 +120,9 @@ def dataentity_add(request, dataentity_id):
                 form.save()
         else:
             form = DataEntityForm(instance=dataentity)
-        return render_to_response('cedainfoapp/edit_dataentity.html', {'dataentity': dataentity, 'form': form} )
+        return render_to_response('cedainfoapp/edit_dataentity.html', {'dataentity': dataentity, 'form': form, 'user': request.user} )
 
+@login_required()
 def dataentity_list(request):
     o = request.GET.get('o', 'id') # default order is ascending id
     qs = DataEntity.objects.order_by(o)
@@ -125,6 +134,7 @@ def dataentity_list(request):
         template_object_name = "dataentity",
     )    
 
+@login_required()
 def dataentities_for_review(request):
     o = request.GET.get('o', 'next_review') # default order is ascending next_review (date)
     qs = DataEntity.objects.filter(review_status="to be reviewed").order_by(o)
@@ -136,6 +146,7 @@ def dataentities_for_review(request):
         template_object_name = "dataentity",
     )    
 
+@login_required()
 def services_by_rack(request, rack_id):
     # show a rack, show hosts within rack, show virtual hosts within hypervisor hosts, services within hosts ...sort of deployment diagram
     # Create a data structure to hold hierarchical structure:
@@ -159,12 +170,14 @@ def services_by_rack(request, rack_id):
             # look for services that belong to this vm
             services_by_host[vm] = Service.objects.filter(host=vm)
 
-    return render_to_response('cedainfoapp/services_view.html', {'rack': rack, 'all_racks': all_racks, 'hosts': hosts, 'services_by_host': services_by_host, 'vms_by_hypervisor': vms_by_hypervisor} )
+    return render_to_response('cedainfoapp/services_view.html', {'user': request.user, 'rack': rack, 'all_racks': all_racks, 'hosts': hosts, 'services_by_host': services_by_host, 'vms_by_hypervisor': vms_by_hypervisor} )
 
+@login_required()
 def home(request):
     # Home page view
-    return render_to_response('cedainfoapp/home.html', )
+    return render_to_response('cedainfoapp/home.html', {'user': request.user})
 
+@login_required()
 def fileset_list(request):
     '''Barebones list of filesets'''
     o = request.GET.get('o', 'id') # default order is ascending id
@@ -185,6 +198,7 @@ def fileset_list(request):
         extra_context = {"totaldu" : totaldu, "totalalloc" : totalalloc}
     )
 
+@login_required()
 def underallocated_fs(request):
     qs = FileSet.objects.all()
     filesets = []
@@ -195,7 +209,7 @@ def underallocated_fs(request):
     return render_to_response('cedainfoapp/underallocated.html', 
            {'filesets': filesets})  
 
-    
+@login_required()    
 def partition_list(request):
     o = request.GET.get('o', 'id') # default order is ascending id
     partfilter = request.GET.get('filter', None) # default order is ascending id
@@ -220,9 +234,9 @@ def partition_list(request):
     else: filtered_partitions = partitions
            
     # Use the object_list view.
-    return render_to_response('cedainfoapp/partition_list.html', {'partitions': filtered_partitions,})    
+    return render_to_response('cedainfoapp/partition_list.html', {'partitions': filtered_partitions,'user': request.user})    
 
-    
+@login_required()    
 def nodelist(request):
     hostlist_list = HostList.objects.all()
     for hostlist in hostlist_list:
@@ -249,6 +263,7 @@ def nodelist(request):
 
     return render_to_response('cedainfoapp/nodelist_view.txt', {'hostlist_list': hostlist_list, 'racklist_list': racklist_list}, mimetype="text/plain")  
 
+@login_required()
 def partition_vis(request, id):
     part = Partition.objects.get(pk=id)
     filesets = FileSet.objects.filter(partition=part)
@@ -262,18 +277,20 @@ def partition_vis(request, id):
 
     
 # do df for a partition and redirect back to partitions list
+@login_required()
 def df(request, id):
     part = Partition.objects.get(pk=id)
     part.df()
     return redirect(request.META['HTTP_REFERER'])
 
 # do du for a fileset and redirect back to fileset list
+@login_required()
 def du(request, id):
     fileset = FileSet.objects.get(pk=id)
     fileset.du()
     return redirect(request.META['HTTP_REFERER'])
 
-
+@login_required()
 def markcomplete(request, id):
     fileset = FileSet.objects.get(pk=id)
     confirm = request.GET.get('confirm', None) 
@@ -286,13 +303,15 @@ def markcomplete(request, id):
         return render_to_response('cedainfoapp/fileset_markcomplete.html', {'fileset': fileset})  
  
 
-# do allocation of a fileset to a partition 
+# do allocation of a fileset to a partition
+@login_required() 
 def allocate(request, id):
     fs = FileSet.objects.get(pk=id)
     fs.allocate()
     return redirect(request.META['HTTP_REFERER'])
 
 # create storage pot and link archive 
+@login_required()
 def makespot(request, id):
     fs = FileSet.objects.get(pk=id)
     error = fs.make_spot()
@@ -301,7 +320,8 @@ def makespot(request, id):
     else:
         return redirect(request.META['HTTP_REFERER'])
         
-# create storage pot and link archive 
+# create storage pot and link archive
+@login_required() 
 def storagesummary(request):
     parts = Partition.objects.all()
     sumtable = [{'status':'Blank',      'npart':0, 'used':0, 'allocated':0, 'allocused':0, 'sec_allocated':0, 'sec_allocused':0, 'capacity':0},
@@ -332,14 +352,15 @@ def storagesummary(request):
 	sumtable[6]["sec_allocused"] += part.secondary_used_by_filesets()
 	sumtable[6]["capacity"] += part.capacity_bytes
  
-    return render_to_response('cedainfoapp/sumtable.html', {'sumtable':sumtable})  
+    return render_to_response('cedainfoapp/sumtable.html', {'sumtable':sumtable, 'user':request.user})  
 
-
+@login_required()
 def storaged_spotlist(request):
 #    filesets = FileSet.objects.filter(logical_path__startswith='/badc')
     filesets = FileSet.objects.filter(sd_backup=True, storage_pot__isnull=False ).exclude(storage_pot='')
     return render_to_response('cedainfoapp/storage-d_spotlist.html', {'filesets':filesets}, mimetype="text/plain")  
 
+@login_required()
 def detailed_spotlist(request):
     '''detailed table of spots including latest FSSM for each one'''
     filesets = FileSet.objects.filter(sd_backup=True, storage_pot__isnull=False ).exclude(storage_pot='')
@@ -353,6 +374,7 @@ def detailed_spotlist(request):
     return render_to_response('cedainfoapp/detailed_spotlist.html', {'filesets':filesets}, mimetype="text/plain")  
     
 # make list of rsync commands for makeing a secondary copies
+@login_required()
 def make_secondary_copies(request):
     filesets = FileSet.objects.all()
     output = ''
@@ -361,7 +383,8 @@ def make_secondary_copies(request):
 	 if rsynccmd: output = "%s%s\n" % (output,rsynccmd)	
     return render_to_response('cedainfoapp/make_secondary_copies.txt', {'cmds':output}, mimetype="text/plain")  
 	
-# create ftp mount script for a host - chroot jail mounting 
+# create ftp mount script for a host - chroot jail mounting
+@login_required() 
 def ftpmount_script(request, host):
     host = Host.objects.get(hostname=host)
     mounts = host.ftpmountpoints
@@ -402,7 +425,8 @@ def ftpmount_script(request, host):
 	'mountlinks': mountlinks,
 	 }, mimetype="text/plain")  
 
-# create auto mount script for a host 
+# create auto mount script for a host
+@login_required() 
 def automount_script(request, host):
     host = Host.objects.get(hostname=host)
     mounts = host.mountpoints
@@ -443,7 +467,8 @@ def automount_script(request, host):
         'filesets':filesets,
         'automount_partitions':automount_partitions,
 	 }, mimetype="text/plain")
-     
+
+@login_required()     
 def makeaudit(request, id):
     '''Make an audit for a fileset'''
     fileset = FileSet.objects.get(pk=id)
