@@ -41,10 +41,10 @@ def host_detail(request, host_id):
        host = get_object_or_404(Host, pk=host_id)
        services = Service.objects.filter(host=host)
        history = HostHistory.objects.filter(host=host)
-       return render_to_response('cedainfoapp/host_detail.html', {'host': host, 'services': services, 'history': history})
+       return render_to_response('cedainfoapp/host_detail.html', {'host': host, 'services': services, 'history': history,'user':request.user})
     except:
        message="Unable to find host with id='%s'"%(host_id)
-       return render_to_response('error.html',{'message':message,'url':url})
+       return render_to_response('error.html',{'message':message,'url':url,'user':request.user})
        
 
 # search by dataentity_id for DataEntity objects (their internal id field is distinct from the MOLES dataentity_id field which links them to the MOLES catalogue)
@@ -83,7 +83,7 @@ def dataentity_find(request, dataentity_id):
         message="Unable to find dataentity %s"%(dataentity_id)
         return render_to_response('error.html',{'message':message,'url':url})
 
-    return render_to_response('cedainfoapp/edit_dataentity.html', {'dataentity': dataentity, 'form': form} )
+    return render_to_response('cedainfoapp/edit_dataentity.html', {'dataentity': dataentity, 'form': form,'user':request.user} )
 
 # Edit a dataentity
 @login_required()
@@ -97,10 +97,10 @@ def dataentity_detail_form(request, id):
 	     form.save()
        else:
           form = DataEntityForm(instance=dataentity)
-       return render_to_response('cedainfoapp/edit_dataentity.html', {'dataentity': dataentity, 'form': form} )
+       return render_to_response('cedainfoapp/edit_dataentity.html', {'dataentity': dataentity, 'form': form,'user':request.user} )
     except:
        message="Unable to find dataentity with id=%s"%(id)
-       return render_to_response('error.html',{'message':message,'url':url})
+       return render_to_response('error.html',{'message':message,'url':url,'user':request.user})
 
 
 # Add a new dataentity
@@ -207,7 +207,7 @@ def underallocated_fs(request):
         lastsize = fs.last_size() 
         if lastsize and (lastsize.size > fs.overall_final_size): filesets.append(fs)
     return render_to_response('cedainfoapp/underallocated.html', 
-           {'filesets': filesets})  
+           {'filesets': filesets,'user':request.user})  
 
 @login_required()    
 def partition_list(request):
@@ -261,7 +261,7 @@ def nodelist(request):
         racklist.memberstring = (" ").join(mylist)
 
 
-    return render_to_response('cedainfoapp/nodelist_view.txt', {'hostlist_list': hostlist_list, 'racklist_list': racklist_list}, mimetype="text/plain")  
+    return render_to_response('cedainfoapp/nodelist_view.txt', {'hostlist_list': hostlist_list, 'racklist_list': racklist_list,'user':request.user}, mimetype="text/plain")  
 
 @login_required()
 def partition_vis(request, id):
@@ -300,7 +300,7 @@ def markcomplete(request, id):
 	fileset.save()
 	return redirect('/admin/cedainfoapp/fileset/%s' %id)
     else:
-        return render_to_response('cedainfoapp/fileset_markcomplete.html', {'fileset': fileset})  
+        return render_to_response('cedainfoapp/fileset_markcomplete.html', {'fileset': fileset,'user':request.user})  
  
 
 # do allocation of a fileset to a partition
@@ -316,7 +316,7 @@ def makespot(request, id):
     fs = FileSet.objects.get(pk=id)
     error = fs.make_spot()
     if error: 
-        return render_to_response('cedainfoapp/spotcreationerror.html', {'error':error})  
+        return render_to_response('cedainfoapp/spotcreationerror.html', {'error':error,'user':request.user})  
     else:
         return redirect(request.META['HTTP_REFERER'])
         
@@ -358,7 +358,7 @@ def storagesummary(request):
 def storaged_spotlist(request):
 #    filesets = FileSet.objects.filter(logical_path__startswith='/badc')
     filesets = FileSet.objects.filter(sd_backup=True, storage_pot__isnull=False ).exclude(storage_pot='')
-    return render_to_response('cedainfoapp/storage-d_spotlist.html', {'filesets':filesets}, mimetype="text/plain")  
+    return render_to_response('cedainfoapp/storage-d_spotlist.html', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
 
 @login_required()
 def detailed_spotlist(request):
@@ -371,7 +371,7 @@ def detailed_spotlist(request):
             fs.latest_size = fssms[len(fssms)-1]
         else:
             fs.latest_suze = 0
-    return render_to_response('cedainfoapp/detailed_spotlist.html', {'filesets':filesets}, mimetype="text/plain")  
+    return render_to_response('cedainfoapp/detailed_spotlist.html', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
     
 # make list of rsync commands for makeing a secondary copies
 @login_required()
@@ -381,7 +381,7 @@ def make_secondary_copies(request):
     for f in filesets:
          rsynccmd = f.secondary_copy_command()
 	 if rsynccmd: output = "%s%s\n" % (output,rsynccmd)	
-    return render_to_response('cedainfoapp/make_secondary_copies.txt', {'cmds':output}, mimetype="text/plain")  
+    return render_to_response('cedainfoapp/make_secondary_copies.txt', {'cmds':output,'user':request.user}, mimetype="text/plain")  
 	
 # create ftp mount script for a host - chroot jail mounting
 @login_required() 
@@ -421,6 +421,7 @@ def ftpmount_script(request, host):
 	
     return render_to_response('cedainfoapp/ftpmountscript.html', {'host':host, 
         'filesets':filesets,
+	'user':request.user,
         'ftpmount_partitions':ftpmount_partitions,
 	'mountlinks': mountlinks,
 	 }, mimetype="text/plain")  
@@ -465,6 +466,7 @@ def automount_script(request, host):
            
     return render_to_response('cedainfoapp/mountscript.html', {'host':host, 
         'filesets':filesets,
+	'user':request.user,
         'automount_partitions':automount_partitions,
 	 }, mimetype="text/plain")
 

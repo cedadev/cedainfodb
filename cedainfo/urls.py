@@ -27,6 +27,11 @@ urlpatterns = patterns('',
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root':settings.MEDIA_ROOT,'show_indexes': True}),
     # views
     # home page
+    
+    # login/logout      
+    (r'^accounts/login/$', 'django.contrib.auth.views.login'), 
+    (r'^accounts/logout/$', 'django.contrib.auth.views.logout_then_login'), 
+
     (r'^$', home),
     (r'^home/$', home),
     #  - hosts
