@@ -26,6 +26,7 @@ urlpatterns = patterns('',
      url(r'^dataset/details/(?P<datasetid>.+)/$', dataset_details),     
      url(r'^authorise/(?P<userkey>\d{1,6})/$', authorise_datasets),
      url(r'^udj/(?P<id>\d{1,6})/$', edit_user_dataset_join),
+     url(r'^request/(?P<id>\d{1,6})/$', edit_dataset_request),
 
 #     url(r'^pending/$', list_pending_datasets),
 )

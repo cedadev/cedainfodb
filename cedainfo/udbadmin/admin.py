@@ -18,7 +18,13 @@ class DatasetjoinAdmin(admin.ModelAdmin):
    def has_delete_permission(self, request, obj=None):
        return False
 
-   list_display = ('userkey', 'datasetid', 'ver', 'research')
+   def editLink(self):
+      url = "/%s/udj/%s" % (self._meta.app_label, self.id)
+      return mark_safe('<a href="%s">Edit</a>' % url)
+   editLink.allow_tags = True
+   editLink.short_description = 'Edit'
+
+   list_display = (editLink, 'userkey', 'datasetid', 'ver', 'research')
    list_filter = ('datasetid',)
    readonly_fields = ('datasetid', 'userkey')
    search_fields =['research']
@@ -187,12 +193,22 @@ class DatasetrequestAdmin(admin.ModelAdmin):
       else:
          return "No"
    nerc.admin_order_field = 'nercfunded'
-	 	 	       
-   list_display = ('id', accountidLink, authoriseLink, 'datasetid', requestdate, 'research', nerc, 'status')
+	 
+   def editLink(self):
+      url = "/%s/request/%s" % (self._meta.app_label, self.id)
+      return mark_safe('<a href="%s">Edit</a>' % url)
+   editLink.allow_tags = True
+   editLink.short_description = 'Edit'
+
+   	 	 	       
+   list_display = (editLink, accountidLink, authoriseLink, 'datasetid', requestdate, 'research', nerc, 'status')
    list_filter = ('status', 'nercfunded', 'requestdate', 'datasetid',)
-   readonly_fields = ('id', 'userkey', 'datasetid', 'requestdate', 'research', 'nercfunded', 'fundingtype', 
+
+   readonly_fields = ('id', 'userkey', 'datasetid', 'requestdate',  'fromhost', 'status')
+
+   fields = ('id', 'userkey', 'datasetid', 'requestdate', 'research', 'nercfunded', 'fundingtype', 
                      'grantref', 'openpub', 'extrainfo', 'fromhost', 'status')
-		      
+   		      
    search_fields =['research']
 
 admin.site.register(Datasetrequest, DatasetrequestAdmin)

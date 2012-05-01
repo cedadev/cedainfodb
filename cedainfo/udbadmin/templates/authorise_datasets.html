@@ -12,10 +12,10 @@
 <p/>
 <table border="1" cellspacing="5">
 
-<tr><td><b>Userkey:</b></td><td><a href="/admin/udbadmin/user/{{user.userkey}}" title="View/edit user details">{{user.userkey}}</a></td></tr>
-<tr><td><b>Name:</b></td><td>{{ user.displayName }}</td></tr>
-<tr><td><b>AccountID:</b></td><td>{{ user.accountid }}</td></tr>
-<tr><td><b>Start date:</b></td><td>{{ user.startdate }}</td></tr>
+<tr><td><b>Userkey:</b></td><td><a href="/admin/udbadmin/user/{{cedauser.userkey}}" title="View/edit user details">{{cedauser.userkey}}</a></td></tr>
+<tr><td><b>Name:</b></td><td>{{ cedauser.displayName }}</td></tr>
+<tr><td><b>AccountID:</b></td><td>{{ cedauser.accountid }}</td></tr>
+<tr><td><b>Start date:</b></td><td>{{ cedauser.startdate }}</td></tr>
 
 </table>
 
@@ -25,7 +25,7 @@
 <h2>Pending requests</h2>
 
 <font size="1">
-<a href="/admin/udbadmin/datasetrequest/?userkey={{user.userkey}}">View all entries in requests table for this user</a>
+<a href="/admin/udbadmin/datasetrequest/?userkey={{cedauser.userkey}}">View all entries in requests table for this user</a>
 </font>
 {% if requests %}
 
@@ -50,7 +50,7 @@
    <tbody>
      {% for request in requests %}
        <tr>
-       <td><a href="/admin/udbadmin/datasetrequest/{{ request.id|escape }}" title="Click to view request details">{{ request.id }}</a></td>
+       <td><a href="/udbadmin/request/{{ request.id|escape }}" title="Click to view request details">{{ request.id }}</a></td>
        <td>{{ request.requestdate|date:"d-M-Y" }}</td>
        <td><a href="{{ request.datasetid.get_absolute_url|escape }}" title="Click to view dataset details">{{ request.datasetid|escape }}</a></td>
 

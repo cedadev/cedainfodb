@@ -1,0 +1,49 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>Edit dataset request</h1>
+<p/>
+<table border="1" cellspacing="5">
+<tr><td><b>Userkey:</b></td><td><a href="/admin/udbadmin/user/{{cedauser.userkey}}" title="View/edit user details">{{cedauser.userkey}}</a></td></tr>
+<tr><td><b>Name:</b></td><td>{{ cedauser.displayName }}</td></tr>
+<tr><td><b>AccountID:</b></td><td>{{ cedauser.accountid }}</td></tr>
+<tr><td><b>Start date:</b></td><td>{{ cedauser.startdate }}</td></tr>
+</table>
+
+<p/>
+
+<form method="post">
+
+<table border="1">
+<tr><td><b>ID:</b></td><td>{{datasetRequest.id}}</td></tr>
+<tr><td><b>Dataset:</b></td> <td> <a href="/udbadmin/dataset/details/{{ datasetRequest.datasetid }}" title="View dataset details">{{ datasetRequest.datasetid }}</a> </td></tr>
+<tr><td><b>Request date:</b></td><td><input type="text" name="requestdate" value="{{ datasetRequest.requestdate|date:'Y-m-d'}}" size="11"></td></tr>
+
+  <tr><td><b>Research:</b></td><td><textarea name="research" rows="6" cols="80">{{ datasetRequest.research }}</textarea></td></tr>
+<tr><td><b>Funding type:</b><td>{{myform.fundingtype}}</td></tr>
+<tr><td><b>NERC Funded:</b></td><td>{{ myform.nercfunded }}</td></tr>
+<tr><td><b>Grant reference:</b></td><td><input type="text" name="grantref" value="{{ datasetRequest.grantref }}"></td></tr>
+
+<tr><td><b>Open publication</b></td><td>
+
+{{myform.openpub}}
+
+</td></tr>
+
+
+<tr><td><b>Extra Info:</b></td><td><textarea name="extrainfo" rows="4" cols="80">{{datasetRequest.extrainfo}}</textarea></td></tr>
+
+<tr><td><b>From host:</b><td>{{ datasetRequest.fromhost }}</td></tr>
+<tr><td><b>Status:</b><td>{{ datasetRequest.status }}</td></tr>
+
+</table>
+<p/>
+
+<center>
+<input type="submit" value="Update">
+</center>
+</form>
+
+
+{% endblock %}

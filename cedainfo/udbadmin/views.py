@@ -86,9 +86,6 @@ def dataset_details(request, datasetid):
 
 @login_required()
 def edit_user_dataset_join (request, id):
-
-   if not request.user.is_authenticated():
-      return HttpResponseRedirect('/admin/login/')
       
    try:
       udj = Datasetjoin.objects.get(id=id) 
@@ -130,3 +127,41 @@ def edit_user_dataset_join (request, id):
 
    return render_to_response('edit_user_dataset_join.html', locals())
 
+
+@login_required()
+def edit_dataset_request (request, id):
+      
+   user = request.user
+      
+   try:
+      datasetRequest = Datasetrequest.objects.get(id=id) 
+      cedauser = datasetRequest.userkey
+   except:
+      return HttpResponse('id %s not found' % id)
+
+   
+   if request.method == 'POST':
+      datasetRequest.research     = request.POST.get('research', '')      
+      datasetRequest.extrainfo    = request.POST.get('extrainfo', '')      
+      datasetRequest.grantref     = request.POST.get('grantref', '')
+      datasetRequest.requestdate  = request.POST.get('requestdate', '')
+      datasetRequest.fundingtype  = request.POST.get('fundingtype', '')
+      datasetRequest.openpub      = request.POST.get('openpub', '')
+      datasetRequest.nercfunded   = int(request.POST.get('nercfunded', 0))         
+      datasetRequest.openpub      = request.POST.get('openpub', '')
+
+      changeendorsedby = request.POST.get('changeendorsedby', '')
+      if changeendorsedby:
+         datasetRequest.endorsedby = changeendorsedby
+	             
+      datasetRequest.save()
+#
+#          For some reason I need to re-read the values in order for the expiredate and endorseddate to show the correct values
+#      
+      datasetRequest = Datasetrequest.objects.get(id=id)    
+
+   myform = DatasetRequestForm(initial={'fundingtype':datasetRequest.fundingtype, 'nercfunded':datasetRequest.nercfunded, 'openpub':datasetRequest.openpub})
+   
+   authorisors = SiteUser.objects.exclude(last_name__exact="").order_by('first_name') 
+
+   return render_to_response('edit_dataset_request.html', locals())

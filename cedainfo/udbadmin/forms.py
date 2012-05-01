@@ -9,6 +9,11 @@ class UdjForm(forms.Form):
    openpub     = ChoiceField(choices=choices.OPEN_PUBLICATION)
    removed     = ChoiceField(choices=((0, "No"), (-1, "Yes")))
 
+class DatasetRequestForm(forms.Form):
+   fundingtype = ChoiceField(choices=choices.FUNDING_TYPES)
+   nercfunded  = ChoiceField(choices=choices.NERC_FUNDED)
+   openpub     = ChoiceField(choices=choices.OPEN_PUBLICATION)
+
 class DatasetForm(ModelForm):
     # customise the form a bit
     comments = CharField(required=False, widget=forms.Textarea(attrs={'rows':'4', 'cols': '50'}))
@@ -18,7 +23,6 @@ class DatasetForm(ModelForm):
     class Meta:
         model = Dataset
 #	fields = ('datasetid', 'authtype', 'grp', 'description', 'directory', 'conditions', 'defaultreglength', 'datacentre', 'infourl', 'comments')
-
 
 class PrivilegeForm(ModelForm):
 

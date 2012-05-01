@@ -100,17 +100,18 @@ def authorise_datasets(request, userkey):
       
    
    try:
-      user = User.objects.get(userkey=userkey)
+      cedauser = User.objects.get(userkey=userkey)
    except:
       return HttpResponse ("No user found with userkey %s" % userkey)
 
-   datasets=user.datasetjoin_set.all().filter(removed__exact=0).order_by('datasetid')
-   removed_datasets=user.datasetjoin_set.all().filter(removed__exact=-1).order_by('datasetid')
+   datasets=cedauser.datasetjoin_set.all().filter(removed__exact=0).order_by('datasetid')
+   removed_datasets=cedauser.datasetjoin_set.all().filter(removed__exact=-1).order_by('datasetid')
 
-   requests = user.datasetRequests(status='pending')
+   requests = cedauser.datasetRequests(status='pending')
 
    authorisors = SiteUser.objects.all()
 
+   user = request.user
    return render_to_response('authorise_datasets.html', locals())
 
       
