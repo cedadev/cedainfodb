@@ -1,3 +1,8 @@
+<SCRIPT LANGUAGE="JavaScript" SRC="/static/javascript/calendar/CalendarPopup.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/static/javascript/calendar/AnchorPosition.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/static/javascript/calendar/date.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/static/javascript/calendar/PopupWindow.js"></SCRIPT>
+
 {% extends "base_site.html" %}
 
 {% block content %}
@@ -15,10 +20,18 @@
 
 <form method="post">
 
+<SCRIPT LANGUAGE="JavaScript" ID="jscal1x">
+   var cal1x = new CalendarPopup();
+</SCRIPT>
+
 <table border="1">
 <tr><td><b>ID:</b></td><td>{{datasetRequest.id}}</td></tr>
 <tr><td><b>Dataset:</b></td> <td> <a href="/udbadmin/dataset/details/{{ datasetRequest.datasetid }}" title="View dataset details">{{ datasetRequest.datasetid }}</a> </td></tr>
-<tr><td><b>Request date:</b></td><td><input type="text" name="requestdate" value="{{ datasetRequest.requestdate|date:'Y-m-d'}}" size="11"></td></tr>
+<tr><td><b>Request date:</b></td><td>
+<input type="text" name="requestdate" value="{{ datasetRequest.requestdate|date:'d/m/Y'}}" size="11">
+<A HREF="#" onClick="cal1x.select(document.forms[0].requestdate,'anchor1x','dd/MM/yyyy'); return false;"  NAME="anchor1x" ID="anchor1x">Choose date</A>
+
+</td></tr>
 
   <tr><td><b>Research:</b></td><td><textarea name="research" rows="6" cols="80">{{ datasetRequest.research }}</textarea></td></tr>
 <tr><td><b>Funding type:</b><td>{{myform.fundingtype}}</td></tr>

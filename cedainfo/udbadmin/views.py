@@ -144,7 +144,7 @@ def edit_dataset_request (request, id):
       datasetRequest.research     = request.POST.get('research', '')      
       datasetRequest.extrainfo    = request.POST.get('extrainfo', '')      
       datasetRequest.grantref     = request.POST.get('grantref', '')
-      datasetRequest.requestdate  = request.POST.get('requestdate', '')
+      datasetRequest.requestdate  = datetime.strptime(request.POST.get('requestdate'), '%d/%m/%Y')
       datasetRequest.fundingtype  = request.POST.get('fundingtype', '')
       datasetRequest.openpub      = request.POST.get('openpub', '')
       datasetRequest.nercfunded   = int(request.POST.get('nercfunded', 0))         
