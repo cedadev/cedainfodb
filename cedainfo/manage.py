@@ -1,4 +1,4 @@
-#!/usr/local/bin/python2.7
+#!/home/badc/software/infrastructure/cedainfo_releases/venv/bin/python
 from django.core.management import execute_manager
 import imp
 try:

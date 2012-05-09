@@ -93,7 +93,7 @@ class ServiceAdminForm(forms.ModelForm):
 class ServiceAdmin(admin.ModelAdmin):
     form = ServiceAdminForm
     list_display = ('name', 'summary', 'host', 'active')
-    list_editable=('active',)
+#    list_editable=('active',)
     list_filter = ('host', 'active')
     search_fields = ('description', 'name')
     ordering = ('name',)

@@ -50,7 +50,7 @@
    <tbody>
      {% for request in requests %}
        <tr>
-       <td><a href="/udbadmin/request/{{ request.id|escape }}" title="Click to view request details">{{ request.id }}</a></td>
+       <td><a href="/udbadmin/request/{{ request.id|escape }}" title="Click to view or edit request details">{{ request.id }}</a></td>
        <td>{{ request.requestdate|date:"d-M-Y" }}</td>
        <td><a href="{{ request.datasetid.get_absolute_url|escape }}" title="Click to view dataset details">{{ request.datasetid|escape }}</a></td>
 

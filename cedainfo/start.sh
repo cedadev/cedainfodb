@@ -3,7 +3,7 @@
 # Script to start and stop cedainfodb. This is suitable as using as an "init.d" script, but must be run as user 'badc'
 #
 
-PYTHON="/usr/local/bin/python2.7"
+PYTHON="/home/badc/software/infrastructure/cedainfo_releases/venv/bin/python"
 PROJDIR="/home/badc/software/infrastructure/cedainfo/cedainfo"
 PIDFILE="$PROJDIR/cedainfo.pid"
 SOCKET="/var/www/fastcgi/cedadb.sock"
