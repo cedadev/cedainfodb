@@ -96,7 +96,7 @@ class ServiceAdmin(admin.ModelAdmin):
 #    list_editable=('active',)
     list_filter = ('host', 'active')
     search_fields = ('description', 'name')
-    ordering = ('name',)
+    ordering = ('-active', 'name')
     filter_horizontal= ('dependencies',)   
 admin.site.register(Service, ServiceAdmin)
 
