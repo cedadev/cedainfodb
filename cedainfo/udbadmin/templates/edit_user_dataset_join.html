@@ -1,3 +1,9 @@
+<SCRIPT LANGUAGE="JavaScript" SRC="/files/javascript/calendar/CalendarPopup.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/files/javascript/calendar/AnchorPosition.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/files/javascript/calendar/date.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/files/javascript/calendar/PopupWindow.js"></SCRIPT>
+
+{
 {% extends "base_site.html" %}
 
 {% block content %}
@@ -14,6 +20,10 @@
 <p/>
 
 <form method="post">
+
+<SCRIPT LANGUAGE="JavaScript" ID="jscal1x">
+   var cal1x = new CalendarPopup();
+</SCRIPT>
 
 <table border="1">
 <tr><td><b>Dataset:</b></td> <td> <a href="/udbadmin/dataset/details/{{ udj.datasetid }}" title="View dataset details">{{ udj.datasetid }}</a> </td></tr>
@@ -32,7 +42,11 @@
 </td>
 </tr>
   
-<tr><td><b>Endorsed date:</b></td><td><input type="text" name="endorseddate" value="{{udj.endorseddate|date:'Y-m-d   H:i'}}"></td></tr>
+<tr><td><b>Endorsed date:</b></td><td><input type="text" size="11" name="endorseddate" value="{{udj.endorseddate|date:'d/m/Y'}}">
+<A HREF="#" onClick="cal1x.select(document.forms[0].endorseddate,'anchor1x','dd/MM/yyyy'); return false;"  NAME="anchor1x" ID="anchor1x">Choose date</A>
+
+</td></tr>
+
 <tr><td><b>Research:</b></td><td><textarea name="research" rows="4" cols="80">{{ udj.research }}</textarea></td></tr>
 <tr><td><b>Funding type:</b><td>{{myform.fundingtype}}</td></tr>
 <tr><td><b>NERC Funded:</b></td><td>{{ myform.nercfunded }}</td></tr>
@@ -44,7 +58,9 @@
 
 </td></tr>
 
-<tr><td><b>Expire date:</b></td><td><input type="text" name="expiredate" value="{{ udj.expiredate|date:'Y-m-d'}}" size="11"></td></tr>
+<tr><td><b>Expire date:</b></td><td><input type="text" name="expiredate" value="{{ udj.expiredate|date:'d/m/Y'}}" size="11">
+<A HREF="#" onClick="cal1x.select(document.forms[0].expiredate,'anchor1x','dd/MM/yyyy'); return false;"  NAME="anchor1x" ID="anchor1x">Choose date</A>
+</td></tr>
 
 <tr><td><b>Extra Info:</b></td><td><textarea name="extrainfo" rows="4" cols="80">{{udj.extrainfo}}</textarea></td></tr>
 
