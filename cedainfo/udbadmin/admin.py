@@ -101,7 +101,9 @@ class UserAdmin(admin.ModelAdmin):
        a = '<table border="0"><tr><td>'
        a += ' <a href="/%s/user/datasets/current/%s">Current datasets (%s)</a> | ' % (self._meta.app_label, self.userkey, currentDatasets)
        a += ' <a href="/%s/user/datasets/removed/%s">Removed datasets (%s)</a> | ' % (self._meta.app_label, self.userkey, removedDatasets)
-       a += ' <a href="/%s/authorise/%s">Pending datasets (%s)</a>' % (self._meta.app_label, self.userkey, pendingDatasets)
+       a += ' <a href="/%s/authorise/%s">Pending datasets (%s)</a> | ' % (self._meta.app_label, self.userkey, pendingDatasets)
+       a += ' <a href="/%s/user/datasets/add/%s">Add datasets</a>' % (self._meta.app_label, self.userkey)
+       
        a += '</td><td>&nbsp;</td><td><b>User navigation</b>: '
        a += '<a href="/admin/udbadmin/user/%s">First</a> | ' % firstUserkey              
        a += '<a href="/admin/udbadmin/user/%s">Previous</a> | ' % previousUserkey       

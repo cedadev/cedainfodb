@@ -23,6 +23,9 @@ urlpatterns = patterns('',
      url(r'^$', home),     
      url(r'^user/datasets/current/(?P<userkey>\d{1,6})/$', list_current_user_datasets),   
      url(r'^user/datasets/removed/(?P<userkey>\d{1,6})/$', list_removed_user_datasets),        
+
+     url(r'^user/datasets/add/(?P<userkey>\d{1,6})/$', add_user_datasets),        
+
      url(r'^dataset/details/(?P<datasetid>.+)/$', dataset_details),     
      url(r'^authorise/(?P<userkey>\d{1,6})/$', authorise_datasets),
      url(r'^udj/(?P<id>\d{1,6})/$', edit_user_dataset_join),

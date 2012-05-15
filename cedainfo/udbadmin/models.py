@@ -260,15 +260,15 @@ class Datasetjoin(models.Model):
     endorsedby = models.CharField(max_length=50)
     endorseddate = models.DateTimeField()
     research = models.CharField(max_length=1500)
-    nercfunded = models.IntegerField()
-    removed = models.IntegerField()
+    nercfunded = models.IntegerField(default=0)
+    removed = models.IntegerField(default=0)
     removeddate = models.DateTimeField()
     fundingtype = models.CharField(max_length=40, choices=choices.FUNDING_TYPES)
     grantref = models.CharField(max_length=40)
     openpub = models.CharField(max_length=1) # This field type is a guess.
     extrainfo = models.CharField(max_length=3000)
     expiredate = models.DateTimeField()
-    
+	        
     def removeDataset(self):
        self.removed = -1
        self.removeddate = datetime.now(timezone('Europe/London'))

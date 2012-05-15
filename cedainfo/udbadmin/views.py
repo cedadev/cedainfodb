@@ -3,6 +3,8 @@ from django.shortcuts import *
 from django.contrib.auth.models import User as SiteUser
 from django.contrib.auth.decorators import login_required
 
+from dateutil.relativedelta import relativedelta
+
 from udbadmin.models import *
 from udbadmin.forms import *
 from udbadmin.SortHeaders import SortHeaders
@@ -86,10 +88,12 @@ def dataset_details(request, datasetid):
 
 @login_required()
 def edit_user_dataset_join (request, id):
-      
+
+   user = request.user  
+         
    try:
       udj = Datasetjoin.objects.get(id=id) 
-      user = udj.userkey
+      cedauser = udj.userkey
    except:
       return HttpResponse('id %s not found' % id)
 
@@ -165,3 +169,31 @@ def edit_dataset_request (request, id):
    authorisors = SiteUser.objects.exclude(last_name__exact="").order_by('first_name') 
 
    return render_to_response('edit_dataset_request.html', locals())
+
+
+@login_required()
+def add_user_datasets(request, userkey):
+
+   user        = request.user
+   cedauser    = User.objects.get(userkey=userkey)
+   
+   authorisors = SiteUser.objects.exclude(last_name__exact="").order_by('first_name') 
+   datasets = Dataset.objects.all()
+      
+   if request.method == 'POST':
+     
+      datasetid = request.POST.get('datasetid', '') 
+      
+      if datasetid:
+	 dataset   = Dataset.objects.get(datasetid=datasetid)
+	 expireDate = datetime.now() + relativedelta(months=dataset.defaultreglength)
+
+	 endorsedby = request.POST.get('endorsedby', '')  
+
+	 version = Datasetjoin.objects.getDatasetVersion(userkey, datasetid) 
+	 udj = Datasetjoin(userkey=cedauser, datasetid=dataset, ver=version, endorsedby=endorsedby, expiredate=expireDate, endorseddate=datetime.now(timezone('Europe/London')))
+	 udj.save()
+
+         return redirect ('/udbadmin/udj/%s' % udj.id)
+	 
+   return render_to_response('add_user_dataset.html', locals())
