@@ -94,7 +94,7 @@ class ServiceAdmin(admin.ModelAdmin):
     form = ServiceAdminForm
     list_display = ('name', 'summary', 'host', 'active')
 #    list_editable=('active',)
-    list_filter = ('host', 'active')
+    list_filter = ('externally_visible', 'active', 'host')
     search_fields = ('description', 'name')
     ordering = ('-active', 'name')
     filter_horizontal= ('dependencies',)   
@@ -166,6 +166,8 @@ class FileSetAdmin(admin.ModelAdmin):
     list_display = ('logical_path', niceOverallFinalSize, 'partition', 'partition_display',
         'spot_display','status','last_size','responsible','links',)
     list_filter = ('partition',)
+    
+    ordering = ('-id',)
     readonly_fields = ('partition',
 #        'migrate_to', 
         'storage_pot', 'complete', 'complete_date', niceOverallFinalSize)
