@@ -25,11 +25,8 @@ class Programme(models.Model):
     startDate = models.DateField(blank=True, null=True)
     endDate = models.DateField(blank=True, null=True)
     state = models.CharField(max_length=200, blank=True, null=True,
-        choices=(("UA","Unassessed"),
-                 ("OOS","Out of Scope"),
-                 ("A","Assessed"),
-                 ("S","Scoping"),
-                 ("T", "Tracking"),
+        choices=(("New","New"),
+                 ("Active","Active"),
                  ("C","Complete")))
     dataCentre = models.CharField(max_length=20, blank=True, null=True,
         choices=(("BADC","BADC"),
@@ -146,9 +143,13 @@ class Project(models.Model):
     thirdpartydata = models.TextField(blank=True, null=True)
     services = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=200, blank=True, null=True,
-            choices=(("Not scoped","Not scoped"),
-                 ("Scoping","Scoping"),
+            choices=(("Proposal","Proposal"),
+                 ("NotFunded","Not Funded"),
+                 ("NotStarted","NotStarted"),
                  ("Active","Active"),
+                 ("NoData","NoData"),
+                 ("EndedWithDataToCome","Ended with data to come"),
+                 ("Defaulted","Defaulted"),
                  ("Complete","Complete")))
     added = models.DateTimeField(auto_now_add=True)
     prog = models.ForeignKey(Programme)
