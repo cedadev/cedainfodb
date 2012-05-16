@@ -4,16 +4,9 @@
 
 <h1>Add dataset</h1>
 
+{% include "userinfo.html" %}
 
-<p/>
-<table border="1" cellspacing="5">
-<tr><td><b>Userkey:</b></td><td><a href="/admin/udbadmin/user/{{cedauser.userkey}}" title="View/edit user details">{{cedauser.userkey}}</a></td></tr>
-<tr><td><b>Name:</b></td><td>{{ cedauser.displayName }}</td></tr>
-<tr><td><b>AccountID:</b></td><td>{{ cedauser.accountid }}</td></tr>
-<tr><td><b>Start date:</b></td><td>{{ cedauser.startdate }}</td></tr>
-</table>
 
-<p/>
 
 This form allows you to add a dataset directly to a user's account without going through the dataset registration 
 process.

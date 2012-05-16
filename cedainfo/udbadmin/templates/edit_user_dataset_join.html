@@ -8,15 +8,9 @@
 {% block content %}
 
 <h1>Edit datasest registration information</h1>
-<p/>
-<table border="1" cellspacing="5">
-<tr><td><b>Userkey:</b></td><td><a href="/admin/udbadmin/user/{{cedauser.userkey}}" title="View/edit user details">{{cedauser.userkey}}</a></td></tr>
-<tr><td><b>Name:</b></td><td>{{ cedauser.displayName }}</td></tr>
-<tr><td><b>AccountID:</b></td><td>{{ cedauser.accountid }}</td></tr>
-<tr><td><b>Start date:</b></td><td>{{ cedauser.startdate }}</td></tr>
-</table>
 
-<p/>
+{% include "userinfo.html" %}
+
 
 <form method="post">
 

@@ -192,6 +192,15 @@ class User (models.Model):
 	   
         return datasets
 
+    def currentDatasets(self):
+       return self.datasets(removed=False)
+
+    def removedDatasets(self):
+       return self.datasets(removed=True)
+        
+    def pendingDatasets(self):
+       return self.datasetRequests(status='pending')
+       	
     def datasetCount(self, removed=False):
     
        return len(self.datasets(removed=removed))
