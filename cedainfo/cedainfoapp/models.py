@@ -108,17 +108,16 @@ class Partition(models.Model):
         """Report disk usage.
            Return a dictionary with total, used, available. Sizes are reported
            in blocks of 1024 bytes."""
-        if os.path.ismount(os.path.realpath(self.mountpoint)):
-            output = subprocess.Popen(['/bin/df', '-B 1024', self.mountpoint],
-                                     stdout=subprocess.PIPE).communicate()[0]
-            lines = output.split('\n')
-	    if len(lines) == 3: dev, blocks_total, blocks_used, blocks_available, used, mount = lines[1].split()
-	    if len(lines) == 4: blocks_total, blocks_used, blocks_available, used, mount = lines[2].split()
-            self.capacity_bytes = int(blocks_total)*1024
-            self.used_bytes = int(blocks_used)*1024
-	    self.last_checked = datetime.now()
-	    self.save() 
-        return      
+        output = subprocess.Popen(['/bin/df', '-B 1024', self.mountpoint],
+                                 stdout=subprocess.PIPE).communicate()[0]
+        lines = output.split('\n')
+	if len(lines) == 3: dev, blocks_total, blocks_used, blocks_available, used, mount = lines[1].split()
+	if len(lines) == 4: blocks_total, blocks_used, blocks_available, used, mount = lines[2].split()
+        self.capacity_bytes = int(blocks_total)*1024
+        self.used_bytes = int(blocks_used)*1024
+	self.last_checked = datetime.now()
+	self.save() 
+              
 
     def exists(self):
         return os.path.ismount(self.mountpoint)  
@@ -553,7 +552,7 @@ class FileSet(models.Model):
     
     def du(self):
         '''Report disk usage of FileSet by creating as FileSetSizeMeasurement.'''
-        if self.spot_exists() and os.path.ismount(os.path.realpath(self.partition.mountpoint)):
+        if self.spot_exists():
             output = subprocess.Popen(['/usr/bin/du', '-sk', self.storage_path()],stdout=subprocess.PIPE).communicate()[0]
             lines = output.split('\n')
             if len(lines) == 2: size, path = lines[0].split()
