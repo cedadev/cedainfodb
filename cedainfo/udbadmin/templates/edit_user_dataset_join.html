@@ -3,7 +3,6 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/files/javascript/calendar/date.js"></SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/files/javascript/calendar/PopupWindow.js"></SCRIPT>
 
-{
 {% extends "base_site.html" %}
 
 {% block content %}
@@ -11,10 +10,10 @@
 <h1>Edit datasest registration information</h1>
 <p/>
 <table border="1" cellspacing="5">
-<tr><td><b>Userkey:</b></td><td><a href="/admin/udbadmin/user/{{user.userkey}}" title="View/edit user details">{{user.userkey}}</a></td></tr>
-<tr><td><b>Name:</b></td><td>{{ user.displayName }}</td></tr>
-<tr><td><b>AccountID:</b></td><td>{{ user.accountid }}</td></tr>
-<tr><td><b>Start date:</b></td><td>{{ user.startdate }}</td></tr>
+<tr><td><b>Userkey:</b></td><td><a href="/admin/udbadmin/user/{{cedauser.userkey}}" title="View/edit user details">{{cedauser.userkey}}</a></td></tr>
+<tr><td><b>Name:</b></td><td>{{ cedauser.displayName }}</td></tr>
+<tr><td><b>AccountID:</b></td><td>{{ cedauser.accountid }}</td></tr>
+<tr><td><b>Start date:</b></td><td>{{ cedauser.startdate }}</td></tr>
 </table>
 
 <p/>
@@ -67,7 +66,15 @@
 
 
    <tr><td><b>Removed</b></td><td>{{ myform.removed }}
-&nbsp; <b>Date removed:</b> {{udj.removeddate|date:'Y-m-d   H:i'}}</td></tr>
+&nbsp; 
+
+{% if udj.removed %}
+   <b>Date removed:</b> {{udj.removeddate|date:'Y-m-d   H:i'}}
+{% else %}
+   To remove access to this dataset select "yes" then press "update"
+{% endif %}
+
+</td></tr>
 </table>
 <p/>
 
