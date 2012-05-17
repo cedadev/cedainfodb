@@ -63,16 +63,21 @@ class Programme(models.Model):
 
     def pstatus(self):
         # summary status of all projects in programme
-        pstate = { "Not scoped": 0,
-                   "Scoping": 0,
+        pstate = { "Unknown": 0,
+                   "Proposal": 0,
+                   "NotFunded": 0,
+                   "NotStarted": 0,
                    "Active": 0,
+                   "NoData": 0,
+                   "EndedWithDataToCome": 0,
 		   "Overdue": 0,
+		   "Defaulted": 0,
                    "Complete": 0}
         for p in Project.objects.filter(prog__id=self.id):
 	    startdate = p.startdate
 	    enddate   = p.enddate
 	    status    = p.status
-            if status == None: status ="Not scoped"
+            if status == None: status ="Unknown"
 	    if startdate == None: startdate = datetime.date(1980,1,1)
 	    if enddate == None: enddate = datetime.date(1980,1,1)
 	    if enddate < datetime.date.today() and status == "Active": status = "Overdue"
@@ -222,9 +227,11 @@ class DataProduct(models.Model):
     proj = models.ForeignKey(Project)
     added = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=200, blank=True, null=True,
-            choices=( ("In Progress","In Progress"),
-                 ("Archived","Archived"),
-                 ("Not Archived","Not going to archive")))
+            choices=( ("WithProjectTeam","With Project Team"),
+                 ("Ingesting","Ingesting"),
+                 ("Archived","Archived and complete"),
+                 ("Defaulted","Defaulted - not archived due to project not supplying data"),
+                 ("NotArchived","Not going to archive - planned")))
     
     def __unicode__(self):
         return "%s" % self.DPT

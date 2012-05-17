@@ -8,7 +8,9 @@ from django.contrib import admin
 
 class DataProductAdmin(admin.ModelAdmin):
     save_on_top = True
-    list_display = ('DPT', 'proj')
+    list_display = ('DPT', 'proj', 'status')
+    search_fields = ('DPT', 'contact')
+    list_filter = ('status','proj')
 
     def render_change_form(self, request, context, *args, **kwargs):
         # this custom functions allows extra context info to be added to the
@@ -34,8 +36,9 @@ admin.site.register(DataProduct, DataProductAdmin)
 
 class ProjectAdmin(admin.ModelAdmin):
     save_on_top = True
-    list_display = ('title', 'prog', 'ndata', 'dpstatus')
+    list_display = ('title', 'prog', 'status', 'ndata', 'dpstatus')
     search_fields = ('title', 'desc', 'PI', 'CoI1', 'CoI2')
+    list_filter = ('status','prog')
 
     def render_change_form(self, request, context, *args, **kwargs):
         # this custom functions allows extra context info to be added to the
