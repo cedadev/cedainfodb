@@ -7,6 +7,7 @@ PYTHON="/home/badc/software/infrastructure/cedainfo_releases/venv/bin/python"
 PROJDIR="/home/badc/software/infrastructure/cedainfo/cedainfo"
 PIDFILE="$PROJDIR/cedainfo.pid"
 SOCKET="/var/www/fastcgi/cedadb.sock"
+LOG_DIR="/var/www/cedainfo_site"
 
 APP="cedainfo Django server"
 
@@ -33,7 +34,8 @@ start ()
    
       umask 007
 
-      CMD="$PYTHON manage.py runfcgi socket=$SOCKET daemonize=true pidfile=$PIDFILE"
+      CMD="$PYTHON manage.py runfcgi socket=$SOCKET outlog=$LOG_DIR/django.out errlog=$LOG_DIR/django.err daemonize=true pidfile=$PIDFILE"
+
 #
 #     Run as user 'badc'
 #
