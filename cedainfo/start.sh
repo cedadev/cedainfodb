@@ -7,7 +7,7 @@ PYTHON="/home/badc/software/infrastructure/cedainfo_releases/venv/bin/python"
 PROJDIR="/home/badc/software/infrastructure/cedainfo/cedainfo"
 PIDFILE="$PROJDIR/cedainfo.pid"
 SOCKET="/var/www/fastcgi/cedadb.sock"
-LOG_DIR="/var/www/cedainfo_site"
+LOG_DIR="/var/www/cedainfo_site/logs"
 
 APP="cedainfo Django server"
 
