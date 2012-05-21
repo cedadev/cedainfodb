@@ -108,6 +108,7 @@ def authorise_datasets(request, userkey):
    removed_datasets=cedauser.datasetjoin_set.all().filter(removed__exact=-1).order_by('datasetid')
 
    requests = cedauser.datasetRequests(status='pending')
+   request_history = cedauser.datasetRequests().order_by('-requestdate')
 
    authorisors = SiteUser.objects.all()
 

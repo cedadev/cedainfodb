@@ -201,4 +201,45 @@ or on:
    <blockquote>User has no removed datasets</blockquote>
 {% endif %}
 
+
+<h2>Request history</h2>
+
+
+{% if request_history %}
+
+   History of all requests made by this user, in chronological order (most recent first).
+   <p/>
+
+   <table cellspacing="0" border="1">
+
+   <thead>
+   <tr>
+   <th>RequestID</th>
+   <th>DatasetID</th>
+   <th>Request Date</th>
+   <th>NERC?</th>
+   <th>Research</th>
+   <th>Status</th>
+   </tr>
+   </thead>
+
+   <tbody>
+     {% for request in request_history %}<tr class="{% cycle odd,even %}">
+       <td><a href="/udbadmin/request/{{ request.id|escape }}" title="Click to view or edit request details">{{ request.id }}</a></td>
+       <td><a href="{{ request.datasetid.get_absolute_url|escape }}" title="Click to view dataset details">{{ request.datasetid|escape }}</a></td>
+       <td>{{ request.requestdate|date:"d-M-Y" }}</td>
+       <td>{{ request.nercfunded|yesno:"Yes,No" }}</td>
+       <td>{{ request.research|escape }}</td>
+       <td>{{ request.status|escape }}</td>
+
+     </tr>
+     {% endfor %}
+
+   </tbody>
+   </table>
+{% else %}
+   <blockquote>User has no request history</blockquote>
+{% endif %}
+
+
 {% endblock %}
