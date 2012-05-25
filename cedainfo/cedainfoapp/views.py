@@ -357,8 +357,10 @@ def storagesummary(request):
 @login_required()
 def storaged_spotlist(request):
 #    filesets = FileSet.objects.filter(logical_path__startswith='/badc')
+    withpath = request.GET.get('withpath', None) 
     filesets = FileSet.objects.filter(sd_backup=True, storage_pot__isnull=False ).exclude(storage_pot='')
-    return render_to_response('cedainfoapp/storage-d_spotlist.html', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
+    if withpath != None: return render_to_response('cedainfoapp/storage-d_spotlist_withpath.html', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
+    else: return render_to_response('cedainfoapp/storage-d_spotlist.html', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
 
 @login_required()
 def detailed_spotlist(request):
