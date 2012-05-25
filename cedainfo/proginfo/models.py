@@ -166,15 +166,56 @@ class Project(models.Model):
     def ndata(self):
         return len(DataProduct.objects.filter(proj__id=self.id))
 
+    def data_man_costs(self): 
+	    
+	if self.cost == None: cost =0.0
+	else: cost = self.cost*1000.0
+        (ndpt, nobs, nact, vol) = self.cost_params()
+	costs = {'scoping_tracking': cost * 0.005,
+		 'ingest': ndpt * 4.0,
+		 'volume': vol,
+		 'storage': vol * 700,
+		 'metadata': (ndpt+nobs+nact) *1.0,
+		 'total': 0.0
+		 }
+
+	# daily STFC rates for SLA staff	 
+        dayrate = {'FY2008':500, 'FY2009':394, 'FY2010':406, 'FY2011':418, 
+	           'FY2012':430, 'FY2013':443, 'FY2014':457, 'FY2015':470, 
+	           'FY2016':470, 'FY2017':470,'FY2018':470,}
+
+	profile = {'FY2008':0.0, 'FY2009':0.0, 'FY2010':0.0, 'FY2011':0.0, 
+	           'FY2012':0.0, 'FY2013':0.0, 'FY2014':0.0, 'FY2015':0.0, 
+	           'FY2016':0.0, 'FY2017':0.0, 'FY2018':0.0,  }
+	if self.startdate == None or self.enddate == None: profile={'FY2012':0.0, }
+	else:
+	    totaleffortdays = costs['ingest'] + costs['metadata']
+	    totalother = costs['scoping_tracking']  + costs['storage']
+	    period = self.enddate-self.startdate
+	    # use a uniform profile
+	    print period
+	    for d in range(period.days):
+		day = self.startdate+ datetime.timedelta(d)
+		fyear = day.year
+		if day.month <4: fyear = fyear-1
+		fyear = "FY%s" % fyear
+		dailycost =  totaleffortdays/period.days*dayrate[fyear] + totalother/period.days
+		profile[fyear] = profile[fyear] + dailycost
+		costs['total'] = costs['total'] + dailycost   
+		 
+	costs.update(profile)
+		 
+        return costs		 
+
     def cost_params(self):
-	ndtp, nobs, nact, vol = (0, 0, 1, 0)     
+	ndpt, nobs, nact, vol = (0, 0, 1, 0)     
         for dp in DataProduct.objects.filter(proj__id=self.id):
-	    ndpt = ndtp + 1
+	    ndpt = ndpt + 1
 	    dp_nobs, dp_nact, dp_vol = dp.cost_params()
 	    nobs = nobs + dp_nobs   # sum number of obs stations
 	    nact = nact + dp_nact   # sum number of activities
 	    vol  = vol  + dp_vol    # sum TB of data
-	return (ndtp, nobs, nact, vol) 
+	return (ndpt, nobs, nact, vol) 
     
     def dpstatus(self):
         # summary status of all data products in programme 

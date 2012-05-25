@@ -194,7 +194,7 @@ def prog_cost(request, prog_id):
     costs = p.data_man_costs()
     for proj in projs:
         proj.data_list = DataProduct.objects.filter(proj__id=proj.id)
-    return render_to_response('prog_costs.html', {'prog': p,
+    return render_to_response('prog_costs.html', {'proj': p,
                                                    'notes': n,
 						   'scoping': costs['scoping'],
 						   'tracking': costs['tracking'],
@@ -203,6 +203,19 @@ def prog_cost(request, prog_id):
 						   'metadata': costs['metadata'],
 						   'costs': costs,
                                                    'proj_list': projs})
+
+
+
+
+def proj_cost(request, proj_id):
+    # a costing of a single project
+    p = get_object_or_404(Project, pk=proj_id)
+    costs = p.data_man_costs()
+    return render_to_response('proj_costs.html', {'proj': p,
+						   'costs': costs,
+                                                   })
+
+
 						   
 def prog_help(request, prog_id):
     # help for programmes
