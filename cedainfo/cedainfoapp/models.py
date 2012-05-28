@@ -556,7 +556,8 @@ class FileSet(models.Model):
             output = subprocess.Popen(['/usr/bin/du', '-sk', self.storage_path()],stdout=subprocess.PIPE).communicate()[0]
             lines = output.split('\n')
             if len(lines) == 2: size, path = lines[0].split()
-            fssm = FileSetSizeMeasurement(fileset=self, date=datetime.now(), size=int(size)*1024)
+            nfiles = subprocess.check_output("find %s -type f| wc -l"  % self.storage_path(), shell=True)
+            fssm = FileSetSizeMeasurement(fileset=self, date=datetime.now(), size=int(size)*1024, no_files=int(nfiles))
             fssm.save() 
         return      
 
@@ -714,7 +715,14 @@ class FileSetSizeMeasurement(models.Model):
     size = models.BigIntegerField(help_text="Size in bytes") # in bytes
     no_files = models.BigIntegerField(null=True, blank=True, help_text="Number of files") 
     def __unicode__(self):
-        return u'%s (%s)' % (self.size, self.date)
+        if self.size > 2000000: size =self.size/(1024*1024); unit = "MB"
+        elif self.size > 2000:    size =self.size/(1024); unit = "kB"
+	else:                     size = self.size; unit= "B"
+
+        if self.no_files > 2000000: no_files =self.no_files/(1000*1000); funit = "Mfiles"
+	else:                     no_files = self.no_files; funit= "files"
+	
+        return u'%s %s; %s %s (%s)' % (size, unit, no_files, funit, self.date.strftime("%Y-%m-%d %H:%M"))
         
 
     
