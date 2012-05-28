@@ -2,7 +2,11 @@
 
 {% block content %}
 
-<h1>Dataset details</h1>
+<h1>Dataset details: {{dataset.datasetid}}</h1>
+
+{% include "datasetinfo.html" %}
+
+
 <table border="1">
 <tr><td><b>DatasetID:</b></td> <td>{{ dataset.datasetid }}</td>
 <tr><td><b>Name:</b></td> <td>{{ dataset.description }}</td>

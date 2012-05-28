@@ -18,14 +18,15 @@ class DatasetjoinAdmin(admin.ModelAdmin):
    def has_delete_permission(self, request, obj=None):
        return False
 
+   
    def editLink(self):
       url = "/%s/udj/%s" % (self._meta.app_label, self.id)
       return mark_safe('<a href="%s">Edit</a>' % url)
    editLink.allow_tags = True
    editLink.short_description = 'Edit'
-
-   list_display = (editLink, 'userkey', 'datasetid', 'ver', 'research')
-   list_filter = ('datasetid',)
+   
+   list_display = (editLink, 'userkey', 'datasetid', 'ver', 'research', 'removed')
+   list_filter = ('removed', 'datasetid')
    readonly_fields = ('datasetid', 'userkey')
    search_fields =['research']
 
@@ -44,8 +45,12 @@ class DatasetAdmin(admin.ModelAdmin):
        models.CharField: {'widget': TextInput(attrs={'size':'50'})},
    }
 
+   def showUsers (self):
+      return  mark_safe ('<a href="/udbadmin/dataset/users/%s">Users</a>' % self.datasetid)
+   showUsers.allow_tags = True
+   showUsers.short_description = 'Show users'   
 
-   list_display = ('datasetid', 'authtype', 'grp', 'description', 'datacentre')
+   list_display = ('datasetid', 'authtype', 'grp', 'description', 'datacentre', showUsers)
    list_filter = ('datacentre', 'authtype')
 #   exclude = ('grouptype', 'source', 'ukmoform')
    fields = ('datasetid', 'authtype', 'grp', 'description', 'directory', 'conditions', 'defaultreglength', 'datacentre', 'infourl', 'comments')

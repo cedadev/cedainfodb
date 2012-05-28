@@ -1,0 +1,25 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>List users email for  dataset: {{dataset.datasetid}}</h1>
+
+<p/>
+
+<p/>
+{% include "datasetinfo.html" %}
+<p/>
+<table border="1">
+<tr><td><b>DatasetID:</b></td> <td><a href="/udbadmin/dataset/details/{{dataset.datasetid}}">{{ dataset.datasetid }}</a></td>
+<tr><td><b>Name:</b></td> <td>{{ dataset.description }}</td>
+</table>
+<p/>
+
+
+<b>Number of users:</b> {{ recs|length}}
+<p/>
+{% for rec in recs %}
+    {{rec.userkey__emailaddress}}<br>
+{% endfor %}
+
+{% endblock %}

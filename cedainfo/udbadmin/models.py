@@ -19,7 +19,7 @@ class Dataset(models.Model):
     grouptype = models.CharField(max_length=20)
     description = models.CharField(max_length=100, blank=True)
     source = models.CharField(max_length=50)
-    ukmoform = models.IntegerField()
+    ukmoform = models.IntegerField(default=0)
 #    ordr = models.IntegerField()
     comments = models.CharField(max_length=200, blank=True)
     directory = models.CharField(max_length=100, blank=True)

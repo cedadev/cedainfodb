@@ -1,0 +1,53 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>List users for dataset: {{dataset.datasetid}}</h1>
+<p/>
+{% include "datasetinfo.html" %}
+
+<p/>
+
+<table border="1">
+<tr><td><b>DatasetID:</b></td> <td><a href="/udbadmin/dataset/details/{{dataset.datasetid}}">{{ dataset.datasetid }}</a></td>
+<tr><td><b>Name:</b></td> <td>{{ dataset.description }}</td>
+</table>
+
+<p/>
+
+Number of users: {{ recs|length}}
+
+<p/>
+<table border="1">
+<th>UserKey</th>
+<th>AccountID</th>
+<th>First name</th>
+<th>Surname</th>
+<th>Email</th>
+<th>Institute</th>
+<th>Endorsed</th>
+<th>Expires</th>
+<th>Research</th>
+<th>Details</th>
+{% for rec in recs %}
+   <tr>
+   <td><a href="/admin/udbadmin/user/{{rec.userkey}}">{{ rec.userkey }}</a>
+   <td>{{ rec.userkey.accountid }}
+   <td>{{ rec.userkey.othernames }}
+   <td>{{ rec.userkey.surname }}
+   <td>{{ rec.rar }}
+   <td>{{ rec.userkey.emailaddress }}
+   <td>{{ rec.userkey.institute }}
+   <td>{{ rec.endorseddate|date:'d/m/Y'}}
+   <td>{{ rec.expiredate|date:'d/m/Y' }}
+   <td>{{ rec.research }} 
+   <td><a href="/udbadmin/udj/{{rec.id }}">Details</a>
+
+
+   </tr>
+{% endfor %} 
+
+</table>
+
+
+{% endblock %}

@@ -197,3 +197,42 @@ def add_user_datasets(request, userkey):
          return redirect ('/udbadmin/udj/%s' % udj.id)
 	 
    return render_to_response('add_user_dataset.html', locals())
+
+
+@login_required()
+def list_users_for_dataset(request, datasetid):
+    user = request.user
+
+    try:
+       dataset = Dataset.objects.get(datasetid=datasetid)   
+#       udjs = Datasetjoin.objects.filter(datasetid=datasetid)
+       recs  = Datasetjoin.objects.filter(datasetid=datasetid).filter(userkey__gt=0).filter(removed=0).order_by('-userkey')      
+
+#       print users[0]
+#       recs = []
+       
+#       for u in users:
+#          print u['userkey']
+#          print userKey
+#          cedaUser = User.objects.get(userkey=userKey)
+#	  mydict = {'user': cedaUser}
+#	  recs.append(userKey)
+	  
+    except:
+       return HttpResponse('dataset not found')
+
+    return render_to_response('list_users_for_dataset.html', locals())
+
+
+@login_required()
+def list_users_email_for_dataset(request, datasetid):
+    user = request.user
+
+    try:
+       dataset = Dataset.objects.get(datasetid=datasetid)   
+       recs  = Datasetjoin.objects.filter(datasetid=datasetid).filter(userkey__gt=0).filter(removed=0).values('userkey__emailaddress').distinct()
+       
+    except:
+       return HttpResponse('Not found')
+       
+    return render_to_response('list_users_email_for_dataset.html', locals())
