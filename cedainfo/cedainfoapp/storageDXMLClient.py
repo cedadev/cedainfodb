@@ -62,7 +62,7 @@ class SpotXMLReader():
         
         text += "Total volume: %s\n" % total_volume
         text += "Total files: %s\n" % total_files
-        text += "Last timeToArchive: %s\n" % latest_time
+        text += "Latest time: %s\n" % latest_time
         return text
         
     def getFilesAsDict(self):

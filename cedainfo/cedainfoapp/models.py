@@ -7,6 +7,7 @@ import string
 import hashlib
 import time
 import audit.models
+from storageDXMLClient import SpotXMLReader
 
 # Needed for BigInteger fix
 from django.db.models.fields import IntegerField
@@ -524,6 +525,13 @@ class FileSet(models.Model):
             self.partition = allocated_partition
 	    self.notes += '\nAllocated partition %s (%s)' % (self.partition, datetime.utcnow())
             self.save()
+            
+    def backup_summary(self):
+        # get a text summary of storaged backup status
+        reader = SpotXMLReader(self.storage_pot)
+        return reader.getSpotSummary()
+    backup_summary.short_description = 'backup'
+    backup_summary.allow_tags = True
 
 # migration allocation don by hand at the moment
 
@@ -570,7 +578,7 @@ class FileSet(models.Model):
 
     def links(self):
         # links to actions for filesets
-        s = '<a href="/fileset/%s/du">du</a> ' % (self.pk,)
+        s = '<a href="/fileset/%s/du">du</a> <a href="http://storaged-monitor.esc.rl.ac.uk/storaged_ceda/CEDA_Fileset_Summary.php?%s">storageD</a>' % (self.pk,self.storage_pot)
         return s
     links.allow_tags = True
     
