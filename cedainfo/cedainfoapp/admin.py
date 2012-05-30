@@ -165,7 +165,7 @@ class FileSetAdmin(admin.ModelAdmin):
      
     list_display = ('logical_path', niceOverallFinalSize, 'partition', 'partition_display',
         'spot_display','status','last_size','responsible','links',)
-    list_filter = ('partition',)
+    list_filter = ('partition','sd_backup')
     
     ordering = ('-id',)
     readonly_fields = ('partition',
