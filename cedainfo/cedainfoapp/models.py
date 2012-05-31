@@ -109,7 +109,13 @@ class Partition(models.Model):
         """Report disk usage.
            Return a dictionary with total, used, available. Sizes are reported
            in blocks of 1024 bytes."""
-        output = subprocess.Popen(['/bin/df', '-B 1024', self.mountpoint],
+	   
+	# skip if retired disk or non-existant   
+	if self.status == 'Retired': return None   
+	if not os.path.exists(self.mountpoint): return None   
+        
+	# do df
+	output = subprocess.Popen(['/bin/df', '-B 1024', self.mountpoint],
                                  stdout=subprocess.PIPE).communicate()[0]
         lines = output.split('\n')
 	if len(lines) == 3: dev, blocks_total, blocks_used, blocks_available, used, mount = lines[1].split()
