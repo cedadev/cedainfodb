@@ -140,6 +140,16 @@ class PartitionAdmin(admin.ModelAdmin):
     update_df.short_description = "Do a df on selected partitions"
 admin.site.register(Partition, PartitionAdmin)
 
+class AuditAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__',
+		     'auditstate','fileset','corrupted_files', 'new_files', 
+		     'deleted_files', 'modified_files', 'unchanges_files')
+    actions=['delete']
+    list_filter = ('auditstate',)  
+    readonly_fields = ('auditstate','corrupted_files', 'new_files', 
+		     'deleted_files', 'modified_files', 'unchanges_files', 'starttime', 'endtime', 'logfile')
+admin.site.register(Audit, AuditAdmin)
+
 class FileSetAdminForm(forms.ModelForm):
 
 #    overall_final_size = ByteSizeField()

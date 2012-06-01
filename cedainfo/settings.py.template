@@ -139,7 +139,6 @@ INSTALLED_APPS = (
     'cedainfo.cedainfoapp',
     'cedainfo.proginfo',
     'cedainfo.udbadmin',
-    'cedainfo.audit',
 )
 
 # ----------------------------------------------------
@@ -158,3 +157,5 @@ fsc_manager_csv_cols = {
     'path' : 1
 }
 
+# ckeckm files dir
+CHECKM_DIR='/home/spepler/play/checkm'

@@ -6,7 +6,6 @@ import subprocess
 import string
 import hashlib
 import time
-import audit.models
 from storageDXMLClient import SpotXMLReader
 
 # Needed for BigInteger fix
@@ -391,12 +390,16 @@ class FileSet(models.Model):
 	return rsynccmd
 	
     def checkm_log(self):
-        LOG = open('/tmp/checkm.%s.log' % self.storage_pot,'w')
+        # make checkm directory for spot is missing
+        if not os.path.exists('%s/%s' %(settings.CHECKM_DIR, self.storage_pot)): 
+	    os.mkdir('%s/%s' %(settings.CHECKM_DIR, self.storage_pot))
+        LOG = open('%s/%s/checkm.%s.%s.log' % (settings.CHECKM_DIR, self.storage_pot,
+	            self.storage_pot, time.strftime('%Y%m%d-%H%M')),'w')
 	LOG.write('#%checkm_0.7\n')
 	LOG.write('# manifest file for %s\n' % self.logical_path)
 	LOG.write('# scaning path %s\n' % self.storage_path())
 	LOG.write('# generated %s\n' % datetime.utcnow())
-	LOG.write('# Filename|Algorithm|Digest\n')
+	LOG.write('# Filename|Algorithm|Digest|Length | ModTime\n')
         self._checkm_log(self.storage_path(), LOG)
 	
     def _checkm_log(self, directory, LOG):
@@ -414,13 +417,15 @@ class FileSet(models.Model):
             relpath = os.path.join(reldir,n)                     
             # if path is reg file
             if os.path.isfile(path): 
+	        size = os.path.getsize(path)
+		mtime = datetime.fromtimestamp(os.path.getmtime(path)).strftime('%Y-%m-%dT%H:%M:%SZ')
                 F=open(path)
                 m=hashlib.md5()
                 while 1:
                     buf= F.read(1024*1024)
                     m.update(buf)
                     if buf=="": break
-                LOG.write("%s|md5|%s\n" % (relpath,m.hexdigest()))	
+                LOG.write("%s|md5|%s|%s|%s\n" % (relpath,m.hexdigest(),size,mtime))	
 
     def _verify_copy(self):	
         # copy - raise an exception if copy is bad
@@ -596,17 +601,16 @@ class FileSet(models.Model):
         except:
             return None
     last_size.allow_tags = True
-    
-    def make_audit(self):
-        '''Make an audit for this FileSet'''
-        myaudit = audit.models.Audit(
-            fileset_logical_path = self.logical_path,
-            fileset = self
-            #auditstate set by default to "not started"
-        )
-        myaudit.save()
-        #audit.start()
-    
+
+    def last_audit(self):
+        # display most recent audit
+        try:
+            audit = Audit.objects.filter(fileset=self).order_by('-starttime')[0]
+            return audit
+        except:
+            return None
+    last_size.allow_tags = True
+        
 
         
 class DataEntity(models.Model):
@@ -729,6 +733,8 @@ class FileSetSizeMeasurement(models.Model):
     size = models.BigIntegerField(help_text="Size in bytes") # in bytes
     no_files = models.BigIntegerField(null=True, blank=True, help_text="Number of files") 
     def __unicode__(self):
+        if self.size > 2000000000000: size =self.size/(1024*1024*1024*1024); unit = "TB"
+        if self.size > 2000000000: size =self.size/(1024*1024*1024); unit = "GB"
         if self.size > 2000000: size =self.size/(1024*1024); unit = "MB"
         elif self.size > 2000:    size =self.size/(1024); unit = "kB"
 	else:                     size = self.size; unit= "B"
@@ -737,8 +743,51 @@ class FileSetSizeMeasurement(models.Model):
 	else:                     no_files = self.no_files; funit= "files"
 	
         return u'%s %s; %s %s (%s)' % (size, unit, no_files, funit, self.date.strftime("%Y-%m-%d %H:%M"))
-        
 
+
+class Audit(models.Model):
+    '''A record of inspecting a fileset'''
+    fileset = models.ForeignKey(FileSet, help_text="FileSet which this audit related to at time of creation", on_delete=models.SET_NULL, null=True, blank=True)
+    starttime = models.DateTimeField(null=True, blank=True, )
+    endtime = models.DateTimeField(null=True, blank=True, )
+    auditstate = models.CharField(max_length=50,       
+        choices=(
+            ("not started","not started"),
+            ("started","started"),
+            ("finished","finished"),
+            ("killed","killed"),
+            ("error","error"),
+        ),
+        default="not started",
+        help_text="state of this audit"
+    )
+    corrupted_files = models.BigIntegerField(default=0)
+    new_files = models.BigIntegerField(default=0)
+    deleted_files = models.BigIntegerField(default=0)
+    modified_files = models.BigIntegerField(default=0)
+    unchanges_files = models.BigIntegerField(default=0)
+    logfile = models.CharField(max_length=255, default='')
+           
+    def __unicode__(self):
+        return 'Audit of %s started %s' % (self.fileset, self.starttime)
+        
+    def start(self):
+        self.starttime = datetime.now()
+	self.auditstate = 'started'
+	self.save()
+	try: 
+	    self.fileset.checkm_log()
+	except:
+	    self.endtime = datetime.now()
+	    self.auditstate = 'error'
+	    self.save()
+	    return
+	    
+	self.endtime = datetime.now()
+	self.auditstate = 'finished'
+	self.save()
+	
+	
     
 #class SpatioTemp(models.Model):
 #    '''spatiotemporal coverage of a file'''

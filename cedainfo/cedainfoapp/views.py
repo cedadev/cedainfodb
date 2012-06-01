@@ -472,9 +472,4 @@ def automount_script(request, host):
         'automount_partitions':automount_partitions,
 	 }, mimetype="text/plain")
 
-@login_required()     
-def makeaudit(request, id):
-    '''Make an audit for a fileset'''
-    fileset = FileSet.objects.get(pk=id)
-    fileset.make_audit()
-    return redirect(request.META['HTTP_REFERER'])
+
