@@ -8,7 +8,6 @@ from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
-from audit.models import *
 from cedainfoapp.models import FileSet, Partition
 
 

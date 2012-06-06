@@ -354,9 +354,10 @@ class FileSet(models.Model):
 	# copy again - exceptions raised if fail
 	self._migration_copy()
 		
-	# verify and log - exceptions raised if fail	
-        self.checkm_log()
-	self._verify_copy()
+	# verify and log - exceptions raised if fail
+	audit=Audit(fileset=self)
+	audit.start()   
+	audit.verify_copy()
 
 	# mark for deletion - write a file in the spot directory 
 	# showing the migration is complete with regard to the CEDA info tool  
@@ -388,65 +389,6 @@ class FileSet(models.Model):
 	topath = "badc@%s:%s" % (self.secondary_partition.host.hostname,self.secondary_storage_path())
 	rsynccmd = 'ssh %s rsync -Puva --delete %s %s' % (host, frompath, topath)
 	return rsynccmd
-	
-    def checkm_log(self):
-        # make checkm directory for spot is missing
-        if not os.path.exists('%s/%s' %(settings.CHECKM_DIR, self.storage_pot)): 
-	    os.mkdir('%s/%s' %(settings.CHECKM_DIR, self.storage_pot))
-        LOG = open('%s/%s/checkm.%s.%s.log' % (settings.CHECKM_DIR, self.storage_pot,
-	            self.storage_pot, time.strftime('%Y%m%d-%H%M')),'w')
-	LOG.write('#%checkm_0.7\n')
-	LOG.write('# manifest file for %s\n' % self.logical_path)
-	LOG.write('# scaning path %s\n' % self.storage_path())
-	LOG.write('# generated %s\n' % datetime.utcnow())
-	LOG.write('# Filename|Algorithm|Digest|Length | ModTime\n')
-        self._checkm_log(self.storage_path(), LOG)
-	
-    def _checkm_log(self, directory, LOG):
-	# recursive function to make checkm log file
-        reldir = directory[len(self.storage_path())+1:]
-        names = os.listdir(directory)
-        # look for diectories and recurse
-	for n in names:
-            path = os.path.join(directory,n)    
-            if os.path.isdir(path) and not os.path.islink(path):
-                self._checkm_log(path, LOG)
-        # for each file 
-        for n in names:
-            path = os.path.join(directory,n)     
-            relpath = os.path.join(reldir,n)                     
-            # if path is reg file
-            if os.path.isfile(path): 
-	        size = os.path.getsize(path)
-		mtime = datetime.fromtimestamp(os.path.getmtime(path)).strftime('%Y-%m-%dT%H:%M:%SZ')
-                F=open(path)
-                m=hashlib.md5()
-                while 1:
-                    buf= F.read(1024*1024)
-                    m.update(buf)
-                    if buf=="": break
-                LOG.write("%s|md5|%s|%s|%s\n" % (relpath,m.hexdigest(),size,mtime))	
-
-    def _verify_copy(self):	
-        # copy - raise an exception if copy is bad
-	# assumes /tmp/checkm.<pk>.log is an upto date checkm file
-        LOG = open('/tmp/checkm.%s.log' % self.storage_pot)
-	while 1:
-	    line = LOG.readline()
-	    if line == '': break
-	    if line[0] == '#': continue
-	    relpath,alg,checksum = line.split('|')
-	    checksum = checksum.strip()
-	    newpath = os.path.join(self.migrate_path(), relpath)
-            if not os.path.isfile(newpath): raise "Not regular file"
-	     
-            F=open(newpath)
-            m=hashlib.md5()
-            while 1:
-                buf= F.read(1024*1024)
-                m.update(buf)
-                if buf=="": break
-	    if m.hexdigest() != checksum: raise "checksums do not match"
 
 
     def spot_display(self):
@@ -602,10 +544,10 @@ class FileSet(models.Model):
             return None
     last_size.allow_tags = True
 
-    def last_audit(self):
+    def last_audit(self, state='finished'):
         # display most recent audit
         try:
-            audit = Audit.objects.filter(fileset=self).order_by('-starttime')[0]
+            audit = Audit.objects.filter(fileset=self, auditstate=state).order_by('-starttime')[0]
             return audit
         except:
             return None
@@ -755,38 +697,225 @@ class Audit(models.Model):
             ("not started","not started"),
             ("started","started"),
             ("finished","finished"),
-            ("killed","killed"),
+            ("copy verified","copy verified"),
+            ("analysed","analysed"),
             ("error","error"),
         ),
         default="not started",
         help_text="state of this audit"
     )
-    corrupted_files = models.BigIntegerField(default=0)
-    new_files = models.BigIntegerField(default=0)
-    deleted_files = models.BigIntegerField(default=0)
-    modified_files = models.BigIntegerField(default=0)
-    unchanges_files = models.BigIntegerField(default=0)
+    corrupted_files = models.IntegerField(default=0)
+    new_files = models.IntegerField(default=0)
+    deleted_files = models.IntegerField(default=0)
+    modified_files = models.IntegerField(default=0)
+    unchanges_files = models.IntegerField(default=0)
     logfile = models.CharField(max_length=255, default='')
            
     def __unicode__(self):
-        return 'Audit of %s started %s' % (self.fileset, self.starttime)
+        return 'Audit of %s started %s  [[%s]]' % (self.fileset, self.starttime, self.auditstate)
         
     def start(self):
-        self.starttime = datetime.now()
+        
+	# find the last finished audit of this fileset for comparison
+        prev_audit = self.fileset.last_audit('analysed') 
+
+	print "**** %s" % prev_audit    
+	    
+ 	self.starttime = datetime.now()
 	self.auditstate = 'started'
 	self.save()
 	try: 
-	    self.fileset.checkm_log()
+	    self.checkm_log()
 	except:
 	    self.endtime = datetime.now()
 	    self.auditstate = 'error'
 	    self.save()
-	    return
+	    raise "Error when creating checkm log" 
 	    
 	self.endtime = datetime.now()
 	self.auditstate = 'finished'
 	self.save()
 	
+	if prev_audit: 
+	    result = self.compare(prev_audit)
+	    print result
+	    self.corrupted_files = len(result['corrupt'])
+	    self.modified_files = result['modified']
+	    self.new_files = result['new']
+	    self.deleted_files = result['deleted']
+	    self.unchanges_files = result['unchanged']
+
+	self.auditstate = 'analysed'
+	self.save()
+	       
+    def compare(self, prev_audit):
+        # open current and previous log files
+	CLOG = open(self.logfile)
+	PLOG = open(prev_audit.logfile)
+	
+	# read top lines from the checkm files
+	cline = CLOG.readline()
+	pline = PLOG.readline()
+	# Flags to indicate end of file
+	cend = False
+	pend = False
+	# lists for tallies 
+	corrupt = []
+	modified = 0
+	new = 0
+	deleted = 0
+	unchanged = 0
+	
+	while 1:
+	    # The lists are sorted so we go down the two lists together. 
+	    # If we find a name on the current list that was not on the last list this is a new file.
+	    # If we find a name on the last list that was not on the current list this is a deleeted file.
+	    # If the names are the same then we need to look for changes.
+	    
+	    if cline == '': cend = True
+	    if pline == '': pend = True
+	                
+	    # stop if end of both files
+	    if pend and cend: break           
+	    
+	    # ignore lines with # at the start
+	    if not cend and cline[0] =='#': 
+	        cline = CLOG.readline()
+		continue
+	    if not pend and pline[0] =='#': 
+	        pline = PLOG.readline()
+		continue
+	    
+	    # if the lines are the same move both logs on 
+	    if cline == pline: 
+	        unchanged = unchanged + 1
+	        cline = CLOG.readline()
+	        pline = PLOG.readline()
+		continue
+
+            # if current log ended then files have been deleted
+	    if cend: 
+	        deleted = deleted + 1
+	        pline = PLOG.readline()
+		continue
+
+            # if previous log ended then files have been added
+	    if pend: 
+	        new = new + 1
+	        cline = CLOG.readline()
+		continue
+		
+	    # split the lines into components. (At this point we know both lines exist)
+	    (cfilename, calgorithm, cdigest, csize, cmodtime) = cline.split('|')  	
+	    (pfilename, palgorithm, pdigest, psize, pmodtime) = pline.split('|')  	
+
+            # if current file is differnt and less than the previous one then
+	    # a new file has been added
+	    if cfilename < pfilename: 
+	        new = new + 1
+	        cline = CLOG.readline()
+		continue
+
+            # if current file is differnt and greater than the previous one 
+	    # then a file has been deleted. 
+	    if cfilename > pfilename: 
+	        deleted = deleted + 1
+	        pline = PLOG.readline()
+		continue
+
+            # at this point we know the log lines are for the same file, but are different in some 
+	    # other way
+	    
+	    # if the modified time has changed then the file has been modified
+	    if cmodtime != pmodtime: 
+	        modified = modified + 1
+	        cline = CLOG.readline()
+	        pline = PLOG.readline()
+		continue
+
+	    # if content has changed this is corrupt
+	    if cdigest != pdigest: 
+	        corrupt.append(cline)
+	        cline = CLOG.readline()
+	        pline = PLOG.readline()
+		continue
+	        
+	return {'corrupt':corrupt, 'modified':modified, 'new':new, 'deleted':deleted, 'unchanged':unchanged}
+            		
+	
+	
+    def checkm_log(self):
+        print "Writing checkm log for this audit..."
+	fileset = self.fileset
+	if fileset == None: raise "Can't make log for audit with no fileset"
+        # make checkm directory for spot is missing
+        if not os.path.exists('%s/%s' %(settings.CHECKM_DIR, fileset.storage_pot)): 
+	    os.mkdir('%s/%s' %(settings.CHECKM_DIR, fileset.storage_pot))
+	self.logfile ='%s/%s/checkm.%s.%s.log' % (settings.CHECKM_DIR, fileset.storage_pot,
+	            fileset.storage_pot, time.strftime('%Y%m%d-%H%M'))     
+        LOG = open(self.logfile, 'w')
+	LOG.write('#%checkm_0.7\n')
+	LOG.write('# manifest file for %s\n' % fileset.logical_path)
+	LOG.write('# scaning path %s\n' % fileset.storage_path())
+	LOG.write('# generated %s\n' % datetime.utcnow())
+	LOG.write('# audit ID: %s\n' % self.id)
+	LOG.write('# \n')
+	LOG.write('# Filename|Algorithm|Digest|Length | ModTime\n')
+        self._checkm_log(fileset.storage_path(), fileset.storage_path(), LOG)
+	LOG.close()
+        print "      ... Done"
+	
+    def _checkm_log(self, directory, storage_path, LOG):
+	# recursive function to make checkm log file
+        reldir = directory[len(storage_path)+1:]
+        names = os.listdir(directory)
+        # look for diectories and recurse
+	names.sort()
+	for n in names:
+            path = os.path.join(directory,n)    
+            if os.path.isdir(path) and not os.path.islink(path):
+                self._checkm_log(path, storage_path, LOG)
+        # for each file 
+        for n in names:
+            path = os.path.join(directory,n)     
+            relpath = os.path.join(reldir,n)                     
+            # if path is reg file
+            if os.path.isfile(path): 
+	        size = os.path.getsize(path)
+		mtime = datetime.fromtimestamp(os.path.getmtime(path)).strftime('%Y-%m-%dT%H:%M:%SZ')
+                F=open(path)
+                m=hashlib.md5()
+                while 1:
+                    buf= F.read(1024*1024)
+                    m.update(buf)
+                    if buf=="": break
+                LOG.write("%s|md5|%s|%s|%s\n" % (relpath,m.hexdigest(),size,mtime))
+
+    def verify_copy(self):	
+        # verify that a migrated copy has the same files as this audit.
+	# Added files are OK. 
+        print "Verifying checkm log against migrated files ..."
+        LOG = open(self.logfile)
+	while 1:
+	    line = LOG.readline()
+	    if line == '': break
+	    if line[0] == '#': continue
+	    relpath,alg,checksum,size,modtime = line.split('|')
+	    checksum = checksum.strip()
+	    newpath = os.path.join(self.fileset.migrate_path(), relpath)
+            if not os.path.exists(newpath): raise "File not there %s" % newpath
+            if not os.path.isfile(newpath): raise "Not regular file %s" % newpath
+	     
+            F=open(newpath)
+            m=hashlib.md5()
+            while 1:
+                buf= F.read(1024*1024)
+                m.update(buf)
+                if buf=="": break
+	    if m.hexdigest() != checksum: raise "checksums do not match %s" % newpath
+	self.auditstate = 'copy verified'
+	self.save()
+        print "      ... Done"
 	
     
 #class SpatioTemp(models.Model):
