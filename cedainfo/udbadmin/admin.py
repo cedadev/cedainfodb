@@ -236,6 +236,7 @@ class PrivilegeAdmin(admin.ModelAdmin):
         
    list_display = (id, 'userkey', accountidLink, 'type', 'datasetid', 'comment')
    list_filter = ('type', 'datasetid')
+   search_fields =['datasetid__datasetid',]
    
    fields = ('userkey',  'type', 'datasetid', 'comment')
 
