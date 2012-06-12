@@ -158,4 +158,4 @@ fsc_manager_csv_cols = {
 }
 
 # ckeckm files dir
-CHECKM_DIR='/home/spepler/play/checkm'
+CHECKM_DIR='/home/badc/checkm'
