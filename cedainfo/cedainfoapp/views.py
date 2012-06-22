@@ -378,12 +378,8 @@ def detailed_spotlist(request):
 # make list of rsync commands for makeing a secondary copies
 @login_required()
 def make_secondary_copies(request):
-    filesets = FileSet.objects.all()
-    output = ''
-    for f in filesets:
-         rsynccmd = f.secondary_copy_command()
-	 if rsynccmd: output = "%s%s\n" % (output,rsynccmd)	
-    return render_to_response('cedainfoapp/make_secondary_copies.txt', {'cmds':output,'user':request.user}, mimetype="text/plain")  
+    filesets = FileSet.objects.filter(secondary_partition__isnull=False)
+    return render_to_response('cedainfoapp/make_secondary_copies.txt', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
 	
 # create ftp mount script for a host - chroot jail mounting
 @login_required() 

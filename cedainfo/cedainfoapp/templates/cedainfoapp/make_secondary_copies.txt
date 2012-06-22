@@ -3,7 +3,9 @@
 # Script Name: make_secondary_copies
 #
 # Author:  CedaInfoDB
-# Purpose: Make secondary disk copies of all filesets that need it
-# History: created on: {{date}}
-
-{{cmds}}
+# Purpose: Make listing of filesets that need to have for secondary disk copies.
+#          The format is <from_path> <to_path>. This is designed to be the input for an rsync like 
+#          backup process.
+# History: created on: {{now}}
+{% for fs in filesets %}{{fs.storage_path}} {{fs.secondary_storage_path}}
+{% endfor %}
