@@ -1,7 +1,7 @@
 import getopt, sys
 import os, errno
 import datetime
-from datetime import timedelta
+from datetime import *
 import smtplib
 
 from django.core.management import setup_environ
