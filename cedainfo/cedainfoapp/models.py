@@ -514,7 +514,7 @@ class FileSet(models.Model):
     def du(self):
         '''Report disk usage of FileSet by creating as FileSetSizeMeasurement.'''
         if self.spot_exists():
-            output = subprocess.Popen(['/usr/bin/du', '-sk', self.storage_path()],stdout=subprocess.PIPE).communicate()[0]
+            output = subprocess.Popen(['/usr/bin/du', '-sk', '--apparent', self.storage_path()],stdout=subprocess.PIPE).communicate()[0]
             lines = output.split('\n')
             if len(lines) == 2: size, path = lines[0].split()
             nfiles = subprocess.check_output("find %s -type f| wc -l"  % self.storage_path(), shell=True)
