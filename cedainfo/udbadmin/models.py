@@ -353,7 +353,7 @@ class Datasetrequest(models.Model):
 	
 class Privilege(models.Model):
     id      = models.AutoField(primary_key=True)
-    userkey =  models.ForeignKey(User, db_column='userkey')
+    userkey =  models.ForeignKey(User, db_column='userkey', to_field='userkey', null=True)
     type    = models.CharField(max_length=25,
                choices=(
 	               ("authorise", "Authorise"), 

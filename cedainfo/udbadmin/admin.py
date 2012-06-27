@@ -234,7 +234,7 @@ class PrivilegeAdmin(admin.ModelAdmin):
    accountidLink.admin_order_field = 'userkey__accountid'
    accountidLink.short_description = 'AccountID'
         
-   list_display = (id, 'userkey', accountidLink, 'type', 'datasetid', 'comment')
+   list_display = ('id', 'userkey', accountidLink, 'type', 'datasetid', 'comment')
    list_filter = ('type', 'datasetid')
    search_fields =['datasetid__datasetid',]
    
