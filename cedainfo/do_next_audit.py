@@ -26,18 +26,20 @@ def pick_audit():
     fileset_to_audit = None
     oldest_audit = datetime.datetime.now()
     for f in filesets:
-        last_audit = f.last_audit() 
-        
-	if last_audit == None:
-	    print 'Last Audit: %s' % last_audit
-	    return f
-        
-	if last_audit.starttime < oldest_audit: 
-	    # don't start one for a fileset that's already going
-	    if last_audit.auditstate == "started":
-	        print " --- Already started" 
-	        continue
-	    oldest_audit = last_audit.starttime
+        started_last_audit = f.last_audit('started')
+        finished_last_audit = f.last_audit('analysed') 
+    
+        # if started audit but then skip this file set
+	if started_last_audit != None:
+            print " --- Already started" 
+            continue
+
+        # if no audit done before then use this one
+	if finished_last_audit == None:
+	    return f    
+
+	if finished_last_audit.starttime < oldest_audit: 
+	    oldest_audit = finished_last_audit.starttime
 	    fileset_to_audit = f
 
     return fileset_to_audit	    
