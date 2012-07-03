@@ -114,7 +114,7 @@ class Partition(models.Model):
 	if not os.path.exists(self.mountpoint): return None   
         
 	# do df
-	output = subprocess.Popen(['/bin/df', '-B 1024', self.mountpoint],
+	output = subprocess.Popen(['/usr/local/bin/pan_df', '-B 1024', self.mountpoint],
                                  stdout=subprocess.PIPE).communicate()[0]
         lines = output.split('\n')
 	if len(lines) == 3: dev, blocks_total, blocks_used, blocks_available, used, mount = lines[1].split()
