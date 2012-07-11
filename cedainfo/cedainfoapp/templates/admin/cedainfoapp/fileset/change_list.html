@@ -1,7 +1,36 @@
 {% extends "admin/change_list.html" %}
 {% load adminmedia admin_list i18n %}
 
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% if action_form %}{% if actions_on_top or actions_on_bottom %}
+<script type="text/javascript">
+(function($) {
+    $(document).ready(function($) {
+        $("tr input.action-select").actions();
+        
+        $('#display-filter').click(function(event) {
+            $('#changelist').addClass('filtered');
+            $('#changelist-filter').show('slow');
+            $('#display-filter').hide('slow');
+        });
+        $('#change-title').click(function(event) {
+            $('#changelist').removeClass('filtered');
+            $('#changelist-filter').hide('slow');
+            $('#display-filter').show('slow');
+        });
 
+    });
+})(django.jQuery);
+</script>
+{% endif %}{% endif %}
+{% endblock %}
+
+
+
+{% block content %}
+  <div id="content-main">
     {% block object-tools %}
       {% if has_add_permission %}
         <ul class="object-tools">
@@ -16,5 +45,41 @@
       [<a href="/home">Home</a>][<a href="/fileset/index">file set summary</a>]
  
     {% endblock %}
+    {% if cl.formset.errors %}
+        <p class="errornote">
+        {% blocktrans count cl.formset.errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+        </p>
+        {{ cl.formset.non_form_errors }}
+    {% endif %}
+    <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
+      {% block search %}{% search_form cl %}{% endblock %}
+      {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
 
+      {% block filters %}
+        {% if cl.has_filters %}
+        <h2 id="display-filter" style="display:none">
+            {% trans 'Filter' %}:
+            {% for spec in cl.filter_specs %} {{ spec.title }}{{ spec.choices }}{% endfor %}
+        </h2>
+          <div id="changelist-filter">
+            <h2 id="change-title">{% trans 'Filter' %}</h2>
+            {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
+          </div>
+        {% endif %}
+      {% endblock %}
 
+      <form id="changelist-form" action="" method="post"{% if cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %}>{% csrf_token %}
+      {% if cl.formset %}
+        <div>{{ cl.formset.management_form }}</div>
+      {% endif %}
+
+      {% block result_list %}
+          {% if action_form and actions_on_top and cl.full_result_count %}{% admin_actions %}{% endif %}
+          {% result_list cl %}
+          {% if action_form and actions_on_bottom and cl.full_result_count %}{% admin_actions %}{% endif %}
+      {% endblock %}
+      {% block pagination %}{% pagination cl %}{% endblock %}
+      </form>
+    </div>
+  </div>
+{% endblock %}
