@@ -159,7 +159,7 @@ class UserAdmin(admin.ModelAdmin):
     list_per_page = 200
     
 #    exclude = ('encpasswd', 'md5passwd', 'onlinereg')
-    readonly_fields = (showDatasets, 'datacenter', 'userkey', 'address', 'accountid', 'addresskey', 'startdate', 'openid', 'encpasswd', 'md5passwd', 'institute', links, password)
+    readonly_fields = (showDatasets, 'datacenter', 'userkey', 'address', 'accountid', 'addresskey', 'startdate', 'encpasswd', 'md5passwd', 'institute', links, password)
 
     fields = (links, 'userkey', 'title', 'surname', 'othernames', 'emailaddress',
                'webpage', 'telephoneno', 'accountid', 'openid', 'accounttype',  password, 
