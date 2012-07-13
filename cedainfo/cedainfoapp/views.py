@@ -376,7 +376,8 @@ def detailed_spotlist(request):
     return render_to_response('cedainfoapp/detailed_spotlist.html', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
     
 # make list of rsync commands for makeing a secondary copies
-@login_required()
+# needs to be open for automation
+#
 def make_secondary_copies(request):
     filesets = FileSet.objects.filter(secondary_partition__isnull=False)
     return render_to_response('cedainfoapp/make_secondary_copies.txt', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
