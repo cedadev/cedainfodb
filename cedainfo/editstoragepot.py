@@ -17,13 +17,7 @@ if __name__=="__main__":
     filesets = FileSet.objects.filter(logical_path = logical_path)
     fs = filesets[0] 
     print "found fileset %s" % fs
-    if fs.storage_pot == None or fs.storage_pot == '':
-        print "fileset has no storage pot set"
-        fs.storage_pot = "archive/spot-%s" % fs.id
-        fs.save()         
-    else: 
-        fs.storage_pot = "archive/spot-%s" % fs.id
-        print "fileset already has storage pot set"
-
+    fs.partition = fs.migrate_to
+    fs.save()        
 
 

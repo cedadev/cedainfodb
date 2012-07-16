@@ -173,8 +173,12 @@ class FileSetAdmin(admin.ModelAdmin):
     niceOverallFinalSize.admin_order_field = 'overall_final_size'
     niceOverallFinalSize.short_description = 'Overall final size'     
      
-    list_display = ('logical_path', niceOverallFinalSize, 'partition', 'partition_display',
-        'spot_display','last_size','responsible','links',)
+    list_display = ('logical_path', niceOverallFinalSize, 
+        'partition', 'partition_display',
+        'spot_display',
+#	'status',
+	'last_size','responsible',
+	'links',)
     list_filter = ('partition','sd_backup')
     
     ordering = ('-id',)
