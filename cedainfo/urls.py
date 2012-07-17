@@ -71,6 +71,9 @@ urlpatterns = patterns('',
     (r'^storage-d/spotlist$', storaged_spotlist),
     (r'^detailed_spotlist$', detailed_spotlist),
     
+    (r'^gwsrequest/(?P<id>\d+)/approve', approve_gwsrequest),
+	(r'^gws/(?P<id>\d+)/update', create_gws_update_request),
+    
     # userdb
     (r'^userdb/userstats/$', user_stats),
     (r'^userdb/newuser/$', newuser), # TODO

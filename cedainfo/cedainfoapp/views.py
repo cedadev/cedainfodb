@@ -470,3 +470,23 @@ def automount_script(request, host):
 	 }, mimetype="text/plain")
 
 
+# approve an existing gwsrequest 
+@login_required()
+def approve_gwsrequest(request, id):
+    gwsrequest = GWSRequest.objects.get(pk=id)
+    error = gwsrequest.approve()
+    if error: 
+        return render_to_response('cedainfoapp/gwsrequestapproveerror.html', {'error':error,'user':request.user})  
+    else:
+        return redirect(request.META['HTTP_REFERER'])
+		
+# create an update request for a GWS
+@login_required
+def create_gws_update_request(request, id):
+	gws = GWS.objects.get(pk=id)
+	reqid = gws.create_update_request()
+	if reqid:
+		return redirect('/admin/cedainfoapp/gwsrequest/%i' % reqid)
+	else:
+		return render_to_response('cedainfoapp/gwscreateupdaterequesterror.html', {'error':error,'user':request.user})
+        

@@ -247,3 +247,16 @@ admin.site.register(RackList)
 #class SpatioTempAdmin(admin.OSMGeoAdmin):
 #    pass
 #admin.site.register(SpatioTemp, SpatioTempAdmin)
+
+
+class GWSRequestAdmin(admin.ModelAdmin):
+    list_display = ('gws_name', 'internal_requester', 'gws_manager', 'requested_volume', 'backup_requirement', 'expiry_date', 'request_type', 'request_status', 'gws_link', 'action_links', 'timestamp')
+    list_filter = ('request_status',)
+    readonly_fields = ('request_status',)
+    ordering = ('timestamp',)
+admin.site.register(GWSRequest, GWSRequestAdmin)
+
+class GWSAdmin(admin.ModelAdmin):
+    list_display = ('name', 'internal_requester', 'gws_manager', 'requested_volume', 'backup_requirement', 'expiry_date', 'last_reviewed', 'status','volume',)
+    list_filter = ('status',)
+admin.site.register(GWS, GWSAdmin)
