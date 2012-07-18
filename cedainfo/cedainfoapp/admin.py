@@ -254,9 +254,11 @@ class GWSRequestAdmin(admin.ModelAdmin):
     list_filter = ('request_status',)
     readonly_fields = ('request_status',)
     ordering = ('timestamp',)
+    search_fields = ('gws_name', 'path')
 admin.site.register(GWSRequest, GWSRequestAdmin)
 
 class GWSAdmin(admin.ModelAdmin):
     list_display = ('name', 'internal_requester', 'gws_manager', 'requested_volume', 'backup_requirement', 'expiry_date', 'last_reviewed', 'status','volume',)
     list_filter = ('status',)
+    search_fields = ('name', 'path')
 admin.site.register(GWS, GWSAdmin)
