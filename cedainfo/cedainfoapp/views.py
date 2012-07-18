@@ -490,3 +490,13 @@ def create_gws_update_request(request, id):
 	else:
 		return render_to_response('cedainfoapp/gwscreateupdaterequesterror.html', {'error':error,'user':request.user})
         
+# approve an existing gwsrequest 
+@login_required()
+def approve_vmrequest(request, id):
+    vmrequest = VMRequest.objects.get(pk=id)
+    error = vmrequest.approve()
+    if error: 
+        return render_to_response('cedainfoapp/vmrequestapproveerror.html', {'error':error,'user':request.user})  
+    else:
+        return redirect(request.META['HTTP_REFERER'])
+        

@@ -262,3 +262,9 @@ class GWSAdmin(admin.ModelAdmin):
     list_filter = ('status',)
     search_fields = ('name', 'path')
 admin.site.register(GWS, GWSAdmin)
+
+class VMRequestAdmin(admin.ModelAdmin):
+    list_display=('vm_name', 'type', 'operation_type', 'internal_requester', 'date_required','timestamp', 'request_type', 'request_status','action_links',)
+    list_filter=('type', 'operation_type','request_status')
+    search_fields = ('vm_name',)
+admin.site.register(VMRequest, VMRequestAdmin)

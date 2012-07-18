@@ -1138,3 +1138,98 @@ class GWS(models.Model):
     def forceSave(self, *args, **kwargs):
         # OK, sometimes we need to update individual fields (e.g. "approved")"
         super(GWS, self).save(*args, **kwargs)
+        
+        
+class VMRequest(models.Model):
+    vm_name = models.CharField(max_length=127, help_text="proposed fully-qualified host name") # TODO : need regex
+    type = models.CharField(max_length=16, choices=settings.VM_TYPE_CHOICES, help_text="Type of VM, see REF") # TODO update REF
+    operation_type = models.CharField(max_length=127, choices=settings.VM_OP_TYPE_CHOICES, help_text="Operation type of VM (dev, test, production, ...")
+    internal_requester = models.ForeignKey(User, help_text="CEDA person sponsoring the request", related_name='internal_requester_user')
+    description = models.TextField(help_text="")
+    date_required = models.DateField()
+    cpu_required = models.CharField(max_length=127, choices=settings.VM_CPU_REQUIRED_CHOICES)
+    memory_required = models.CharField(max_length=127, choices=settings.VM_MEM_REQUIRED_CHOICES)
+    disk_space_required = models.CharField(max_length=127, choices=settings.VM_DISK_SPACE_REQUIRED_CHOICES)
+    disk_activity_required = models.CharField(max_length=127, choices=settings.VM_DISK_ACTIVITY_REQUIRED_CHOICES)
+    network_required = models.CharField(max_length=127, choices=settings.VM_NETWORK_ACTIVITY_REQUIRED_CHOICES)
+    os_required = models.CharField(max_length=127, choices=settings.VM_OS_REQUIRED_CHOICES, default='rhel6')
+    other_info = models.TextField(blank=True)
+    patch_responsible = models.ForeignKey(User, related_name='patch_responsible_user')
+    root_users = models.ManyToManyField(User, related_name='root_users_user')
+    request_type = models.CharField(max_length=127, choices=settings.VM_REQUEST_TYPE_CHOICES, default='new')
+    request_status = models.CharField(max_length=127, choices=settings.VM_REQUEST_STATUS_CHOICES, default='pending')
+    timestamp = models.DateTimeField(auto_now=True, auto_now_add=False, help_text='time last modified')
+    
+    def __unicode__(self):
+        return u'%s' % self.vm_name
+        
+    def action_links(self):
+        if self.request_status == 'approved':
+            return u'approved'
+        else:
+            return u'<a href="/vmrequest/%i/approve">approve</a>' % self.id
+    action_links.allow_tags = True
+    action_links.short_description = 'actions'
+    
+    def approve(self):
+        '''Set the status to approved. If no associated VM, make one and associate this request with it. Else update an existing VM. In both cases, copy existing fields to overwrite attributes of VM.'''
+        
+        # Approving a new request (first time)
+        if self.request_type == 'new': #and (self.vm is None or self.vm == ''):
+            # make a new gws object, copying attributes from request           
+            #vm =VM.objects.create(
+            #    name = self.gws_name,
+            #    status = 'approved',
+            #    internal_requester = self.internal_requester,
+             #   description = self.description,
+            #)
+            #self.vm = vm
+            # update the request status
+            self.request_status = 'approved'
+            self.save()        
+
+        #elif self.request_type == 'update':
+        #    if self.gws is None or self.gws == '':
+        #        raise Exception("Can't do update request : no GWS associated")
+        #    else:
+        #        gws = self.gws
+        #        print self.gws
+        #        # update the existing associated gws
+        #        #self.gws.name = self.gws_name #DISABLED : presumably this never needs to change, once created.
+        #        gws.path = self.path
+        #        #gws.status = 'approved' #DISABLED : don't need to update this
+        #        gws.internal_requester = self.internal_requester
+        #        gws.gws_manager = self.gws_manager
+        #        gws.description = self.description
+        #        gws.requested_volume = self.requested_volume
+        #        gws.backup_requirement = self.backup_requirement
+        #        gws.related_url = self.related_url
+        #        gws.expiry_date = self.expiry_date
+        #        gws.forceSave()
+        #        self.gws = gws
+        #        print "GWS saved"
+        #        # update the request status
+        #        self.request_status = 'approved'
+        #        self.save()
+        #        print "GWSRequest saved"
+                
+        else:
+            raise Exception("Must set request status to update if updating an existing VM")
+            
+#class VM(models.Model):
+#    name = models.CharField(max_length=127, help_text="proposed fully-qualified host name") # TODO : need regex
+#    type = models.CharField(max_length=16, choices=settings.VM_TYPE_CHOICES, help_text="Type of VM, see REF") # TODO update REF
+#    operation_type = models.CharField(max_length=127, choices=settings.VM_OP_TYPE_CHOICES, help_text="Operation type of VM (dev, test, production, ...")
+#    internal_requester = models.ForeignKey(User, help_text="CEDA person sponsoring the request", related_name='internal_requester_user')
+#    description = models.TextField(help_text="")
+#    cpu_required = models.CharField(max_length=127, choices=settings.VM_CPU_REQUIRED_CHOICES)
+#    memory_required = models.CharField(max_length=127, choices=settings.VM_MEM_REQUIRED_CHOICES)
+#    disk_space_required = models.CharField(max_length=127, choices=settings.VM_DISK_SPACE_REQUIRED_CHOICES)
+#    disk_activity_required = models.CharField(max_length=127, choices=settings.VM_DISK_ACTIVITY_REQUIRED_CHOICES)
+#    network_required = models.CharField(max_length=127, choices=settings.VM_NETWORK_ACTIVITY_REQUIRED_CHOICES)
+#    os_required = models.CharField(max_length=127, choices=settings.VM_OS_REQUIRED_CHOICES, default='rhel6')
+#    other_info = models.TextField(blank=True)
+#    patch_responsible = models.ForeignKey(User, related_name='patch_responsible_user')
+#    root_users = models.ManyToManyField(User, related_name='root_users_user')
+#    request_status = models.CharField(max_length=127, choices=settings.VM_REQUEST_STATUS_CHOICES, default='pending')
+#    timestamp = models.DateTimeField(auto_now=True, auto_now_add=False, help_text='time last modified')

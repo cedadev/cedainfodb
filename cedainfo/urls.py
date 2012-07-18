@@ -73,6 +73,7 @@ urlpatterns = patterns('',
     
     (r'^gwsrequest/(?P<id>\d+)/approve', approve_gwsrequest),
 	(r'^gws/(?P<id>\d+)/update', create_gws_update_request),
+    (r'^vmrequest/(?P<id>\d+)/approve', approve_vmrequest),
     
     # userdb
     (r'^userdb/userstats/$', user_stats),
