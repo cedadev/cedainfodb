@@ -1,0 +1,54 @@
+import sys
+import os
+
+from django.core.management import setup_environ
+
+#
+# Work out directory containing settings file relative to this scripts location
+#
+script_dir   = os.path.dirname(os.path.realpath(__file__))
+settings_dir = os.path.realpath(script_dir + '/../')
+sys.path.append(settings_dir)
+
+import settings_test as dbsettings
+setup_environ(dbsettings)
+
+from   udbadmin.models import *
+
+
+def get_dataset_accounts (datasetGroup):
+#
+#   For given group name, return list of accountIDs which are currently authorised to access it
+#  
+
+    udjs = Datasetjoin.objects.filter(datasetid__grp__exact=datasetGroup).filter(removed__exact=0).order_by('userkey__accountid')
+#
+#   Add extra check that expire date has not already passed
+#
+#    udjs = udjs.filter(expiredate__gt=datetime.now()) 
+
+    accounts = []
+
+    for udj in udjs:
+        accountID = udj.userkey.accountid
+
+        if accountID:
+            accounts.append(accountID)
+
+    accounts = list(set(accounts))
+    accounts.sort()
+    return accounts
+
+
+datasets = Dataset.objects.all().order_by('grp')
+ 
+for dataset in datasets:
+
+    if dataset.grp:
+        users = get_dataset_accounts(dataset.grp)
+
+        if users:         
+            userString = ",".join(users) 
+            print '%s:*:33333:%s' % (dataset.grp, userString)
+
+    

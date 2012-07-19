@@ -1,0 +1,117 @@
+import sys
+import os
+import grp
+
+from django.core.management import setup_environ
+
+script_dir   = os.path.dirname(os.path.realpath(__file__))
+settings_dir = os.path.realpath(script_dir + '/../')
+sys.path.append(settings_dir)
+
+import settings_test as dbsettings
+setup_environ(dbsettings)
+
+from django.db import connections, transaction
+
+from   udbadmin.models import *
+
+
+cursor = connections['userdb'].cursor()
+
+
+def get_all_account_names():
+#
+#   Returns all active account names as a comma separated list.
+#
+    sql = """select distinct accountid from tbusers
+           where (lower(accounttype) = 'web' or lower(accounttype) = 'tornado') and
+           accountid is not null
+           order by accountid"""
+
+    cursor.execute(sql)
+    accounts = cursor.fetchall()
+
+    accountString = ''
+
+    for account in accounts:
+        if account:
+           accountString += account[0] + ','
+
+    return accountString[:-1]
+
+
+def get_dataset_accounts_sql (datasetGroup):
+#
+#   For given dataset group name returns comma-separated string with list of all users who have access to 
+#   the group. Uses raw sql for efficiency
+#
+    sql = """select distinct tbusers.accountid 
+    from tbdatasets, tbdatasetjoin, tbusers 
+    where tbusers.userkey = tbdatasetjoin.userkey 
+    and tbdatasets.datasetid = tbdatasetjoin.datasetid 
+    and tbdatasets.grp = '%s' and 
+    tbdatasetjoin.removed = 0  and 
+    (lower(tbusers.accounttype)='web' or 
+    lower(accounttype)='tornado')
+    order by tbusers.accountid""" % datasetGroup
+
+    cursor.execute(sql)
+    accounts = cursor.fetchall()
+
+    accountString = ''
+
+    for account in accounts:
+        if account:
+           accountString += account[0] + ','
+
+    return accountString[:-1]
+
+
+if __name__ == '__main__':
+
+    destFile = '/usr/groups.django'
+
+    if (len(sys.argv) > 1):
+       destFile = sys.argv[1]
+
+    tmpFile = destFile + '.tmp'
+
+    try:
+       out = open(tmpFile, 'w')
+    except:
+       print 'Error opening %s for writing' % tmpFile
+       sys.exit()
+
+    allAccounts = get_all_account_names()
+
+    out.write ("byacl:*:26057:ftp,%s" % allAccounts)
+    out.write ("reguser:*:33333:%s" % allAccounts)
+
+    datasets = Dataset.objects.all().order_by('grp').values('grp').distinct()
+
+    for dataset in datasets:
+
+	group = dataset['grp']
+
+	if group:
+    #
+    #       If this corresponds to a linux group then use the group id number (not sure if we need this feature anymore)
+    #
+            try:
+        	gid = grp.getgrnam(group)[2]
+            except:
+        	gid = 33333
+
+            accountString = get_dataset_accounts_sql(group)
+
+            if accountString:         
+        	out.write ('%s:*:%s:%s' % (group, gid, accountString))
+
+    out.close()
+#
+#   Do sanity check on file size before copying to active location
+#
+    statinfo = os.stat(tmpFile)
+    
+    if (statinfo.st_size > 10000):
+       os.rename(tmpFile, destFile)
