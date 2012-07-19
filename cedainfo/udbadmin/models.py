@@ -104,7 +104,7 @@ class User (models.Model):
     telephoneno = models.CharField(max_length=50, blank=True)
     faxno = models.CharField(max_length=50, blank=True)
     emailaddress = models.CharField(max_length=50)
-    comments = models.TextField()
+    comments = models.TextField(blank=True)
     endorsedby = models.CharField(max_length=50, blank=True)
     degree = models.CharField(max_length=20)
     
@@ -156,13 +156,14 @@ class User (models.Model):
 
 #    webpasswd = models.CharField(max_length=13)  #Don't use this field.
     encpasswd = models.CharField(max_length=13) 
-    md5passwd = models.CharField(max_length=32) 
+    md5passwd = models.CharField(max_length=32)
+    public_key = models.TextField(blank=True) 
     startdate = models.DateTimeField()
     webpage = models.CharField(max_length=100, blank=True)
 #    sharedetails = models.IntegerField()
     datacenter = models.CharField(max_length=30)
     openid_username_component = models.CharField(max_length=100)
-    openid = models.CharField(max_length=100)
+    openid = models.CharField(max_length=100, blank=True)
 #    onlinereg = models.IntegerField()
 
     def institute (self):
@@ -205,7 +206,7 @@ class User (models.Model):
     
        return len(self.datasets(removed=removed))
 
-    datasetCount.short_description='Datasets'
+    datasetCount.short_description='Datasets'         
            
     def datasetRequests(self, status=''):
         '''Return users entries in datasetRequests table. Optionally only returns entries for given status.'''    

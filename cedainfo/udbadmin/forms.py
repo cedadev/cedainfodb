@@ -30,3 +30,11 @@ class PrivilegeForm(ModelForm):
 
     class Meta:
        model = Privilege
+
+
+class UserForm(ModelForm):
+
+    public_key = CharField(required=False, widget=forms.Textarea(attrs={'rows':'5', 'cols': '100'}))
+
+    class Meta:
+       model = User

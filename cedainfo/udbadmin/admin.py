@@ -83,6 +83,8 @@ class InstituteAdmin(admin.ModelAdmin):
 admin.site.register(Institute, InstituteAdmin)
     
 class UserAdmin(admin.ModelAdmin):
+
+    form = UserForm
 #
 #      Forbit adding and deleging users
 #
@@ -162,7 +164,7 @@ class UserAdmin(admin.ModelAdmin):
     readonly_fields = (showDatasets, 'datacenter', 'userkey', 'address', 'accountid', 'addresskey', 'startdate', 'encpasswd', 'md5passwd', 'institute', links, password)
 
     fields = (links, 'userkey', 'title', 'surname', 'othernames', 'emailaddress',
-               'webpage', 'telephoneno', 'accountid', 'openid', 'accounttype',  password, 
+               'webpage', 'telephoneno', 'accountid', 'openid', 'public_key', 'accounttype',  password, 
 	       'degree', 'endorsedby', 'field', 'startdate', showDatasets, 'datacenter', 'institute', 'address', 'comments')
 #    list_editable = ('accountid','title')
 
