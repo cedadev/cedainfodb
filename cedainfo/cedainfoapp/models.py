@@ -1,6 +1,6 @@
 from django.db import models
 #from django.contrib.gis.db import models
-from datetime import datetime
+from datetime import datetime, timedelta
 import os, sys
 import subprocess
 import string
@@ -8,6 +8,7 @@ import hashlib
 import time
 import re
 from storageDXMLClient import SpotXMLReader
+from fields import * # custom MultiSelectField, MultiSelectFormField from http://djangosnippets.org/snippets/2753/
 
 # Needed for BigInteger fix
 from django.db.models.fields import IntegerField
@@ -935,23 +936,6 @@ class Audit(models.Model):
 #    def __unicode__(self):
 #        return 'spatiotemp for file %s' % self.file
 
-# Some GWS settings used for both GWSRequest and GWS
-GWS_BACKUP_CHOICES = (
-    ('no backup', 'no backup'),
-)
-GWS_REQUEST_TYPE_CHOICES = (
-    ('new','new'),
-    ('update','update'),
-    ('remove','remove'),
-)
-GWS_REQUEST_STATUS_CHOICES = (
-    ('pending', 'pending'),
-    ('approved','approved'),
-    ('rejected','rejected'),
-)
-gws_name_regex = re.compile(r'^[a-z][0-9_a-z]*$')
-
-
 class GWSRequest(models.Model):
     '''Request for a Group Workspace
        Captures all information about requirements for GWS and if approved is copied to a GWS instance (new or updated)'''
@@ -963,11 +947,11 @@ class GWSRequest(models.Model):
         max_length=16,
         validators=[
             RegexValidator( 
-                regex=gws_name_regex,
-                message=u"Invalid name : this string will be used as a unix group name so must match the pattern %s" % gws_name_regex.pattern,
+                regex=settings.GWS_NAME_REGEX,
+                message=u"Invalid name : this string will be used as a unix group name so must match the pattern %s" % settings.GWS_NAME_REGEX.pattern,
                 )
             ]
-        , help_text='short string to be used as name for group workspace, also used for corresponsing unix group name. Must match pattern %s' % gws_name_regex.pattern
+        , help_text='short string to be used as name for group workspace, also used for corresponsing unix group name. Must match pattern %s' % settings.GWS_NAME_REGEX.pattern
         )
     path = models.CharField(max_length=2048, help_text='storage path to this group workspace excluding GWS name', default='/group_workspaces/jasmin_or_cems/')
     internal_requester = models.ForeignKey(User, help_text='CEDA person sponsoring the request')
@@ -976,7 +960,7 @@ class GWSRequest(models.Model):
     requested_volume = models.BigIntegerField(help_text="In bytes, but can be enetered using integer<space>suffix e.g. '200 Tb'")
     backup_requirement = models.CharField(max_length=127, choices=settings.GWS_BACKUP_CHOICES, default='no backup')
     related_url = models.URLField(verify_exists=False, blank=True, help_text='Link to further info relevant to this GWS')
-    expiry_date = models.DateField(help_text='Date after which GWS will be deleted')
+    expiry_date = models.DateField(default = datetime.now()+timedelta(days=2*365), help_text="date after which GWS will be deleted") # approx 2 years from now
     request_type = models.CharField(max_length=127, choices=settings.GWS_REQUEST_TYPE_CHOICES, default='new', help_text='type of request')
     request_status = models.CharField(max_length=127, choices=settings.GWS_REQUEST_STATUS_CHOICES, default='pending', help_text='status of this request')
     gws = models.ForeignKey('GWS', blank=True, null=True, on_delete=models.SET_NULL, help_text='GWS to which this request pertains')
@@ -1033,6 +1017,13 @@ class GWSRequest(models.Model):
                 self.save()
                 print "GWSRequest saved"
                 
+        elif self.request_type == 'remove':
+            if self.gws is None or self.gws == '':
+                raise Exception("Can't do update request : no GWS associated")
+            else:
+                self.gws.delete()
+                self.request_status = 'approved'
+                self.save()
         else:
             raise Exception("Must set request status to update if updating an existing GWS")
 
@@ -1061,11 +1052,11 @@ class GWS(models.Model):
         unique=True,
         validators=[
             RegexValidator( 
-                regex=gws_name_regex,
-                message=u"Invalid name : this string will be used as a unix group name so must match the pattern %s" % gws_name_regex.pattern,
+                regex=settings.GWS_NAME_REGEX,
+                message=u"Invalid name : this string will be used as a unix group name so must match the pattern %s" % settings.GWS_NAME_REGEX.pattern,
                 )
             ]
-        , help_text='short string to be used as name for group workspace, also used for corresponsing unix group name. Must match pattern %s' % gws_name_regex.pattern
+        , help_text='short string to be used as name for group workspace, also used for corresponsing unix group name. Must match pattern %s' % settings.GWS_NAME_REGEX.pattern
         )
 
     # Fields populated from GWS request
@@ -1082,7 +1073,9 @@ class GWS(models.Model):
     # Fields specific to GWS
     last_reviewed = models.DateTimeField(null=True, blank=True, help_text='date of last review')
     review_notes = models.TextField(blank=True, help_text='notes from reviews (append)')
-    status = models.CharField(max_length=127, choices=settings.GWS_STATUS_CHOICES, default='approved', help_text='status of GWS')    
+    status = models.CharField(max_length=127, choices=settings.GWS_STATUS_CHOICES, default='approved', help_text='status of GWS')
+
+    
     def get_current_gwsrequest(self):
         '''Find the most recent GWSRequest which has this GWS as FK'''
         try:
@@ -1137,28 +1130,31 @@ class GWS(models.Model):
             
     def forceSave(self, *args, **kwargs):
         # OK, sometimes we need to update individual fields (e.g. "approved")"
-        super(GWS, self).save(*args, **kwargs)
-        
-        
+        super(GWS, self).save(*args, **kwargs)  
+   
 class VMRequest(models.Model):
     vm_name = models.CharField(max_length=127, help_text="proposed fully-qualified host name") # TODO : need regex
     type = models.CharField(max_length=16, choices=settings.VM_TYPE_CHOICES, help_text="Type of VM, see REF") # TODO update REF
     operation_type = models.CharField(max_length=127, choices=settings.VM_OP_TYPE_CHOICES, help_text="Operation type of VM (dev, test, production, ...")
-    internal_requester = models.ForeignKey(User, help_text="CEDA person sponsoring the request", related_name='internal_requester_user')
+    internal_requester = models.ForeignKey(User, help_text="CEDA person sponsoring the request", related_name='vmrequest_internal_requester_user')
     description = models.TextField(help_text="")
     date_required = models.DateField()
     cpu_required = models.CharField(max_length=127, choices=settings.VM_CPU_REQUIRED_CHOICES)
     memory_required = models.CharField(max_length=127, choices=settings.VM_MEM_REQUIRED_CHOICES)
     disk_space_required = models.CharField(max_length=127, choices=settings.VM_DISK_SPACE_REQUIRED_CHOICES)
     disk_activity_required = models.CharField(max_length=127, choices=settings.VM_DISK_ACTIVITY_REQUIRED_CHOICES)
+    mountpoints_required = MultiSelectField(max_length=127, choices=settings.MOUNT_CHOICES)
     network_required = models.CharField(max_length=127, choices=settings.VM_NETWORK_ACTIVITY_REQUIRED_CHOICES)
     os_required = models.CharField(max_length=127, choices=settings.VM_OS_REQUIRED_CHOICES, default='rhel6')
     other_info = models.TextField(blank=True)
-    patch_responsible = models.ForeignKey(User, related_name='patch_responsible_user')
-    root_users = models.ManyToManyField(User, related_name='root_users_user')
+    patch_responsible = models.ForeignKey(User, related_name='vmrequest_patch_responsible_user')
+    root_users = models.ManyToManyField(User, related_name='vmrequest_root_users_user')
     request_type = models.CharField(max_length=127, choices=settings.VM_REQUEST_TYPE_CHOICES, default='new')
     request_status = models.CharField(max_length=127, choices=settings.VM_REQUEST_STATUS_CHOICES, default='pending')
+    vm = models.ForeignKey('VM', blank=True, null=True, on_delete=models.SET_NULL, help_text='VM to which this request pertains')
+    end_of_life = models.DateField(default = datetime.now()+timedelta(days=3*365)) # approx 3 years from now
     timestamp = models.DateTimeField(auto_now=True, auto_now_add=False, help_text='time last modified')
+
     
     def __unicode__(self):
         return u'%s' % self.vm_name
@@ -1177,59 +1173,142 @@ class VMRequest(models.Model):
         # Approving a new request (first time)
         if self.request_type == 'new': #and (self.vm is None or self.vm == ''):
             # make a new gws object, copying attributes from request           
-            #vm =VM.objects.create(
-            #    name = self.gws_name,
-            #    status = 'approved',
-            #    internal_requester = self.internal_requester,
-             #   description = self.description,
-            #)
-            #self.vm = vm
+            vm =VM.objects.create(
+                name = self.vm_name,
+                internal_requester = self.internal_requester,
+                description = self.description,
+                date_required = self.date_required,
+                type = self.type,
+                operation_type = self.operation_type,
+                cpu_required = self.cpu_required, 
+                memory_required = self.memory_required, 
+                disk_space_required = self.disk_space_required,
+                disk_activity_required = self.disk_activity_required,
+                mountpoints_required = self.mountpoints_required,
+                network_required = self.network_required,
+                os_required = self.os_required,
+                patch_responsible = self.patch_responsible,
+                status = 'approved',
+                end_of_life = self.end_of_life,
+            )
+            # root_users is a ManyToManyField, so need to copy outside of create()
+            vm.root_users = self.root_users.all()
+            vm.forceSave()
+            
+            self.vm = vm
             # update the request status
             self.request_status = 'approved'
             self.save()        
 
-        #elif self.request_type == 'update':
-        #    if self.gws is None or self.gws == '':
-        #        raise Exception("Can't do update request : no GWS associated")
-        #    else:
-        #        gws = self.gws
-        #        print self.gws
-        #        # update the existing associated gws
-        #        #self.gws.name = self.gws_name #DISABLED : presumably this never needs to change, once created.
-        #        gws.path = self.path
-        #        #gws.status = 'approved' #DISABLED : don't need to update this
-        #        gws.internal_requester = self.internal_requester
-        #        gws.gws_manager = self.gws_manager
-        #        gws.description = self.description
-        #        gws.requested_volume = self.requested_volume
-        #        gws.backup_requirement = self.backup_requirement
-        #        gws.related_url = self.related_url
-        #        gws.expiry_date = self.expiry_date
-        #        gws.forceSave()
-        #        self.gws = gws
-        #        print "GWS saved"
-        #        # update the request status
-        #        self.request_status = 'approved'
-        #        self.save()
-        #        print "GWSRequest saved"
+        elif self.request_type == 'update':
+            if self.vm is None or self.vm == '':
+                raise Exception("Can't do update request : no VM associated")
+            else:
+                vm = self.vm
+                print self.vm
+                # update the existing associated vm
+                vm.name = self.vm_name
+                vm.internal_requester = self.internal_requester
+                vm.description = self.description
+                vm.date_required = self.date_required
+                vm.type = self.type
+                vm.operation_type = self.operation_type
+                vm.cpu_required = self.cpu_required
+                vm.memory_required = self.memory_required
+                vm.disk_space_required = self.disk_space_required
+                vm.disk_activity_required = self.disk_activity_required
+                vm.mountpoints_required = self.mountpoints_required
+                vm.network_required = self.network_required
+                vm.os_required = self.os_required
+                vm.patch_responsible = self.patch_responsible
+                vm.status = 'approved'
+                vm.end_of_life = self.end_of_life
+                vm.root_users = self.root_users.all()
+                vm.forceSave()
+                
+                # update the request status
+                self.request_status = 'approved'
+                self.save()
+                
+        elif self.request_type == 'remove':
+            if self.vm is None or self.vm == '':
+                raise Exception("Can't do update request : no VM associated")
+            else:
+                self.vm.delete()
+                self.request_status = 'approved'
+                self.save()
                 
         else:
             raise Exception("Must set request status to update if updating an existing VM")
             
-#class VM(models.Model):
-#    name = models.CharField(max_length=127, help_text="proposed fully-qualified host name") # TODO : need regex
-#    type = models.CharField(max_length=16, choices=settings.VM_TYPE_CHOICES, help_text="Type of VM, see REF") # TODO update REF
-#    operation_type = models.CharField(max_length=127, choices=settings.VM_OP_TYPE_CHOICES, help_text="Operation type of VM (dev, test, production, ...")
-#    internal_requester = models.ForeignKey(User, help_text="CEDA person sponsoring the request", related_name='internal_requester_user')
-#    description = models.TextField(help_text="")
-#    cpu_required = models.CharField(max_length=127, choices=settings.VM_CPU_REQUIRED_CHOICES)
-#    memory_required = models.CharField(max_length=127, choices=settings.VM_MEM_REQUIRED_CHOICES)
-#    disk_space_required = models.CharField(max_length=127, choices=settings.VM_DISK_SPACE_REQUIRED_CHOICES)
-#    disk_activity_required = models.CharField(max_length=127, choices=settings.VM_DISK_ACTIVITY_REQUIRED_CHOICES)
-#    network_required = models.CharField(max_length=127, choices=settings.VM_NETWORK_ACTIVITY_REQUIRED_CHOICES)
-#    os_required = models.CharField(max_length=127, choices=settings.VM_OS_REQUIRED_CHOICES, default='rhel6')
-#    other_info = models.TextField(blank=True)
-#    patch_responsible = models.ForeignKey(User, related_name='patch_responsible_user')
-#    root_users = models.ManyToManyField(User, related_name='root_users_user')
-#    request_status = models.CharField(max_length=127, choices=settings.VM_REQUEST_STATUS_CHOICES, default='pending')
-#    timestamp = models.DateTimeField(auto_now=True, auto_now_add=False, help_text='time last modified')
+    def vm_link(self):
+        return u'<a href="/admin/cedainfoapp/vm/%i">%s</a>' % (self.vm.id, self.vm.name)
+    vm_link.allow_tags = True
+    vm_link.short_description = 'VM'
+            
+class VM(models.Model):
+    name = models.CharField(max_length=127, help_text="fully-qualified host name", unique=True) # TODO : need regex
+    type = models.CharField(max_length=16, choices=settings.VM_TYPE_CHOICES, help_text="Type of VM, see REF") # TODO update REF
+    operation_type = models.CharField(max_length=127, choices=settings.VM_OP_TYPE_CHOICES, help_text="Operation type of VM (dev, test, production, ...")
+    internal_requester = models.ForeignKey(User, help_text="CEDA person sponsoring the request", related_name='vm_internal_requester_user')
+    description = models.TextField(help_text="")
+    date_required = models.DateField()
+    cpu_required = models.CharField(max_length=127)
+    memory_required = models.CharField(max_length=127)
+    disk_space_required = models.CharField(max_length=127, choices=settings.VM_DISK_SPACE_REQUIRED_CHOICES)
+    disk_activity_required = models.CharField(max_length=127, choices=settings.VM_DISK_ACTIVITY_REQUIRED_CHOICES)
+    mountpoints_required = MultiSelectField(max_length=127, choices=settings.MOUNT_CHOICES)
+    network_required = models.CharField(max_length=127, choices=settings.VM_NETWORK_ACTIVITY_REQUIRED_CHOICES)
+    os_required = models.CharField(max_length=127, choices=settings.VM_OS_REQUIRED_CHOICES, default='rhel6')
+    other_info = models.TextField(blank=True)
+    patch_responsible = models.ForeignKey(User, related_name='vm_patch_responsible_user')
+    root_users = models.ManyToManyField(User, related_name='vm_root_users_user')
+    status = models.CharField(max_length=127, choices=settings.VM_STATUS_CHOICES, default='pending')
+    created = models.DateField(auto_now_add=True)
+    end_of_life = models.DateField(default = datetime.now()+timedelta(days=3*365)) # 3 years from now
+    retired = models.DateField(null=True, blank=True)
+    timestamp = models.DateTimeField(auto_now=True, auto_now_add=False, help_text='time last modified')
+    
+    def __unicode__(self):
+        return u'%s' % self.name
+        
+    def save(self, *args, **kwargs):
+        # Custom save method : will only save an instance if there is no PK, i.e. if the model is a new instance
+        # Logic : If you want to change a request, you can't, you need to make a new one & have that approved.
+        if self.pk is None:
+            super(VM, self).save(*args, **kwargs)
+        else:
+            raise Exception("Unable to save changes to existing VM : create an update request & get it approved")
+            
+    def forceSave(self, *args, **kwargs):
+        # OK, sometimes we need to update individual fields (e.g. "approved")"
+        super(VM, self).save(*args, **kwargs)
+        
+    def create_update_request(self):
+        '''Create a new gwsrequest based on this gws pre-populated with values ready for editing & approval'''
+        req = VMRequest.objects.create(
+            vm_name = self.name,
+            internal_requester = self.internal_requester,
+            description = self.description,
+            date_required = self.date_required,
+            type = self.type,
+            operation_type = self.operation_type,
+            cpu_required = self.cpu_required, 
+            memory_required = self.memory_required, 
+            disk_space_required = self.disk_space_required,
+            disk_activity_required = self.disk_activity_required,
+            mountpoints_required = self.mountpoints_required,
+            network_required = self.network_required,
+            os_required = self.os_required,
+            patch_responsible = self.patch_responsible,
+            request_status = 'update',
+            end_of_life = self.end_of_life,
+        )
+        req.root_users = self.root_users.all()
+        req.save()
+        return req.id
+        
+    		
+    def update_link(self):
+		return u'<a href="/vm/%i/update">update</a>' % self.id
+    update_link.allow_tags = True

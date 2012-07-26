@@ -74,7 +74,8 @@ urlpatterns = patterns('',
     (r'^gwsrequest/(?P<id>\d+)/approve', approve_gwsrequest),
 	(r'^gws/(?P<id>\d+)/update', create_gws_update_request),
     (r'^vmrequest/(?P<id>\d+)/approve', approve_vmrequest),
-    
+    (r'^vm/(?P<id>\d+)/update', create_vm_update_request),
+        
     # userdb
     (r'^userdb/userstats/$', user_stats),
     (r'^userdb/newuser/$', newuser), # TODO

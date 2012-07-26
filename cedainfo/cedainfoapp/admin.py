@@ -250,21 +250,36 @@ admin.site.register(RackList)
 
 
 class GWSRequestAdmin(admin.ModelAdmin):
-    list_display = ('gws_name', 'internal_requester', 'gws_manager', 'requested_volume', 'backup_requirement', 'expiry_date', 'request_type', 'request_status', 'gws_link', 'action_links', 'timestamp')
-    list_filter = ('request_status',)
-    readonly_fields = ('request_status',)
+    list_display = ('gws_name', 'action_links','internal_requester', 'gws_manager', 'requested_volume', 'backup_requirement', 'expiry_date', 'request_type', 'request_status', 'gws_link',  'timestamp')
+    #list_filter = ('request_status',)
+    #readonly_fields = ('request_status',)
     ordering = ('timestamp',)
     search_fields = ('gws_name', 'path')
 admin.site.register(GWSRequest, GWSRequestAdmin)
 
 class GWSAdmin(admin.ModelAdmin):
     list_display = ('name', 'internal_requester', 'gws_manager', 'requested_volume', 'backup_requirement', 'expiry_date', 'last_reviewed', 'status','volume',)
-    list_filter = ('status',)
+    #list_filter = ('status',)
     search_fields = ('name', 'path')
+    def has_add_permission(self, request):
+        return False
+    def has_delete_permission(self, request, obj=None):
+        return False
 admin.site.register(GWS, GWSAdmin)
 
 class VMRequestAdmin(admin.ModelAdmin):
-    list_display=('vm_name', 'type', 'operation_type', 'internal_requester', 'date_required','timestamp', 'request_type', 'request_status','action_links',)
-    list_filter=('type', 'operation_type','request_status')
+    list_display=('vm_name', 'action_links', 'type', 'operation_type', 'internal_requester', 'date_required','timestamp', 'request_type', 'request_status','vm_link',)
+    #list_filter=('type', 'operation_type','request_status')
     search_fields = ('vm_name',)
+    #readonly_fields = ('request_status',)
 admin.site.register(VMRequest, VMRequestAdmin)
+
+class VMAdmin(admin.ModelAdmin):
+    list_display=('name', 'type', 'operation_type', 'internal_requester', 'timestamp', 'status', )
+    #list_filter=('type', 'operation_type',)
+    search_fields = ('vm_name',)
+    def has_add_permission(self, request):
+        return False
+    def has_delete_permission(self, request, obj=None):
+        return False
+admin.site.register(VM, VMAdmin)

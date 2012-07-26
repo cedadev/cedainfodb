@@ -500,3 +500,13 @@ def approve_vmrequest(request, id):
     else:
         return redirect(request.META['HTTP_REFERER'])
         
+# create an update request for a VM
+@login_required
+def create_vm_update_request(request, id):
+	vm = VM.objects.get(pk=id)
+	reqid = vm.create_update_request()
+	if reqid:
+		return redirect('/admin/cedainfoapp/vmrequest/%i' % reqid)
+	else:
+		return render_to_response('cedainfoapp/vmcreateupdaterequesterror.html', {'error':error,'user':request.user})
+        

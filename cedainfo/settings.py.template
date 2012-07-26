@@ -1,6 +1,7 @@
 # Django settings for cedainfo project.
 
 import os
+import re
 PROJECT_DIR= os.path.dirname(__file__) 
 
 DEBUG = True
@@ -16,7 +17,7 @@ LOGIN_REDIRECT_URL = "/admin"
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'cedainfo',                      # Or path to database file if using sqlite3.
         'USER': 'cedainfo',                      # Not used with sqlite3.
         'PASSWORD': 'ler239b',                  # Not used with sqlite3.
@@ -24,18 +25,18 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     },
 
-    'userdb': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'userdb',                      # Or path to database file if using sqlite3.
-        'USER': 'badc',                      # Not used with sqlite3.
-        'PASSWORD': 'rtp569w',                  # Not used with sqlite3.
-        'HOST': 'bora.badc.rl.ac.uk',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-    }
+    #'userdb': {
+    #    'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+    #    'NAME': 'userdb',                      # Or path to database file if using sqlite3.
+    #    'USER': 'badc',                      # Not used with sqlite3.
+    #    'PASSWORD': 'rtp569w',                  # Not used with sqlite3.
+    #    'HOST': 'bora.badc.rl.ac.uk',                      # Set to empty string for localhost. Not used with sqlite3.
+    #    'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    #}
 
 }
-DATABASE_ROUTERS = ['dbrouter.DatabaseAppsRouter']
-DATABASE_APPS_MAPPING= {'udbadmin': 'userdb'}
+#DATABASE_ROUTERS = ['dbrouter.DatabaseAppsRouter']
+#DATABASE_APPS_MAPPING= {'udbadmin': 'userdb'}
 #DATABASE_ENGINE = 'postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 #DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 #DATABASE_NAME = 'cedainfo_dev'             # Or path to database file if using sqlite3.
@@ -146,7 +147,7 @@ INSTALLED_APPS = (
 #
 import logging
 logging.basicConfig(
-level = logging.DEBUG,
+level = logging.INFO,
     format = '%(name)s %(module)s %(levelname)s [%(asctime)s] %(message)s',
 )
 LOG=logging.getLogger('cedadb')
@@ -159,3 +160,106 @@ fsc_manager_csv_cols = {
 
 # ckeckm files dir
 CHECKM_DIR='/home/badc/checkm'
+
+# Settings used for both GWSRequest and GWS
+GWS_BACKUP_CHOICES = (
+    ('no backup', 'no backup'),
+)
+GWS_REQUEST_TYPE_CHOICES = (
+    ('new','new'),
+    ('update','update'),
+    ('remove','remove'),
+)
+GWS_REQUEST_STATUS_CHOICES = (
+    ('pending', 'pending'),
+    ('approved','approved'),
+    ('rejected','rejected'),
+)
+GWS_STATUS_CHOICES = (
+        ('approved','approved'),
+        ('active','active'),
+        ('retired', 'retired'),
+)
+GWS_NAME_REGEX = re.compile(r'^[a-z][0-9_a-z]*$')
+
+# Types of VM
+VM_TYPE_CHOICES = (
+    ('login','login'),
+    ('transfer','transfer'),
+    ('analysis','analysis'),
+    ('specialist','specialist'),
+)
+
+# Operation Types for VM
+VM_OP_TYPE_CHOICES = (
+    ('development', 'development'),
+    ('test', 'test'),
+    ('production', 'production'),
+    ('research', 'research'),
+)
+
+VM_CPU_REQUIRED_CHOICES = (
+    ('light','light (1)'),
+    ('moderate','moderate (4)'),
+    ('heavy','heavy (8)'),
+)
+
+VM_MEM_REQUIRED_CHOICES = (
+    ('light','light (4 Gb)'),
+    ('moderate','moderate (8 Gb)'),
+    ('heavy','heavy (16 Gb)'),
+)
+
+VM_DISK_SPACE_REQUIRED_CHOICES = (
+    ('light','light (30 Gb)'),
+    ('moderate','moderate (100 Gb)'),
+    ('heavy','heavy (200 Gb)'),
+)
+
+VM_DISK_ACTIVITY_REQUIRED_CHOICES = (
+    ('light','light'),
+    ('moderate','moderate'),
+    ('heavy','heavy'),
+)
+
+VM_NETWORK_ACTIVITY_REQUIRED_CHOICES = (
+    ('light','light'),
+    ('moderate','moderate'),
+    ('heavy','heavy'),
+)
+
+VM_OS_REQUIRED_CHOICES = (
+    ('rhel6','rhel6'),
+    ('rhel5','rhel5'),
+    ('sles11','sles11'),
+)
+
+VM_REQUEST_STATUS_CHOICES = (
+    ('pending','pending'),
+    ('approved','approved'),
+    ('rejected','rejected'),
+)
+
+VM_REQUEST_TYPE_CHOICES = (
+    ('new','new'),
+    ('update','update'),
+    ('remove','remove'),
+)
+VM_STATUS_CHOICES = (
+    ('approved','approved'),
+    ('active','active'),
+    ('retired', 'retired'),
+)
+MOUNT_CHOICES = (
+    ('/datacentre/archvol ro', '/datacentre/archvol ro : Archive filesystem access'),
+    ('/datacentre/archvol rw', '/datacentre/archvol rw : Archive write access CEDA internal ingest machines only'),
+    ('/group_workspaces/jasmin rw','/group_workspaces/jasmin rw : JASMIN Group Workspaces'),
+    ('/group_workspaces/cems rw','/group_workspaces/cems rw : CEMS Group Workspaces'),
+    ('/home/users rw','/home/users rw : User home areas'),
+    ('/datacentre/processing rw','/datacentre/processing rw : CEDA internal ingest machines only'),
+    ('/datacentre/arrivals ro','/datacentre/arrivals ro : CEDA internal ingest machines only'),
+    ('/datacentre/requests rw','/datacentre/requests rw : User Requests area'),
+    ('/datacentre/stats rw', '/datacentre/stats rw : CEDA internal management machines only'),
+    #('/datacentre/opshome', '/datacentre/opshome rw : CEDA internal management machines only'),
+    #('/datacentre/backupcache rw','/datacentre/backupcache rw : CEDA internal backup systems only'),    
+)
