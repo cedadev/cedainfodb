@@ -75,7 +75,28 @@ if __name__=="__main__":
 	    print  '%s:%s/archive /datacentre/archvol/pan%s/archive ' % (p.host.hostname, p.mountpoint, pannumber)
             pannumber += 1
 	    
-    
+    # mark partitions as migrating
+    print "# Marking partitions and filesets as migrating"
+    pannumber = 5
+    for p in sorted_partitions:
+        if p.score >0 : 
+            filesets = FileSet.objects.filter(partition=p, storage_pot_type = 'archive')
+	    p.status = 'Migrating'
+	    p.save()
+	    panname = '/datacentre/archvol/pan%s' % pannumber
+	    existingpan = Partition.objects.filter(mountpoint=panname)
+	    if len(existingpan) == 0:
+	        newpan = Partition(mountpoint=panname, used_bytes=0, 
+	                   capacity_bytes=p.newcapacity*1024*1024*1024*1024, status='Closed')
+	        newpan.save()
+            else: 
+	        newpan = existingpan[0]
+	    
+	    for fs in filesets:
+	        fs.migrate_to = newpan
+		fs.save()
+		print fs 
+            pannumber += 1
     
     
     

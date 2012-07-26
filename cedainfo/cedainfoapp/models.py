@@ -292,7 +292,7 @@ class FileSet(models.Model):
                  ("project_spaces","project_spaces"),
                  ("group_workspace","group_workspace")) )
     storage_pot = models.CharField(max_length=1024, blank=True, default='', help_text="The directory under which the data is held")
-    migrate_to = models.ForeignKey(Partition, blank=True, null=True, limit_choices_to = {'status': 'Allocating'},help_text="Target partition for migration", related_name='fileset_migrate_to_partition')
+    migrate_to = models.ForeignKey(Partition, blank=True, null=True,help_text="Target partition for migration", related_name='fileset_migrate_to_partition')
     secondary_partition = models.ForeignKey(Partition, blank=True, null=True, help_text="Target for secondary disk copy", related_name='fileset_secondary_partition')
     dmf_backup = models.BooleanField(default=False, help_text="Backup to DMF")
     sd_backup = models.BooleanField(default=False, help_text="Backup to Storage-D")
