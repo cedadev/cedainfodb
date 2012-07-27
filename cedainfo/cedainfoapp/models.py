@@ -343,7 +343,7 @@ class FileSet(models.Model):
             return ("os.symlink(%s, %s) \n (removed spot dir for consistancy)" % (self.storage_path(),self.logical_path),sys.exc_value )
         self.save()
 
-    def migrate_spot(self):
+    def migrate_spot(self, do_audit=True):
         if self.storage_pot == '': raise "can't migrate a spot does not already exists in the db"
         if not self.partition: raise "can't migrate a spot if no partition"
         if not self.migrate_to: raise "can't migrate a spot if no migration partition" 
@@ -360,22 +360,27 @@ class FileSet(models.Model):
 	# copy again - exceptions raised if fail
 	self._migration_copy()
 		
-	# verify and log - exceptions raised if fail
-	audit=Audit(fileset=self)
-	audit.start()   
-	audit.verify_copy()
-
-	# mark for deletion - write a file in the spot directory 
-	# showing the migration is complete with regard to the CEDA info tool  
-        DOC = open(os.path.join(self.storage_path(),'MIGRATED.txt'), 'w')
-	DOC.write("""This storage directory has been migrated and can be deleted.
 	
-	Migrated %s -> %s (%s)
-	Storage pot: %s/%s
-	Logical path: %s""" % (self.partition, self.migrate_to, datetime.utcnow(), self.storage_pot_type, self.storage_pot, self.logical_path))
+	# verify and log - exceptions raised if fail
+	if do_audit:
+	    audit=Audit(fileset=self)
+	    audit.start()   
+	    audit.verify_copy()
+
+	    # mark for deletion - write a file in the spot directory 
+	    # showing the migration is complete with regard to the CEDA info tool  
+            DOC = open(os.path.join(self.storage_path(),'MIGRATED.txt'), 'w')
+	    DOC.write("""This storage directory has been migrated and can be deleted.
+	
+	            Migrated %s -> %s (%s)
+	            Storage pot: %s/%s
+	            Logical path: %s""" % (self.partition, self.migrate_to, 
+		                           datetime.utcnow(), self.storage_pot_type, 
+					   self.storage_pot, self.logical_path))
 
 	# upgade fs with new partition info on success
-	self.notes += '\nMigrated %s -> %s (%s)' % (self.partition, self.migrate_to, datetime.utcnow())
+	self.notes += '\nMigrated %s -> %s (%s) [do_audit=%s]' % (self.partition, 
+	                             self.migrate_to, datetime.utcnow(), do_audit)
 	self.partition = self.migrate_to
  	self.migrate_to = None
         self.save()
