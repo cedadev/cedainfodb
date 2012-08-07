@@ -72,10 +72,21 @@ urlpatterns = patterns('',
     (r'^detailed_spotlist$', detailed_spotlist),
     
     (r'^gwsrequest/(?P<id>\d+)/approve', approve_gwsrequest),
+    (r'^gwsrequest/(?P<id>\d+)/reject', reject_gwsrequest),
+    (r'^gwsrequest/(?P<id>\d+)/convert', convert_gwsrequest),
+    (r'^gwsrequest/index/$', gwsrequest_list), # list for external viewers
+    (r'^gwsrequest/(?P<id>\d+)/$', gwsrequest_detail), #detail view for external viewers    
+
 	(r'^gws/(?P<id>\d+)/update', create_gws_update_request),
+    
     (r'^vmrequest/(?P<id>\d+)/approve', approve_vmrequest),
+    (r'^vmrequest/(?P<id>\d+)/reject', reject_vmrequest),
+    (r'^vmrequest/(?P<id>\d+)/convert', convert_vmrequest),
+    (r'^vmrequest/index/$', vmrequest_list), # list for external viewers
+    (r'^vmrequest/(?P<id>\d+)/$', vmrequest_detail), #detail view for external viewers 
+    
     (r'^vm/(?P<id>\d+)/update', create_vm_update_request),
-        
+
     # userdb
     (r'^userdb/userstats/$', user_stats),
     (r'^userdb/newuser/$', newuser), # TODO

@@ -1,0 +1,46 @@
+{% extends "base_site.html" %}
+
+{% block title %}
+VM Request list
+{% endblock %}
+
+{% block content %}
+<h2>VM Requests</h2>
+
+<h3>Filters</h3>
+<form action="." method="POST">
+<table border="1">
+{{ form.as_table }}
+</table>
+<input type="submit" value="Go">
+</form>
+
+<br>
+
+	<table border="1">
+	    <tr>
+		<th>Id</th>
+		<th>Name</th>
+        <th>Type</th>
+        <th>Op Type</th>
+        <th>Requester</th>
+        <th>Date Required</th>
+        <th>Status</th>
+        <th>End of life</th>
+        </tr>
+	    {% for i in items %}
+		    <tr>
+	            <td><a href="/vmrequest/{{i.id}}">{{i.id}}</a></td>
+	            <td><a href="/vmrequest/{{i.id}}">{{i.vm_name}}</a></td>
+                <td>{{i.type}}</td>
+	            <td>{{i.operation_type}}</td>
+                <td>{{i.internal_requester}}</td>
+                <td>{{i.date_required}}</td>
+	            <td>{{i.request_status}}</td>
+	            <td>{{i.end_of_life}}</td>
+			</tr>
+        {% endfor %}
+	</table>
+{% endblock %}
+
+

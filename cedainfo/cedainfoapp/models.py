@@ -943,7 +943,7 @@ class Audit(models.Model):
 
 class GWSRequest(models.Model):
     '''Request for a Group Workspace
-       Captures all information about requirements for GWS and if approved is copied to a GWS instance (new or updated)'''
+       Captures all information about requirements for GWS and if converted is copied to a GWS instance (new or updated)'''
     class Meta:
         verbose_name_plural = 'group workspace requests'
     
@@ -974,8 +974,37 @@ class GWSRequest(models.Model):
     def __unicode__(self):
         return u'%s' % self.gws_name
         
+    # Actions : 
+    # reject
+    #   - following CEDA review, reject a request (can later be deleted)
+    # approve
+    #   - following CEDA review, approve a request (puts it into list for SCD to see)
+    # convert
+    #   - make a GWS out of a GWSRequest (new)
+    #   - update an existing GWS out of a GWSRequest (update)
+    
+    def reject(self):
+        '''Review process : reject a request'''
+        if self.request_status == 'ceda pending':
+            self.request_status = 'ceda rejected'
+            # disassociate it from any gws
+            self.gws = None
+            self.save()
+            
+        else:
+            raise Exception("Can't reject a request unless status = 'ceda pending'")
+            
     def approve(self):
-        '''Set the status to approved. If no associated GWS, make one and associate this request with it. Else update an existing GWS. In both cases, copy existing fields to overwrite attributes of GWS.'''
+        '''Review process : approve a request'''
+        if self.request_status == 'ceda pending':
+            self.request_status = 'ceda approved'
+            # disassociate it from any gws
+            self.save()
+        else:
+            raise Exception("Can't approve a request unless status = 'ceda pending'")        
+
+    def convert(self):
+        '''Set the status to under construction. If no associated GWS, make one and associate this request with it. Else update an existing GWS. In both cases, copy existing fields to overwrite attributes of GWS.'''
         
         # Approving a new request (first time)
         if self.request_type == 'new' and (self.gws is None or self.gws == ''):
@@ -983,7 +1012,7 @@ class GWSRequest(models.Model):
             gws = GWS.objects.create(
                 name = self.gws_name,
                 path = self.path,
-                status = 'approved',
+                status = 'active',
                 internal_requester = self.internal_requester,
                 gws_manager = self.gws_manager,
                 description = self.description,
@@ -994,7 +1023,7 @@ class GWSRequest(models.Model):
             )
             self.gws = gws
             # update the request status
-            self.request_status = 'approved'
+            self.request_status = 'completed'
             self.save()        
 
         elif self.request_type == 'update':
@@ -1002,7 +1031,6 @@ class GWSRequest(models.Model):
                 raise Exception("Can't do update request : no GWS associated")
             else:
                 gws = self.gws
-                print self.gws
                 # update the existing associated gws
                 #self.gws.name = self.gws_name #DISABLED : presumably this never needs to change, once created.
                 gws.path = self.path
@@ -1014,30 +1042,30 @@ class GWSRequest(models.Model):
                 gws.backup_requirement = self.backup_requirement
                 gws.related_url = self.related_url
                 gws.expiry_date = self.expiry_date
+                gws.status = 'active'
                 gws.forceSave()
                 self.gws = gws
-                print "GWS saved"
                 # update the request status
-                self.request_status = 'approved'
+                self.request_status = 'completed'
                 self.save()
-                print "GWSRequest saved"
                 
         elif self.request_type == 'remove':
             if self.gws is None or self.gws == '':
-                raise Exception("Can't do update request : no GWS associated")
+                raise Exception("Can't do remove request : no GWS associated")
             else:
                 self.gws.delete()
-                self.request_status = 'approved'
-                self.save()
+                self.delete()
         else:
             raise Exception("Must set request status to update if updating an existing GWS")
 
             
     def action_links(self):
-        if self.request_status == 'approved':
-            return u'approved'
+        if self.request_status == 'ceda pending':
+            return u'<a href="/gwsrequest/%i/approve">approve</a> <a href="/gwsrequest/%i/reject">reject</a>' % (self.id, self.id)
+        elif self.request_status == 'ceda approved':
+            return u'<a href="/gwsrequest/%i/convert">convert</a>' % self.id
         else:
-            return u'<a href="/gwsrequest/%i/approve">approve</a>' % self.id
+            return u'n/a'
     action_links.allow_tags = True
     action_links.short_description = 'actions'
     
@@ -1078,7 +1106,7 @@ class GWS(models.Model):
     # Fields specific to GWS
     last_reviewed = models.DateTimeField(null=True, blank=True, help_text='date of last review')
     review_notes = models.TextField(blank=True, help_text='notes from reviews (append)')
-    status = models.CharField(max_length=127, choices=settings.GWS_STATUS_CHOICES, default='approved', help_text='status of GWS')
+    status = models.CharField(max_length=127, choices=settings.GWS_STATUS_CHOICES, default='active', help_text='status of GWS')
 
     
     def get_current_gwsrequest(self):
@@ -1140,7 +1168,7 @@ class GWS(models.Model):
 class VMRequest(models.Model):
     vm_name = models.CharField(max_length=127, help_text="proposed fully-qualified host name") # TODO : need regex
     type = models.CharField(max_length=16, choices=settings.VM_TYPE_CHOICES, help_text="Type of VM, see REF") # TODO update REF
-    operation_type = models.CharField(max_length=127, choices=settings.VM_OP_TYPE_CHOICES, help_text="Operation type of VM (dev, test, production, ...")
+    operation_type = models.CharField(max_length=127, choices=settings.VM_OP_TYPE_CHOICES, help_text="Operation type of VM (dev, test, production, ...)")
     internal_requester = models.ForeignKey(User, help_text="CEDA person sponsoring the request", related_name='vmrequest_internal_requester_user')
     description = models.TextField(help_text="")
     date_required = models.DateField()
@@ -1159,21 +1187,42 @@ class VMRequest(models.Model):
     vm = models.ForeignKey('VM', blank=True, null=True, on_delete=models.SET_NULL, help_text='VM to which this request pertains')
     end_of_life = models.DateField(default = datetime.now()+timedelta(days=3*365)) # approx 3 years from now
     timestamp = models.DateTimeField(auto_now=True, auto_now_add=False, help_text='time last modified')
-
     
     def __unicode__(self):
         return u'%s' % self.vm_name
         
     def action_links(self):
-        if self.request_status == 'approved':
-            return u'approved'
+        if self.request_status == 'ceda pending':
+            return u'<a href="/vmrequest/%i/approve">approve</a> <a href="/vmrequest/%i/reject">reject</a>' % (self.id, self.id)
+        elif self.request_status == 'ceda approved':
+            return u'<a href="/vmrequest/%i/convert">convert</a>' % self.id
         else:
-            return u'<a href="/vmrequest/%i/approve">approve</a>' % self.id
+            return u'n/a'
     action_links.allow_tags = True
     action_links.short_description = 'actions'
     
+    def reject(self):
+        '''Review process : reject a request'''
+        if self.request_status == 'ceda pending':
+            self.request_status = 'ceda rejected'
+            # disassociate it from any gws
+            self.vm = None
+            self.save()
+            
+        else:
+            raise Exception("Can't reject a request unless status = 'ceda pending'")
+            
     def approve(self):
-        '''Set the status to approved. If no associated VM, make one and associate this request with it. Else update an existing VM. In both cases, copy existing fields to overwrite attributes of VM.'''
+        '''Review process : approve a request'''
+        if self.request_status == 'ceda pending':
+            self.request_status = 'ceda approved'
+            # disassociate it from any gws
+            self.save()
+        else:
+            raise Exception("Can't approve a request unless status = 'ceda pending'")        
+
+    def convert(self):
+        '''Set the status to completed. If no associated VM, make one and associate this request with it. Else update an existing VM. In both cases, copy existing fields to overwrite attributes of VM.'''
         
         # Approving a new request (first time)
         if self.request_type == 'new': #and (self.vm is None or self.vm == ''):
@@ -1193,7 +1242,7 @@ class VMRequest(models.Model):
                 network_required = self.network_required,
                 os_required = self.os_required,
                 patch_responsible = self.patch_responsible,
-                status = 'approved',
+                status = 'active',
                 end_of_life = self.end_of_life,
             )
             # root_users is a ManyToManyField, so need to copy outside of create()
@@ -1202,7 +1251,7 @@ class VMRequest(models.Model):
             
             self.vm = vm
             # update the request status
-            self.request_status = 'approved'
+            self.request_status = 'completed'
             self.save()        
 
         elif self.request_type == 'update':
@@ -1226,13 +1275,13 @@ class VMRequest(models.Model):
                 vm.network_required = self.network_required
                 vm.os_required = self.os_required
                 vm.patch_responsible = self.patch_responsible
-                vm.status = 'approved'
+                vm.status = 'active'
                 vm.end_of_life = self.end_of_life
                 vm.root_users = self.root_users.all()
                 vm.forceSave()
                 
                 # update the request status
-                self.request_status = 'approved'
+                self.request_status = 'completed'
                 self.save()
                 
         elif self.request_type == 'remove':
@@ -1240,8 +1289,7 @@ class VMRequest(models.Model):
                 raise Exception("Can't do update request : no VM associated")
             else:
                 self.vm.delete()
-                self.request_status = 'approved'
-                self.save()
+                self.delete()
                 
         else:
             raise Exception("Must set request status to update if updating an existing VM")
@@ -1254,7 +1302,7 @@ class VMRequest(models.Model):
 class VM(models.Model):
     name = models.CharField(max_length=127, help_text="fully-qualified host name", unique=True) # TODO : need regex
     type = models.CharField(max_length=16, choices=settings.VM_TYPE_CHOICES, help_text="Type of VM, see REF") # TODO update REF
-    operation_type = models.CharField(max_length=127, choices=settings.VM_OP_TYPE_CHOICES, help_text="Operation type of VM (dev, test, production, ...")
+    operation_type = models.CharField(max_length=127, choices=settings.VM_OP_TYPE_CHOICES, help_text="Operation type of VM (dev, test, production, ...)")
     internal_requester = models.ForeignKey(User, help_text="CEDA person sponsoring the request", related_name='vm_internal_requester_user')
     description = models.TextField(help_text="")
     date_required = models.DateField()
@@ -1268,7 +1316,7 @@ class VM(models.Model):
     other_info = models.TextField(blank=True)
     patch_responsible = models.ForeignKey(User, related_name='vm_patch_responsible_user')
     root_users = models.ManyToManyField(User, related_name='vm_root_users_user')
-    status = models.CharField(max_length=127, choices=settings.VM_STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=127, choices=settings.VM_STATUS_CHOICES, default='active')
     created = models.DateField(auto_now_add=True)
     end_of_life = models.DateField(default = datetime.now()+timedelta(days=3*365)) # 3 years from now
     retired = models.DateField(null=True, blank=True)

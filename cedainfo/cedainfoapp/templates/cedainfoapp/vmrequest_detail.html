@@ -1,0 +1,18 @@
+{% extends "base_site.html" %}
+
+{% block title %}
+VM Request {{item.vm_name}}
+{% endblock %}
+
+{% block content %}
+<h2>VM Request {{item.vm_name}}</h2>
+
+<table border="1">
+<form>
+    {{ form.as_table }}
+</form>
+</table>
+
+{% endblock %}
+
+

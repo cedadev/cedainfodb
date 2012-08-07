@@ -171,12 +171,12 @@ GWS_REQUEST_TYPE_CHOICES = (
     ('remove','remove'),
 )
 GWS_REQUEST_STATUS_CHOICES = (
-    ('pending', 'pending'),
-    ('approved','approved'),
-    ('rejected','rejected'),
+    ('ceda pending', 'ceda pending'), # initial state for new requests
+    ('ceda rejected','ceda rejected'), # reviewed & rejected within CEDA
+    ('ceda approved','ceda approved'), # reviewed & approved within CEDA, marks ones we want SCD to make.
+    ('completed', 'completed'), # now exists or changes now applied
 )
 GWS_STATUS_CHOICES = (
-        ('approved','approved'),
         ('active','active'),
         ('retired', 'retired'),
 )
@@ -235,9 +235,10 @@ VM_OS_REQUIRED_CHOICES = (
 )
 
 VM_REQUEST_STATUS_CHOICES = (
-    ('pending','pending'),
-    ('approved','approved'),
-    ('rejected','rejected'),
+    ('ceda pending', 'ceda pending'), # initial state for new requests
+    ('ceda rejected','ceda rejected'), # reviewed & rejected within CEDA
+    ('ceda approved','ceda approved'), # reviewed & approved within CEDA, marks ones we want SCD to make.
+    ('completed', 'completed'),
 )
 
 VM_REQUEST_TYPE_CHOICES = (
@@ -246,7 +247,6 @@ VM_REQUEST_TYPE_CHOICES = (
     ('remove','remove'),
 )
 VM_STATUS_CHOICES = (
-    ('approved','approved'),
     ('active','active'),
     ('retired', 'retired'),
 )

@@ -7,6 +7,8 @@ from django.shortcuts import redirect, render_to_response, get_object_or_404
 from django.views.generic import list_detail
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.template import RequestContext
+from django.core.context_processors import csrf
 
 import re
 
@@ -469,17 +471,36 @@ def automount_script(request, host):
         'automount_partitions':automount_partitions,
 	 }, mimetype="text/plain")
 
-
-# approve an existing gwsrequest 
+# approve an existing gwsrequest
+@login_required()
+def reject_gwsrequest(request, id):
+    gwsrequest = GWSRequest.objects.get(pk=id)
+    error = gwsrequest.reject()
+    if error: 
+        return render_to_response('cedainfoapp/gwsrequesterror.html', {'error':error,'user':request.user})  
+    else:
+        return redirect(request.META['HTTP_REFERER'])
+     
+# approve an existing gwsrequest
 @login_required()
 def approve_gwsrequest(request, id):
     gwsrequest = GWSRequest.objects.get(pk=id)
     error = gwsrequest.approve()
     if error: 
-        return render_to_response('cedainfoapp/gwsrequestapproveerror.html', {'error':error,'user':request.user})  
+        return render_to_response('cedainfoapp/gwsrequesterror.html', {'error':error,'user':request.user})  
     else:
         return redirect(request.META['HTTP_REFERER'])
-		
+
+# convert an existing gwsrequest into a gws
+@login_required()
+def convert_gwsrequest(request, id):
+    gwsrequest = GWSRequest.objects.get(pk=id)
+    error = gwsrequest.convert()
+    if error: 
+        return render_to_response('cedainfoapp/gwsrequesterror.html', {'error':error,'user':request.user})  
+    else:
+        return redirect(request.META['HTTP_REFERER'])
+        
 # create an update request for a GWS
 @login_required
 def create_gws_update_request(request, id):
@@ -488,20 +509,40 @@ def create_gws_update_request(request, id):
 	if reqid:
 		return redirect('/admin/cedainfoapp/gwsrequest/%i' % reqid)
 	else:
-		return render_to_response('cedainfoapp/gwscreateupdaterequesterror.html', {'error':error,'user':request.user})
+		return render_to_response('cedainfoapp/gwsrequesterror.html', {'error':error,'user':request.user})
         
-# approve an existing gwsrequest 
+# convert an existing vmrequest into a vm 
+@login_required()
+def reject_vmrequest(request, id):
+    vmrequest = VMRequest.objects.get(pk=id)
+    error = vmrequest.reject()
+    if error: 
+        return render_to_response('cedainfoapp/vmrequestconverterror.html', {'error':error,'user':request.user})  
+    else:
+        return redirect(request.META['HTTP_REFERER'])
+
+# convert an existing vmrequest into a vm 
 @login_required()
 def approve_vmrequest(request, id):
     vmrequest = VMRequest.objects.get(pk=id)
     error = vmrequest.approve()
     if error: 
-        return render_to_response('cedainfoapp/vmrequestapproveerror.html', {'error':error,'user':request.user})  
+        return render_to_response('cedainfoapp/vmrequestconverterror.html', {'error':error,'user':request.user})  
+    else:
+        return redirect(request.META['HTTP_REFERER'])
+
+# convert an existing vmrequest into a vm 
+@login_required()
+def convert_vmrequest(request, id):
+    vmrequest = VMRequest.objects.get(pk=id)
+    error = vmrequest.convert()
+    if error: 
+        return render_to_response('cedainfoapp/vmrequestconverterror.html', {'error':error,'user':request.user})  
     else:
         return redirect(request.META['HTTP_REFERER'])
         
 # create an update request for a VM
-@login_required
+@login_required()
 def create_vm_update_request(request, id):
 	vm = VM.objects.get(pk=id)
 	reqid = vm.create_update_request()
@@ -510,3 +551,64 @@ def create_vm_update_request(request, id):
 	else:
 		return render_to_response('cedainfoapp/vmcreateupdaterequesterror.html', {'error':error,'user':request.user})
         
+# list of GWSs presented for external viewers
+@login_required()    
+def gwsrequest_list(request):
+    o = request.GET.get('o', 'id') # default order is ascending id
+
+    filter = {}
+    if request.method=='POST': # if form was submitted
+        form = GWSRequestListFilterForm(request.POST, initial={'request_status':'ceda approved'}, )
+        filter['request_status'] = request.POST['request_status']
+        items = GWSRequest.objects.filter(request_status__exact=filter['request_status']).order_by(o)
+    else:   # provide a blank form
+        form = GWSRequestListFilterForm(initial={'request_status':'ceda approved'}, )
+        items = GWSRequest.objects.order_by(o)
+        
+    c = RequestContext(request, {
+        'form': form,
+        'items': items,
+    })        
+    c.update(csrf(request))
+    return render_to_response('cedainfoapp/gwsrequest_list.html', c)
+
+@login_required()
+def gwsrequest_detail(request, id):
+    item = get_object_or_404(GWSRequest, pk=id)
+    form = GWSRequestDetailForm(instance=item)
+    c = RequestContext(request, {
+        'item': item,
+        'form': form,
+    }) 
+    return render_to_response('cedainfoapp/gwsrequest_detail.html', c)
+        
+# list of VMRequests presented for external viewers
+@login_required()  
+def vmrequest_list(request):
+    o = request.GET.get('o', 'id') # default order is ascending id
+    
+    filter = {}
+    if request.method=='POST': # if form was submitted
+        form = VMRequestListFilterForm(request.POST, initial={'request_status':'ceda approved'}, )
+        filter['request_status'] = request.POST['request_status']
+        items = VMRequest.objects.filter(request_status__exact=filter['request_status']).order_by(o)
+    else:   # provide a blank form
+        form = VMRequestListFilterForm(initial={'request_status':'ceda approved'}, )
+        items = VMRequest.objects.order_by(o)
+        
+    c = RequestContext(request, {
+        'form': form,
+        'items': items,
+    })        
+    c.update(csrf(request))
+    return render_to_response('cedainfoapp/vmrequest_list.html', c)
+
+@login_required()
+def vmrequest_detail(request, id):
+    item = get_object_or_404(VMRequest, pk=id)
+    form = VMRequestDetailForm(instance=item)
+    c = RequestContext(request, {
+        'item': item,
+        'form': form,
+    }) 
+    return render_to_response('cedainfoapp/vmrequest_detail.html', c)

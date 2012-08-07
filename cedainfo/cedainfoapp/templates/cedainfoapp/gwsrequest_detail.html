@@ -1,0 +1,18 @@
+{% extends "base_site.html" %}
+
+{% block title %}
+GWS Request {{item.gws_name}}
+{% endblock %}
+
+{% block content %}
+<h2>GWS Request {{item.gws_name}}</h2>
+
+<table border="1">
+<form>
+    {{ form.as_table }}
+</form>
+</table>
+
+{% endblock %}
+
+
