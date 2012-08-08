@@ -477,7 +477,7 @@ def reject_gwsrequest(request, id):
     gwsrequest = GWSRequest.objects.get(pk=id)
     error = gwsrequest.reject()
     if error: 
-        return render_to_response('cedainfoapp/gwsrequesterror.html', {'error':error,'user':request.user})  
+        return render_to_response('error.html', {'error':error,'user':request.user})  
     else:
         return redirect(request.META['HTTP_REFERER'])
      
@@ -487,7 +487,7 @@ def approve_gwsrequest(request, id):
     gwsrequest = GWSRequest.objects.get(pk=id)
     error = gwsrequest.approve()
     if error: 
-        return render_to_response('cedainfoapp/gwsrequesterror.html', {'error':error,'user':request.user})  
+        return render_to_response('error.html', {'error':error,'user':request.user})  
     else:
         return redirect(request.META['HTTP_REFERER'])
 
@@ -497,7 +497,7 @@ def convert_gwsrequest(request, id):
     gwsrequest = GWSRequest.objects.get(pk=id)
     error = gwsrequest.convert()
     if error: 
-        return render_to_response('cedainfoapp/gwsrequesterror.html', {'error':error,'user':request.user})  
+        return render_to_response('error.html', {'error':error,'user':request.user})  
     else:
         return redirect(request.META['HTTP_REFERER'])
         
@@ -509,7 +509,7 @@ def create_gws_update_request(request, id):
 	if reqid:
 		return redirect('/admin/cedainfoapp/gwsrequest/%i' % reqid)
 	else:
-		return render_to_response('cedainfoapp/gwsrequesterror.html', {'error':error,'user':request.user})
+		return render_to_response('error.html', {'error':error,'user':request.user})
         
 # convert an existing vmrequest into a vm 
 @login_required()
@@ -517,7 +517,7 @@ def reject_vmrequest(request, id):
     vmrequest = VMRequest.objects.get(pk=id)
     error = vmrequest.reject()
     if error: 
-        return render_to_response('cedainfoapp/vmrequestconverterror.html', {'error':error,'user':request.user})  
+        return render_to_response('error.html', {'error':error,'user':request.user})  
     else:
         return redirect(request.META['HTTP_REFERER'])
 
@@ -527,7 +527,7 @@ def approve_vmrequest(request, id):
     vmrequest = VMRequest.objects.get(pk=id)
     error = vmrequest.approve()
     if error: 
-        return render_to_response('cedainfoapp/vmrequestconverterror.html', {'error':error,'user':request.user})  
+        return render_to_response('error.html', {'error':error,'user':request.user})  
     else:
         return redirect(request.META['HTTP_REFERER'])
 
@@ -537,7 +537,7 @@ def convert_vmrequest(request, id):
     vmrequest = VMRequest.objects.get(pk=id)
     error = vmrequest.convert()
     if error: 
-        return render_to_response('cedainfoapp/vmrequestconverterror.html', {'error':error,'user':request.user})  
+        return render_to_response('error.html', {'error':error,'user':request.user})  
     else:
         return redirect(request.META['HTTP_REFERER'])
         
@@ -549,7 +549,7 @@ def create_vm_update_request(request, id):
 	if reqid:
 		return redirect('/admin/cedainfoapp/vmrequest/%i' % reqid)
 	else:
-		return render_to_response('cedainfoapp/vmcreateupdaterequesterror.html', {'error':error,'user':request.user})
+		return render_to_response('error.html', {'error':error,'user':request.user})
         
 # list of GWSs presented for external viewers
 @login_required()    
