@@ -103,7 +103,7 @@ class User (models.Model):
     addresskey = models.OneToOneField(Addresses, db_column='addresskey')
     telephoneno = models.CharField(max_length=50, blank=True)
     faxno = models.CharField(max_length=50, blank=True)
-    emailaddress = models.CharField(max_length=50)
+    emailaddress = models.CharField(max_length=100)
     comments = models.TextField(blank=True)
     endorsedby = models.CharField(max_length=50, blank=True)
     degree = models.CharField(max_length=20)
