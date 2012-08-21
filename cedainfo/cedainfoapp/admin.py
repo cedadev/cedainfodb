@@ -277,7 +277,7 @@ admin.site.register(VMRequest, VMRequestAdmin)
 class VMAdmin(admin.ModelAdmin):
     list_display=('name', 'type', 'operation_type', 'internal_requester', 'timestamp', 'status', )
     #list_filter=('type', 'operation_type',)
-    search_fields = ('vm_name',)
+    search_fields = ('name',)
     def has_add_permission(self, request):
         return False
     def has_delete_permission(self, request, obj=None):
