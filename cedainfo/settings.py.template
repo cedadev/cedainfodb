@@ -251,6 +251,7 @@ VM_STATUS_CHOICES = (
     ('retired', 'retired'),
 )
 MOUNT_CHOICES = (
+    ('no panasas mounts', 'no panasas mounts'),
     ('/datacentre/archvol ro', '/datacentre/archvol ro : Archive filesystem access'),
     ('/datacentre/archvol rw', '/datacentre/archvol rw : Archive write access CEDA internal ingest machines only'),
     ('/group_workspaces/jasmin rw','/group_workspaces/jasmin rw : JASMIN Group Workspaces'),
