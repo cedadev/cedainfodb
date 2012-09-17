@@ -536,6 +536,7 @@ class FileSet(models.Model):
     def responsible(self):
 	des = DataEntity.objects.order_by("-logical_path")
 	for de in des:
+            if de.logical_path == '': return None #skip if getting to DE with no logical path set
 	    if de.logical_path == self.logical_path[0:len(de.logical_path)]:
 	        return de.responsible_officer
 	return None	
