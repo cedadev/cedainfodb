@@ -164,6 +164,7 @@ CHECKM_DIR='/home/badc/checkm'
 # Settings used for both GWSRequest and GWS
 GWS_BACKUP_CHOICES = (
     ('no backup', 'no backup'),
+    ('mirror volume', 'mirror volume'),
 )
 GWS_REQUEST_TYPE_CHOICES = (
     ('new','new'),
