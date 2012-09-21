@@ -22,7 +22,7 @@ def pick_audit():
     # pick an audit to do: 
     # 1) any fileset that has no privious audit
     # 2) any fileset that has 
-    filesets = FileSet.objects.all()
+    filesets = FileSet.objects.filter(storage_pot_type='archive')
     fileset_to_audit = None
     oldest_audit = datetime.datetime.now()
     for f in filesets:

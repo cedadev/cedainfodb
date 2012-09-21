@@ -34,7 +34,7 @@ def do_dus():
             f.du()
 	    print "            ... Done"
 	else: 
-	    print "      SKIPPING %s (done in last 10 days)" % f
+	    print "SKIPP:%s " % f,
 
 def do_dfs():
     # do df for all partitions
