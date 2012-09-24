@@ -34,11 +34,33 @@ REMOVED_DATASET_HEADERS = (
     ('Research', 'research'),
 )
 
+KEY_HEADERS = (
+  ('Userkey', 'userkey'),
+  ('AccountID', 'accountid'),
+  ('Start date', 'startdate'),
+  ('Email', 'emailaddress'),
+  ('Public key', 'public_key')
+)
 
 @login_required()
 def home(request):
     user = request.user
     return render_to_response('home.html', locals())
+
+
+@login_required()
+def list_keys(request):
+    user = request.user
+
+    cedausers = User.objects.exclude(public_key__exact='a').exclude(public_key__exact='b')
+
+
+    sort_headers = SortHeaders(request, KEY_HEADERS)
+    headers = list(sort_headers.headers())
+    cedausers = User.objects.exclude(public_key__exact=' ').exclude(public_key__exact='').order_by(sort_headers.get_order_by())
+    
+    return render_to_response('list_keys.html', locals())
+
     
 @login_required()
 def list_current_user_datasets(request, userkey):

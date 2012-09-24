@@ -1,0 +1,39 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>List public keys</h1>
+
+This table lists all users who have uploaded a public key to their CEDA account.
+<p>
+
+<table cellspacing="0" border="1">
+<thead>
+
+{% for header in headers %}
+   <th{{ header.class_attr }}>
+     {% if header.sortable %}<a href="{{ header.url|escape }}" title="Click to sort by this column">{% endif %}
+     {{ header.text }}
+     {% if header.sortable %}</a>{% endif %}
+   </th>{% endfor %}
+</tr>
+
+</thead>
+
+<tbody>
+{% for user in cedausers %}
+<tr>
+<td><a href="/admin/udbadmin/user/{{user.userkey}}">{{user.userkey}}</a>
+<td>{{user.accountid}}
+<td nowrap>{{user.startdate|date:"d-M-Y H:i"}}
+<td>{{user.emailaddress}}
+<td>{{user.public_key}}
+</tr>
+{% endfor %}
+</tbody>
+
+</table>
+
+
+
+{% endblock %}

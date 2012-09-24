@@ -159,6 +159,16 @@ class FileSetAdminForm(forms.ModelForm):
 #    
     overall_final_size.help_text = "The allocation given to a fileset is an estimate of the final size on disk. If the dataset is going to grow indefinitely then estimate the size for 4 years ahead. Filesets can't be bigger than a single partition, but in order to aid disk managment they should not exceed 20% of the size of a partition."
 
+    def clean_logical_path(self):
+#
+#              Make sure logical path does not have a '/' at the end as this causes problems later
+#    
+        data = self.cleaned_data['logical_path']
+	data = data.strip()
+	data = data.rstrip('/')
+	
+	return data
+    
     class Meta:
         model = FileSet
 	
