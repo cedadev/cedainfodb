@@ -1,6 +1,7 @@
 from django.contrib import admin
 #from django.contrib.gis import admin
-from cedainfo.cedainfoapp.models import *
+from models import *
+from filters import MountpointFilter 
 from django import forms
 
 
@@ -279,14 +280,14 @@ admin.site.register(GWS, GWSAdmin)
 
 class VMRequestAdmin(admin.ModelAdmin):
     list_display=('vm_name', 'action_links', 'type', 'operation_type', 'internal_requester', 'date_required','timestamp', 'request_type', 'request_status','vm_link',)
-    #list_filter=('type', 'operation_type','request_status')
+    list_filter=('type', 'operation_type', 'request_status', MountpointFilter,)
     search_fields = ('vm_name',)
     #readonly_fields = ('request_status',)
 admin.site.register(VMRequest, VMRequestAdmin)
 
 class VMAdmin(admin.ModelAdmin):
     list_display=('name', 'type', 'operation_type', 'internal_requester', 'timestamp', 'status', )
-    #list_filter=('type', 'operation_type',)
+    list_filter=('type', 'operation_type', 'status', MountpointFilter,)
     search_fields = ('name',)
     def has_add_permission(self, request):
         return False
