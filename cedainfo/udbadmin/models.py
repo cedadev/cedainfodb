@@ -35,7 +35,20 @@ class Dataset(models.Model):
     def get_absolute_url(self):
        '''Return url for viewing details.'''    
        return "/%s/dataset/details/%s" % (self._meta.app_label, self.datasetid)
+
+    def manual_processing_required(self):
+#
+#            Temporary fudge to indicate that the dataset requires "manual processing", ie Andrew needs to do some work once this dataset/service is approved
+#
+       datasetid = self.datasetid 
        
+       if datasetid.startswith('gws_') or datasetid.startswith('vm_') \
+          or datasetid == 'jasmin-login' or datasetid == 'cems-login':
+          return True
+       else:
+          return False  
+
+              
     class Meta:
         db_table = u'tbdatasets'
         ordering = ['datasetid']
