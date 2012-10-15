@@ -1,0 +1,5 @@
+# Purpose: Make listing of filesets with completion flags for deposit service.
+#          The format is <logical_path> <complete_flag>. 
+# History: created on: {{now}}
+{% for fs in filesets %}{{fs.logical_path}} {{fs.complete}}
+{% endfor %}

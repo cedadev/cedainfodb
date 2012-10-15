@@ -383,6 +383,13 @@ def detailed_spotlist(request):
 def make_secondary_copies(request):
     filesets = FileSet.objects.filter(secondary_partition__isnull=False)
     return render_to_response('cedainfoapp/make_secondary_copies.txt', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
+
+# make list filesets for depositserver
+# needs to be open for automation
+#
+def complete_filesets(request):
+    filesets = FileSet.objects.all()
+    return render_to_response('cedainfoapp/complete.txt', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
 	
 # create ftp mount script for a host - chroot jail mounting
 @login_required() 
