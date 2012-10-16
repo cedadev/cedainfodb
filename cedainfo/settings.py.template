@@ -201,20 +201,25 @@ VM_OP_TYPE_CHOICES = (
 )
 
 VM_CPU_REQUIRED_CHOICES = (
-    ('light','light (1)'),
-    ('moderate','moderate (4)'),
-    ('heavy','heavy (8)'),
+    ('minimal','minimal (1)'),
+    ('light','light (2)'),
+    ('moderate','moderate/multiuser (4)'),
+    ('heavy','heavy/multi-threaded processing (8)'),
 )
 
 VM_MEM_REQUIRED_CHOICES = (
-    ('light','light (4 Gb)'),
-    ('moderate','moderate (8 Gb)'),
-    ('heavy','heavy (16 Gb)'),
+    ('light', 'light (1 Gb)'),
+    ('moderate','moderate (2 Gb)'),
+    ('multiuser','multiuser (4 Gb)'),
+    ('multithreaded', 'multi-threaded processing (8 Gb)'),
+    ('max','max science workload (16 Gb)'),
 )
 
 VM_DISK_SPACE_REQUIRED_CHOICES = (
-    ('light','light (30 Gb)'),
-    ('moderate','moderate (100 Gb)'),
+    ('light','light (10 Gb)'),
+    ('moderate','moderate (30 Gb)'),
+    ('large', 'large (80 Gb)'),
+    ('database', 'database (100 Gb)'),
 )
 
 VM_DISK_ACTIVITY_REQUIRED_CHOICES = (
