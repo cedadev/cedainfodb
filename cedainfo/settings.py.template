@@ -215,7 +215,6 @@ VM_MEM_REQUIRED_CHOICES = (
 VM_DISK_SPACE_REQUIRED_CHOICES = (
     ('light','light (30 Gb)'),
     ('moderate','moderate (100 Gb)'),
-    ('heavy','heavy (200 Gb)'),
 )
 
 VM_DISK_ACTIVITY_REQUIRED_CHOICES = (
@@ -266,3 +265,11 @@ MOUNT_CHOICES = (
     #('/datacentre/opshome', '/datacentre/opshome rw : CEDA internal management machines only'),
     #('/datacentre/backupcache rw','/datacentre/backupcache rw : CEDA internal backup systems only'),    
 )
+
+ADMIN_USERS_PATCH_RESPONSIBLE = [
+    3,  # Brian
+    6,  # Andrew
+    8,  # Peter
+    35, # Jonathan
+    36, # Cristina
+]

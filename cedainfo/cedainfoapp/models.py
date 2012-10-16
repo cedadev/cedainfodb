@@ -1189,7 +1189,9 @@ class VMRequest(models.Model):
     network_required = models.CharField(max_length=127, choices=settings.VM_NETWORK_ACTIVITY_REQUIRED_CHOICES)
     os_required = models.CharField(max_length=127, choices=settings.VM_OS_REQUIRED_CHOICES, default='rhel6')
     other_info = models.TextField(blank=True)
-    patch_responsible = models.ForeignKey(User, related_name='vmrequest_patch_responsible_user')
+    patch_responsible = models.ForeignKey(User, related_name='vmrequest_patch_responsible_user',
+        limit_choices_to = {'id__in': settings.ADMIN_USERS_PATCH_RESPONSIBLE},
+    )
     root_users = models.ManyToManyField(User, related_name='vmrequest_root_users_user')
     request_type = models.CharField(max_length=127, choices=settings.VM_REQUEST_TYPE_CHOICES, default='new')
     request_status = models.CharField(max_length=127, choices=settings.VM_REQUEST_STATUS_CHOICES, default='pending')
@@ -1323,7 +1325,9 @@ class VM(models.Model):
     network_required = models.CharField(max_length=127, choices=settings.VM_NETWORK_ACTIVITY_REQUIRED_CHOICES)
     os_required = models.CharField(max_length=127, choices=settings.VM_OS_REQUIRED_CHOICES, default='rhel6')
     other_info = models.TextField(blank=True)
-    patch_responsible = models.ForeignKey(User, related_name='vm_patch_responsible_user')
+    patch_responsible = models.ForeignKey(User, related_name='vm_patch_responsible_user',
+        limit_choices_to = {'id__in': settings.ADMIN_USERS_PATCH_RESPONSIBLE},
+    )
     root_users = models.ManyToManyField(User, related_name='vm_root_users_user')
     status = models.CharField(max_length=127, choices=settings.VM_STATUS_CHOICES, default='active')
     created = models.DateField(auto_now_add=True)
