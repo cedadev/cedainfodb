@@ -123,7 +123,7 @@ class User (models.Model):
     
     degree = models.CharField(max_length=20, blank=True, null=True, verbose_name='Studying for',
         choices=(
-            ("BS","BS"),
+            ("BA","BA"),
             ("BSc","BSc"),
             ("MA","MA"),
             ("MPhil","MPhil"),
