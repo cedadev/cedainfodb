@@ -48,6 +48,22 @@ def home(request):
     return render_to_response('home.html', locals())
 
 
+def user_account_details(request, userkey):
+ 
+    cedauser = User.objects.get(userkey=userkey)
+  
+    record = 'accountid: ' + cedauser.accountid + '\n'
+    record += 'surname: ' + cedauser.surname + '\n'
+  
+    record = \
+"""accountid: %s
+surname: %s
+    """ % (cedauser.accountid, cedauser.surname)
+      
+    return HttpResponse(record, content_type="text/plain")
+
+
+
 @login_required()
 def list_keys(request):
     user = request.user

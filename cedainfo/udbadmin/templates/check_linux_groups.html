@@ -1,0 +1,44 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>Linux group check</h1>
+
+This page displays membership of all groups which are used within the JASMIN system. It lists the membership of the group 
+according to the userdb. It then compares the userdb with the group file on the "external" NIS server and highlights any 
+inconsistencies in red.
+<p>
+
+   {% for dataset in datasets %}
+
+        <h2>{{dataset.datasetid}}</h2>
+                        
+        <ul>
+                
+        {% for user in dataset.users %}
+        
+             <li><font color="green"><a href="/admin/udbadmin/user/{{user.userkey}}">{{user.accountid}}</a></font>
+ 
+        {% endfor %}
+        
+        </ul>
+        
+
+        <ul>
+            {% for user in dataset.usersNotInGroupFile %}
+               <li> <a href="/admin/udbadmin/user/{{user.userkey}}"><font color="red">{{user.accountid}} (in userdb, not in NIS)</font></a>
+            {% endfor %}
+         </ul>   
+       
+        <ul>
+            {% for user in dataset.usersNotInUserdb %}
+               <li><a href="/admin/udbadmin/user/?q={{user}}"><font color="red ">{{user}} (in NIS, not in userdb)</font></a>
+            {% endfor %}
+         </ul>   
+            
+        
+   {% endfor %}
+<p/>
+  
+
+{% endblock %}
