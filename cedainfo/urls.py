@@ -70,6 +70,7 @@ urlpatterns = patterns('',
     (r'^rack/services/(?P<rack_id>\d+)$', services_by_rack),
     (r'^storagesummary$', storagesummary),
     (r'^storage-d/spotlist$', storaged_spotlist),
+    (r'^external/storage-d/spotlist$', storaged_spotlist_public),
     (r'^detailed_spotlist$', detailed_spotlist),
     
     (r'^gwsrequest/(?P<id>\d+)/approve', approve_gwsrequest),

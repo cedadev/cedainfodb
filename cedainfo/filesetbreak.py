@@ -7,7 +7,6 @@ from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
-from audit.models import *
 from cedainfoapp.models import *
 
 
@@ -41,7 +40,7 @@ if __name__=="__main__":
     new_fs = FileSet(partition=fs_to_break.partition, 
              logical_path=breakpath, overall_final_size=1024*1024)
     new_fs.save() 
-    spotname = "archive/spot-%s" % new_fs.pk
+    spotname = "spot-%s" % new_fs.pk
     new_fs.storage_pot = spotname
     # if spot exists?
     if os.path.exists(new_fs.storage_path()) : 
@@ -49,9 +48,11 @@ if __name__=="__main__":
     new_fs.save() 
     
     # rename the break dir as the spot
+    print "rename %s to %s" % (breakpath, new_fs.storage_path())
     os.rename(breakpath, new_fs.storage_path())
 
     # make new link
+    print "symlink %s to %s" % (new_fs.storage_path(), new_fs.logical_path)
     os.symlink(new_fs.storage_path(), new_fs.logical_path)
 
      

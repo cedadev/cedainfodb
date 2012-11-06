@@ -1,6 +1,7 @@
 # Create your views here.
 
 from django.db.models import Q
+from django.http import HttpResponse
 from cedainfo.cedainfoapp.models import *
 from cedainfo.cedainfoapp.forms import *
 from django.shortcuts import redirect, render_to_response, get_object_or_404
@@ -363,6 +364,20 @@ def storaged_spotlist(request):
     filesets = FileSet.objects.filter(sd_backup=True, storage_pot__isnull=False ).exclude(storage_pot='')
     if withpath != None: return render_to_response('cedainfoapp/storage-d_spotlist_withpath.html', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
     else: return render_to_response('cedainfoapp/storage-d_spotlist.html', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
+
+#
+# Provide 'external' access to simple list of spots for use by e-science. Login is disabled for this view. If any access protection is required then it can be added to the apache configuration file.
+#
+def storaged_spotlist_public(request):
+    filesets = FileSet.objects.filter(sd_backup=True, storage_pot__isnull=False ).exclude(storage_pot='')
+    
+    output = ''
+    
+    for fs in filesets:
+        output += fs.storage_pot + '\n'
+           
+    return HttpResponse(output, content_type="text/plain")
+
 
 @login_required()
 def detailed_spotlist(request):
