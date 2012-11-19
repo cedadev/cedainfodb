@@ -68,7 +68,12 @@ class TidyRun:
             raise "No more partitions - STOP."
         self.partition = Partition.objects.get(pk=self.state['partitions_todo'][self.state['current_partition_index']])
         self.write_runfile()
-        
+    
+    def run(self):
+        while 1:
+           self.check_partition()
+           self.next_partition()
+    
     def check_partition(self):
         partition  = self.partition
         old_archivedir = os.path.join(partition.mountpoint,'archive')
@@ -99,8 +104,8 @@ class TidyRun:
         
 
             # storage-d backup size
-            backup= fileset.backup_summary()
-            self.LOG.write("%s\n" %backup)
+            #backup= fileset.backup_summary()
+            #self.LOG.write("%s\n" %backup)
 
             # crude storage-d size finder via screen scrape... 
             #url = 'http://storaged-monitor.esc.rl.ac.uk/storaged_ceda/CEDA_Fileset_Summary.php?%s' % s
