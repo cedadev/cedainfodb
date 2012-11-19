@@ -1,8 +1,24 @@
-# script to add storage pot for manual fileset set up.
-# Sam Pepler 2011-09-22
+# script to remove files from partitions that have been migrated
+# Sam Pepler 2012-11-19
 
-import getopt, sys
-import os, errno, re
+# This script goes through all data on partitions marked as migrating. 
+# It checks that the spots it can see in the archive directory.
+# If a spot has one matching fileset and that primary fileset is on a diffent partion then
+# it checks to see if a storage-d backup exists.
+# If the backup exists it checks all files in the fileset to see if they are the same as the
+# current one. If they are the same then the file is removed. 
+
+# If the script is stopped it records the partition and fileset so that restart is from 
+# where it left off. Logging is done to trace what has happened and a summary of 
+# volume and number of files is recorded. 
+
+# A runfile is used to record the config and status of a run. 
+# This file is updated at the end of each fileset to be restartable.  
+
+
+
+import getopt, sys, pickle
+import os, errno, re, time
 
 from django.core.management import setup_environ
 import settings
@@ -12,10 +28,34 @@ import filecmp
 from cedainfoapp.models import *
 
 
-# usage: partition_migrate.py <from_partition> <to_partition>
-# mark a whole partition for migration to a new one
-# both partition need to exist in the data base
-# No auditing is done on the datasets
+class TidyRun:
+
+
+    def __init__(self, filename):
+        self.filename = filename
+        if not os.path.exists(filename):
+            # make new run
+            self.state = {'files_deleted':0, 'files_checked':0, 'dir_deleted':0, 'vol_deleted':0, 
+                     'filesets_checked':0, 'partitions_checked':0}
+            self.LOG = open("%s.log" % filename, 'a')
+            self.state['current_partition'] = None
+            self.state['current_fileset']=None
+            self.state['run_start'] = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+            self.state['partitions_todo'] = []
+            for p in Partition.objects.filter(status='Migrating').order_by('mountpoint'): 
+                self.state['partitions_todo'].append(p.pk)
+            self.write_runfile()
+            
+        else: 
+            f = open(filename)
+            self.state = pickle.load(f)
+            self.LOG = open("%s.log" % filename, 'a')
+            
+    def write_runfile(self):
+        output = open(self.filename, 'wb')
+        pickle.dump(self.state, output)
+        output.close()
+
 
 
 def check_del(old, new):
@@ -46,6 +86,11 @@ def check_del(old, new):
 
 if __name__=="__main__":
     
+
+    T = TidyRun('/tmp/samsrun')
+
+    T.write_runfile()
+
     partition = sys.argv[1]
     
     print partition
