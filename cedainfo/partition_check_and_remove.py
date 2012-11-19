@@ -165,7 +165,7 @@ if __name__=="__main__":
     T.write_runfile()
 
    
-    T.check_partition()
+    T.run()
 
 
 
