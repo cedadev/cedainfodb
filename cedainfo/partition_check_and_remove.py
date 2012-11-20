@@ -65,14 +65,16 @@ class TidyRun:
         self.partition = Partition.objects.get(pk=self.state['partitions_todo'][self.state['current_partition_index']])
         self.state['current_partition_index'] = self.state['current_partition_index'] + 1
         if self.state['current_partition_index'] >= len(self.state['partitions_todo']): 
-            raise "No more partitions - STOP."
-        self.partition = Partition.objects.get(pk=self.state['partitions_todo'][self.state['current_partition_index']])
+            self.partition = None
+        else:    
+            self.partition = Partition.objects.get(pk=self.state['partitions_todo'][self.state['current_partition_index']])
         self.write_runfile()
     
     def run(self):
         while 1:
            self.check_partition()
            self.next_partition()
+           if self.partition == None: return
     
     def check_partition(self):
         partition  = self.partition
@@ -153,8 +155,6 @@ def check_del(old, new):
              nfiles =  len(os.listdir(oldpath))
              if nfiles == 0: print "os.rmdir(%s)" % oldpath 
         else: continue 
-
-
 
 
 if __name__=="__main__":
