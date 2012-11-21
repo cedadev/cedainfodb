@@ -10,6 +10,9 @@ import re
 from storageDXMLClient import SpotXMLReader
 from fields import * # custom MultiSelectField, MultiSelectFormField from http://djangosnippets.org/snippets/2753/
 
+# needed for volume feed
+from django.contrib.syndication.views import Feed
+
 # Needed for BigInteger fix
 from django.db.models.fields import IntegerField
 from django.conf import settings
@@ -574,6 +577,58 @@ class FileSet(models.Model):
     last_size.allow_tags = True
         
 
+class VolFeed(Feed):
+    # RSS feed to be used by the CEDA site.
+    title = "CEDA data volume summary"
+    link = "/latest/volumes"
+    description = "Lastest volume summary for CEDA data."
+
+    def items(self): return [1]
+
+    def item_title(self, item): return "Volume summary"
+
+    def item_description(self, item):
+         
+        d= ''
+        table = {}
+        filesets = FileSet.objects.all().order_by('logical_path')
+    
+        toplevel = ''
+        vol, nfiles = 0,0
+        for f in filesets:
+            slashcount = f.logical_path.count('/')
+            if slashcount == 4: 
+                table[toplevel] = (vol,nfiles)
+                vol, nfiles = 0,0
+                toplevel = f.logical_path
+
+            size  = f.last_size()
+            if size: 
+                vol=vol+size.size
+                nfiles = nfiles+size.no_files   
+        lines = table.items()
+
+        d += "Top 10 largest datasets\n"
+        lines.sort( key=lambda a:a[1][0], reverse=True )
+        i=0
+        for topfs, size in lines:
+            d += "%s | %2.2f TB | %s\n" % (topfs, size[0]/1.0e12, size[1])
+            i+=1
+            if i >9: break
+
+        d += "\nTop 10 datasets with most files\n"
+        lines.sort( key=lambda a:a[1][1], reverse=True )
+        i=0
+        for topfs, size in lines:
+            d += "%s | %2.2f TB | %s\n" % (topfs, size[0]/1.0e12, size[1])
+            i+=1
+            if i >9: break
+
+        return d
+
+
+    def item_link(self, item): 
+        return "link"
         
 class DataEntity(models.Model):
     '''Collection of data treated together. Has corresponding MOLES DataEntity record.'''

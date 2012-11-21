@@ -35,7 +35,7 @@ class TidyRun:
         self.filename = filename
         if not os.path.exists(filename):
             # make new run
-            self.state = {'files_deleted':0, 'files_checked':0, 'dir_deleted':0, 'vol_deleted':0, 
+            self.state = {'files_deleted':0, 'links_deleted':0, 'dirs_deleted':0, 'files_checked':0, 'vol_deleted':0, 
                      'filesets_checked':0, 'partitions_checked':0}
             self.LOG = open("%s.log" % filename, 'a')
             self.state['current_partition_index'] = 0
@@ -133,28 +133,38 @@ class TidyRun:
         
 
 
-def check_del(old, new):
-    files = os.listdir(old)
-    for f in files:
-        oldpath = os.path.join(old, f)
-        newpath = os.path.join(new, f)
-        if os.path.islink(oldpath): continue
-        elif os.path.isdir(oldpath): check_del(oldpath, newpath)
-        elif os.path.isfile(oldpath): 
-             pass
-             print "cf %s to %s" % (oldpath, newpath)
-             print filecmp.cmp(oldpath, newpath)        
-        else: continue 
+    def check_del(self, old, new):
+        files = os.listdir(old)
+        for f in files:
+            oldpath = os.path.join(old, f)
+            newpath = os.path.join(new, f)
+            self.status['files_checked'] += 1 
+
+            if os.path.islink(oldpath): 
+                if os.path.islink(newpath): 
+                    #os.unlink(oldpath)
+                    self.status['links_deleted'] += 1 
+                    self.LOG.write("RMLINK: %s\n" % oldpath)
+
+            elif os.path.isdir(oldpath): 
+                check_del(oldpath, newpath)
+                nfiles =  len(os.listdir(oldpath))
+                if nfiles == 0: 
+                    #os.rmdir(oldpath)
+                    self.status['dirs_deleted'] += 1 
+                    self.LOG.write("RMDIR: %s\n" % oldpath)
+
+            elif os.path.isfile(oldpath): 
+                same = filecmp.cmp(oldpath, newpath)        
+                if same: 
+                    #os.unlink(oldpath)
+                    self.status['files_deleted'] += 1 
+                    self.LOG.write("DEL: %s\n" % oldpath)
+
+            else: 
+                self.LOG.write("IREGULAR FILE: %s\n" % oldpath)
+                continue 
             
-    # remove empty dir
-    for f in files:
-        oldpath = os.path.join(old, f)
-        newpath = os.path.join(new, f)
-        if os.path.islink(oldpath): continue
-        elif os.path.isdir(oldpath):
-             nfiles =  len(os.listdir(oldpath))
-             if nfiles == 0: print "os.rmdir(%s)" % oldpath 
-        else: continue 
 
 
 if __name__=="__main__":
