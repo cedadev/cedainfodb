@@ -261,6 +261,27 @@ def list_users_for_dataset(request, datasetid):
 
     return render_to_response('list_users_for_dataset.html', locals())
 
+@login_required()
+def list_accounts_for_dataset(request, datasetid):
+    user = request.user
+
+    try:
+       dataset = Dataset.objects.get(datasetid=datasetid)   
+       recs  = Datasetjoin.objects.filter(datasetid=datasetid).filter(userkey__gt=0).filter(removed=0)      	  
+    except:
+       return HttpResponse('dataset not found')
+
+
+    accounts = []
+    
+    for rec in recs:
+        accounts.append(rec.userkey.accountid)
+        
+    accounts = list(set(accounts))
+    accounts.sort()        
+        
+    return render_to_response('list_accounts_for_dataset.html', locals())
+
 
 @login_required()
 def list_users_email_for_dataset(request, datasetid):

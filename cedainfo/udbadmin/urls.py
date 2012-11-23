@@ -30,10 +30,13 @@ urlpatterns = patterns('',
      url(r'^user/datasets/add/(?P<userkey>\d{1,6})/$', add_user_datasets),        
 
      url(r'^dataset/details/(?P<datasetid>.+)/$', dataset_details),    
-     url(r'^dataset/users/(?P<datasetid>.+)/$', list_users_for_dataset),     
+     url(r'^dataset/users/(?P<datasetid>.+)/$', list_users_for_dataset),
+     url(r'^dataset/accounts/(?P<datasetid>.+)/$', list_accounts_for_dataset),
+          
      url(r'^dataset/email/(?P<datasetid>.+)/$', list_users_email_for_dataset),     
 
      url(r'^jasmin/check_linux_groups/$', check_linux_groups),     
+     url(r'^jasmin/nis_group_entries/$', nis_group_entries),     
  
      url(r'^authorise/(?P<userkey>\d{1,6})/$', authorise_datasets),
      url(r'^udj/(?P<id>\d{1,6})/$', edit_user_dataset_join),

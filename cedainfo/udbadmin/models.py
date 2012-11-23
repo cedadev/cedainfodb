@@ -1,5 +1,7 @@
 from django.db import models
 import md5
+import NISaccounts
+
 from django.db.models.base import ModelBase
 from django.db.models import Max, Min
 
@@ -8,6 +10,10 @@ from pytz import timezone
 
 import choices
 
+
+EXT_PASSWD = NISaccounts.getExtPasswdFile()
+INT_PASSWD = NISaccounts.getIntPasswdFile()
+        
 class Dataset(models.Model):
     datasetid = models.CharField(max_length=40, primary_key=True)
 
@@ -231,6 +237,27 @@ class User (models.Model):
 
         return requests
 
+    def isExtNISUser (self):
+        '''Returns True if the user should appear in the external NIS database.
+           This should really be determined by checking for 'isJasminUser', 'isCemsUser' or 'isExtLinuxUser',
+           but for now we will cheat and simply check if they are already in the external NIS passwd file.
+        '''
+                
+        if self.accountid in EXT_PASSWD.keys():
+            return True
+        else:
+            return False     
+
+    def isIntNISUser (self):
+        '''Returns True if the user should appear in the internal NIS database.
+        '''
+                
+        if self.accountid in INT_PASSWD.keys():
+            return True
+        else:
+            return False     
+ 
+    
     def nextUserkey (self):	   
 	'''Returns the next userkey value'''
 	

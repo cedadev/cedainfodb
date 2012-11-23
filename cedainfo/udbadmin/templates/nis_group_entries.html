@@ -1,0 +1,87 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>Check archive access groups</h1>
+
+Checks the membership of the archive access groups in the external and internal NIS
+domains against what is expected in the userdb.
+<p>
+
+<h2>External NIS</h2>
+
+{% for group_info  in ext_nis_groups %}
+
+<h3>{{group_info.name}}</h3>
+
+<blockquote>
+
+<b>Datasets: </b>
+{% for dataset in group_info.datasets %}
+<a href="/udbadmin/dataset/details/{{dataset}}">{{dataset}}</a>
+{% endfor %}
+<p>
+<table border="0">
+<tr>
+<td><b>Userdb</b>  ({{group_info.accounts|length}}):
+<td>{{group_info.accountString}}
+
+<tr>
+<td><b>NIS</b> ({{group_info.nisAccounts|length}})
+<td>{{group_info.nisAccountsString}}</font>
+
+<tr><td><b>Diff1:</b><td>
+{% for account in group_info.diff1 %}
+<a href="/admin/udbadmin/user/?q={{account}}">{{account}}</a>
+{% endfor %}
+
+<tr><td><b>Diff2:</b><td>
+{% for account in group_info.diff2 %}
+<a href="/admin/udbadmin/user/?q={{account}}">{{account}}</a>
+{% endfor %}
+
+</table>
+
+</blockquote>
+{% endfor %}
+
+
+
+<h2>Internal NIS</h2>
+
+{% for group_info  in int_nis_groups %}
+
+<h3>{{group_info.name}}</h3>
+
+<blockquote>
+
+<b>Datasets: </b>
+{% for dataset in group_info.datasets %}
+<a href="/udbadmin/dataset/details/{{dataset}}">{{dataset}}</a>
+{% endfor %}
+<p>
+<table border="0">
+<tr>
+<td><b>Userdb</b>  ({{group_info.accounts|length}}):
+<td>{{group_info.accountString}}
+
+<tr>
+<td><b>NIS</b> ({{group_info.nisAccounts|length}})
+<td>{{group_info.nisAccountsString}}</font>
+
+<tr><td><b>Diff1:</b><td>
+{% for account in group_info.diff1 %}
+<a href="/admin/udbadmin/user/?q={{account}}">{{account}}</a>
+{% endfor %}
+
+<tr><td><b>Diff2:</b><td>
+{% for account in group_info.diff2 %}
+<a href="/admin/udbadmin/user/?q={{account}}">{{account}}</a>
+{% endfor %}
+
+</table>
+
+</blockquote>
+{% endfor %}
+
+{% endblock %}

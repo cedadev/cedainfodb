@@ -1,8 +1,9 @@
 import ldap
 
 
-LDAP_URL   = 'ldap://homer.esc.rl.ac.uk'
-GROUP_BASE = "ou=ceda,ou=Groups,o=hpc,dc=rl,dc=ac,dc=uk"
+LDAP_URL    = 'ldap://homer.esc.rl.ac.uk'
+GROUP_BASE  = "ou=ceda,ou=Groups,o=hpc,dc=rl,dc=ac,dc=uk"
+PEOPLE_BASE = "ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"
 
 l = ldap.initialize(LDAP_URL)
 
@@ -38,17 +39,41 @@ def group_members (group):
         return []
 
 
+def cluster_members (clusterName):
+#
+#      Returns membses of given 'cluster'
+#    
+    users = []
+    
+    try:
+        base = PEOPLE_BASE
+        results = l.search_s(base , ldap.SCOPE_ONELEVEL, 'description=cluster:%s' % clusterName)
+ 
+        for dn, entry in results:
+           users.append(entry['uid'][0])
+
+        users.sort()  
+    except:
+        pass
+         
+    return users   
+
                  
+users = cluster_members('jasmin-login')
 
-groups = ceda_groups()
-groups.sort()
-
-for group in groups:
-   if group.startswith('gws_'):
-      print group
-      members = group_members(group)
-      for member in members:
-          print ' ', member
+for user in users:
+   print user
+   
+#groups = ceda_groups()
+#groups.sort()
+#
+#for group in groups:
+#   if group.startswith('gws_') or group == 'upscale':
+#      print group
+#      members = group_members(group)
+#      members.sort()
+#      for member in members:
+#          print ' ', member
       
       
 #members = group_members('gws_pagoda')

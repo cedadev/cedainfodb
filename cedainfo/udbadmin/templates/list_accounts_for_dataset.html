@@ -1,0 +1,25 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>List accountids for dataset: {{dataset.datasetid}}</h1>
+<p/>
+{% include "datasetinfo.html" %}
+
+<p/>
+
+<table border="1">
+<tr><td><b>DatasetID:</b></td> <td><a href="/udbadmin/dataset/details/{{dataset.datasetid}}">{{ dataset.datasetid }}</a></td>
+<tr><td><b>Name:</b></td> <td>{{ dataset.description }}</td>
+</table>
+
+<p/>
+
+Number of users: {{ accounts|length}}
+<p/>
+
+{% for account in accounts %}
+{{ account }}<br>
+{% endfor %}
+
+{% endblock %}
