@@ -90,13 +90,12 @@ def check_linux_groups(request):
      
 
 
-ARCHIVE_ACCESS_GROUPS = {"cmip5_research":[],
-
-                         "esacat1": ["aatsr_multimission"],                         
-                         "ecmwf": ["era", "ecmwfop"],
-                         "ukmo" : ["surface"],
-                         "eurosat": ["metop_iasi"],
-                         "open": [],
+ARCHIVE_ACCESS_GROUPS = {"cmip5_research":["cmip5_research"],
+                         "esacat1":       ["aatsr_multimission"],                         
+                         "ecmwf":         ["era", "ecmwfop"],
+                         "ukmo" :         ["surface"],
+                         "eurosat":       ["metop_iasi"],
+                         "open":          [],
 }
 
 

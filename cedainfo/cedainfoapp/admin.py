@@ -188,10 +188,11 @@ class FileSetAdmin(admin.ModelAdmin):
         'partition', 'partition_display',
         'spot_display',
 #	'status',
-	'last_size','responsible',
+	'sd_backup','responsible',
 	'links',)
     list_filter = ('partition','sd_backup')
-    
+    list_editable=['sd_backup']  
+  
     ordering = ('-id',)
     readonly_fields = ('partition',
 #        'migrate_to', 
