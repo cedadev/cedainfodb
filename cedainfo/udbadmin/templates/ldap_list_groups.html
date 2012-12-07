@@ -1,0 +1,21 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>LDAP groups</h1>
+<p>
+<table border="1">
+<th>Name
+<th>Internal
+<th>External
+{% for groupInfo in groupsInfo %}
+<tr>
+
+<td><a href="/udbadmin/jasmin/group/{{groupInfo.cn.0}}">{{groupInfo.cn.0}}</a> 
+<td>{{groupInfo.internal|yesno:"Y,"}}
+<td>{{groupInfo.external|yesno:"Y,"}}
+
+{% endfor %}
+</table>
+
+{% endblock %}

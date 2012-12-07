@@ -53,7 +53,7 @@ class DatasetAdmin(admin.ModelAdmin):
    list_display = ('datasetid', 'authtype', 'grp', 'description', 'datacentre', showUsers)
    list_filter = ('datacentre', 'authtype')
 #   exclude = ('grouptype', 'source', 'ukmoform')
-   fields = ('datasetid', 'authtype', 'grp', 'description', 'directory', 'conditions', 'defaultreglength', 'datacentre', 'infourl', 'comments')
+   fields = ('datasetid', 'authtype', 'grp', 'description', 'directory', 'conditions', 'defaultreglength', 'datacentre', 'infourl', 'gid', 'comments')
    search_fields =['datasetid', 'description']
 #
 #     Set datasetid to be read-only on edit form but allow entry on create form
@@ -165,7 +165,7 @@ class UserAdmin(admin.ModelAdmin):
 
     fields = (links, 'userkey', 'title', 'surname', 'othernames', 'emailaddress',
                'webpage', 'telephoneno', 'accountid', 'openid', 'public_key', 'accounttype',  password, 
-	       'degree', 'endorsedby', 'field', 'startdate', showDatasets, 'datacenter', 'institute', 'address', 'comments')
+	       'degree', 'endorsedby', 'field', 'startdate', showDatasets, 'datacenter', 'institute', 'address', 'uid', 'comments')
 #    list_editable = ('accountid','title')
 
 

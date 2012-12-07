@@ -1,0 +1,23 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>LDAP group details</h1>
+
+<table border="1">
+<tr><td>Name:<td>{{details.cn.0}}
+<tr><td>GID:<td>{{details.gidNumber.0}}
+<tr><td>Tags:<td>
+{% for tag in details.description %}
+{{tag}}<br>
+{% endfor %}
+
+<tr><td>Members:
+<td>
+{% for member in details.memberUid %}
+{{member}}<br>
+{% endfor %}
+
+</table>
+
+{% endblock %}

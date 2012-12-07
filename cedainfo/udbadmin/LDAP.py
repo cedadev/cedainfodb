@@ -1,5 +1,7 @@
 import ldap
 
+from operator import itemgetter
+
 
 LDAP_URL    = 'ldap://homer.esc.rl.ac.uk'
 GROUP_BASE  = "ou=ceda,ou=Groups,o=hpc,dc=rl,dc=ac,dc=uk"
@@ -17,10 +19,21 @@ def ceda_groups():
     
     try:
         results = l.search_s(GROUP_BASE, ldap.SCOPE_ONELEVEL)
-        
+
         for dn, entry in results:
-           groups.append(entry['cn'][0])
-           
+           if 'cluster:ceda-external' in entry['description']:
+              entry['external'] = True
+           else:
+              entry['external'] = False
+                 
+           if 'cluster:ceda-internal' in entry['description']:
+              entry['internal'] = True
+           else:
+              entry['internal'] = False
+                 
+           groups.append(entry)
+
+        groups = sorted(groups, key=itemgetter('cn'))          
     except:
         pass
         
@@ -38,51 +51,75 @@ def group_members (group):
     except:
         return []
 
-
-def cluster_members (clusterName):
+def member_groups (accountID):
 #
-#      Returns membses of given 'cluster'
+#      Returns groups that the fiven member belongs to
 #    
-    users = []
+    groups = []
     
     try:
-        base = PEOPLE_BASE
-        results = l.search_s(base , ldap.SCOPE_ONELEVEL, 'description=cluster:%s' % clusterName)
- 
+        base = GROUP_BASE
+        results = l.search_s(base , ldap.SCOPE_SUBTREE, 'memberUid=%s' % accountID)
+         
         for dn, entry in results:
-           users.append(entry['uid'][0])
+           groups.append(entry)
+    except:
+        pass
+        
+    return groups    
 
-        users.sort()  
+
+def group_details (group):
+#
+#      Returns details of given group
+#    
+    try:
+        base = "cn=%s," % group + GROUP_BASE
+        (dn, entry) = l.search_s(base , ldap.SCOPE_BASE)[0]
+ 
+        if entry.has_key('memberUid'):       
+           entry['memberUid'] = sorted(entry['memberUid'])
+
+        return entry
+    except:
+        return []
+
+
+def tag_members (tagName):
+#
+#      Returns membses with the given tag. If no tag is given then returns all users
+#    
+    users = []
+
+        
+    try:
+        base = PEOPLE_BASE
+        
+        if tagName:
+            results = l.search_s(base , ldap.SCOPE_ONELEVEL, 'description=%s' % tagName)
+        else:
+            results = l.search_s(base , ldap.SCOPE_ONELEVEL)
+
+        for dn, entry in results:
+            users.append(entry)
+        
+        users = sorted(users, key=itemgetter('uid'))
     except:
         pass
          
     return users   
 
-                 
-users = cluster_members('jasmin-login')
 
-for user in users:
-   print user
-   
-#groups = ceda_groups()
-#groups.sort()
+def member_details (uid):
 #
-#for group in groups:
-#   if group.startswith('gws_') or group == 'upscale':
-#      print group
-#      members = group_members(group)
-#      members.sort()
-#      for member in members:
-#          print ' ', member
-      
-      
-#members = group_members('gws_pagoda')
-#for member in members:
-#   print member
-#for dn,entry in r:
-#   print 'Processing', repr(dn)
-#   print entry
-#   try:
-#      print entry['memberUid']
-#   except:
-#       pass
+#      Returns membses with the given tag. If no tag is given then returns all users
+#    
+
+    base = PEOPLE_BASE
+    
+    try:    
+        userDetails = l.search_s(base , ldap.SCOPE_ONELEVEL, 'uid=%s' % uid) 
+    except:
+        pass
+         
+    return userDetails[0][1]

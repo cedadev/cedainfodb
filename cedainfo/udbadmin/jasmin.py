@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 import os
 import sys
 import tempfile
+import LDAP
+from operator import itemgetter
 
 from models import *
 import NISaccounts
@@ -27,7 +29,41 @@ def _list_difference(list1, list2):
             diff_list.append(item)
     return diff_list
 
+@login_required()
+def list_jasmin_users(request, tag=''):
+    """
+    Lists jasmin users which have the given tag in the LDAP database
+    """    
+    users = LDAP.tag_members(tag)
+    
+    for user in users:
+       accountID = user['uid'][0]
+       groups = LDAP.member_groups(accountID)
+       groups = sorted(groups, key=itemgetter('cn'))
+       user['groups'] = groups
+       
+    return render_to_response ('list_jasmin_users.html', locals())
+    
+@login_required()
+def ldap_group_details(request, group=''):
+    """
+    Lists details of the given group in the LDAP database
+    """    
+    
+    details = LDAP.group_details(group)
+          
+    return render_to_response ('ldap_group_details.html', locals())
 
+@login_required()
+def ldap_list_groups(request):
+    """
+    Lists all groups in the LDAP database
+    """    
+    
+    groupsInfo = LDAP.ceda_groups()
+          
+    return render_to_response ('ldap_list_groups.html', locals())
+    
 @login_required()
 def check_linux_groups(request):
     """

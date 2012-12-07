@@ -37,7 +37,13 @@ urlpatterns = patterns('',
 
      url(r'^jasmin/check_linux_groups/$', check_linux_groups),     
      url(r'^jasmin/nis_group_entries/$', nis_group_entries),     
- 
+
+     url(r'^jasmin/list_users/(?P<tag>.+)/$', list_jasmin_users), 
+     url(r'^jasmin/list_users/$', list_jasmin_users), 
+
+     url(r'^jasmin/group/(?P<group>.+)$', ldap_group_details), 
+     url(r'^jasmin/group/$', ldap_list_groups), 
+      
      url(r'^authorise/(?P<userkey>\d{1,6})/$', authorise_datasets),
      url(r'^udj/(?P<id>\d{1,6})/$', edit_user_dataset_join),
      url(r'^request/(?P<id>\d{1,6})/$', edit_dataset_request),
