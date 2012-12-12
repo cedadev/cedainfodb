@@ -38,15 +38,11 @@ from django.db.models import Max, Min
 from datetime import datetime
 from pytz import timezone
 import choices
-import NISaccounts
 import django.db.models.options as options
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
 USERDB = u'userdb'
-
-EXT_PASSWD = NISaccounts.getExtPasswdFile()
-INT_PASSWD = NISaccounts.getIntPasswdFile()
-         
+        
 class Dataset(models.Model):
     datasetid = models.CharField(max_length=40, primary_key=True)
 
@@ -276,25 +272,25 @@ class User (models.Model):
             requests=self.datasetrequest_set.all()
         return requests
 
-    def isExtNISUser (self):
-        '''Returns True if the user should appear in the external NIS database.
-           This should really be determined by checking for 'isJasminUser', 'isCemsUser' or 'isExtLinuxUser',
-           but for now we will cheat and simply check if they are already in the external NIS passwd file.
-        '''
-                
-        if self.accountid in EXT_PASSWD.keys():
+    def hasDataset(self, datasetid):
+        """Checks if the user has access to the given datasetid"""
+           
+        if self.datasetjoin_set.all().filter(removed__exact=0, datasetid=datasetid):  
             return True
         else:
-            return False     
+            return False    
 
-    def isIntNISUser (self):
-        '''Returns True if the user should appear in the internal NIS database.
-        '''
-                
-        if self.accountid in INT_PASSWD.keys():
-            return True
-        else:
-            return False     
+    def isLDAPUser(self, tag=''):
+        """Checks if the user should be in the LDAP database with the given tag"""
+               
+        if not tag:
+           return self.isLDAPUser("cluster:ceda-internal") or self.isLDAPUser("cluster:ceda-external")
+                  
+        if tag == "cluster:ceda-internal":
+           return self.hasDataset("ceda")
+        elif tag == "cluster:ceda-external":
+           return self.hasDataset("jasmin-login") or self.hasDataset("cems-login")       
+     
      
     def nextUserkey (self):        
         '''Returns the next userkey value'''

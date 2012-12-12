@@ -56,3 +56,27 @@ def getIntPasswdFile():
 
     return pw
     
+
+def isExtNISUser (user):
+    '''Returns True if the user should appear in the external NIS database.
+       This should really be determined by checking for 'isJasminUser', 'isCemsUser' or 'isExtLinuxUser',
+       but for now we will cheat and simply check if they are already in the external NIS passwd file.
+    '''
+
+    if user.accountid in EXT_PASSWD.keys():
+        return True
+    else:
+        return False     
+
+def isIntNISUser (user):
+    '''Returns True if the user should appear in the internal NIS database.
+    '''
+
+    if user.accountid in INT_PASSWD.keys():
+        return True
+    else:
+        return False     
+
+
+EXT_PASSWD = getExtPasswdFile()
+INT_PASSWD = getIntPasswdFile()

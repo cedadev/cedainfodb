@@ -2,19 +2,17 @@ import ldap
 
 from operator import itemgetter
 
-
 LDAP_URL    = 'ldap://homer.esc.rl.ac.uk'
 GROUP_BASE  = "ou=ceda,ou=Groups,o=hpc,dc=rl,dc=ac,dc=uk"
 PEOPLE_BASE = "ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"
 
-l = ldap.initialize(LDAP_URL)
-
-
+#l = ldap.initialize(LDAP_URL)
+l = ldap.ldapobject.ReconnectLDAPObject(LDAP_URL, trace_level=0, retry_max=3)
 
 def ceda_groups():
-#
-#      Returns all ceda group names
-#
+
+    """Returns all ceda group names"""
+    
     groups = []
     
     try:
@@ -41,9 +39,9 @@ def ceda_groups():
         
 
 def group_members (group):
-#
-#      Returns membses of given group
-#    
+
+    """Returns members of given group"""
+    
     try:
         base = "cn=%s," % group + GROUP_BASE
         (dn, entry) = l.search_s(base , ldap.SCOPE_BASE)[0]
@@ -85,6 +83,39 @@ def group_details (group):
         return []
 
 
+def peopleTags ():
+
+    """Returns list of tags used for people"""
+        
+    base = PEOPLE_BASE
+    results = l.search_s(base , ldap.SCOPE_ONELEVEL, attrlist=['description'])
+
+    tags = []
+
+    for dn, entry in results:
+        tags = tags + entry['description']
+
+    tags = list(set(tags))
+    tags.sort()  
+    return tags
+
+def groupTags ():
+
+    """Returns list of tags used for people"""
+        
+    base = GROUP_BASE
+    results = l.search_s(base , ldap.SCOPE_ONELEVEL, attrlist=['description'])
+
+    tags = []
+
+    for dn, entry in results:
+        tags = tags + entry['description']
+
+    tags = list(set(tags))
+    tags.sort()  
+    return tags
+        
+
 def tag_members (tagName):
 #
 #      Returns membses with the given tag. If no tag is given then returns all users
@@ -111,9 +142,8 @@ def tag_members (tagName):
 
 
 def member_details (uid):
-#
-#      Returns membses with the given tag. If no tag is given then returns all users
-#    
+
+    """Returns members with the given tag. If no tag is given then returns all users"""    
 
     base = PEOPLE_BASE
     
@@ -123,3 +153,18 @@ def member_details (uid):
         pass
          
     return userDetails[0][1]
+
+
+def peopleTagChoices():
+    """Returns peopleTags as list suitable for use as 'choices' argument in forms"""
+    
+    tags = peopleTags()
+
+    choices = [('', 'All users')]
+    
+    for tag in tags:
+       choices.append ((tag, tag))
+
+    return choices
+
+

@@ -10,6 +10,7 @@ import LDAP
 from operator import itemgetter
 
 from models import *
+from udbadmin.forms import *
 import NISaccounts
 
 
@@ -32,8 +33,14 @@ def _list_difference(list1, list2):
 @login_required()
 def list_jasmin_users(request, tag=''):
     """
-    Lists jasmin users which have the given tag in the LDAP database
+    Lists LDAP users which have the given tag in the LDAP database
     """    
+    
+    if request.method == 'POST':
+        tag = request.POST.get('tagname', '')  
+    else:
+        tag = 'cluster:jasmin-login'
+           
     users = LDAP.tag_members(tag)
     
     for user in users:
@@ -42,8 +49,16 @@ def list_jasmin_users(request, tag=''):
        groups = sorted(groups, key=itemgetter('cn'))
        user['groups'] = groups
        
+#       try:
+#           udbuser = User.objects.get(accountid=accountID)
+#           user['udbuser'] = udbuser
+#       except:
+#           user['udbuser'] = None
+
+    myform = LDAPuserForm(initial={'tagname':tag},)
+           
     return render_to_response ('list_jasmin_users.html', locals())
-    
+   
 @login_required()
 def ldap_group_details(request, group=''):
     """

@@ -4,14 +4,16 @@
 
 <h1>LDAP users</h1>
 
-<table border="1">
-<tr><td>Tag name:<td> {{ tag }}
-<tr><td>Number of users: <td>{{users|length}}
-</table>
-<p/>
 
+<form method="post">
+Display users with tag: {{myform.tagname }}
+<input type="Submit" value="Go">
+</form>
+<p>
+Number of users: {{users|length}}
+<p>
 <table border="1">
-<th>Details<th>Account<th>UID<th>Name
+<th>Details<th>Account<th>UID<th>Name<th>LDAP groups
 {% for user in users %}
 
 <tr>
@@ -20,6 +22,7 @@
 <td>{{ user.uid.0 }}
 <td>{{ user.uidNumber.0 }}
 <td>{{ user.gecos.0 }}
+
 <td>
 {% for group in user.groups %}
 <a href="/udbadmin/jasmin/group/{{group.cn.0}}">{{  group.cn.0 }}</a>

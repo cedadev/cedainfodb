@@ -2,17 +2,21 @@ from django.forms import *
 from models import *
 from django.contrib.admin import widgets
 import choices
+import LDAP
 
+class LDAPuserForm(forms.Form):
+    tagname = ChoiceField(choices=LDAP.peopleTagChoices())
+    
 class UdjForm(forms.Form):
-   fundingtype = ChoiceField(choices=choices.FUNDING_TYPES)
-   nercfunded  = ChoiceField(choices=choices.NERC_FUNDED)
-   openpub     = ChoiceField(choices=choices.OPEN_PUBLICATION)
-   removed     = ChoiceField(choices=((0, "No"), (-1, "Yes")))
+    fundingtype = ChoiceField(choices=choices.FUNDING_TYPES)
+    nercfunded  = ChoiceField(choices=choices.NERC_FUNDED)
+    openpub     = ChoiceField(choices=choices.OPEN_PUBLICATION)
+    removed     = ChoiceField(choices=((0, "No"), (-1, "Yes")))
 
 class DatasetRequestForm(forms.Form):
-   fundingtype = ChoiceField(choices=choices.FUNDING_TYPES)
-   nercfunded  = ChoiceField(choices=choices.NERC_FUNDED)
-   openpub     = ChoiceField(choices=choices.OPEN_PUBLICATION)
+    fundingtype = ChoiceField(choices=choices.FUNDING_TYPES)
+    nercfunded  = ChoiceField(choices=choices.NERC_FUNDED)
+    openpub     = ChoiceField(choices=choices.OPEN_PUBLICATION)
 
 class DatasetForm(ModelForm):
     # customise the form a bit
@@ -29,7 +33,7 @@ class DatasetForm(ModelForm):
             return 0
         else:
             return self.cleaned_data["gid"]             
-        
+
     class Meta:
         model = Dataset
 #	fields = ('datasetid', 'authtype', 'grp', 'description', 'directory', 'conditions', 'defaultreglength', 'datacentre', 'infourl', 'comments')
