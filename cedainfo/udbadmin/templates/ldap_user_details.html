@@ -1,0 +1,26 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>LDAP user details</h1>
+
+
+<table border="1">
+<tr><td><b>AccountID:</b><td>{{details.cn.0}}
+<tr><td><b>Gecos string:</b><td>{{details.gecos.0}}
+<tr><td><b>UID:</b><td>{{details.uidNumber.0}}
+<tr><td><b>Home directory:</b><td>{{details.homeDirectory.0}}
+<tr><td><b>Shell:</b><td>{{details.loginShell.0}}
+
+<tr><td><b>GID:</b><td>{{details.gidNumber.0}}
+
+<tr><td><b>Public key:</b><td>{{details.sshPublicKey.0}}
+
+<tr><td><b>Tags:</b><td>
+
+{% for tag in details.description %}
+<a href="/udbadmin/jasmin/list_users/?tagname={{tag}}">{{tag}}</a><br>
+{% endfor %}
+
+</table>
+{% endblock %}
