@@ -43,6 +43,8 @@ urlpatterns = patterns('',
 
      url(r'^jasmin/group/(?P<group>.+)$', ldap_group_details), 
      url(r'^jasmin/group/$', ldap_list_groups), 
+     
+     url(r'^ldap/user/(?P<accountid>.+)$', ldap_user_details),      
       
      url(r'^authorise/(?P<userkey>\d{1,6})/$', authorise_datasets),
      url(r'^udj/(?P<id>\d{1,6})/$', edit_user_dataset_join),

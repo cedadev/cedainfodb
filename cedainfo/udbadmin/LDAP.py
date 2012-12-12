@@ -167,4 +167,3 @@ def peopleTagChoices():
 
     return choices
 
-

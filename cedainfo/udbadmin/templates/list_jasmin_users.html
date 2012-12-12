@@ -13,13 +13,13 @@ Display users with tag: {{myform.tagname }}
 Number of users: {{users|length}}
 <p>
 <table border="1">
-<th>Details<th>Account<th>UID<th>Name<th>LDAP groups
+<th>Userdb<th>Account<th>UID<th>Name<th>LDAP groups
 {% for user in users %}
 
 <tr>
-<td><a href="/admin/udbadmin/user/?accountid={{user.uid.0}}">Userdb</a>
+<td><a href="/admin/udbadmin/user/?accountid={{user.uid.0}}" title="View/Edit user details in userdb">View</a>
 
-<td>{{ user.uid.0 }}
+<td><a href="/udbadmin/ldap/user/{{user.uid.0}}" title="View user details in LDAP database">{{ user.uid.0 }}</a>
 <td>{{ user.uidNumber.0 }}
 <td>{{ user.gecos.0 }}
 

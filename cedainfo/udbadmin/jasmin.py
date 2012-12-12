@@ -36,10 +36,12 @@ def list_jasmin_users(request, tag=''):
     Lists LDAP users which have the given tag in the LDAP database
     """    
     
-    if request.method == 'POST':
-        tag = request.POST.get('tagname', '')  
-    else:
-        tag = 'cluster:jasmin-login'
+    tag = request.REQUEST.get('tagname', 'cluster:jasmin-login')
+    
+#    if request.method == 'POST':
+#        tag = request.POST.get('tagname', '')  
+#    else:
+#        tag = 'cluster:jasmin-login'
            
     users = LDAP.tag_members(tag)
     
@@ -68,6 +70,17 @@ def ldap_group_details(request, group=''):
     details = LDAP.group_details(group)
           
     return render_to_response ('ldap_group_details.html', locals())
+
+   
+@login_required()
+def ldap_user_details(request, accountid=''):
+    """
+    Lists details of the given user in the LDAP database
+    """    
+    
+    details = LDAP.member_details(accountid)
+          
+    return render_to_response ('ldap_user_details.html', locals())
 
 @login_required()
 def ldap_list_groups(request):
