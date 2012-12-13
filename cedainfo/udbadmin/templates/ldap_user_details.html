@@ -22,5 +22,12 @@
 <a href="/udbadmin/jasmin/list_users/?tagname={{tag}}">{{tag}}</a><br>
 {% endfor %}
 
+<tr><td><b>Root access:</b><td>
+
+{% for name in details.rootAccessGroupName %}
+    {{name}}<br>
+{% endfor %}
+
 </table>
+
 {% endblock %}
