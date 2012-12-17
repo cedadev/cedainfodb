@@ -30,6 +30,52 @@ def _list_difference(list1, list2):
             diff_list.append(item)
     return diff_list
 
+
+@login_required()
+def ldap_list_root_users(request):
+    """
+    Lists LDAP users that have root access
+    """      
+    
+    info = []
+             
+    groupNames = LDAP.rootAccessGroupNameValues()
+
+    LDAPRootAccessAccountIDs = []
+    notInLDAP                = []     
+   
+    for name in groupNames:
+    
+        if not (name == 'NON-STAFF' or name == 'NON_STAFF'):
+            members = LDAP.attribute_members('rootAccessGroupName', name)
+            
+            for member in members:
+                #
+                # Check udb to see if user should have root access or not
+                #            
+                accountid = member['uid'][0]
+               
+                LDAPRootAccessAccountIDs.append(accountid)
+                
+                user = User.objects.get(accountid=accountid)  
+                if user.hasDataset("vm_root"):
+                    member['udbRootAccess'] = True
+                else:
+                    member['udbRootAccess'] = False                
+                      
+            info.append((name, members))
+#
+#      Check for any users in the userdb who are not in LDAP
+#
+    udjJoin  = Datasetjoin.objects.filter(datasetid="vm_root").filter(userkey__gt=0).filter(removed=0)            
+            
+    for entry in udjJoin:
+        if entry.userkey.accountid not in LDAPRootAccessAccountIDs:
+            notInLDAP.append(entry.userkey.accountid)
+ 
+        
+    return render_to_response ('ldap_list_root_users.html', locals())
+   
 @login_required()
 def list_jasmin_users(request, tag=''):
     """

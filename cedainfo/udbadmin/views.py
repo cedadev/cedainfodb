@@ -47,6 +47,19 @@ def home(request):
     user = request.user
     return render_to_response('home.html', locals())
 
+@login_required()
+def user_edit_by_accountid(request, accountid):
+    """Provides a simple redirect to allow user details page to be specified directly by accountid. 
+       You can do this by adding '?accountid=' to the admin page, but you end up with an extra page
+       of 'results' in between."""
+   
+    try:    
+        cedauser = User.objects.get(accountid=accountid)
+    except:
+       return HttpResponse('Accountid: %s not found' % accountid)
+    
+    return redirect ('/admin/udbadmin/user/%s' % cedauser.userkey)
+
 
 def user_account_details(request, userkey):
  

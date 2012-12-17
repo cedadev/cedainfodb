@@ -82,26 +82,37 @@ def group_details (group):
     except:
         return []
 
-
 def peopleTags ():
 
-    """Returns list of tags used for people"""
+    """Returns list of description tags used for people"""
+
+    return personAttributeValues('description')        
+
+def rootAccessGroupNameValues():
+    """Returns list of values used for the 'rootAccessGroupName' attribute"""
+    return personAttributeValues('rootAccessGroupName')
+    
+def personAttributeValues (attribute):
+
+    """Returns all values of the given attribute"""
         
     base = PEOPLE_BASE
-    results = l.search_s(base , ldap.SCOPE_ONELEVEL, attrlist=['description'])
+    
+    results = l.search_s(base , ldap.SCOPE_ONELEVEL, attrlist=[attribute])
 
     tags = []
 
     for dn, entry in results:
-        tags = tags + entry['description']
+        tags = tags + entry[attribute]
 
     tags = list(set(tags))
     tags.sort()  
     return tags
 
+
 def groupTags ():
 
-    """Returns list of tags used for people"""
+    """Returns list of tags used for groups"""
         
     base = GROUP_BASE
     results = l.search_s(base , ldap.SCOPE_ONELEVEL, attrlist=['description'])
@@ -141,6 +152,27 @@ def tag_members (tagName):
     return users   
 
 
+def attribute_members (attributeName, attributeValue):
+    """Returns members who have the given attribute set to the given value"""
+    
+    users = []
+        
+    try:
+        base = PEOPLE_BASE
+        
+
+        results = l.search_s(base , ldap.SCOPE_ONELEVEL, '%s=%s' % (attributeName, attributeValue))
+
+        for dn, entry in results:
+            users.append(entry)
+        
+        users = sorted(users, key=itemgetter('uid'))
+    except:
+        pass
+         
+    return users   
+
+
 def member_details (uid):
 
     """Returns members with the given tag. If no tag is given then returns all users"""    
@@ -167,3 +199,24 @@ def peopleTagChoices():
 
     return choices
 
+
+def rootAccessMembers():
+    """Returns list of accountIDs of members who have root access privilege"""
+    memberAccounts = []
+    
+    groupNames = rootAccessGroupNameValues()
+
+    for name in groupNames:
+#
+#              Ignore values of rootAccessGroupName that are not actually used
+#    
+        if not (name == 'NON-STAFF' or name == 'NON_STAFF'):
+            members = attribute_members('rootAccessGroupName', name)
+ 
+            for member in members:
+                memberAccounts.append(member['uid'][0])
+
+    memberAccounts = list(set(memberAccounts))
+    memberAccounts .sort()
+    
+    return memberAccounts

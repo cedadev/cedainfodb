@@ -5,11 +5,9 @@ from authorise import *
 from jasmin import *
 from django.views.generic import list_detail
 
-
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
-
 
 urlpatterns = patterns('',
     # Examples:
@@ -20,7 +18,8 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
 #     url(r'^admin/', include(admin.site.urls)),
 
-     url(r'^$', home),     
+     url(r'^$', home), 
+     url(r'^user/accountid/(?P<accountid>.+)/$', user_edit_by_accountid),    
      url(r'^user/datasets/current/(?P<userkey>\d{1,6})/$', list_current_user_datasets),   
      url(r'^user/datasets/removed/(?P<userkey>\d{1,6})/$', list_removed_user_datasets),        
 
@@ -45,7 +44,8 @@ urlpatterns = patterns('',
      url(r'^jasmin/group/$', ldap_list_groups), 
      
      url(r'^ldap/user/(?P<accountid>.+)$', ldap_user_details),      
-      
+     url(r'^ldap/list_root_users$', ldap_list_root_users),
+           
      url(r'^authorise/(?P<userkey>\d{1,6})/$', authorise_datasets),
      url(r'^udj/(?P<id>\d{1,6})/$', edit_user_dataset_join),
      url(r'^request/(?P<id>\d{1,6})/$', edit_dataset_request),
