@@ -1,0 +1,49 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>LDAP root users</h1>
+
+This page lists the users for each group access name defined in the LDAP database. These groups are then used in the configuration of
+VMs to define which users are allowed access. If a user does not have the vm_root role in the userdb then their accountid is highlighted
+in red.
+<p> 
+
+
+{% if notInLDAP %}
+<font color="red">
+<h2>Warning</h2>
+According to the userdb the following users have root access, but they do not appear in the LDAP database:
+<p>
+{% for accountid in notInLDAP %}
+    <a href="/udbadmin/ldap/user/{{accountid}}"  title="View LDAP user details">{{accountid}}</a>              
+    <a href="/udbadmin/user/accountid/{{accountid}}" title="View/Edit userdb details"> (Userdb)</a>
+{% endfor %}
+</font>
+{% endif %}
+
+
+{% for group in info %}
+    <h2>{{ group.0 }}</h2>
+
+    <blockquote>
+    {% for member in group.1 %}
+        {% if member.udbRootAccess %}
+            <a href="/udbadmin/ldap/user/{{member.uid.0}}" title="View LDAP user details">{{member.uid.0}}</a>
+        {% else %}
+            <a href="/udbadmin/ldap/user/{{member.uid.0}}"  title="View LDAP user details"><font color="red">{{member.uid.0}}</font></a>      
+        {% endif %}  
+        
+        <a href="/udbadmin/user/accountid/{{member.uid.0}}" title="View/Edit userdb details"> (Userdb)</a>
+
+        <br>  
+        
+    {% endfor %}
+    </blockquote>
+
+    <p>
+{% endfor %}
+
+
+
+{% endblock %}
