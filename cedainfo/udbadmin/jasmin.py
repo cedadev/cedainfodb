@@ -153,7 +153,8 @@ def check_linux_groups(request):
 #   datasetid that starts with 'gws_' ('group workspace'), but it might need to be changed
 #   to use another method.
 #    
-    datasets = Dataset.objects.all().filter(datasetid__startswith='gws_')
+#    datasets = Dataset.objects.all().filter(datasetid__startswith='gws_')
+    datasets = Dataset.objects.all().filter(gid__gt=0)
    
     for dataset in datasets:
             
@@ -219,7 +220,7 @@ def group_members_ext(datasetid):
     accountids = []
     
     for udj in udjs:
-       if  udj.userkey.isExtNISUser():
+       if  NISaccounts.isExtNISUser(udj.userkey):
            accountids.append(udj.userkey.accountid)
               
     return _unique(accountids)
@@ -235,7 +236,7 @@ def group_members_int(datasetid):
     accountids = []
     
     for udj in udjs:
-       if  udj.userkey.isIntNISUser():
+       if NISaccounts.isIntNISUser(udj.userkey):
            accountids.append(udj.userkey.accountid)
               
     return _unique(accountids)
@@ -252,11 +253,11 @@ def group_members(datasetid, server='external'):
 
     if server == 'external':    
         for udj in udjs:
-           if  udj.userkey.isExtNISUser():
+           if NISaccounts.isExtNISUser(udj.userkey):
                accountids.append(udj.userkey.accountid)
     else:        
         for udj in udjs:
-           if  udj.userkey.isIntNISUser():
+           if NISaccounts.isIntNISUser(udj.userkey):
                accountids.append(udj.userkey.accountid)
                   
     return _unique(accountids)
