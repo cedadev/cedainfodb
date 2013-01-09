@@ -17,30 +17,34 @@ VM Request list
 
 <br>
 
-	<table border="1">
-	    <tr>
-		<th>Id</th>
-		<th>Name</th>
-        <th>Type</th>
-        <th>Op Type</th>
-        <th>Requester</th>
-        <th>Date Required</th>
-        <th>Status</th>
-        <th>End of life</th>
-        </tr>
-	    {% for i in items %}
-		    <tr>
-	            <td><a href="/vmrequest/{{i.id}}">{{i.id}}</a></td>
-	            <td><a href="/vmrequest/{{i.id}}">{{i.vm_name}}</a></td>
-                <td>{{i.type}}</td>
-	            <td>{{i.operation_type}}</td>
-                <td>{{i.internal_requester}}</td>
-                <td>{{i.date_required}}</td>
-	            <td>{{i.request_status}}</td>
-	            <td>{{i.end_of_life}}</td>
-			</tr>
-        {% endfor %}
-	</table>
+    <table border="1">
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+    <th>Type</th>
+    <th>Request Type</th>
+    <th>Op Type</th>
+    <th>Requester</th>
+    <th>Date Required</th>
+    <th>Status</th>
+    <th>End of life</th>
+    <th>VM</th>
+    </tr>
+        {% for i in items %}
+                <tr>
+                <td><a href="/vmrequest/{{i.id}}">{{i.id}}</a></td>
+                <td><a href="/vmrequest/{{i.id}}">{{i.vm_name}}</a></td>
+            <td>{{i.type}}</td>
+            <td>{{i.request_type}}</td>
+                <td>{{i.operation_type}}</td>
+            <td>{{i.internal_requester}}</td>
+            <td>{{i.date_required}}</td>
+                <td>{{i.request_status}}</td>
+                <td>{{i.end_of_life}}</td>
+            <td>{{i.vm}}</td>
+                    </tr>
+    {% endfor %}
+    </table>
 {% endblock %}
 
 
