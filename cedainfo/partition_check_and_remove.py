@@ -37,14 +37,16 @@ class TidyRun:
             # make new run
             self.state = {'files_deleted':0, 'links_deleted':0, 'dirs_deleted':0, 'files_checked':0, 'vol_deleted':0, 
                      'filesets_checked':0, 'partitions_checked':0}
-            self.LOG = open("%s.log" % filename, 'a')
+            self.LOG = open("%s.log" % filename, 'w')
             self.state['current_partition_index'] = 0
             self.state['current_fileset']=None
             self.state['run_start'] = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
             self.LOG.write("==== started: %s\n" % self.state['run_start'])
             self.state['partitions_todo'] = []
-            for p in Partition.objects.filter(status='Migrating').order_by('mountpoint'): 
+            for p in Partition.objects.filter(status='Migrating').order_by('-capacity_bytes','mountpoint'): 
                 self.state['partitions_todo'].append(p.pk)
+            print self.state['partitions_todo']
+            print self.state['current_partition_index']
             self.partition = Partition.objects.get(pk=self.state['partitions_todo'][self.state['current_partition_index']])
             self.write_runfile()
             
@@ -52,6 +54,9 @@ class TidyRun:
             f = open(filename)
             self.state = pickle.load(f)
             self.LOG = open("%s.log" % filename, 'a')
+            if self.state['current_partition_index'] >= len(self.state['partitions_todo']):
+                raise Exception("Old runfile says its finished") 
+            self.partition = None
             self.state['reload'] =  time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
             self.partition = Partition.objects.get(pk=self.state['partitions_todo'][self.state['current_partition_index']])            
             self.write_runfile()
@@ -60,6 +65,11 @@ class TidyRun:
         output = open(self.filename, 'wb')
         pickle.dump(self.state, output)
         output.close()
+
+    def log(self,msg):
+        self.LOG.write("%s\n" % msg)
+        self.LOG.flush()
+        
 
     def next_partition(self):
         self.partition = Partition.objects.get(pk=self.state['partitions_todo'][self.state['current_partition_index']])
@@ -87,94 +97,127 @@ class TidyRun:
             filesets = FileSet.objects.filter(storage_pot=s, storage_pot_type = 'archive')
             old_spotpath = os.path.join( old_archivedir, s)
             if len(filesets)==0: 
-                self.LOG.write("** %s no matching fileset- skip\n" %s)
+                self.log("** %s no matching fileset- skip" % s)
                 continue
             if len(filesets)>1:
-                self.LOG.write("** %s more than 1 matching fileset- skip\n" %s)
+                self.log("** %s more than 1 matching fileset- skip" %s)
                 continue
             print filesets
             fileset = filesets[0]
             new_spotpath = fileset. storage_path()
-            self.LOG.write("old path %s was migrated to %s\n" % (old_spotpath, new_spotpath))
+            self.log("old path %s was migrated to %s" % (old_spotpath, new_spotpath))
             if old_spotpath == new_spotpath:
-                self.LOG.write("** %s old and new the same - skip\n" %s)
+                self.log("** %s old and new the same - skip" %s)
                 continue
 
             # latest size measurements
             size = fileset.last_size()
-            self.LOG.write("%s\n" %size)
-        
+            self.log("%s" %size)
+            if size != None: lastfiles = size.no_files
+            else: 
+                self.log("** %s no file size measurement - skip" %s)
+                continue
 
             # storage-d backup size
             #backup= fileset.backup_summary()
             #self.LOG.write("%s\n" %backup)
 
             # crude storage-d size finder via screen scrape... 
-            #url = 'http://storaged-monitor.esc.rl.ac.uk/storaged_ceda/CEDA_Fileset_Summary.php?%s' % s
-            #import urllib2
-            #f = urllib2.urlopen(url)
-            #for i in range(7): f.readline()
-            #backup = f.readline()
-            #backup = backup.split('<td')
-            #m = re.search('>(\d*)</a></td>', backup[3])
-            #backupfiles = m.group(1)
-            #if backupfiles !='': backupfiles = int(backupfiles)
-            #else: backupfiles = 0 
-            #print backupfiles, size.no_files
+            url = 'http://storaged-monitor.esc.rl.ac.uk/storaged_ceda/CEDA_Fileset_Summary_XML.php?%s' % s
+            import urllib2
+            f = urllib2.urlopen(url)
+            backup = f.read()
+            m = re.search('<total_volume>(.*)</total_volume><total_file_count>(.*)</total_file_count>', backup)
+            try:
+                backupsize, backupfiles =  int(m.group(1)), int(m.group(2))
+            except:
+                backupsize, backupfiles = 0, 0
+            if backupfiles >= size.no_files: print "OK -- ",backupfiles, size.no_files
+            else: print " *** ",backupfiles, size.no_files 
 
             # skip if no backup         
-            #if backupfiles == size.no_files: print "**** exactly the right size backup ****"
+            if backupfiles >= size.no_files: print "**** backup with more files done ****"
             #elif backupfiles > 0: print "++++ some backup done ++++"
-            #else: 
-            #    print "no backup done - skip"
-            #    continue 
+            else: 
+                self.log("** %s no backup suffience on storage-D  (storage-d:%s, measured:%s)- skip" %(s,backupfiles, size.no_files))
+                continue 
 
-            #check_del(old_spotpath, new_spotpath)
-        
+            self.check_del(old_spotpath, new_spotpath)
+            
+            # record that a fileset has been checked
+            self.state['filesets_checked'] += 1 
+            self.write_runfile()
 
+        # record that a partition has been checked
+        self.state['partitions_checked'] += 1 
+        self.write_runfile()
+
+            
 
     def check_del(self, old, new):
+        # check files are ok to remove         
+        # if all files are checked and ok return True 
+
+        # check file present?
+        # use a MIGRATED.txt file to see if this dir and it's subdirectories have been checked
+        if os.path.exists(os.path.join(old, 'MIGRATED.txt')): return True
+
+        # if can't write in the dir then skip this one because it will not be possible to record it as checked.
+        if not os.access(old, os.W_OK):
+            self.log("Can't write to this dir (skip): %s" % old)
+            return False
+
         files = os.listdir(old)
+        nfiles = len(files)
+
         for f in files:
             oldpath = os.path.join(old, f)
             newpath = os.path.join(new, f)
-            self.status['files_checked'] += 1 
+            self.state['files_checked'] += 1 
+            
+            if not os.path.exists(newpath):
+                self.log("MISSING: %s" % newpath)
+                continue
 
             if os.path.islink(oldpath): 
                 if os.path.islink(newpath): 
-                    #os.unlink(oldpath)
-                    self.status['links_deleted'] += 1 
-                    self.LOG.write("RMLINK: %s\n" % oldpath)
+                    self.state['links_deleted'] += 1 
+                    self.log("RMLINK: %s" % oldpath)
+                    nfiles -= 1
 
             elif os.path.isdir(oldpath): 
-                check_del(oldpath, newpath)
-                nfiles =  len(os.listdir(oldpath))
-                if nfiles == 0: 
-                    #os.rmdir(oldpath)
-                    self.status['dirs_deleted'] += 1 
-                    self.LOG.write("RMDIR: %s\n" % oldpath)
+                
+                if self.check_del(oldpath, newpath):
+                    self.state['dirs_deleted'] += 1 
+                    self.log("RMDIR: %s" % oldpath)
+                    nfiles -= 1
+                    self.write_runfile()
 
             elif os.path.isfile(oldpath): 
                 same = filecmp.cmp(oldpath, newpath)        
                 if same: 
-                    #os.unlink(oldpath)
-                    self.status['files_deleted'] += 1 
-                    self.LOG.write("DEL: %s\n" % oldpath)
+                    self.state['files_deleted'] += 1 
+                    self.state['vol_deleted'] += os.path.getsize(oldpath)
+                    self.log("DEL: %s" % oldpath)
+                    nfiles -= 1
 
             else: 
-                self.LOG.write("IREGULAR FILE: %s\n" % oldpath)
+                self.log("IREGULAR FILE: %s" % oldpath)
                 continue 
             
+        # write MIGRATED.txt file to this dir and it's subdirectories have been checked
+        if nfiles ==0: 
+            M = open(os.path.join(old, 'MIGRATED.txt'),'w')
+            M.close()
+            return True
+        else: return False
 
 
 if __name__=="__main__":
     
-
-    T = TidyRun('/tmp/samsrun')
-
+    filename = sys.argv[1]
+    T = TidyRun(filename)
     T.write_runfile()
-
-   
     T.run()
 
 
