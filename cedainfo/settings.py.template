@@ -255,6 +255,7 @@ VM_REQUEST_TYPE_CHOICES = (
 )
 VM_STATUS_CHOICES = (
     ('active','active'),
+    ('operational', 'operational'),
     ('retired', 'retired'),
 )
 MOUNT_CHOICES = (
