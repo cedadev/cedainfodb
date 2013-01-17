@@ -634,3 +634,13 @@ def vmrequest_detail(request, id):
         'form': form,
     }) 
     return render_to_response('cedainfoapp/vmrequest_detail.html', c)
+
+# toggle operational status of a VM 
+@login_required()
+def toggle_operational(request, id):
+    vm = VM.objects.get(pk=id)
+    error = vm.toggle_operational()
+    if error: 
+        return render_to_response('error.html', {'error':error,'user':request.user})  
+    else:
+        return redirect(request.META['HTTP_REFERER'])

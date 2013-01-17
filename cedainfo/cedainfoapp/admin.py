@@ -287,7 +287,7 @@ class VMRequestAdmin(admin.ModelAdmin):
 admin.site.register(VMRequest, VMRequestAdmin)
 
 class VMAdmin(admin.ModelAdmin):
-    list_display=('name', 'type', 'operation_type', 'internal_requester', 'timestamp', 'status', )
+    list_display=('name', 'action_links', 'type', 'operation_type', 'internal_requester', 'timestamp', 'status', )
     list_filter=('type', 'operation_type', 'status', MountpointFilter,)
     search_fields = ('name',)
     def has_add_permission(self, request):

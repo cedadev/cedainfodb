@@ -1440,3 +1440,19 @@ class VM(models.Model):
     def update_link(self):
 		return u'<a href="/vm/%i/update">update</a>' % self.id
     update_link.allow_tags = True
+    
+    def toggle_operational(self):
+        '''Toggle a VM as operational (to be supported by SDDCS), or active (working, but not operational)'''
+        if self.status == 'operational':
+            self.status = 'active'
+        elif self.status == 'active':
+            self.status = 'operational'
+        else:
+            raise Exception("Unrecognised status to use for VM")
+        self.forceSave()
+        
+    def action_links(self):
+        return u'<a href="/vm/%i/toggleop">toggle operational</a>' % (self.id,)
+    action_links.allow_tags = True
+    action_links.short_description = 'actions'
+    
