@@ -1315,7 +1315,7 @@ class VMRequest(models.Model):
                 network_required = self.network_required,
                 os_required = self.os_required,
                 patch_responsible = self.patch_responsible,
-                status = 'active',
+                status = 'created',
                 end_of_life = self.end_of_life,
             )
             # root_users is a ManyToManyField, so need to copy outside of create()
@@ -1348,7 +1348,7 @@ class VMRequest(models.Model):
                 vm.network_required = self.network_required
                 vm.os_required = self.os_required
                 vm.patch_responsible = self.patch_responsible
-                vm.status = 'active'
+                vm.status = 'created'
                 vm.end_of_life = self.end_of_life
                 vm.root_users = self.root_users.all()
                 vm.forceSave()
@@ -1441,18 +1441,22 @@ class VM(models.Model):
 		return u'<a href="/vm/%i/update">update</a>' % self.id
     update_link.allow_tags = True
     
-    def toggle_operational(self):
-        '''Toggle a VM as operational (to be supported by SDDCS), or active (working, but not operational)'''
-        if self.status == 'operational':
-            self.status = 'active'
-        elif self.status == 'active':
-            self.status = 'operational'
+    def change_status(self):
+        '''Toggle a VM as inuse / deprecated / retired'''
+        if self.status == 'deprecated':
+            self.status = 'created'
+        elif self.status == 'created':
+            self.status = 'inuse'
+        elif self.status == 'inuse':
+            self.status = 'deprecated'
+        elif self.status == 'deprecated':
+            self.status = 'retired'
         else:
             raise Exception("Unrecognised status to use for VM")
         self.forceSave()
         
     def action_links(self):
-        return u'<a href="/vm/%i/toggleop">toggle operational</a>' % (self.id,)
+        return u'<a href="/vm/%i/changestatus">change status</a>' % (self.id,)
     action_links.allow_tags = True
     action_links.short_description = 'actions'
     

@@ -637,9 +637,9 @@ def vmrequest_detail(request, id):
 
 # toggle operational status of a VM 
 @login_required()
-def toggle_operational(request, id):
+def change_status(request, id):
     vm = VM.objects.get(pk=id)
-    error = vm.toggle_operational()
+    error = vm.change_status()
     if error: 
         return render_to_response('error.html', {'error':error,'user':request.user})  
     else:
