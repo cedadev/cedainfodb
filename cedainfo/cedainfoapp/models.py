@@ -1442,17 +1442,19 @@ class VM(models.Model):
     update_link.allow_tags = True
     
     def change_status(self):
-        '''Toggle a VM as inuse / deprecated / retired'''
-        if self.status == 'deprecated':
-            self.status = 'created'
-        elif self.status == 'created':
-            self.status = 'inuse'
-        elif self.status == 'inuse':
-            self.status = 'deprecated'
-        elif self.status == 'deprecated':
-            self.status = 'retired'
-        else:
-            raise Exception("Unrecognised status to use for VM")
+        '''Cycle thro the available VM_STATUS_CHOICES (created / inuse / deprecated / retired)'''
+        status_options = settings.VM_STATUS_CHOICES
+        current_index=0
+        for i in status_options:
+            # lookup position of current status value in tuple
+            if (self.status == i[0]):
+                break
+            current_index += 1
+        # select the next entry from the tuple
+        try:
+            self.status = status_options[current_index+1][0]
+        except IndexError:
+            self.status = status_options[0][0]
         self.forceSave()
         
     def action_links(self):
