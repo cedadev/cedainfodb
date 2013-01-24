@@ -644,3 +644,31 @@ def change_status(request, id):
         return render_to_response('error.html', {'error':error,'user':request.user})  
     else:
         return redirect(request.META['HTTP_REFERER'])
+        
+# list of actual GWSs presented for external viewers
+@login_required()    
+def gws_list(request):
+    o = request.GET.get('o', 'id') # default order is ascending id
+
+    filter = {}
+    if request.method=='POST': # if form was submitted
+        form = GWSListFilterForm(request.POST, initial={'status':'active'}, )
+        filter['status'] = request.POST['status']
+        filter['path'] = request.POST['path']
+        items = GWS.objects.filter(status__exact=filter['status'], path__exact=filter['path']).order_by(o)
+
+    else:   # provide a blank form
+        form = GWSListFilterForm(initial={'status':'active'}, )
+        items = GWS.objects.order_by(o)
+        
+    total_volume = 0
+    for i in items:
+        total_volume += i.requested_volume
+        
+    c = RequestContext(request, {
+        'form': form,
+        'items': items,
+        'total_volume': total_volume,
+    })        
+    c.update(csrf(request))
+    return render_to_response('cedainfoapp/gws_list.html', c)

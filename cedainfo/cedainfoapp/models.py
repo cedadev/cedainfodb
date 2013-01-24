@@ -1029,7 +1029,7 @@ class GWSRequest(models.Model):
             ]
         , help_text='short string to be used as name for group workspace, also used for corresponsing unix group name. Must match pattern %s' % settings.GWS_NAME_REGEX.pattern
         )
-    path = models.CharField(max_length=2048, help_text='storage path to this group workspace excluding GWS name', default='/group_workspaces/jasmin_or_cems/')
+    path = models.CharField(max_length=2048, help_text='storage path to this group workspace excluding GWS name', choices=settings.GWS_PATH_CHOICES)
     internal_requester = models.ForeignKey(User, help_text='CEDA person sponsoring the request')
     gws_manager = models.CharField(max_length=1024, help_text='External person who will manage the GWS during its lifetime')
     description = models.TextField(null=True, blank=True, help_text='Text description of proposed GWS')
@@ -1164,7 +1164,7 @@ class GWS(models.Model):
         )
 
     # Fields populated from GWS request
-    path = models.CharField(max_length=2048, help_text='storage path to this group workspace excluding GWS name')
+    path = models.CharField(max_length=2048, help_text='storage path to this group workspace excluding GWS name', choices=settings.GWS_PATH_CHOICES)
     internal_requester = models.ForeignKey(User, help_text='CEDA person sponsoring the GWS')
     gws_manager = models.CharField(max_length=1024, help_text='External person who will manage the GWS during its lifetime')
     description = models.TextField(null=True, blank=True, help_text='Text description of GWS')

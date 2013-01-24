@@ -60,6 +60,13 @@ class GWSRequestListFilterForm(ModelForm):
     class Meta:
         model = GWSRequest
         fields = ('request_status',)
+
+# Form for filters when displaying list of GWSs
+class GWSListFilterForm(ModelForm):
+    class Meta:
+        model = GWS
+        fields = ('status','path')
+    path = ChoiceField(choices=settings.GWS_PATH_CHOICES, required=False)
         
 # Form for filters when displaying list of VMRequests
 class VMRequestListFilterForm(ModelForm):
@@ -87,3 +94,4 @@ class GWSRequestDetailForm(ModelForm):
             'requested_volume': TextInput(attrs={'size': 80,}),
             'related_url': TextInput(attrs={'size': 80,}),
         }
+        
