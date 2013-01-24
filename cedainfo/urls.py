@@ -81,6 +81,7 @@ urlpatterns = patterns('',
     (r'^gwsrequest/(?P<id>\d+)/$', gwsrequest_detail), #detail view for external viewers    
 
 	(r'^gws/(?P<id>\d+)/update', create_gws_update_request),
+    (r'^gws/index/$', gws_list), # list for external viewers
     
     (r'^vmrequest/(?P<id>\d+)/approve', approve_vmrequest),
     (r'^vmrequest/(?P<id>\d+)/reject', reject_vmrequest),
