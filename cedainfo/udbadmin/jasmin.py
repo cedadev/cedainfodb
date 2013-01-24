@@ -284,7 +284,14 @@ def get_nis_group_entries(server='external'):
 #             Sort and remove any duplicates
 #
         accounts = _unique(accounts)
-        group_info['accounts']      = ['badc', 'prototype'] +accounts        
+#
+#              Add any known general users
+#
+        if server == 'external':
+            group_info['accounts']      = ['badc', 'prototype'] + accounts        
+        else:
+            group_info['accounts']      = ['badc', 'prototype', 'cwps'] + accounts        
+        
         group_info['accountString'] = ",".join(group_info['accounts']) 
 
         group_info['nisAccounts'] = groupFile[accessGroup].users 
