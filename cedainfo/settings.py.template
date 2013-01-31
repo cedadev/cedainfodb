@@ -138,6 +138,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'django_extensions',
+    'sizefield',
     'cedainfo.cedainfoapp',
     'cedainfo.proginfo',
     'cedainfo.udbadmin',
