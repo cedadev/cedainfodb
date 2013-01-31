@@ -1,4 +1,5 @@
 {% extends "base_site.html" %}
+{% load sizefieldtags %}
 
 {% block title %}
 Group Workspace Request list
@@ -35,7 +36,7 @@ Group Workspace Request list
 	            <td><a href="/gwsrequest/{{i.id}}">{{i.id}}</a></td>
 	            <td><a href="/gwsrequest/{{i.id}}">{{i.gws_name}}</a></td>
 	            <td>{{i.path}}</td>
-	            <td>{{i.requested_volume|filesizeformat}}</td>
+	            <td>{{i.requested_volume|filesize}}</td>
                 <td>{{i.internal_requester}}</td>
                 <td>{{i.gws_manager}}</td>
 	            <td>{{i.backup_requirement}}</td>

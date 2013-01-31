@@ -10,6 +10,9 @@ import re
 from storageDXMLClient import SpotXMLReader
 from fields import * # custom MultiSelectField, MultiSelectFormField from http://djangosnippets.org/snippets/2753/
 
+from sizefield.models import FileSizeField
+from sizefield.templatetags.sizefieldtags import filesize
+
 # needed for volume feed
 from django.contrib.syndication.views import Feed
 
@@ -1033,7 +1036,7 @@ class GWSRequest(models.Model):
     internal_requester = models.ForeignKey(User, help_text='CEDA person sponsoring the request')
     gws_manager = models.CharField(max_length=1024, help_text='External person who will manage the GWS during its lifetime')
     description = models.TextField(null=True, blank=True, help_text='Text description of proposed GWS')
-    requested_volume = models.BigIntegerField(help_text="In bytes, but can be enetered using integer<space>suffix e.g. '200 Tb'")
+    requested_volume = FileSizeField(help_text="In bytes, but can be enetered using suffix e.g. '200TB'")
     backup_requirement = models.CharField(max_length=127, choices=settings.GWS_BACKUP_CHOICES, default='no backup')
     related_url = models.URLField(verify_exists=False, blank=True, help_text='Link to further info relevant to this GWS')
     expiry_date = models.DateField(default = datetime.now()+timedelta(days=2*365), help_text="date after which GWS will be deleted") # approx 2 years from now
@@ -1145,6 +1148,10 @@ class GWSRequest(models.Model):
     gws_link.allow_tags = True
     gws_link.short_description = 'GWS'
     
+    def volume_filesize(self):
+        return filesize(self.requested_volume)
+    volume_filesize.short_description = 'volume' 
+    
 
 class GWS(models.Model):
 
@@ -1168,7 +1175,7 @@ class GWS(models.Model):
     internal_requester = models.ForeignKey(User, help_text='CEDA person sponsoring the GWS')
     gws_manager = models.CharField(max_length=1024, help_text='External person who will manage the GWS during its lifetime')
     description = models.TextField(null=True, blank=True, help_text='Text description of GWS')
-    requested_volume = models.BigIntegerField(help_text="In bytes, but can be enetered using integer<space>suffix e.g. '200 Tb'")
+    requested_volume = FileSizeField(help_text="In bytes, but can be enetered using suffix e.g. '200TB'")
     backup_requirement = models.CharField(max_length=127, choices=settings.GWS_BACKUP_CHOICES, default='no backup')
     related_url = models.URLField(verify_exists=False, blank=True, help_text='Link to further info relevant to this GWS')
     expiry_date = models.DateField(help_text='Date after which GWS will be deleted')
@@ -1234,7 +1241,11 @@ class GWS(models.Model):
             
     def forceSave(self, *args, **kwargs):
         # OK, sometimes we need to update individual fields (e.g. "approved")"
-        super(GWS, self).save(*args, **kwargs)  
+        super(GWS, self).save(*args, **kwargs)
+ 
+    def volume_filesize(self):
+        return filesize(self.requested_volume)
+    volume_filesize.short_description = 'volume'        
    
 class VMRequest(models.Model):
     vm_name = models.CharField(max_length=127, help_text="proposed fully-qualified host name") # TODO : need regex
@@ -1371,6 +1382,7 @@ class VMRequest(models.Model):
         return u'<a href="/admin/cedainfoapp/vm/%i">%s</a>' % (self.vm.id, self.vm.name)
     vm_link.allow_tags = True
     vm_link.short_description = 'VM'
+
             
 class VM(models.Model):
     name = models.CharField(max_length=127, help_text="fully-qualified host name", unique=True) # TODO : need regex

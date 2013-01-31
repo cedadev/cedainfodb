@@ -1,4 +1,5 @@
 {% extends "base_site.html" %}
+{% load sizefieldtags  %}
 
 {% block title %}
 Group Workspaces
@@ -35,7 +36,7 @@ Group Workspaces
 	            <td><a href="/gws/{{i.id}}">{{i.id}}</a></td>
 	            <td><a href="/gws/{{i.id}}">{{i.name}}</a></td>
 	            <td>{{i.path}}</td>
-	            <td>{{i.requested_volume|filesizeformat}}</td>
+	            <td>{{i.requested_volume|filesize}}</td>
                 <td>{{i.internal_requester}}</td>
                 <td>{{i.gws_manager}}</td>
 	            <td>{{i.backup_requirement}}</td>
@@ -48,7 +49,7 @@ Group Workspaces
             <tr></tr>
             <tr>
                 <th>Total volume</th>
-                <td colspan="10">{{total_volume|filesizeformat}}</td>
+                <td colspan="10">{{total_volume|filesize}}</td>
             </tr>
 	</table>
 {% endblock %}

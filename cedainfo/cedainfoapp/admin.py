@@ -262,7 +262,7 @@ admin.site.register(RackList)
 
 
 class GWSRequestAdmin(admin.ModelAdmin):
-    list_display = ('gws_name', 'action_links','internal_requester', 'gws_manager', 'requested_volume', 'backup_requirement', 'expiry_date', 'request_type', 'request_status', 'gws_link',  'timestamp')
+    list_display = ('gws_name', 'action_links','internal_requester', 'gws_manager', 'volume_filesize', 'backup_requirement', 'expiry_date', 'request_type', 'request_status', 'gws_link',  'timestamp')
     list_filter = ('request_status',)
     #readonly_fields = ('request_status',)
     ordering = ('timestamp',)
@@ -270,7 +270,7 @@ class GWSRequestAdmin(admin.ModelAdmin):
 admin.site.register(GWSRequest, GWSRequestAdmin)
 
 class GWSAdmin(admin.ModelAdmin):
-    list_display = ('name', 'path', 'internal_requester', 'gws_manager', 'requested_volume', 'backup_requirement', 'expiry_date', 'last_reviewed', 'status','volume',)
+    list_display = ('name', 'path', 'internal_requester', 'gws_manager', 'volume_filesize', 'backup_requirement', 'expiry_date', 'last_reviewed', 'status','volume',)
     list_filter = ('status','path',)
     search_fields = ('name', 'path')
     def has_add_permission(self, request):
