@@ -1036,7 +1036,7 @@ class GWSRequest(models.Model):
     internal_requester = models.ForeignKey(User, help_text='CEDA person sponsoring the request')
     gws_manager = models.CharField(max_length=1024, help_text='External person who will manage the GWS during its lifetime')
     description = models.TextField(null=True, blank=True, help_text='Text description of proposed GWS')
-    requested_volume = FileSizeField(help_text="In bytes, but can be enetered using suffix e.g. '200TB'")
+    requested_volume = FileSizeField(help_text="In bytes, but can be enetered using suffix e.g. '200TB'", default='0')
     backup_requirement = models.CharField(max_length=127, choices=settings.GWS_BACKUP_CHOICES, default='no backup')
     related_url = models.URLField(verify_exists=False, blank=True, help_text='Link to further info relevant to this GWS')
     expiry_date = models.DateField(default = datetime.now()+timedelta(days=2*365), help_text="date after which GWS will be deleted") # approx 2 years from now
@@ -1175,7 +1175,7 @@ class GWS(models.Model):
     internal_requester = models.ForeignKey(User, help_text='CEDA person sponsoring the GWS')
     gws_manager = models.CharField(max_length=1024, help_text='External person who will manage the GWS during its lifetime')
     description = models.TextField(null=True, blank=True, help_text='Text description of GWS')
-    requested_volume = FileSizeField(help_text="In bytes, but can be enetered using suffix e.g. '200TB'")
+    requested_volume = FileSizeField(help_text="In bytes, but can be enetered using suffix e.g. '200TB'", default='0')
     backup_requirement = models.CharField(max_length=127, choices=settings.GWS_BACKUP_CHOICES, default='no backup')
     related_url = models.URLField(verify_exists=False, blank=True, help_text='Link to further info relevant to this GWS')
     expiry_date = models.DateField(help_text='Date after which GWS will be deleted')
