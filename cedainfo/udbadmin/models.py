@@ -224,10 +224,21 @@ class User (models.Model):
         return self.addresskey.institutekey.name
     
     def address (self):
-        """Returns full address as string"""
-        return self.addresskey.address1 + self.addresskey.address2 \
-            +  self.addresskey.address3 + self.addresskey.address4 \
-            + self.addresskey.address5 
+        """Returns full address as string. Each line is separated by a comma."""
+        
+        a1 = self.addresskey.address1.rstrip(", ")
+        a2 = self.addresskey.address2.rstrip(", ")
+        a3 = self.addresskey.address3.rstrip(", ")
+        a4 = self.addresskey.address4.rstrip(", ")
+        a5 = self.addresskey.address5.rstrip(", ")
+        
+        addressLine = a1
+        if a2: addressLine = addressLine + ", " + a2
+        if a3: addressLine = addressLine + ", " + a3
+        if a4: addressLine = addressLine + ", " + a4
+        if a5: addressLine = addressLine + ", " + a5
+                
+        return addressLine
              
     def displayName (self, titleFirst=True):
         """ Displays name """
@@ -280,17 +291,13 @@ class User (models.Model):
         else:
             return False    
 
-    def isLDAPUser(self, tag=''):
-        """Checks if the user should be in the LDAP database with the given tag"""
-               
-        if not tag:
-           return self.isLDAPUser("cluster:ceda-internal") or self.isLDAPUser("cluster:ceda-external")
-                  
-        if tag == "cluster:ceda-internal":
-           return self.hasDataset("ceda")
-        elif tag == "cluster:ceda-external":
-           return self.hasDataset("jasmin-login") or self.hasDataset("cems-login")       
-     
+    def isJasminCemsUser(self):
+        '''Returns True if the user should have a jasmin/cems account'''
+        
+        if self.hasDataset("jasmin-login") or self.hasDataset("cems-login"):
+            return True
+        else:
+            return False                 
      
     def nextUserkey (self):        
         '''Returns the next userkey value'''
