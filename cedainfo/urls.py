@@ -90,7 +90,7 @@ urlpatterns = patterns('',
     (r'^vmrequest/(?P<id>\d+)/$', vmrequest_detail), #detail view for external viewers 
     
     (r'^vm/(?P<id>\d+)/update', create_vm_update_request),
-    (r'^vm/(?P<id>\d+)/toggleop', toggle_operational),
+    (r'^vm/(?P<id>\d+)/changestatus', change_status),
 
     # userdb
     (r'^userdb/userstats/$', user_stats),
