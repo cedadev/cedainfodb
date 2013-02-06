@@ -3,6 +3,7 @@ from django.conf.urls.defaults import patterns, include, url
 from views import *
 from authorise import *
 from jasmin import *
+from udb_ldap_views import *
 from django.views.generic import list_detail
 
 # Uncomment the next two lines to enable the admin:
@@ -45,6 +46,12 @@ urlpatterns = patterns('',
      
      url(r'^ldap/user/(?P<accountid>.+)$', ldap_user_details),      
      url(r'^ldap/list_root_users$', ldap_list_root_users),
+           
+     url(r'^ldapext/nis/group/(?P<id>.+)$', write_nis_group), 
+     url(r'^ldapext/nis/group/$', write_all_nis_groups),            
+
+     url(r'^ldapext/group/(?P<id>.+)$', write_ldap_group), 
+     url(r'^ldapext/group/$', write_all_ldap_groups),            
            
      url(r'^authorise/(?P<userkey>\d{1,6})/$', authorise_datasets),
      url(r'^udj/(?P<id>\d{1,6})/$', edit_user_dataset_join),
