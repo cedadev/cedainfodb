@@ -142,6 +142,7 @@ INSTALLED_APPS = (
     'cedainfo.cedainfoapp',
     'cedainfo.proginfo',
     'cedainfo.udbadmin',
+    'cedainfo.dmp',
 )
 
 # ----------------------------------------------------
