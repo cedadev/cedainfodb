@@ -1,0 +1,24 @@
+#!/usr/bin/python
+#
+# Downloads the group file information generated from the userdb
+#
+import urllib2
+
+
+proxy_handler = urllib2.ProxyHandler()
+
+auth_handler = urllib2.HTTPBasicAuthHandler()
+auth_handler.add_password(realm='UDBadmin',
+                          uri='http://cedadb.badc.rl.ac.uk',
+                          user='',
+                          passwd='')
+
+url = 'http://cedadb.badc.rl.ac.uk/udbadmin/ldapext/nis/group' 
+opener = urllib2.build_opener(proxy_handler, auth_handler)
+
+fileHandle = opener.open(url)
+for line in fileHandle:
+    print line,
+         
+fileHandle.close()
+

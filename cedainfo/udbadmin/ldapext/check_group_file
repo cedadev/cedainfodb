@@ -1,0 +1,44 @@
+#!/usr/bin/python
+
+import os
+import sys
+import shutil
+import subprocess
+import tempfile
+
+SWROOT       = "/home/badc/software/infrastructure/cedainfo_releases/development/cedainfo/udbadmin/ldapext"
+FILESTORE    = SWROOT + "/files"
+FIXED_GROUPS = FILESTORE + '/group.internal'
+GROUP_FILE   = FILESTORE + '/group'
+
+group_file = FILESTORE + '/' + 'udbgroup.' + \
+            os.popen("date +'%Y%m%d_%H%M'").readline().rstrip('\n')
+tmp_file   = tempfile.NamedTemporaryFile()
+            
+cmd = "%s/download_group_file > %s" % (SWROOT, tmp_file.name)
+print "Executing: %s" % cmd
+os.system(cmd)
+
+cmd = "cat %s %s > %s" % (FIXED_GROUPS, tmp_file.name, group_file)
+print "Executing: %s" % cmd
+os.system(cmd)
+
+#
+# Sort the live group file and the one generated from the userdb
+# and check if they are different
+#
+a = tempfile.NamedTemporaryFile()
+cmd = "sort %s > %s" % (GROUP_FILE, a.name) 
+print "Executing: %s" % cmd
+os.system(cmd)
+
+b = tempfile.NamedTemporaryFile()
+cmd = "sort %s > %s" % (group_file, b.name) 
+print "Executing: %s" % cmd
+os.system(cmd)
+
+status = subprocess.call(["diff", "--brief", a.name, b.name])
+
+if status:
+   print 'Files differ'
+   shutil.copy2(group_file, GROUP_FILE)
