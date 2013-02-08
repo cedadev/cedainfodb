@@ -1,4 +1,11 @@
 #!/usr/bin/python
+#
+# Script designed to run on external NIS server to update group file.
+#
+# Downloads group information from the userdb then adds any extra local
+# group information. Stores result as a dated group file. If it is different
+# from the active group file then replaces it.
+# 
 
 import os
 import sys
@@ -6,23 +13,66 @@ import shutil
 import subprocess
 import tempfile
 
-SWROOT       = "/home/badc/software/infrastructure/cedainfo_releases/development/cedainfo/udbadmin/ldapext"
+
+SWROOT       = "/etc/yp-excedar/scripts"
 FILESTORE    = SWROOT + "/files"
 FIXED_GROUPS = FILESTORE + '/group.internal'
 GROUP_FILE   = FILESTORE + '/group'
+MIN_SIZE          = 6000    #Minimum group file size, in bytes
+MAX_PER_SIZE_DIFF = 20.0    #Maximum percentage difference in group files
+
 
 group_file = FILESTORE + '/' + 'udbgroup.' + \
             os.popen("date +'%Y%m%d_%H%M'").readline().rstrip('\n')
 tmp_file   = tempfile.NamedTemporaryFile()
-            
+
+#
+# Download group file lines from userdb. Exit if there is a
+# problem with the download.
+#            
 cmd = "%s/download_group_file > %s" % (SWROOT, tmp_file.name)
 print "Executing: %s" % cmd
-os.system(cmd)
+status = subprocess.call(cmd, shell=True)
+print 'Status: ', status
+
+if status != 0:
+   sys.exit(1)
 
 cmd = "cat %s %s > %s" % (FIXED_GROUPS, tmp_file.name, group_file)
 print "Executing: %s" % cmd
 os.system(cmd)
 
+#
+# Sanity check that new group file exists
+#
+if not os.path.isfile(group_file):
+    sys.exit(2)
+#
+# Do sanity check on size of new group file and the difference between old 
+# and new group files. Exit if the difference is large as this may mean 
+# something has gone wrong.
+#
+new_size = os.path.getsize(group_file)
+
+if new_size < MIN_SIZE:
+    print 'New group file is too small! (%s bytes, min limit is %s bytes)' % \
+          (new_size, MIN_SIZE) 
+    sys.exit(2)
+
+if not os.path.isfile(GROUP_FILE):
+    print 'Group file %s not found' % GROUP_FILE
+    sys.exit(2)
+
+old_size = os.path.getsize(GROUP_FILE)
+   
+print 'New size: ', new_size
+print 'Old size: ', old_size
+per_diff = (100.0 * abs(new_size - old_size))/old_size
+print 'Per diff: ', per_diff
+
+if per_diff > MAX_PER_SIZE_DIFF:
+    print 'Size of files  %s and %s differs by % percent' % (group_file, GROUP_FILE, per_diff)
+    sys.exit(2)
 #
 # Sort the live group file and the one generated from the userdb
 # and check if they are different
@@ -41,4 +91,7 @@ status = subprocess.call(["diff", "--brief", a.name, b.name])
 
 if status:
    print 'Files differ'
+   print 'Copying %s to %s' % (group_file, GROUP_FILE)
    shutil.copy2(group_file, GROUP_FILE)
+   print 'Updating NIS files'
+   os.system("/csupport/script/nis_update")
