@@ -56,8 +56,19 @@ class DMP(models.Model):
     def dmp_groups(self):
         output = ''
         for dmpg in self.dmpgroup_set.all():
-            output += "%s " % dmpg.name
+            output += '<a href="/admin/dmp/dmpgroup/%s">%s</a> ' % (dmpg.id, dmpg.name)
         return output
+    dmp_groups.allow_tags = True    
+
+    def grants(self):
+        return Grant.objects.filter(dmp=self)
+
+    def grant_links(self):
+        output = ''
+        for g in self.grants:
+            output += '<a href="/admin/dmp/grant/%s">%s</a> ' % (g.id, g.number)
+        return output
+    dmp_groups.allow_tags = True    
 
 
 
@@ -95,6 +106,13 @@ class DataProduct(models.Model):
     def __unicode__(self):
         return "%s" % self.title
 
+#    def dmps_where_output(self): 
+#        return DMP.objects.filter('data_outputs__contains'==self)
+
+    def dmps_where_output(self): 
+        return DMP.objects.filter(data_outputs=self)
+    def dmps_where_thirdparty(self): 
+        return DMP.objects.filter(third_party_data=self)
 
 class Grant(models.Model):
     dmp = models.ForeignKey('DMP', blank=True, null=True)

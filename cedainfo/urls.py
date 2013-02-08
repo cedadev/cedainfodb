@@ -3,12 +3,11 @@ from django.views.generic import list_detail
 from cedainfoapp.models import *
 from cedainfoapp.views import *
 from django.conf import settings
-from userdb.views import *
-from userdb.models import *
-from rar.views import *
-from rar.models import *
+#from userdb.views import *
+#from userdb.models import *
 from proginfo.views import *
 from proginfo.models import *
+from dmp.views import *
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -112,8 +111,6 @@ urlpatterns = patterns('',
     (r'^userdb/role/view/(?P<id>\d+)/$', role_view),
     (r'^userdb/licence/(?P<user>.*)/(?P<group>.*)/(?P<id>\d+)/$', licence_view),
     
-    #RAR
-    (r'^rar/avail/(?P<id>\d+)/$', avail),
     
     # scisup proginfo tool
     (r'^programme/$', index),
@@ -135,4 +132,8 @@ urlpatterns = patterns('',
     (r'^newproj$', add_proj_gotw),
 
     (r'^udbadmin/', include('cedainfo.udbadmin.urls')),   
+
+    (r'^dmp/dmp/(?P<dmp_id>\d+)$', dmp_draft),
+
+
 )
