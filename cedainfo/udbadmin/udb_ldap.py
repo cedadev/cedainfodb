@@ -57,10 +57,10 @@ def getDatasetUsers(datasetids):
     for datasetid in datasetids:
          
         udjs = Datasetjoin.objects.filter(datasetid=datasetid).filter(removed=0)     
-
+        
         for udj in udjs:
             user = udj.userkey
-
+            
             if is_ldap_user(user):
                 if not user.userkey in userkeys:
                     users.append(user)
@@ -102,7 +102,7 @@ def checkGroups():
                 
 #----------------------- The following routines are used for generating the contents of the NIS password and group files
 
-def userAccountsString(users):
+def userAccountsString(users, extraAccounts=[]):
 
     '''Converts a list of user objects into a comma separated list of accounts in alphabetical order, removing
        any duplicates.'''
@@ -113,6 +113,8 @@ def userAccountsString(users):
         if user.accountid not in accounts:
             accounts.append(user.accountid)
 
+    accounts.extend(extraAccounts)
+       
     accounts.sort()
     accountsString = ",".join(accounts)
     return accountsString       
@@ -136,7 +138,8 @@ def open_group_string():
     ''''Returns line for "open" group for NIS group file'''
     
     users = all_users()
-    record = 'open:*:' + str(ARCHIVE_ACCESS_GROUPS["open"]["gid"]) + ':' + userAccountsString(users)
+    record = 'open:*:' + str(ARCHIVE_ACCESS_GROUPS["open"]["gid"]) + ':' + \
+          userAccountsString(users, extraAccounts=ARCHIVE_ACCESS_STANDARD_USERS)
     return record
 
 def generate_all_nis_groups ():
@@ -161,10 +164,8 @@ def generate_all_nis_groups ():
             continue
             
         users = getDatasetUsers(ARCHIVE_ACCESS_GROUPS[accessGroup]["datasets"])
-        accountsString = userAccountsString(users)
-        
-        additionalUsers = ",".join(ARCHIVE_ACCESS_STANDARD_USERS)
-        
+        accountsString = userAccountsString(users, extraAccounts=ARCHIVE_ACCESS_STANDARD_USERS)
+                
         record = record + accessGroup + ':*:' + str(ARCHIVE_ACCESS_GROUPS[accessGroup]["gid"]) + ':' + accountsString + "\n";
 
 #
