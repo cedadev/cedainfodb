@@ -6,7 +6,6 @@ Django views that make use of these routines are stored separately.
 
 from models import *
 
-
 ARCHIVE_ACCESS_GROUPS = {"cmip5_research": {"gid": 26059, "datasets" : ["cmip5_research"]},
                          "esacat1":        {"gid": 26017, "datasets" : ["aatsr_multimission"]},                         
                          "ecmwf":          {"gid": 26018, "datasets" : ["era", "ecmwfop"]},
@@ -22,24 +21,32 @@ ARCHIVE_ACCESS_STANDARD_USERS = ("badc", "prototype")
 def is_ldap_user (user):    
     ''' Checks if the user should be in the LDAP system'''
 
-    if user.isJasminCemsUser() or user.hasDataset("system-login"):
+    if user.hasDataset("system-login") or user.isJasminCemsUser():
         return True
     else:
         return False    
 
 def all_users():
-    '''Returns user objects for all LDAP users'''
-    
-    all_users = User.objects.filter(uid__gt=0)
-    
-    users = []
-    
-    for user in all_users:
-        if is_ldap_user(user):
-            users.append(user)
+    '''Returns user objects for all LDAP users. For efficiency this is done using an sql query'''
 
-    return users        
+    sql = "select distinct tbusers.userkey from tbusers, tbdatasetjoin where (tbusers.userkey=tbdatasetjoin.userkey)" + \
+          "and tbdatasetjoin.removed=0 and ((datasetid='jasmin-login') or (datasetid='system-login') or (datasetid='cems-login')) " + \
+           "and tbusers.uid > 0 order by userkey"
+    users = User.objects.raw(sql)
+    
+    return users
 
+def all_users_userkeys():
+    '''Returns array of userkeys of all LDAP users'''
+    
+    userkeys = []
+    
+    users = all_users()
+    
+    for user in users:
+        userkeys.append(user.userkey)
+
+    return userkeys
 
 def getDatasetUsers(datasetids):
 
@@ -50,24 +57,31 @@ def getDatasetUsers(datasetids):
  
     if isinstance(datasetids, basestring):
         datasetids = [datasetids]
-       
+#
+#      Get usekeys of all users who have an ldap account
+#    
+    all_valid_userkeys = all_users_userkeys()
+
     users    = []
     userkeys = []
-    
-    for datasetid in datasetids:
-         
+        
+    for datasetid in datasetids:       
+
         udjs = Datasetjoin.objects.filter(datasetid=datasetid).filter(removed=0)     
         
         for udj in udjs:
             user = udj.userkey
-            
-            if is_ldap_user(user):
-                if not user.userkey in userkeys:
-                    users.append(user)
-                    userkeys.append(user.userkey)
 
+            if user.userkey not in all_valid_userkeys:
+                continue
+            if user.userkey in userkeys:
+                continue
+                
+            users.append(user)
+            userkeys.append(user.userkey)
+    
     return users
-
+  
 
 def checkUid ():
     ''' Returns any users which do not have a uid set'''
@@ -165,9 +179,7 @@ def generate_all_nis_groups ():
             
         users = getDatasetUsers(ARCHIVE_ACCESS_GROUPS[accessGroup]["datasets"])
         accountsString = userAccountsString(users, extraAccounts=ARCHIVE_ACCESS_STANDARD_USERS)
-                
         record = record + accessGroup + ':*:' + str(ARCHIVE_ACCESS_GROUPS[accessGroup]["gid"]) + ':' + accountsString + "\n";
-
 #
 #      Generate 'open' data access group
 #
