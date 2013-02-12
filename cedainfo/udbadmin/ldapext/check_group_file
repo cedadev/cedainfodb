@@ -1,26 +1,21 @@
 #!/usr/bin/python
 #
-# Script designed to run on external NIS server to update group file.
+# Cron script to check and update the external NIS group file
+# based on the contents of the userdb.
 #
-# Downloads group information from the userdb then adds any extra local
-# group information. Stores result as a dated group file. If it is different
-# from the active group file then replaces it.
 # 
-
 import os
 import sys
 import shutil
 import subprocess
 import tempfile
 
-
+MIN_SIZE     = 6000    #Minimum group file size, in bytes
+MAX_PER_SIZE_DIFF = 20.0
 SWROOT       = "/etc/yp-excedar/scripts"
 FILESTORE    = SWROOT + "/files"
-FIXED_GROUPS = FILESTORE + '/group.internal'
-GROUP_FILE   = FILESTORE + '/group'
-MIN_SIZE          = 6000    #Minimum group file size, in bytes
-MAX_PER_SIZE_DIFF = 20.0    #Maximum percentage difference in group files
-
+FIXED_GROUPS = "/etc/yp-excedar/group.internal"
+GROUP_FILE   = "/etc/yp-excedar/group"
 
 group_file = FILESTORE + '/' + 'udbgroup.' + \
             os.popen("date +'%Y%m%d_%H%M'").readline().rstrip('\n')
@@ -95,3 +90,8 @@ if status:
    shutil.copy2(group_file, GROUP_FILE)
    print 'Updating NIS files'
    os.system("/csupport/script/nis_update")
+   os.system ("svn -m '' commit %s" % GROUP_FILE)
+else:
+   print 'Files do not differ. Removing %s' % group_file
+   os.remove(group_file) 
+
