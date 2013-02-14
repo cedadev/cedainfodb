@@ -176,8 +176,8 @@ def check_linux_groups(request):
         for rec in recs:
            user = User.objects.get(userkey=rec.userkey.userkey)
            dataset.users.append(user)
-                     
-           if not user.accountid in dataset.linux_users:
+                 
+           if (user.isJasminCemsUser() or user.hasDataset("system-login")) and (not user.accountid in dataset.linux_users):
               dataset.usersNotInGroupFile.append(user)
  #
  #      Now check that each member of the group in the NIS file also has a registration
