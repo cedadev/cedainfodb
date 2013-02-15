@@ -3,6 +3,7 @@ This module contains routines used for generating LDAP/NIS password
 and group file information from the userdb.
 Django views that make use of these routines are stored separately.
 '''
+from operator import attrgetter
 
 from models import *
 
@@ -10,13 +11,17 @@ ARCHIVE_ACCESS_GROUPS = {"cmip5_research": {"gid": 26059, "datasets" : ["cmip5_r
                          "esacat1":        {"gid": 26017, "datasets" : ["aatsr_multimission"]},                         
                          "ecmwf":          {"gid": 26018, "datasets" : ["era", "ecmwfop"]},
                          "ukmo" :          {"gid": 26019, "datasets" : ["surface"]},
-                         "eurosat":        {"gid": 26021, "datasets" : ["metop_iasi"]},
-                         "open":           {"gid": 26020, "datasets" : []},
-}
+                         "eurosat":        {"gid": 26021, "datasets" : ["metop_iasi"]}
+                         }
+#
+# GID for 'open' group
+#
+OPEN_GID = 26020
+
 #
 # The following users should be a member of all archive access groups
 #
-ARCHIVE_ACCESS_STANDARD_USERS = ("badc", "prototype")
+ARCHIVE_ACCESS_STANDARD_USERS = ["badc", "prototype", "cwps"]
 
 def is_ldap_user (user):    
     ''' Checks if the user should be in the LDAP system'''
@@ -31,7 +36,7 @@ def all_users():
 
     sql = "select distinct tbusers.userkey from tbusers, tbdatasetjoin where (tbusers.userkey=tbdatasetjoin.userkey)" + \
           "and tbdatasetjoin.removed=0 and ((datasetid='jasmin-login') or (datasetid='system-login') or (datasetid='cems-login')) " + \
-           "and tbusers.uid > 0 order by userkey"
+          "and tbusers.uid > 0 order by userkey"
     users = User.objects.raw(sql)
     
     return users
@@ -113,7 +118,86 @@ def checkGroups():
                     badUsers.append(user)
     return badUsers
                          
-                
+def ldap_group_record(datasetid):
+    '''Returns LDAP record for a group'''
+    
+    record = ''
+    
+    try:
+        dataset = Dataset.objects.get(datasetid=datasetid)
+    except:
+        return 
+            
+    record = "dn: cn=%s,ou=ceda,ou=Groups,o=hpc,dc=rl,dc=ac,dc=uk\n" % dataset.grp
+    record = record + 'objectClass: posixGroup\n'
+    record = record + 'objectClass: top\n'
+    record = record + 'cn: %s\n' % dataset.grp
+    record = record + 'gidNumber: %s\n' % dataset.gid
+    record = record + 'description: cluster:ceda-external\n'
+    
+    users = getDatasetUsers(datasetid)
+    users.sort(key=attrgetter('accountid'))
+        
+    for user in users:
+       record = record + 'memberUid: ' + user.accountid + '\n'
+  
+    return record
+
+def ldap_open_group_record():
+    '''Returns LDAP record for open group'''
+    
+    record = ''
+
+    record = "dn: cn=open,ou=ceda,ou=Groups,o=hpc,dc=rl,dc=ac,dc=uk\n"
+    record = record + 'objectClass: posixGroup\n'
+    record = record + 'objectClass: top\n'
+    record = record + 'cn: open\n'
+    record = record + 'gidNumber: ' + str(OPEN_GID) + '\n'
+    record = record + 'description: cluster:ceda-external\n'
+    record = record + 'description: cluster:ceda-internal\n'
+    
+    all = all_users()
+    
+    accounts = []
+    
+    for user in all:
+       accounts.append(user.accountid)
+       
+    accounts = accounts + ARCHIVE_ACCESS_STANDARD_USERS
+
+    for account in sorted(accounts):
+       record = record + 'memberUid: ' + account + '\n'
+        
+    return record   
+
+def ldap_archive_access_group_record(datasetid):
+
+    record = ''
+    
+    if not datasetid in ARCHIVE_ACCESS_GROUPS.keys():
+        return
+
+    record = "dn: cn=%s,ou=ceda,ou=Groups,o=hpc,dc=rl,dc=ac,dc=uk\n" % datasetid
+    record = record + 'objectClass: posixGroup\n'
+    record = record + 'objectClass: top\n'
+    record = record + 'cn: %s\n' % datasetid
+    record = record + 'gidNumber: ' + str(ARCHIVE_ACCESS_GROUPS[datasetid]["gid"]) + '\n'
+    record = record + 'description: cluster:ceda-external\n'
+    record = record + 'description: cluster:ceda-internal\n'
+        
+    users = getDatasetUsers(ARCHIVE_ACCESS_GROUPS[datasetid]["datasets"]) 
+    
+    accounts = []
+    
+    for user in users:
+        accounts.append(user.accountid)
+        
+    accounts = accounts  + ARCHIVE_ACCESS_STANDARD_USERS
+
+    for account in accounts:
+        record = record + 'memberUid: ' + account + '\n'
+         
+    return record                       
 #----------------------- The following routines are used for generating the contents of the NIS password and group files
 
 def userAccountsString(users, extraAccounts=[]):
@@ -152,7 +236,7 @@ def open_group_string():
     ''''Returns line for "open" group for NIS group file'''
     
     users = all_users()
-    record = 'open:*:' + str(ARCHIVE_ACCESS_GROUPS["open"]["gid"]) + ':' + \
+    record = 'open:*:' + str(OPEN_GID) + ':' + \
           userAccountsString(users, extraAccounts=ARCHIVE_ACCESS_STANDARD_USERS)
     return record
 
@@ -173,10 +257,7 @@ def generate_all_nis_groups ():
 #       Generate archive access groups
 #
 
-    for accessGroup in ARCHIVE_ACCESS_GROUPS.keys():
-        if accessGroup == 'open':
-            continue
-            
+    for accessGroup in ARCHIVE_ACCESS_GROUPS.keys():            
         users = getDatasetUsers(ARCHIVE_ACCESS_GROUPS[accessGroup]["datasets"])
         accountsString = userAccountsString(users, extraAccounts=ARCHIVE_ACCESS_STANDARD_USERS)
         record = record + accessGroup + ':*:' + str(ARCHIVE_ACCESS_GROUPS[accessGroup]["gid"]) + ':' + accountsString + "\n";

@@ -12,7 +12,7 @@ from operator import itemgetter
 from models import *
 from udbadmin.forms import *
 import NISaccounts
-
+import udb_ldap
 
 def _unique(array):
     """Removes duplicates from given list and sorts results"""
@@ -210,50 +210,22 @@ ARCHIVE_ACCESS_GROUPS = {"cmip5_research":["cmip5_research"],
 }
 
 
-def group_members_ext(datasetid):
-    """
-    Returns list of accountids that should be able to access the given group
-    on the external NIS server.
-    """
-    udjs = Datasetjoin.objects.filter(datasetid=datasetid).filter(userkey__gt=0).filter(removed=0)
-    
-    accountids = []
-    
-    for udj in udjs:
-       if  NISaccounts.isExtNISUser(udj.userkey):
-           accountids.append(udj.userkey.accountid)
-              
-    return _unique(accountids)
-
-def group_members_int(datasetid):
-    """
-    Returns list of accountids that should be able to access the given group
-    on the internal NIS server.
-    """
- 
-    udjs = Datasetjoin.objects.filter(datasetid=datasetid).filter(userkey__gt=0).filter(removed=0)
-    
-    accountids = []
-    
-    for udj in udjs:
-       if NISaccounts.isIntNISUser(udj.userkey):
-           accountids.append(udj.userkey.accountid)
-              
-    return _unique(accountids)
 
 def group_members(datasetid, server='external'):
     """
     Returns list of accountids that should be able to access the given group
-    on the internal NIS server.
+    on the given NIS server.
     """
  
     udjs = Datasetjoin.objects.filter(datasetid=datasetid).filter(userkey__gt=0).filter(removed=0)
     
     accountids = []
 
-    if server == 'external':    
+    if server == 'external':  
+      
         for udj in udjs:
-           if NISaccounts.isExtNISUser(udj.userkey):
+           if udb_ldap.is_ldap_user(udj.userkey):
+#           if NISaccounts.isExtNISUser(udj.userkey):
                accountids.append(udj.userkey.accountid)
     else:        
         for udj in udjs:

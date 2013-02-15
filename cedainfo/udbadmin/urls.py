@@ -50,7 +50,7 @@ urlpatterns = patterns('',
      url(r'^ldapext/nis/group/(?P<id>.+)$', write_nis_group), 
      url(r'^ldapext/nis/group/$', write_all_nis_groups),            
 
-     url(r'^ldapext/group/(?P<id>.+)$', write_ldap_group), 
+     url(r'^ldapext/group/(?P<datasetid>.+)$', write_ldap_group), 
      url(r'^ldapext/group/$', write_all_ldap_groups),            
            
      url(r'^authorise/(?P<userkey>\d{1,6})/$', authorise_datasets),
