@@ -357,7 +357,7 @@ def storagesummary(request):
  
     return render_to_response('cedainfoapp/sumtable.html', {'sumtable':sumtable, 'user':request.user})  
 
-@login_required()
+# needs to be public to interact with scripts.
 def storaged_spotlist(request):
 #    filesets = FileSet.objects.filter(logical_path__startswith='/badc')
     withpath = request.GET.get('withpath', None) 
