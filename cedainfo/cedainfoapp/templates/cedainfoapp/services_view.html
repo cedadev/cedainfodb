@@ -32,19 +32,19 @@ Services by rack
                   <tr class="{% cycle 'greybgd' 'darkgreybgd' %}">
                     <td class="lightgreybgd">
                       {% ifequal host.host_type "hypervisor_server" %}
-                        <span class="cell_normal"><a href="/admin/cedainfoapp/host/{{host.id}}" title="hypervisor server: {{host}}"><img src="/static_files/images/set_hypervisor.png" width="69" height="34" border="0" alt="hypervisor server: {{host}}"><br>{{host}}</a></span>
+                        <span class="cell_normal"><a href="/admin/cedainfoapp/host/{{host.id}}" title="hypervisor server: {{host}}"><img src="/files/images/set_hypervisor.png" width="69" height="34" border="0" alt="hypervisor server: {{host}}"><br>{{host}}</a></span>
                       {% else %} 
                                                                                           {% ifequal host.host_type "storage_server" %}
-                        <span class="cell_normal"><a href="/admin/cedainfoapp/host/{{host.id}}" title="storage server: {{host}}"><img src="/static_files/images/storage.jpg" width="69" height="34" border="0" alt="storage server: {{host}}"><br>{{host}}</a></span>
+                        <span class="cell_normal"><a href="/admin/cedainfoapp/host/{{host.id}}" title="storage server: {{host}}"><img src="/files/images/storage.jpg" width="69" height="34" border="0" alt="storage server: {{host}}"><br>{{host}}</a></span>
                         {% else %}
-                        <span class="cell_normal"><a href="/admin/cedainfoapp/host/{{host.id}}" title="physical server: {{host}}"><img src="/static_files/images/set_large_server.png" width="69" height="34" border="0" alt="physical server: {{host}}"><br>{{host}}</a></span>
+                        <span class="cell_normal"><a href="/admin/cedainfoapp/host/{{host.id}}" title="physical server: {{host}}"><img src="/files/images/set_large_server.png" width="69" height="34" border="0" alt="physical server: {{host}}"><br>{{host}}</a></span>
                         {% endifequal %}
                       {% endifequal %}
                       
 
                       <!-- Partitions belonging to this host -->
                       {% for part in host.partitions %}
-                       <span class="tiny"><a href="/admin/cedainfoapp/partition/{{part.id}}" title="partition: {{part}}"><img src="/static_files/images/disk.png" width="40" height="40" border="0" alt="partition: {{part}}">{{part.mountpoint}}</a></span>
+                       <span class="tiny"><a href="/admin/cedainfoapp/partition/{{part.id}}" title="partition: {{part}}"><img src="/files/images/disk.png" width="40" height="40" border="0" alt="partition: {{part}}">{{part.mountpoint}}</a></span>
                       {% endfor %}                      
 
 
@@ -60,7 +60,7 @@ Services by rack
                             {% for service in value %}
                               <tr>
                                 <td>
-                                  <span class="tiny"><a href="/admin/cedainfoapp/service/{{service.id}}" title="service: {{service.name}}"><img src="/static_files/images/service.png" border="0" alt="{{service.name}}">{{service.name}}</a></span>
+                                  <span class="tiny"><a href="/admin/cedainfoapp/service/{{service.id}}" title="service: {{service.name}}"><img src="/files/images/service.png" border="0" alt="{{service.name}}">{{service.name}}</a></span>
                                 </td>
                               </tr>
 
@@ -80,7 +80,7 @@ Services by rack
                               <tr valign="top">
                                 {% for vm in value %}
                                   <td width="200px">
-                                    <span class="cell_small"><a href="/admin/cedainfoapp/host/{{vm.id}}"  title="virtual server: {{vm}}"><img src="/static_files/images/set_virtual_server.png" width="69" height="34" border="0" alt="{{vm}}"><br>{{vm}}</a></span>
+                                    <span class="cell_small"><a href="/admin/cedainfoapp/host/{{vm.id}}"  title="virtual server: {{vm}}"><img src="/files/images/set_virtual_server.png" width="69" height="34" border="0" alt="{{vm}}"><br>{{vm}}</a></span>
                                     <!-- Services belonging to this host -->
                                     {% for k,v in services_by_host.items %}
                                       {% ifequal k vm %}
@@ -92,7 +92,7 @@ Services by rack
                                           {% for s in v %}
                                             <tr>
                                               <td>
-                                                <span class="tiny"><a href="/admin/cedainfoapp/service/{{s.id}}" title="service: {{s.name}}"><img src="/static_files/images/service.png" border="0" alt="{{s.name}}">{{s.name}}</a></span>
+                                                <span class="tiny"><a href="/admin/cedainfoapp/service/{{s.id}}" title="service: {{s.name}}"><img src="/files/images/service.png" border="0" alt="{{s.name}}">{{s.name}}</a></span>
                                                 
                                               </td>
                                             </tr>
