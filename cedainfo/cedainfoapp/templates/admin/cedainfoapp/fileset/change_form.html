@@ -81,8 +81,7 @@
 {% for fssm in fssms %}  data.push([new Date({{fssm.date.year}},{{fssm.date.month}},{{fssm.date.day}}),
                    {{fssm.size}},
                    {{fssm.fileset.overall_final_size}},
-                   {{fssm.no_files|default:0}},
-                   0 ]);
+                   {{fssm.no_files|default:0}} ]);
 {% endfor %}
 
 
