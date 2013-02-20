@@ -35,35 +35,24 @@
 {% block after_field_sets %} 
 {{ original.last_size }} used of {{ original.overall_final_size|filesizeformat }} allocated.
 
-    <script type='text/javascript' src='https://www.google.com/jsapi'></script>
-    <script type='text/javascript'>
-      google.load('visualization', '1', {'packages':['annotatedtimeline']});
-      google.setOnLoadCallback(drawChart);
-      function drawChart() {
-        var data = new google.visualization.DataTable();
-        data.addColumn('date', 'Date');
-        data.addColumn('number', 'Total Size (du)');
-        data.addColumn('string', 'title1');
-        data.addColumn('string', 'text1');
-        data.addColumn('number', 'Allocation');
-        data.addColumn('string', 'title2');
-        data.addColumn('string', 'text2');
-        data.addRows([
-{% for fssm in fssms %}
-          [new Date({{fssm.date.year}}, {{fssm.date.month|add:-1}} ,{{fssm.date.day}}), {{fssm.size}}, undefined, undefined, {{fssm.fileset.overall_final_size}}, undefined, undefined],
+
+sss<script type="text/javascript"
+  src="/static/js/dygraph-combined.js"></script>
+<div id="graphdiv"></div>
+<script type="text/javascript">
+  g = new Dygraph(
+
+    // containing div
+    document.getElementById("graphdiv"),
+
+    // CSV or path to a CSV file.
+    "Date,Volume,Expected Volume\n" +
+ {% for fssm in fssms %} "{{fssm.date.year}}-{{fssm.date.month|add:-1}}-{{fssm.date.day}}, {{fssm.size}}, {{fssm.fileset.overall_final_size}}\n" +
 {% endfor %}
-        ]);
-
-        var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
-        chart.draw(data, {displayAnnotations: true});
-      }
-    </script>
-
-    <div id='chart_div' style='width: 700px; height: 240px;'></div>
-
-      }
-
-
+    ""
+  );
+</script>
+eeee
 {% endblock %}
 
 
