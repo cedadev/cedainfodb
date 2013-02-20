@@ -70,8 +70,43 @@
 {% endfor %}
     ""
   );
+
+<div id="demodiv" style="width: 640; height: 350; border: 1px solid black"></div>
 </script>
 </td></tr></table>
+
+    <script type="text/javascript">
+      var data = [];
+        // two series, one with range 1-100, one with range 1-2M
+{% for fssm in fssms %}  data.push([new Date("{{fssm.date.year}}-{{fssm.date.month|add:-1}}-{{fssm.date.day}}"),
+                   {{fssm.size}},
+                   {{fssm.fileset.overall_final_size}},
+                   {{fssm.no_files}} ]);
+{% endfor %}
+
+      g = new Dygraph(
+          document.getElementById("demodiv"),
+          data,
+          {
+            labels: [ 'Date', 'Volume', 'Expected Volume', 'Number of files' ],
+            'Volume': {
+              axis: { }
+            },
+            'Expected Volume': {
+              axis: 'Volume'  // use the same y-axis as series Y3
+            },
+            axes: {
+              y2: {
+                // set axis-related properties here
+                labelsKMB: true
+              }
+            },
+            ylabel: 'Primary y-axis',
+            y2label: 'Secondary y-axis',
+            yAxisLabelWidth: 60
+          }
+      );
+</script>
 
 {% endblock %}
 
