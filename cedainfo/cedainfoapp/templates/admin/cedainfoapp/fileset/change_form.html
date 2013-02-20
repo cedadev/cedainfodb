@@ -90,13 +90,10 @@
           document.getElementById("demodiv"),
           data,
           {
-            labels: [ 'Date', 'Y1', 'Y2', 'Number of files', 'Junk' ],
+            labels: [ 'Date', 'Y1', 'Y2', 'Number of files' ],
             'Number of files': {
               axis: {
               }
-            },
-            'Junk': {
-              axis: 'Number of files'  // use the same y-axis as series Y3
             },
             axes: {
               y2: {
@@ -104,8 +101,8 @@
                 labelsKMB: true
               }
             },
-            ylabel: 'Primary y-axis',
-            y2label: 'Secondary y-axis',
+            ylabel: 'Volume',
+            y2label: 'Number of files',
             yAxisLabelWidth: 60
           }
       );
