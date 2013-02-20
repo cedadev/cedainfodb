@@ -23,6 +23,8 @@ Logical path search: <input type="text" name="search" />
 			<th><a href="?o=logical_path">Logical Path</a></th>
 			<th>Allocation</th>
 			<th>current size</th>
+			<th>Last measured number of files</th>
+			<th>Storage-D backup status</th>
 			</tr>
 	    {% for fs in fileset_list %}
 		    <tr>
@@ -30,6 +32,8 @@ Logical path search: <input type="text" name="search" />
 	    	    <td>{{fs.logical_path}}</td>
 	    	    <td>{{fs.overall_final_size|filesizeformat}}</td>
 	    	    <td>{{fs.last_size.size|filesizeformat}}</td>
+	    	    <td>{{fs.last_size.no_files}}</td>
+	    	    <td>{% if fs.sd_backup %}{{fs.backup_summary2|safe}}{% else %}Not marked for storage-d{% endif %}</td>
 			</tr>
         {% endfor %}
   <tr>

@@ -507,6 +507,20 @@ class FileSet(models.Model):
     backup_summary.short_description = 'backup'
     backup_summary.allow_tags = True
 
+
+    # crude storage-d size finder via screen scrape... 
+    def backup_summary2(self):
+        url = 'http://storaged-monitor.esc.rl.ac.uk/storaged_ceda/CEDA_Fileset_Summary_XML.php?%s' % self.storage_pot
+        import urllib2
+        f = urllib2.urlopen(url)
+        backup = f.read()
+        m = re.search('<total_volume>(.+)</total_volume><total_file_count>(.*)</total_file_count><aggregation_count>(.*)</aggregation_count><first_file>(.*)</first_file><last_updated>(.*)</last_updated>', backup)
+        if m: 
+            backupsize, backupfiles, nagg, firstfiletime, lastupdated =  (int(m.group(1)), 
+                                     int(m.group(2)), int(m.group(3)), m.group(4), m.group(5)) 
+        else: backupsize, backupfiles, nagg, firstfiletime, lastupdated =  0, 0, 0, '--', '--'
+        return "%s files, %s bytes last stored %s" %(backupfiles,backupsize, lastupdated)
+
 # migration allocation don by hand at the moment
 
     #def allocate_m(self):
