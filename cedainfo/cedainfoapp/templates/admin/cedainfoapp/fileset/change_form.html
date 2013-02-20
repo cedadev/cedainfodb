@@ -84,16 +84,18 @@
                    {{fssm.no_files|default:0}} ]);
 {% endfor %}
 
+
       g = new Dygraph(
           document.getElementById("demodiv"),
           data,
           {
-            labels: [ 'Date', 'Volume', 'Expected Volume', 'Number of files' ],
-            'Volume': {
-              axis: { }
+            labels: [ 'Date', 'Y1', 'Y2', 'Y3', 'Y4' ],
+            'Y3': {
+              axis: {
+              }
             },
-            'Expected Volume': {
-              axis: 'Volume'  // use the same y-axis as series Y3
+            'Y4': {
+              axis: 'Y3'  // use the same y-axis as series Y3
             },
             axes: {
               y2: {
