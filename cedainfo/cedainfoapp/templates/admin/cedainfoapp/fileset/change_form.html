@@ -78,7 +78,7 @@
     <script type="text/javascript">
       var data = [];
         // two series, one with range 1-100, one with range 1-2M
-{% for fssm in fssms %}  data.push([new Date("{{fssm.date.year}}/{{fssm.date.month|add:-1}}/{{fssm.date.day}}"),
+{% for fssm in fssms %}  data.push([new Date({{fssm.date.year}},{{fssm.date.month|add:-1}},{{fssm.date.day}}),
                    {{fssm.size}},
                    {{fssm.fileset.overall_final_size}},
                    {{fssm.no_files|default:0}},
