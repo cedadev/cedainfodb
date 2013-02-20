@@ -36,7 +36,7 @@
 {{ original.last_size }} used of {{ original.overall_final_size|filesizeformat }} allocated.
 
 
-sss<script type="text/javascript"
+<script type="text/javascript"
   src="/files/javascript/dygraph-combined.js"></script>
 <div id="graphdiv"></div>
 <script type="text/javascript">
@@ -51,8 +51,21 @@ sss<script type="text/javascript"
 {% endfor %}
     ""
   );
+</script><div id="graphdiv2"></div>
+<script type="text/javascript">
+  g = new Dygraph(
+
+    // containing div
+    document.getElementById("graphdiv2"),
+
+    // CSV or path to a CSV file.
+    "Date,Number of files\n" +
+ {% for fssm in fssms %} "{{fssm.date.year}}-{{fssm.date.month|add:-1}}-{{fssm.date.day}}, {{fssm.no_files}}\n" +
+{% endfor %}
+    ""
+  );
 </script>
-eeee
+
 {% endblock %}
 
 
