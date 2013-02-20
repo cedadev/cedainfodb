@@ -33,7 +33,7 @@ Logical path search: <input type="text" name="search" />
 	    	    <td>{{fs.overall_final_size|filesizeformat}}</td>
 	    	    <td>{{fs.last_size.size|filesizeformat}}</td>
 	    	    <td>{{fs.last_size.no_files}}</td>
-	    	    <td>{% if fs.sd_backup %}{{fs.backup_summary2|safe}}{% else %}Not marked for storage-d{% endif %}</td>
+	    	    <td>{% if fs.sd_backup %}<a href="http://storaged-monitor.esc.rl.ac.uk/storaged_ceda/CEDA_Fileset_Summary.php?{{fs.storage_pot}}">{{fs.backup_summary2|safe}}</a>{% else %}Not marked for storage-d{% endif %}</td>
 			</tr>
         {% endfor %}
   <tr>
