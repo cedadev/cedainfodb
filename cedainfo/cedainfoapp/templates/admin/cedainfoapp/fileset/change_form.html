@@ -38,6 +38,8 @@
 
 <script type="text/javascript"
   src="/files/javascript/dygraph-combined.js"></script>
+
+<table><tr><td>
 <div id="graphdiv"></div>
 <script type="text/javascript">
   g = new Dygraph(
@@ -51,7 +53,11 @@
 {% endfor %}
     ""
   );
-</script><div id="graphdiv2"></div>
+</script>
+</td>
+
+<td>
+<div id="graphdiv2"></div>
 <script type="text/javascript">
   g = new Dygraph(
 
@@ -65,6 +71,7 @@
     ""
   );
 </script>
+</td></tr></table>
 
 {% endblock %}
 
