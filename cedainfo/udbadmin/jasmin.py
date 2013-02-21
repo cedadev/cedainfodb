@@ -260,7 +260,7 @@ def get_nis_group_entries(server='external'):
 #              Add any known general users
 #
         if server == 'external':
-            group_info['accounts']      = ['badc', 'prototype'] + accounts        
+            group_info['accounts']      = ['badc', 'prototype', 'cwps'] + accounts        
         else:
             group_info['accounts']      = ['badc', 'prototype', 'cwps'] + accounts        
         
