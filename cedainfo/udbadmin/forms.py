@@ -23,7 +23,10 @@ class DatasetForm(ModelForm):
     comments = CharField(required=False, widget=forms.Textarea(attrs={'rows':'4', 'cols': '50'}))
     defaultreglength = CharField(initial=36, required=False, label='Default Registration length (months)', max_length=4, widget=forms.TextInput(attrs={'size': '4'}))
     conditions = CharField(required=False, widget=forms.TextInput(attrs={'size': '80'}))
-    directory = CharField(required=False)  
+    description = CharField(required=False, widget=forms.TextInput(attrs={'size': '80'}))  
+    directory = CharField(required=False, widget=forms.TextInput(attrs={'size': '80'}))  
+    infourl = CharField(required=False, widget=forms.TextInput(attrs={'size': '80'}))  
+    
     gid = IntegerField(initial=0, required=False, label='Associated Linux group ID (0 if not used)', max_value=90000, min_value=0)
 #
 #      Make sure we can cope with a blank gid
@@ -48,8 +51,19 @@ class PrivilegeForm(ModelForm):
 
 class UserForm(ModelForm):
 
+    surname      = CharField(required=False, widget=forms.TextInput(attrs={'size': '60'}))  
+    othernames   = CharField(required=False, widget=forms.TextInput(attrs={'size': '60'}))  
+    emailaddress = CharField(required=False, widget=forms.TextInput(attrs={'size': '60'}))  
+    webpage = CharField(required=False, widget=forms.TextInput(attrs={'size': '60'}))  
+    telephoneno = CharField(required=False, widget=forms.TextInput(attrs={'size': '60'}))  
+    openid = CharField(required=False, widget=forms.TextInput(attrs={'size': '60'}))  
+    
     public_key = CharField(required=False, widget=forms.Textarea(attrs={'rows':'5', 'cols': '100'}))
     uid = IntegerField(initial=0, required=False, label='Associated Linux user ID (0 if not used)', max_value=90000, min_value=0)
+    gid = IntegerField(initial=0, required=False, label='Primary group id (0= use default)', max_value=90000, min_value=0)
+    shell = CharField(required=False, label='Shell - leave blank to use default')
+    home_directory = CharField(required=False, label='Home directory. Leave blank to use default')
+    
 #
 #      Make sure we can cope with a blank uid
 #
@@ -58,6 +72,12 @@ class UserForm(ModelForm):
              return 0
          else:
              return self.cleaned_data["uid"]             
+
+    def clean_gid(self):
+         if not self.cleaned_data["gid"]:
+             return 0
+         else:
+             return self.cleaned_data["gid"]             
 
     class Meta:
        model = User

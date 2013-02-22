@@ -64,7 +64,9 @@ class Dataset(models.Model):
     datacentre = models.CharField(max_length=20, choices=choices.DATACENTRES)
     infourl = models.CharField(max_length=200, blank=True)
     gid     = models.IntegerField(default=0, blank=True)
-
+    public_key_required = models.BooleanField("Check for public key on registration", 
+                                              default=False)
+    
     def __unicode__(self):
         return self.datasetid
  
@@ -217,7 +219,9 @@ class User (models.Model):
     openid = models.CharField(max_length=100, blank=True)
 
     uid     = models.IntegerField(default=0, blank=True)
-    
+    home_directory = models.CharField(max_length=150, blank=True)
+    shell = models.CharField(max_length=50, blank=True)  
+    gid   = models.IntegerField(default=0, blank=True)  
 #    onlinereg = models.IntegerField()
 
     def institute (self):
