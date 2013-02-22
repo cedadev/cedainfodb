@@ -82,7 +82,10 @@ class TidyRun:
     
     def run(self):
         while 1:
-           self.check_partition()
+           try: 
+               self.check_partition()
+           except: 
+               pass
            self.next_partition()
            if self.partition == None: return
     
@@ -132,11 +135,11 @@ class TidyRun:
                 backupsize, backupfiles =  int(m.group(1)), int(m.group(2))
             except:
                 backupsize, backupfiles = 0, 0
-            if backupfiles >= size.no_files: print "OK -- ",backupfiles, size.no_files
+            if backupfiles >= 0.95*size.no_files: print "OK -- ",backupfiles, size.no_files
             else: print " *** ",backupfiles, size.no_files 
 
             # skip if no backup         
-            if backupfiles >= size.no_files: print "**** backup with more files done ****"
+            if backupfiles >= 0.95*size.no_files: print "**** backup with more files done ****"
             #elif backupfiles > 0: print "++++ some backup done ++++"
             else: 
                 self.log("** %s no backup suffience on storage-D  (storage-d:%s, measured:%s)- skip" %(s,backupfiles, size.no_files))
@@ -160,7 +163,9 @@ class TidyRun:
 
         # check file present?
         # use a MIGRATED.txt file to see if this dir and it's subdirectories have been checked
-        if os.path.exists(os.path.join(old, 'MIGRATED.txt')): return True
+        if os.path.exists(os.path.join(old, 'MIGRATED.txt')): 
+            self.log("already migrated - has a MIGRATED.txt file (skip): %s" % old)
+            return True
 
         # if can't write in the dir then skip this one because it will not be possible to record it as checked.
         if not os.access(old, os.W_OK):
@@ -175,7 +180,14 @@ class TidyRun:
             newpath = os.path.join(new, f)
             self.state['files_checked'] += 1 
             
-            if not os.path.exists(newpath):
+            # cmip5 frequenty updated files
+            if f[0:5] == "COPY_" or f==".ftpaccess" or f==".mnj_wrk":
+                    self.state['files_deleted'] += 1 
+                    self.log("IGNORE: %s " % oldpath)
+                    nfiles -= 1
+                    continue
+
+            if not os.path.lexists(newpath):
                 self.log("MISSING: %s" % newpath)
                 continue
 
@@ -200,6 +212,9 @@ class TidyRun:
                     self.state['vol_deleted'] += os.path.getsize(oldpath)
                     self.log("DEL: %s" % oldpath)
                     nfiles -= 1
+                else: 
+                    self.log("MODIFIED: %s" % oldpath)
+                   
 
             else: 
                 self.log("IREGULAR FILE: %s" % oldpath)
