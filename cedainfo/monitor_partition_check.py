@@ -9,8 +9,9 @@ if __name__=="__main__":
     f = open(filename)
     state = pickle.load(f)
     print "------------------------"
-    print "Run stated: %s (restarted: %s)" % (state['run_start'],state['reload'])
+    print "Run stated: %s " % (state['run_start'],)
     print "files checked: %s" % (state['files_checked'],)
+    print "volume: %s" % (state['vol_deleted']*1e-12,)
     print state
 
 #'links_deleted', 'dirs_deleted', 'partitions_checked', 'files_deleted', , 
