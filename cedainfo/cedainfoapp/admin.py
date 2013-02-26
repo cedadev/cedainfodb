@@ -195,7 +195,7 @@ class FileSetAdmin(admin.ModelAdmin):
   
     ordering = ('-id',)
     readonly_fields = ('partition',
-#        'migrate_to', 
+        'migrate_to', 
         'storage_pot', 'complete', 'complete_date', niceOverallFinalSize)
 	
     fields = (
@@ -204,7 +204,6 @@ class FileSetAdmin(admin.ModelAdmin):
     niceOverallFinalSize,
     'notes',
     'partition',
-    'storage_pot_type',
     'storage_pot',
     'migrate_to',
     'secondary_partition',
