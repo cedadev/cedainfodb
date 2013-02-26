@@ -1,0 +1,28 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_modify adminmedia %}
+
+
+
+{% block object-tools %}
+{% if change %}{% if not is_popup %}
+  <ul class="object-tools">
+    {% block object-tools-items %}
+    <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
+    <li>{{original.dmp_groups|safe}}</li>
+    <li>{{original.grant_links|safe}}</li>
+    {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
+    {% endblock %}
+  </ul>
+{% endif %}{% endif %}
+{% endblock %}
+
+{% block after_related_objects %}
+Data products: 
+{% for d in original.data_outputs.all %} 
+<a href="/admin/dmp/dataproduct/{{d.id}}">{{d}}</a>
+{% endfor %}
+Third party data: 
+{% for d in original.third_party_data.all %} 
+<a href="/admin/dmp/dataproduct/{{d.id}}">{{d}}</a>
+{% endfor %}
+{% endblock %}
