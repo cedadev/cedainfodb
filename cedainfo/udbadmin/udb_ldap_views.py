@@ -1,12 +1,18 @@
+from operator import attrgetter
+
+import os
+
 from django.http import HttpResponse
 
 from models import *
 import udb_ldap
 
+ADDITIONAL_LDAP_GROUP_FILE = "/home/badc/etc/infrastructure/accounts/ldap/ldap_additional_groups.txt"
+
 
 def write_nis_group (request, datasetid=''):
     '''
-    Write nis group file entry for the given group
+     Write nis group file entry for the given group
     '''    
     
     record = udb_ldap.dataset_group_string (dataset.datasetid)
@@ -64,7 +70,40 @@ def write_all_ldap_groups (request):
         record = record + '\n'
         
     record = record + udb_ldap.ldap_open_group_record()
+
+    if os.path.exists(ADDITIONAL_LDAP_GROUP_FILE):
+        f = open(ADDITIONAL_LDAP_GROUP_FILE, "r")
+
+        additional_groups = f.read()
+        record = record + additional_groups    
         
     return HttpResponse(record, content_type="text/plain")
      
+
+def write_ldap_user (request, accountid=''):
+    '''
+    Write ldap entry for the given user
+    '''    
+    record = udb_ldap.ldap_user_record(accountid)    
+
+    return HttpResponse(record, content_type="text/plain")
+
+           
+def write_all_ldap_users (request):
+    '''
+    Writes ldap entries for all LDAP users
+    '''
+
+
+    record = ''
+        
+    users = udb_ldap.all_users(order_by="accountid")
+
+#    users = udb_ldap.get_dataset_users("jasmin-login")
+#    users.sort(key=attrgetter('accountid'))
+        
+    for user in users:
+        record = record + udb_ldap.ldap_user_record(user.accountid) + '\n'
+           
+    return HttpResponse(record, content_type="text/plain")
 

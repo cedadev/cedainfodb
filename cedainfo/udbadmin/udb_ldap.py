@@ -8,7 +8,7 @@ from operator import attrgetter
 from models import *
 
 ARCHIVE_ACCESS_GROUPS = {"cmip5_research": {"gid": 26059, "datasets" : ["cmip5_research"]},
-                         "esacat1":        {"gid": 26017, "datasets" : ["aatsr_multimission"]},                         
+                         "esacat1":        {"gid": 26017, "datasets" : ["aatsr_multimission", "atsrubt"]},                         
                          "ecmwf":          {"gid": 26018, "datasets" : ["era", "ecmwfop"]},
                          "ukmo" :          {"gid": 26019, "datasets" : ["surface"]},
                          "eurosat":        {"gid": 26021, "datasets" : ["metop_iasi"]}
@@ -17,6 +17,13 @@ ARCHIVE_ACCESS_GROUPS = {"cmip5_research": {"gid": 26059, "datasets" : ["cmip5_r
 # GID for 'open' group
 #
 OPEN_GID = 26020
+#
+# Default group id for account
+#
+DEFAULT_GID = 26030
+#
+# Default shell for accont
+DEFAULT_SHELL = "/bin/bash" 
 
 #
 # The following users should be a member of all archive access groups
@@ -31,12 +38,42 @@ def is_ldap_user (user):
     else:
         return False    
 
-def all_users():
-    '''Returns user objects for all LDAP users. For efficiency this is done using an sql query'''
+def user_shell (user):
+    ''' Returns shell to be used for user. If no specific value has been set 
+        for user then use default'''
+        
+    if user.shell:
+        return user.shell
+    else:
+        return DEFAULT_SHELL
 
-    sql = "select distinct tbusers.userkey from tbusers, tbdatasetjoin where (tbusers.userkey=tbdatasetjoin.userkey)" + \
+def user_gid (user):
+    ''' Returns initial group to be used for user. If no specific value has been set 
+        for user then use default'''
+        
+    if user.gid:
+        return user.gid
+    else:
+        return DEFAULT_GID
+        
+def user_home_directory (user):
+    ''' Returns home directory to be used for user. If no specific value has been set 
+        for user then use default'''
+        
+    if user.home_directory:
+        return user.home_directory
+    else:
+        return "/home/users/%s" % user.accountid
+        
+             
+
+def all_users(order_by="userkey"):
+    '''Returns user objects for all LDAP users. For efficiency this is done using an sql query.
+       optionally the results can be ordered by the given field'''
+
+    sql = "select distinct tbusers.* from tbusers, tbdatasetjoin where (tbusers.userkey=tbdatasetjoin.userkey)" + \
           "and tbdatasetjoin.removed=0 and ((datasetid='jasmin-login') or (datasetid='system-login') or (datasetid='cems-login')) " + \
-          "and tbusers.uid > 0 order by userkey"
+          "and tbusers.uid > 0 order by %s" % order_by
     users = User.objects.raw(sql)
     
     return users
@@ -53,7 +90,7 @@ def all_users_userkeys():
 
     return userkeys
 
-def getDatasetUsers(datasetids):
+def get_dataset_users(datasetids):
 
     '''Returns an array of user objects for users who currently have access to the given dataset(s).
     argument can be either a single dataset id, or an array of datasetids. If more than one datasetid is
@@ -110,7 +147,7 @@ def checkGroups():
     
         if dataset.datasetid.startswith('gws_'):
             print dataset.datasetid
-            users = getDatasetUsers(dataset.datasetid)
+            users = get_dataset_users(dataset.datasetid)
             
             for user in users:
                 print '   ', user.accountid
@@ -135,7 +172,7 @@ def ldap_group_record(datasetid):
     record = record + 'gidNumber: %s\n' % dataset.gid
     record = record + 'description: cluster:ceda-external\n'
     
-    users = getDatasetUsers(datasetid)
+    users = get_dataset_users(datasetid)
     users.sort(key=attrgetter('accountid'))
         
     for user in users:
@@ -185,7 +222,7 @@ def ldap_archive_access_group_record(datasetid):
     record = record + 'description: cluster:ceda-external\n'
     record = record + 'description: cluster:ceda-internal\n'
         
-    users = getDatasetUsers(ARCHIVE_ACCESS_GROUPS[datasetid]["datasets"]) 
+    users = get_dataset_users(ARCHIVE_ACCESS_GROUPS[datasetid]["datasets"]) 
     
     accounts = []
     
@@ -197,7 +234,46 @@ def ldap_archive_access_group_record(datasetid):
     for account in accounts:
         record = record + 'memberUid: ' + account + '\n'
          
-    return record                       
+    return record  
+    
+def ldap_user_record(accountid):
+    '''Returns LDAP record for given user'''
+    
+    
+    record = ''
+    
+    try:
+        user = User.objects.get(accountid=accountid)
+    except:
+        return "%s not found" % accountid
+            
+    if not is_ldap_user (user):
+        return 'Not LDAP user'
+    
+    if not user.uid > 0:
+        return 'uid not set for %s' % accountid
+        
+    record = "dn: cn=%s,ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk\n" % user.accountid
+       
+    record = record + 'loginShell: %s\n' % user_shell(user)
+    record = record + 'sn: %s\n' % user.surname
+    record = record + 'objectClass: top\n'
+    record = record + 'objectClass: person\n'
+    record = record + 'objectClass: posixAccount\n'
+    record = record + 'objectClass: ldapPublicKey\n'
+    record = record + 'objectClass: rootAccessGroup\n'
+    record = record + 'gidNumber: %s\n' % user_gid(user)
+    record = record + 'uid: %s\n' % user.accountid
+    record = record + 'gecos: %s %s %s\n' % (user.title, user.othernames, user.surname)   
+    record = record + 'uidNumber: %s\n' % user.uid      
+    record = record + 'cn: %s\n' % user.accountid
+    record = record + 'homeDirectory: %s\n' % user_home_directory(user)
+    record = record + 'sshPublicKey: %s\n' % user.public_key  
+         
+    return record   
+    
+    
+                          
 #----------------------- The following routines are used for generating the contents of the NIS password and group files
 
 def userAccountsString(users, extraAccounts=[]):
@@ -227,7 +303,7 @@ def dataset_group_string (datasetid):
 
     record = '%s:*:%s:' % (dataset.grp, dataset.gid)
         
-    users = getDatasetUsers(datasetid)
+    users = get_dataset_users(datasetid)
     record = record + userAccountsString(users)
     
     return record
@@ -258,7 +334,7 @@ def generate_all_nis_groups ():
 #
 
     for accessGroup in ARCHIVE_ACCESS_GROUPS.keys():            
-        users = getDatasetUsers(ARCHIVE_ACCESS_GROUPS[accessGroup]["datasets"])
+        users = get_dataset_users(ARCHIVE_ACCESS_GROUPS[accessGroup]["datasets"])
         accountsString = userAccountsString(users, extraAccounts=ARCHIVE_ACCESS_STANDARD_USERS)
         record = record + accessGroup + ':*:' + str(ARCHIVE_ACCESS_GROUPS[accessGroup]["gid"]) + ':' + accountsString + "\n";
 #

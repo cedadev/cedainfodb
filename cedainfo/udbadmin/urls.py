@@ -52,6 +52,10 @@ urlpatterns = patterns('',
 
      url(r'^ldapext/group/(?P<datasetid>.+)$', write_ldap_group), 
      url(r'^ldapext/group/$', write_all_ldap_groups),            
+
+     url(r'^ldapext/user/(?P<accountid>.+)$', write_ldap_user), 
+     url(r'^ldapext/user/$', write_all_ldap_users),            
+
            
      url(r'^authorise/(?P<userkey>\d{1,6})/$', authorise_datasets),
      url(r'^udj/(?P<id>\d{1,6})/$', edit_user_dataset_join),

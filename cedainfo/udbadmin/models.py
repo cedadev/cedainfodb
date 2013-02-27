@@ -38,11 +38,29 @@ from django.db.models import Max, Min
 from datetime import datetime
 from pytz import timezone
 import choices
+import country_list
 import django.db.models.options as options
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
+import base64
+
 USERDB = u'userdb'
-        
+
+class Base64Field(models.TextField):
+
+    def contribute_to_class(self, cls, name):
+        if self.db_column is None:
+            self.db_column = name
+        self.field_name = name + '_base64'
+        super(Base64Field, self).contribute_to_class(cls, self.field_name)
+        setattr(cls, name, property(self.get_data, self.set_data))
+
+    def get_data(self, obj):
+        return base64.decodestring(getattr(obj, self.field_name))
+
+    def set_data(self, obj, data):
+        setattr(obj, self.field_name, base64.encodestring(data))
+         
 class Dataset(models.Model):
     datasetid = models.CharField(max_length=40, primary_key=True)
 
@@ -94,14 +112,23 @@ class Dataset(models.Model):
         ordering = ['datasetid']
         managed  = False
  
-
+ 
 
 class Institute(models.Model):
     institutekey = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=80)
-    country = models.CharField(max_length=30)
-    type = models.CharField(max_length=30)
-    link = models.CharField(max_length=100)
+    name = models.CharField('Institute Name', 
+         help_text=
+   'Name of institute, universtity or other organisation for which you work', 
+         max_length=80)
+    country = models.CharField('Institute Country', 
+               help_text='home country of institue', max_length=30,
+               choices=country_list.COUNTRY_LIST)
+    type = models.CharField('Institute type', max_length=30,
+               help_text='Commercial, Government, University, etc',
+               choices=choices.INSTITUTE_TYPES)
+    link = models.CharField('Institute URL',
+                help_text='Public web page of Institute',
+                max_length=100)
     class Meta:
         in_db = USERDB
         db_table = u'tbinstitutes'
@@ -110,13 +137,15 @@ class Institute(models.Model):
 class Addresses(models.Model):
     addresskey = models.IntegerField(primary_key=True)
     institutekey = models.ForeignKey(Institute, db_column='institutekey')
-    department = models.CharField(max_length=100)
-    address1 = models.CharField(max_length=150)
-    address2 = models.CharField(max_length=100)
-    address3 = models.CharField(max_length=100)
-    address4 = models.CharField(max_length=100)
-    address5 = models.CharField(max_length=100)
-    nerc = models.IntegerField()
+    department = models.CharField(max_length=100, help_text='department inside institute')
+    address1 = models.CharField("Department Address Line 1", max_length=150, help_text='address of department')
+    address2 = models.CharField("Department Address Line 2", max_length=100, help_text='address')
+    address3 = models.CharField("Department Address Line 3", max_length=100, blank=True, help_text='address')
+    address4 = models.CharField("Department Address Line 4", max_length=100, blank=True, help_text='address')
+    address5 = models.CharField("Department Address Line 5", max_length=100, blank=True, help_text='address')
+    nerc = models.IntegerField(verbose_name='Is Department NERC funded?',
+                   choices=((0, "No"), (-1, "Yes")), 
+                   help_text='Does your department get any funding from NERC?')
 
     def __unicode__ (self):
         return "%s" % self.address1
@@ -140,7 +169,7 @@ class UserManager(models.Manager):
 class User (models.Model):
     userkey = models.AutoField(primary_key=True)
 
-    title = models.CharField(max_length=10,       
+    title = models.CharField(max_length=10, help_text='title',
           choices=(
               ("Mr","Mr"),
               ("Mrs","Mrs"),
@@ -151,17 +180,21 @@ class User (models.Model):
           )
         ) 
 
-    surname = models.CharField(max_length=50)
-    othernames = models.CharField(max_length=50, verbose_name='First name(s)')
+    surname = models.CharField(max_length=50, help_text='surname')
+    othernames = models.CharField(max_length=50, verbose_name='Other names', help_text='Christian or Forenames')
     addresskey = models.OneToOneField(Addresses, db_column='addresskey')
-    telephoneno = models.CharField(max_length=50, blank=True)
-    faxno = models.CharField(max_length=50, blank=True)
-    emailaddress = models.CharField(max_length=100)
+    telephoneno = models.CharField('Telephone number', max_length=50, blank=True, help_text='Your institute/work number')
+    faxno = models.CharField('Fax number', max_length=50, blank=True, help_text='Your institute/work fax number')
+    emailaddress = models.EmailField('Email Address', max_length=100, help_text='Your institute/work email address')
     comments = models.TextField(blank=True)
-    endorsedby = models.CharField(max_length=50, blank=True)
-    degree = models.CharField(max_length=20)
+    endorsedby = models.CharField("Supervisor's name", 
+                           max_length=50, 
+                           blank=True, 
+                           help_text='Your academic supervisor. This is a required field for PhD students')
+#    degree = models.CharField('Degree you are studying for', max_length=20)
     
-    degree = models.CharField(max_length=20, blank=True, null=True, verbose_name='Studying for',
+    degree = models.CharField('Degree you are studying for', max_length=20, blank=True, null=True, 
+        help_text = 'Enter the qualification for which you are currently studying',
         choices=(
             ("BA","BA"),
             ("BSc","BSc"),
@@ -175,10 +208,12 @@ class User (models.Model):
         )
     ) 
         
-    field = models.CharField(max_length=50, blank=True, null=True,  
+    field = models.CharField('Discipline', max_length=50, blank=True, null=True,  
+        help_text = 'field you are working in',
         choices=(
             ("Atmospheric Physics","Atmospheric Physics"),
             ("Atmospheric Chemistry","Atmospheric Chemistry"),
+            ("Climate Change","Climate Change"),
             ("Earth Science","Earth Science"),
             ("Marine Science","Marine Science"),
             ("Terrestrial and Fresh Water","Terrestrial and Fresh Water"),
@@ -194,7 +229,9 @@ class User (models.Model):
         )
     )
     
-    accountid = models.CharField(max_length=20, blank=True)
+    accountid = models.CharField('Account Id', 
+                                 max_length=20, blank=True, 
+                                 help_text='this is your username on this system')
     
     accounttype = models.CharField(max_length=10,
                choices=(
@@ -210,18 +247,22 @@ class User (models.Model):
 #    webpasswd = models.CharField(max_length=13)  #Don't use this field.
     encpasswd = models.CharField(max_length=13) 
     md5passwd = models.CharField(max_length=32)
-    public_key = models.TextField(blank=True) 
+    public_key = models.TextField('Public Key', blank=True, 
+                                  help_text='RSA public key required for access to JASMIN') 
     startdate = models.DateTimeField()
-    webpage = models.CharField(max_length=100, blank=True)
+    webpage = models.URLField('URL of Personal Web Page', max_length=100, blank=True,
+                        help_text=' personal webpage giving your contact details, research interests etc')
 #    sharedetails = models.IntegerField()
     datacenter = models.CharField(max_length=30)
-    openid_username_component = models.CharField(max_length=100)
-    openid = models.CharField(max_length=100, blank=True)
-
+    openid_username_component = models.CharField('OpenID Username Component',max_length=100, 
+                                  help_text='the unique part of your OpenID address')
+    openid = models.URLField(max_length=100, blank=True, 
+           help_text='You may log in using a "sign-on once" account by entering its address here')
     uid     = models.IntegerField(default=0, blank=True)
     home_directory = models.CharField(max_length=150, blank=True)
     shell = models.CharField(max_length=50, blank=True)  
     gid   = models.IntegerField(default=0, blank=True)  
+    
 #    onlinereg = models.IntegerField()
 
     def institute (self):
@@ -243,7 +284,7 @@ class User (models.Model):
         if a5: addressLine = addressLine + ", " + a5
                 
         return addressLine
-             
+               
     def displayName (self, titleFirst=True):
         """ Displays name """
        
@@ -302,7 +343,7 @@ class User (models.Model):
             return True
         else:
             return False                 
-     
+      
     def nextUserkey (self):        
         '''Returns the next userkey value'''
 
