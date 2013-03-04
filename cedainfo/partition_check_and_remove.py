@@ -85,7 +85,7 @@ class TidyRun:
            try: 
                self.check_partition()
            except: 
-               pass
+               self.log("!! Error checking partition %s \n%s\n" % (self.partition, sys.exc_info()))
            self.next_partition()
            if self.partition == None: return
     
