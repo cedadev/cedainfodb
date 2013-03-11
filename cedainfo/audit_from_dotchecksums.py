@@ -100,10 +100,17 @@ if __name__=="__main__":
         if not os.path.exists(checksumsfile):
             print "no checksums file for %s." % fs.logical_path
             continue
-        else: 
-            # scan for checksums   
-            print "Do audit for %s" %  fs.logical_path
-            audit=Audit(fileset=fs)
-            audit.start() 
-            audit.save()  
+        
+        # check that .checksums Audit does not exist
+        mtime = datetime.datetime.utcfromtimestamp(os.path.getmtime(checksumsfile))	    
+        audits = Audit.objects.filter(fileset=fs, starttime=mtime)
+        if len(audits) >0:
+            print "audit already done or already started. %s." % fs.logical_path
+            continue
+             
+        # scan for checksums   
+        print "Do audit for %s" %  fs.logical_path
+        audit=Audit(fileset=fs)
+        audit.start() 
+        audit.save()  
 
