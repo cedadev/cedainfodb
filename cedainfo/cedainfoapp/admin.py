@@ -142,10 +142,11 @@ class PartitionAdmin(admin.ModelAdmin):
 admin.site.register(Partition, PartitionAdmin)
 
 class AuditAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__',
-		     'auditstate','fileset','corrupted_files', 'new_files', 
+    list_display = ('fileset',
+		     'auditstate','starttime','corrupted_files', 'new_files', 
 		     'deleted_files', 'modified_files', 'unchanges_files')
     actions=['delete']
+    search_fields = ['fileset__logical_path']
     list_filter = ('auditstate',)  
     readonly_fields = ('auditstate','corrupted_files', 'new_files', 
 		     'deleted_files', 'modified_files', 'unchanges_files', 'starttime', 'endtime', 'logfile')
