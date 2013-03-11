@@ -94,7 +94,7 @@ if __name__=="__main__":
     
 
 
-    filesets  =   FileSet.objects.all()
+    filesets  =   FileSet.objects.filter(storage_pot__isnull=False)
     for fs in filesets:
         checksumsfile = os.path.join(fs.storage_path(), '.checksums') 
         if not os.path.exists(checksumsfile):
