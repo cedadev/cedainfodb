@@ -11,6 +11,33 @@ setup_environ(settings)
 from cedainfoapp.models import FileSet, Partition, Audit
 
 
+def start(self):
+        
+    checksumsfile = os.path.join(self.fileset.storage_path(), '.checksums') 
+    if not os.path.exists(checksumsfile):
+        print "no checksums file."
+        return
+
+    # time of audit
+    mtime = datetime.datetime.utcfromtimestamp(os.path.getmtime(checksumsfile))	    
+    self.starttime = mtime
+    self.auditstate = 'started'
+    self.save()
+    try: 
+        self.checkm_log()
+    except Exception, e:
+        self.endtime = datetime.now()
+        self.auditstate = 'error'
+        self.save()
+        raise e  
+	    
+    self.endtime = self.starttime
+	
+    self.auditstate = 'analysed'
+    self.save()
+
+Audit.start = start
+
 
 def _checkm_log(self, directory, storage_path, LOG):
     # recursive function to make checkm log file
@@ -27,11 +54,19 @@ def _checkm_log(self, directory, storage_path, LOG):
     if os.path.exists(checksumsfile):
         CS = open(checksumsfile)
         lines = CS.readlines()
-        print lines
+#        print lines
+        checksums = {}
+        filenames = []
         for l in lines:
             bits = l.split(':')
             name, digest, size, mtime = bits[0], bits[1], bits[2],bits[3]
-            relpath = os.path.join(reldir, name)   
+            checksums[name]=(digest, size, mtime)
+            filenames.append(name)
+
+        filenames.sort()
+        for name in filenames:
+            relpath = os.path.join(reldir, name)  
+            (digest, size, mtime) = checksums[name] 
             LOG.write("%s|md5|%s|%s|%s\n" % (relpath,digest ,size,
                       time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime(float(mtime)))))
 
