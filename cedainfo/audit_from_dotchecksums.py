@@ -92,15 +92,18 @@ if __name__=="__main__":
         else:
             assert False, "unhandled option"
     
-    path = args[0] 
-    fs = FileSet.objects.filter(logical_path=path)
-    if len(fs) == 0:
-        raise Exception("path not found as fileset")
-    
-    fs = fs[0]
 
-    # scan for checksums     
-    audit=Audit(fileset=fs)
-    audit.start() 
-    audit.save()  
+
+    filesets  =   FileSet.objects.all()
+    for fs in filesets:
+        checksumsfile = os.path.join(fs.storage_path(), '.checksums') 
+        if not os.path.exists(checksumsfile):
+            print "no checksums file for %s." % fs.logical_path
+            continue
+        else: 
+            # scan for checksums   
+            print "Do audit for %s" %  fs.logical_path
+            audit=Audit(fileset=fs)
+            audit.start() 
+            audit.save()  
 
