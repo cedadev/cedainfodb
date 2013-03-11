@@ -135,7 +135,7 @@ class Partition(models.Model):
 	if len(lines) == 4: blocks_total, blocks_used, blocks_available, used, mount = lines[2].split()
         self.capacity_bytes = int(blocks_total)*1024
         self.used_bytes = int(blocks_used)*1024
-	self.last_checked = datetime.now()
+	self.last_checked = datetime.utcnow()
 	self.save() 
               
 
@@ -560,7 +560,7 @@ class FileSet(models.Model):
             p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
             nfiles = p2.communicate()[0]
 
-            fssm = FileSetSizeMeasurement(fileset=self, date=datetime.now(), size=int(size)*1024, no_files=int(nfiles))
+            fssm = FileSetSizeMeasurement(fileset=self, date=datetime.utcnow(), size=int(size)*1024, no_files=int(nfiles))
             fssm.save() 
         return      
 
@@ -824,18 +824,18 @@ class Audit(models.Model):
 
 	print "**** %s" % prev_audit    
 	    
- 	self.starttime = datetime.now()
+ 	self.starttime = datetime.utcnow()
 	self.auditstate = 'started'
 	self.save()
 	try: 
 	    self.checkm_log()
 	except Exception, e:
-	    self.endtime = datetime.now()
+	    self.endtime = datetime.utcnow()
 	    self.auditstate = 'error'
 	    self.save()
 	    raise e  
 	    
-	self.endtime = datetime.now()
+	self.endtime = datetime.utcnow()
 	self.auditstate = 'finished'
 	self.save()
 	
@@ -985,7 +985,7 @@ class Audit(models.Model):
             # if path is reg file
             if os.path.isfile(path): 
 	        size = os.path.getsize(path)
-		mtime = datetime.fromtimestamp(os.path.getmtime(path)).strftime('%Y-%m-%dT%H:%M:%SZ')
+		mtime = datetime.utcfromtimestamp(os.path.getmtime(path)).strftime('%Y-%m-%dT%H:%M:%SZ')
                 F=open(path)
                 m=hashlib.md5()
                 while 1:
