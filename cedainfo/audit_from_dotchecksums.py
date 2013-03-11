@@ -26,7 +26,7 @@ def start(self):
     try: 
         self.checkm_log()
     except Exception, e:
-        self.endtime = datetime.now()
+        self.endtime = datetime.datetime.utcnow()
         self.auditstate = 'error'
         self.save()
         raise e  
