@@ -1,0 +1,71 @@
+import getopt, sys
+import os, errno
+import datetime, time
+from datetime import timedelta
+import smtplib
+
+from django.core.management import setup_environ
+import settings
+setup_environ(settings)
+
+from cedainfoapp.models import FileSet, Partition, Audit
+
+
+
+def _checkm_log(self, directory, storage_path, LOG):
+    # recursive function to make checkm log file
+    reldir = directory[len(storage_path)+1:]
+    names = os.listdir(directory)
+    # look for diectories and recurse
+    names.sort()
+    for n in names:
+        path = os.path.join(directory,n)    
+        if os.path.isdir(path) and not os.path.islink(path):
+            self._checkm_log(path, storage_path, LOG)
+    # read old .checksuns file
+    checksumsfile = os.path.join(directory, '.checksums') 
+    if os.path.exists(checksumsfile):
+        CS = open(checksumsfile)
+        lines = CS.readlines()
+        print lines
+        for l in lines:
+            bits = l.split(':')
+            name, digest, size, mtime = bits[0], bits[1], bits[2],bits[3]
+            relpath = os.path.join(reldir, name)   
+            LOG.write("%s|md5|%s|%s|%s\n" % (relpath,digest ,size,
+                      time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime(float(mtime)))))
+
+Audit._checkm_log = _checkm_log
+	
+
+
+if __name__=="__main__":
+
+
+    
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "h")
+    except getopt.GetoptError:
+        # print help information and exit:
+        usage()
+        sys.exit(2)
+    
+    for o, a in opts:
+        if o in ("-h", "--help"):
+            usage()
+            sys.exit()
+        else:
+            assert False, "unhandled option"
+    
+    path = args[0] 
+    fs = FileSet.objects.filter(logical_path=path)
+    if len(fs) == 0:
+        raise Exception("path not found as fileset")
+    
+    fs = fs[0]
+
+    # scan for checksums     
+    audit=Audit(fileset=fs)
+    audit.start() 
+    audit.save()  
+

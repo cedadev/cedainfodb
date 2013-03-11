@@ -829,11 +829,11 @@ class Audit(models.Model):
 	self.save()
 	try: 
 	    self.checkm_log()
-	except:
+	except Exception, e:
 	    self.endtime = datetime.now()
 	    self.auditstate = 'error'
 	    self.save()
-	    raise "Error when creating checkm log" 
+	    raise e  
 	    
 	self.endtime = datetime.now()
 	self.auditstate = 'finished'
