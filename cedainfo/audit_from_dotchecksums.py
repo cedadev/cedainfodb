@@ -96,6 +96,7 @@ if __name__=="__main__":
 
     filesets  =   FileSet.objects.filter(storage_pot__isnull=False)
     for fs in filesets:
+        print "===== %s ====" % fs
         checksumsfile = os.path.join(fs.storage_path(), '.checksums') 
         if not os.path.exists(checksumsfile):
             print "no checksums file for %s." % fs.logical_path
