@@ -94,7 +94,7 @@ if __name__=="__main__":
     
 
 
-    filesets  =   FileSet.objects.filter(storage_pot__isnull=False)
+    filesets  =   FileSet.objects.filter(storage_pot__isnull=False).exclude(storage_pot='')
     for fs in filesets:
         print "===== %s ====" % fs
         checksumsfile = os.path.join(fs.storage_path(), '.checksums') 
