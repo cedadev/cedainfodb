@@ -1459,8 +1459,10 @@ class VM(models.Model):
             network_required = self.network_required,
             os_required = self.os_required,
             patch_responsible = self.patch_responsible,
-            request_status = 'update',
+            request_status = 'ceda pending',
+            request_type = 'update',
             end_of_life = self.end_of_life,
+            vm = self,
         )
         req.root_users = self.root_users.all()
         req.save()

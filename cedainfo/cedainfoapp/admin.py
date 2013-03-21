@@ -280,15 +280,20 @@ class GWSAdmin(admin.ModelAdmin):
 admin.site.register(GWS, GWSAdmin)
 
 class VMRequestAdmin(admin.ModelAdmin):
-    list_display=('vm_name', 'action_links', 'type', 'operation_type', 'internal_requester', 'date_required','timestamp', 'request_type', 'request_status','vm_link',)
-    list_filter=('type', 'operation_type', 'request_status', MountpointFilter,)
+    list_display=('vm_name', 'action_links', 'type', 'operation_type', 'internal_requester', 'patch_responsible', 'date_required','timestamp', 'request_type', 'request_status','vm_link',)
+    list_filter=('type', 'operation_type', 'request_status', 'patch_responsible', MountpointFilter,)
     search_fields = ('vm_name',)
     #readonly_fields = ('request_status',)
+    # order vm dropdown by name
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'vm':
+            kwargs["queryset"] = VM.objects.order_by('name')
+        return super(VMRequestAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 admin.site.register(VMRequest, VMRequestAdmin)
 
 class VMAdmin(admin.ModelAdmin):
-    list_display=('name', 'action_links', 'type', 'operation_type', 'internal_requester', 'timestamp', 'status', )
-    list_filter=('type', 'operation_type', 'status', MountpointFilter,)
+    list_display=('name', 'action_links', 'type', 'operation_type', 'internal_requester', 'patch_responsible', 'timestamp', 'status', )
+    list_filter=('type', 'operation_type', 'status', 'patch_responsible', MountpointFilter,)
     search_fields = ('name',)
     def has_add_permission(self, request):
         return False
