@@ -1038,6 +1038,7 @@ class GWSRequest(models.Model):
        Captures all information about requirements for GWS and if converted is copied to a GWS instance (new or updated)'''
     class Meta:
         verbose_name_plural = 'group workspace requests'
+        ordering = ['gws_name']
     
     gws_name = models.CharField(
         # name doesn't need to be unique here : there might be several requests but it's the one that's approved that gets copied.
@@ -1175,6 +1176,7 @@ class GWS(models.Model):
 
     class Meta:
         verbose_name_plural = 'group workspaces'
+        ordering = ['name']
      
     name = name = models.CharField(
         max_length=16,
@@ -1289,7 +1291,11 @@ class VMRequest(models.Model):
     vm = models.ForeignKey('VM', blank=True, null=True, on_delete=models.SET_NULL, help_text='VM to which this request pertains')
     end_of_life = models.DateField(default = datetime.now()+timedelta(days=3*365)) # approx 3 years from now
     timestamp = models.DateTimeField(auto_now=True, auto_now_add=False, help_text='time last modified')
-    
+        
+    # Set default ordering
+    class Meta:
+        ordering = ['vm_name']
+        
     def __unicode__(self):
         return u'%s' % self.vm_name
         
@@ -1426,6 +1432,10 @@ class VM(models.Model):
     end_of_life = models.DateField(default = datetime.now()+timedelta(days=3*365)) # 3 years from now
     retired = models.DateField(null=True, blank=True)
     timestamp = models.DateTimeField(auto_now=True, auto_now_add=False, help_text='time last modified')
+    
+    # Set default ordering
+    class Meta:
+        ordering = ['name']
     
     def __unicode__(self):
         return u'%s' % self.name

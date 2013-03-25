@@ -285,10 +285,6 @@ class VMRequestAdmin(admin.ModelAdmin):
     search_fields = ('vm_name',)
     #readonly_fields = ('request_status',)
     # order vm dropdown by name
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == 'vm':
-            kwargs["queryset"] = VM.objects.order_by('name')
-        return super(VMRequestAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 admin.site.register(VMRequest, VMRequestAdmin)
 
 class VMAdmin(admin.ModelAdmin):
