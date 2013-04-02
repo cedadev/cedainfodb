@@ -68,7 +68,7 @@ class Dataset(models.Model):
        choices=choices.DATASET_REGISTRATION_TYPES
        )
     
-    grp = models.CharField(max_length=40, verbose_name='Group')
+    grp = models.CharField(max_length=40, verbose_name='Group', blank=True)
     grouptype = models.CharField(max_length=20)
     description = models.CharField(max_length=100, blank=True)
     source = models.CharField(max_length=50)
@@ -79,7 +79,7 @@ class Dataset(models.Model):
 #    metdata = models.IntegerField()
     conditions = models.CharField(max_length=100, blank=True)
     defaultreglength = models.IntegerField()
-    datacentre = models.CharField(max_length=20, choices=choices.DATACENTRES)
+    datacentre = models.CharField(max_length=20, choices=choices.DATACENTRES, default='badc')
     infourl = models.CharField(max_length=200, blank=True)
     gid     = models.IntegerField(default=0, blank=True)
     public_key_required = models.BooleanField("Check for public key on registration", 

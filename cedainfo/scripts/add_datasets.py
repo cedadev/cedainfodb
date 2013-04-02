@@ -4,25 +4,30 @@
 #
 from udbadmin.models import User
 
-DATASETID = "system-login"
+FILE      =  "users.lis"
+DATASETID =  "xxx"
 ENDORSEDBY = "Andrew Harwood"
-RESEARCH  =  "Added retrospectively based on content of external NIS passwd file"
-EXPIREDATE = "31-Dec-2013"
+RESEARCH  =  "Added retrospectively"
+EXPIREDATE = "dd-mmm-yyyy"
 
-f = open('users.lis', 'r')
+def process(infile, datasetid):
 
-def run():
+    f = open(infile, 'r')
 
     for line in f:
         username = line.strip()
-    #   print username
+
         try: 
             user = User.objects.get(accountid=username)
-            if user.hasDataset("ceda"):
-               print "insert into tbdatasetjoin (userkey, datasetid, ver, endorsedby, endorseddate, expiredate, research) values (",            
-               print "%s, '%s', %s, '%s', '%s', '%s', '%s'" % (user.userkey, DATASETID, 1,  ENDORSEDBY, "now", EXPIREDATE, RESEARCH),
-            
-               print ")"
+
+            print "insert into tbdatasetjoin (userkey, datasetid, ver, endorsedby, endorseddate, expiredate, research) values (",            
+            print "%s, '%s', %s, '%s', '%s', '%s', '%s'" % (user.userkey, datasetid, 1,  ENDORSEDBY, "now", EXPIREDATE, RESEARCH),
+
+            print ")"
         except:
-            pass
-        
+            print 'Not Found: %s' % username
+  
+    f.close()
+
+def run():      
+    process(FILE, DATASETID)

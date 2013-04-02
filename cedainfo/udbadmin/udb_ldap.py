@@ -33,7 +33,7 @@ ARCHIVE_ACCESS_STANDARD_USERS = ["badc", "prototype", "cwps"]
 def is_ldap_user (user):    
     ''' Checks if the user should be in the LDAP system'''
 
-    if user.hasDataset("system-login") or user.isJasminCemsUser():
+    if user.hasDataset("system-login") or user.hasDataset("vm_access_ceda_internal") or user.isJasminCemsUser():
         return True
     else:
         return False    
@@ -72,7 +72,8 @@ def all_users(order_by="userkey"):
        optionally the results can be ordered by the given field'''
 
     sql = "select distinct tbusers.* from tbusers, tbdatasetjoin where (tbusers.userkey=tbdatasetjoin.userkey)" + \
-          "and tbdatasetjoin.removed=0 and ((datasetid='jasmin-login') or (datasetid='system-login') or (datasetid='cems-login')) " + \
+          "and tbdatasetjoin.removed=0 and ((datasetid='jasmin-login') or " + \
+          "(datasetid='vm_access_ceda_internal') or (datasetid='system-login') or (datasetid='cems-login')) " + \
           "and tbusers.uid > 0 order by %s" % order_by
     users = User.objects.raw(sql)
     
@@ -235,7 +236,28 @@ def ldap_archive_access_group_record(datasetid):
         record = record + 'memberUid: ' + account + '\n'
          
     return record  
+
+def ldap_user_tags(user):
+
+    record = ''
+
+    if user.hasDataset("system-login") or user.isJasminCemsUser():
+        record = record + 'description: cluster:ceda-external\n'
+
+    datasetjoins = user.currentDatasets()
     
+    for datasetjoin in datasetjoins:
+       if datasetjoin.datasetid.datasetid.startswith('vm_access_'):
+           record = record + 'description: %s\n' % datasetjoin.datasetid.grp       
+       if datasetjoin.datasetid.datasetid == 'jasmin-login':
+           record = record + 'description: cluster:jasmin-login\n'
+       if datasetjoin.datasetid.datasetid == 'cems-login':
+           record = record + 'description: cluster:cems-login\n'
+  
+    
+    return record
+    
+        
 def ldap_user_record(accountid):
     '''Returns LDAP record for given user'''
     
@@ -264,9 +286,12 @@ def ldap_user_record(accountid):
     record = record + 'objectClass: rootAccessGroup\n'
     record = record + 'gidNumber: %s\n' % user_gid(user)
     record = record + 'uid: %s\n' % user.accountid
-    record = record + 'gecos: %s %s %s\n' % (user.title, user.othernames, user.surname)   
+    record = record + 'gecos: %s %s\n' % (user.othernames, user.surname)   
     record = record + 'uidNumber: %s\n' % user.uid      
     record = record + 'cn: %s\n' % user.accountid
+    
+    record = record + ldap_user_tags(user)
+    
     record = record + 'homeDirectory: %s\n' % user_home_directory(user)
     record = record + 'sshPublicKey: %s\n' % user.public_key  
          

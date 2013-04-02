@@ -229,7 +229,7 @@ def add_user_datasets(request, userkey):
    cedauser    = User.objects.get(userkey=userkey)
    
    authorisors = SiteUser.objects.exclude(last_name__exact="").order_by('first_name') 
-   datasets = Dataset.objects.all()
+   datasets = Dataset.objects.exclude(datasetid__startswith='msf')
       
    if request.method == 'POST':
      
