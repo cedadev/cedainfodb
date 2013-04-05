@@ -458,6 +458,36 @@ Documentation on this format is available here: http://www.badc.rl.ac.uk/help/fo
  
 <hr/>
 <h1>Appendix A: </h1>
+{% if data_list %}
+	<table border=2> 
+	    <tr>
+	        <th>Data Product</th>
+		<th>Contact</th>
+		<th>Data Volume (TB)</th>
+		<th>Delivery date</th>
+		<th>Issues</th>
+		<th>Preservation plan</th>
+	    </tr>
+
+         {% for data in data_list %}
+	        <tr>
+		    <td>{{ data.DPT }}</td>
+		    <td>{{ data.contact1 }}</td>
+		    <td>{{ data.datavol }}</td>
+		    <td>{{ data.deliverydate }}</td>
+		    <td>{{ data.format }} {{ data.ipr }} {{ data.versions }}</td>
+		    <td>{{ data.preservation }}</td>
+		</tr>
+        {% endfor %}
+        </table>
+	
+    
+    
+{% else %}
+    <p>No outputs expected for this project.</p>
+{% endif %}
+
+
 <h2>Output Data</h2>
  
  
@@ -489,28 +519,20 @@ datasets. XYZ data will be available to other researchers, either via the projec
 		<th>Preservation plan</th>
 	    </tr>
             
+         {% for data in data_list %}
 	        <tr>
-		    <td>Dataset description</td>
-		    <td>Dataset contact name</td>
-		    <td>xxx</td>
-		    <td>xxx</td>
-		    <td>Any issues with data eg legal, access, retention etc  </td>
-		    <td>Date expect to receive data</td>
-		    <td>max 2 years after delivery</td>
+		    <td>{{ data.DPT }}</td>
+		    <td>{{ data.contact1 }}</td>
+		    <td>{{ data.datavol }}</td>
+		    <td>{{ data.format }}</td>
+		    <td>{{ data.ipr }} {{ data.versions }}</td>
+		    <td>{{ data.deliverydate }}</td>
+		    <td>max 2 years after collection</td>
 		    <td>eg re-use by other atmospheric composition studies</td>
-		    <td>eg keep indefinitely, Do not keep etc, inc destination data centre (if not owning DC)</td>
+		    <td>{{ data.preservation }}</td>
 		</tr>
- 	        <tr>
-		    <td>add more rows as required</td>
-		    <td>.</td>
-		    <td>.</td>
-		    <td>.</td>
-		    <td>.</td>
-		    <td>.</td>
-		    <td>.</td>
-		    <td>.</td>
-		    <td>.</td>
-		</tr>
+        {% endfor %}
+
             
         </table>
 	
