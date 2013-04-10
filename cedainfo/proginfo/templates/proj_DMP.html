@@ -29,7 +29,7 @@ back to <a href="/admin/proginfo/project/{{ proj.id }}">edit</a>
 <tr><td colspan=2>&nbsp</td></tr>
 <tr><td colspan=2 style='font-size:larger'><b>Organisation</b></td></tr>
  
-<tr><td>Nominated Data Centre</td><td BGCOLOR='lightgrey'>British Atmospheric Data Centre / NERC Earth Observation Data Centre</td></tr>
+<tr><td>Nominated Data Centre</td><td BGCOLOR='lightgrey'>British Atmospheric Data Centre / NERC Earth Observation Data Centre (CEMS academic archive)</td></tr>
 <tr><td>Data Centre Contact</td><td BGCOLOR='lightgrey'>[SCISUPPORT CONTACT]</td></tr>
 <tr><td>Project Data Contact</td><td BGCOLOR='lightgrey'>{{ proj.PI }}</td></tr>
 <tr><td>Any other team members with responsibility for data</td><td BGCOLOR='lightgrey'>{{ proj.CoI1 }}{{ proj.CoI2 }}</td></tr>
@@ -123,8 +123,8 @@ Potential users of the archive will be required to agree to the Conditions of Us
 <table BGCOLOR='lightgrey' align='center' width="70%" >
 <tr><td  style='font-size:larger'><b>Conditions of use</b></td></tr>
 <tr><td ><ol>
-<li>Access to all data submitted to the {{proj.name}} archive will be restricted 
-to {{proj.title}}participants for one year following the archival date, after which 
+<li>Access to all data submitted to the {{proj.title}} archive will be restricted 
+to project participants for one year following the archival date, after which 
 they will be released into the public domain under the 
 <a href="http://www.nationalarchives.gov.uk/doc/open-government-licence/">Open Government Licence</a>.</li>
 <li>Whilst the data are restricted from the public domain, no data should be transferred 
@@ -140,7 +140,7 @@ an citation  must be given: for example, "British Antarctic Survey. Antarctic Hi
 NCAS British Atmospheric Data Centre, Date of citation. Available from http://badc.nerc.ac.uk/view/badc.nerc.ac.uk__ATOM__dataent_12220884243426614 " </li>
 <li>Information submitted in application for access to the data will be made available 
 to the Natural Environment Research Council (NERC) and its delegated authorities, 
-i.e. the NERC Earth Observation Data Centre and the 
+i.e. the NERC Earth Observation Data Centre (CEMS academic archive) and the 
 British Atmospheric Data Centre (BADC) and their host organisation, 
 the Science and Technology Facilities Council (STFC) for the purposes of tracking data usage 
 and of improving the service. </li>
@@ -182,7 +182,7 @@ The data centre will provide assistance with format and metadata issues,
 as well as a helpdesk to handle queries from data users and providers. 
  
 <h3>Archive Location, Security and Backup</h3> 
-<p>The {{proj.title}} archive will be located at the British Atmospheric Data Centre / NERC Earth Observation Data Centre, part of the 
+<p>The {{proj.title}} archive will be located at the British Atmospheric Data Centre / NERC Earth Observation Data Centre (CEMS academic archive), part of the 
 Centre of Environmental Data Archival (CEDA) at STFC (Science and Technology Facilities Council). Data will be stored online 
 and accessible to users as per the conditions of use stated above. Data will be curated and backed up according to current data centre practices</p> 
  
@@ -197,14 +197,14 @@ datasets. XYZ data will be available to other researchers, either via the projec
 
 <p>Until the data are supplied to the data centre, the project team are responsible for storing the collected data securely. General advice includes:</p>
 <ul>
-<li>	Keep updated anti-virus protection on every computer. 
-<li>	Use appropriate descriptive file names to avoid over-writing or mixing up results.
-<li>	Record all relevant metadata at the same time as the data – it can be hard to remember specifics after the event.
-<li>	Record the original creation date and time for files on your systems. 
-<li>	Version control -  keep track of authorship and changes made to data files. 
-<li>	Lab notebooks should be stored in a safe place.
-<li>	Data files should be backed up regularly and the backup data stored in a secure place physically removed from the original data.
-<li>	Samples should be appropriately saved so they will not degrade over time.
+<li>	Keep updated anti-virus protection on every computer. </li>
+<li>	Use appropriate descriptive file names to avoid over-writing or mixing up results.</li>
+<li>	Record all relevant metadata at the same time as the data – it can be hard to remember specifics after the event.</li>
+<li>	Record the original creation date and time for files on your systems. </li>
+<li>	Version control -  keep track of authorship and changes made to data files. </li>
+<li>	Lab notebooks should be stored in a safe place.</li>
+<li>	Data files should be backed up regularly and the backup data stored in a secure place physically removed from the original data.</li>
+<li>	Samples should be appropriately saved so they will not degrade over time.</li>
 </ul> 
  
  
@@ -215,7 +215,7 @@ datasets. XYZ data will be available to other researchers, either via the projec
 <p>Metadata (i.e. information on the data) are a crucial part of any data archive since 
 they ensure the discoverability, accessibility and readability of the data. It is therefore essential 
 that metadata be submitted at the same time as the data sets to which they pertain. 
-Metadata describing any {{proj.name}} data not archived at the data centre should also 
+Metadata describing any project data not archived at the data centre should also 
 be supplied to the data centre. Metadata for NetCDF files should comply with the 
 Climate Forecasting (CF) convention as far as possible. Metadata requirements are 
 documented here: http://badc.nerc.ac.uk/help/metadata/.
@@ -276,9 +276,9 @@ datasets. XYZ data will be available to other researchers, either via the projec
 	        <tr>
 		    <td>{{ data.DPT }}</td>
 		    <td>{{ data.contact1 }}</td>
-		    <td>{{ data.datavol }}</td>
-		    <td>{{ data.format }}</td>
-		    <td>{{ data.ipr }} {{ data.versions }}</td>
+		    <td>{{ data.datavol }}&nbsp</td>
+		    <td>{{ data.format }}&nbsp</td>
+		    <td>{{ data.ipr }} {{ data.versions }}&nbsp</td>
 		    <td>{{ data.deliverydate }}</td>
 		    <td>max 2 years after collection</td>
 		    <td>eg re-use by other atmospheric composition studies</td>
@@ -296,13 +296,6 @@ datasets. XYZ data will be available to other researchers, either via the projec
   
 	
  <h2>Appendix B: Services and third party data</h2>
-       
-
- <h3>Third party data</h3>
-    <p>{{ proj.thirdpartydata }}</p>
- <h3>Additional Services</h3>
-    <p>{{ proj.services }}</p>
-          <p><b>Services:</b> {{ proj.services }}</p>
 
 
  
@@ -323,7 +316,7 @@ datasets. XYZ data will be available to other researchers, either via the projec
 		    <td>who can have access, note when project space created and name(xxx_ps), name of authorisers</td>
 		</tr>
  	        <tr>
-		    <td>add more rows as required</td>
+		    <td>{{ proj.services }}</td>
 		    <td>.</td>
 		    <td>.</td>
 		</tr>
@@ -354,7 +347,7 @@ datasets. XYZ data will be available to other researchers, either via the projec
 		    <td>Any additional information (eg licence or use restrictions)</td>
 		</tr>
  	        <tr>
-		    <td>add more rows as required</td>
+		    <td>{{ proj.thirdpartydata }}</td>
 		    <td>.</td>
 		    <td>.</td>
 		    <td>.</td>
