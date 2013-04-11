@@ -25,11 +25,12 @@ back to <a href="/admin/proginfo/project/{{ proj.id }}">edit</a>
 <tr><td>Project Name</td><td BGCOLOR='lightgrey'>{{ proj.title }}</td></tr>
 <tr><td>Grant Reference</td><td BGCOLOR='lightgrey'>{{ proj.grant }}</td></tr>
 <tr><td>Principle Investigator</td><td BGCOLOR='lightgrey'>{{ proj.PI }}</td></tr>
+<tr><td>Start/End Dates</td><td BGCOLOR='lightgrey'>{{ proj.StartDate }} to {{ proj.EndDate }}</td></tr>
 		
 <tr><td colspan=2>&nbsp</td></tr>
 <tr><td colspan=2 style='font-size:larger'><b>Organisation</b></td></tr>
  
-<tr><td>Nominated Data Centre</td><td BGCOLOR='lightgrey'>British Atmospheric Data Centre / NERC Earth Observation Data Centre (CEMS academic archive)</td></tr>
+<tr><td>Nominated Data Centre</td><td BGCOLOR='lightgrey'>British Atmospheric Data Centre / CEMS academic archive (formerly NERC Earth Observation Data Centre)</td></tr>
 <tr><td>Data Centre Contact</td><td BGCOLOR='lightgrey'>[SCISUPPORT CONTACT]</td></tr>
 <tr><td>Project Data Contact</td><td BGCOLOR='lightgrey'>{{ proj.PI }}</td></tr>
 <tr><td>Any other team members with responsibility for data</td><td BGCOLOR='lightgrey'>{{ proj.CoI1 }}{{ proj.CoI2 }}</td></tr>
@@ -88,7 +89,7 @@ NERC requires that all environmental data of long-term value generated through N
     should be announced as soon as possible. 
     <li>All validated processed data 
     (i.e. data sets in their final form) will be archived at the data centre. Archival must take 
-    place no later than the end of the project funding period {{proj.enddate}}.
+    place no later than the end of the project funding period {{proj.EndDate}}.
   </ul>
 <li>Ownership of the data lies with the data creator, but NERC has the right to exploit data resulting from NERC funded research.
 <li>Data creators will be required to agree to the data deposit conditions before 
@@ -99,7 +100,7 @@ the data are added to the archive.
 <tr><td  style='font-size:larger'><b>Deposit Conditions</b></td></tr>
 <tr><td ><ol>
 <li>The depositor confirms that he/she is the owner of the data and/or has the 
-right to deposit the data in the {{proj.title}} archive</li> 
+right to deposit the data in the BADC/CEMS academic archive</li> 
 <li>Ownership of the data remains with the data creator, but NERC has the right 
 to exploit data resulting from NERC funded research</li>
 <li>NERC reserves the right to store the data, and make the data available under 
@@ -140,7 +141,7 @@ an citation  must be given: for example, "British Antarctic Survey. Antarctic Hi
 NCAS British Atmospheric Data Centre, Date of citation. Available from http://badc.nerc.ac.uk/view/badc.nerc.ac.uk__ATOM__dataent_12220884243426614 " </li>
 <li>Information submitted in application for access to the data will be made available 
 to the Natural Environment Research Council (NERC) and its delegated authorities, 
-i.e. the NERC Earth Observation Data Centre (CEMS academic archive) and the 
+i.e. the PI, the CEMS academic archive (formerly NERC Earth Observation Data Centre) and the 
 British Atmospheric Data Centre (BADC) and their host organisation, 
 the Science and Technology Facilities Council (STFC) for the purposes of tracking data usage 
 and of improving the service. </li>
@@ -164,7 +165,7 @@ integrated into the archive documentation.</p>
  
 <h3>Access to third party data</h3>
 <p>Third-party data required for the development of the programme activities and held at 
-the BADC or NEODC, such as Envisat, ECMWF and Met Office data sets, will be made available 
+the BADC or CEMS academic archive, such as Envisat, ECMWF and Met Office data sets, will be made available 
 to the participants, subject to current access conditions.</p>
 <p>If required and depending on available resources, the data centre 
 will endeavour to retrieve data sets 
@@ -182,7 +183,7 @@ The data centre will provide assistance with format and metadata issues,
 as well as a helpdesk to handle queries from data users and providers. 
  
 <h3>Archive Location, Security and Backup</h3> 
-<p>The {{proj.title}} archive will be located at the British Atmospheric Data Centre / NERC Earth Observation Data Centre (CEMS academic archive), part of the 
+<p>The {{proj.title}} archive will be located at the British Atmospheric Data Centre / CEMS academic archive, part of the 
 Centre of Environmental Data Archival (CEDA) at STFC (Science and Technology Facilities Council). Data will be stored online 
 and accessible to users as per the conditions of use stated above. Data will be curated and backed up according to current data centre practices</p> 
  
@@ -251,7 +252,7 @@ Documentation on this format is available here: http://www.badc.rl.ac.uk/help/fo
 	<table>
 	<tr><td>PI: </td><td>[PI]</td></tr>
 	<tr><td>Grant reference: </td><td>{{proj.grant}}</td></tr>
-	<tr><td>Dates: </td><td>[START DATE] - [END DATE]</td></tr>
+	<tr><td>Dates: </td><td>{{ proj.StartDate }} - {{ proj.EndDate }}</td></tr>
 	</table>
 	
 	<p>[brief description] eg Data will be collected by [FAAM aircraft / ground instruments / whatever] [throughout the project / during intensive 
