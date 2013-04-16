@@ -488,7 +488,7 @@ class FileSet(models.Model):
 	    allocated_partition = None
 	    fullest_space = 10e40
 	    for p in partitions:
-	        partition_free_space = 0.95 * p.capacity_bytes - p.allocated()
+	        partition_free_space = 0.80 * p.capacity_bytes - p.allocated()
 		# if this partition could accommidate file set...
 		if partition_free_space > self.overall_final_size:
 		    # ... and its the fullest so far  
@@ -555,8 +555,8 @@ class FileSet(models.Model):
             if len(lines) == 2: size, path = lines[0].split()
 
             # find number of files
-            p1 = Popen(["find", self.storage_path(), "-type", "f"], stdout=PIPE)
-            p2 = Popen(["wc", "-l"], stdin=p1.stdout, stdout=PIPE)
+            p1 = subprocess.Popen(["find", self.storage_path(), "-type", "f"], stdout=subprocess.PIPE)
+            p2 = subprocess.Popen(["wc", "-l"], stdin=p1.stdout, stdout=subprocess.PIPE)
             p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
             nfiles = p2.communicate()[0]
 
