@@ -338,7 +338,10 @@ def open_group_string():
     ''''Returns line for "open" group for NIS group file'''
     
     users = all_users()
-    record = 'open:*:' + str(OPEN_GID) + ':' + \
+#
+#      Temporary fix for user ttoniazzo to get around problem of NIS not handling long group lines. 
+#    
+    record = 'open:*:' + str(OPEN_GID) + ':' + 'ttoniazzo,' + \
           userAccountsString(users, extraAccounts=ARCHIVE_ACCESS_STANDARD_USERS)
 #
 #      Trim the record to 1024 characters. This is due to a lilmitation in the NIS system
@@ -375,6 +378,6 @@ def generate_all_nis_groups ():
 #
 
     record = record + open_group_string()
-                        
+   
     return record
        
