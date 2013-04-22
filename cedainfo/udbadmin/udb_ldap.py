@@ -269,11 +269,11 @@ def ldap_user_record(accountid):
     except:
         return "%s not found" % accountid
             
-    if not is_ldap_user (user):
-        return 'Not LDAP user'
+#    if not is_ldap_user (user):
+#        return 'Not LDAP user'
     
-    if not user.uid > 0:
-        return 'uid not set for %s' % accountid
+#    if not user.uid > 0:
+#        return 'uid not set for %s' % accountid
         
     record = "dn: cn=%s,ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk\n" % user.accountid
        
@@ -291,9 +291,10 @@ def ldap_user_record(accountid):
     record = record + 'cn: %s\n' % user.accountid
     
     record = record + ldap_user_tags(user)
+    record = record + 'rootAccessGroupName: NON-STAFF\n'
     
     record = record + 'homeDirectory: %s\n' % user_home_directory(user)
-    record = record + 'sshPublicKey: %s\n' % user.public_key  
+    record = record + 'sshPublicKey: %s\n' % user.public_key.strip()  
          
     return record   
     
@@ -339,6 +340,13 @@ def open_group_string():
     users = all_users()
     record = 'open:*:' + str(OPEN_GID) + ':' + \
           userAccountsString(users, extraAccounts=ARCHIVE_ACCESS_STANDARD_USERS)
+#
+#      Trim the record to 1024 characters. This is due to a lilmitation in the NIS system
+#          
+    record = record[0:1023]
+    loc = record.rfind(',')
+    record = record[0:loc]
+          
     return record
 
 def generate_all_nis_groups ():

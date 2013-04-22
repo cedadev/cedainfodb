@@ -244,6 +244,9 @@ def get_nis_group_entries(server='external'):
        groupFile = NISaccounts.getIntGroupFile()   
 
     for accessGroup in ARCHIVE_ACCESS_GROUPS.keys():
+        if not accessGroup in groupFile:
+            continue    
+ 
         group_info = {}
         group_info['uid'] = 999
         group_info['name'] = accessGroup
