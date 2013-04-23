@@ -10,6 +10,7 @@
     <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
     <li>{{original.dmp_groups|safe}}</li>
     <li>{{original.grant_links|safe}}</li>
+    <li><a href="/dmp/dmp/{{original.id}}" class="historylink">Draft DMP</li>
     {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
     {% endblock %}
   </ul>

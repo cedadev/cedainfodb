@@ -215,6 +215,25 @@ def underallocated_fs(request):
     return render_to_response('cedainfoapp/underallocated.html', 
            {'filesets': filesets,'user':request.user})  
 
+@login_required()
+def audit_totals(request):
+    # view total volume of all analyses audits
+    audits = Audit.objects.filter(auditstate="analysed")
+    total_files = 0
+    total_volume = 0
+    naudits = 0
+    for a in audits:
+        total_files += a.total_files
+        total_volume += a.total_volume
+        naudits +=1
+
+    return render_to_response('cedainfoapp/audit_totals.html', 
+           {'total_files': total_files,'total_volume':total_volume, "naudits":naudits})  
+
+
+
+
+
 @login_required()    
 def partition_list(request):
     o = request.GET.get('o', 'id') # default order is ascending id

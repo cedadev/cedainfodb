@@ -807,6 +807,8 @@ class Audit(models.Model):
         default="not started",
         help_text="state of this audit"
     )
+    total_files = models.IntegerField(default=0)
+    total_volume = FileSizeField(default='0')
     corrupted_files = models.IntegerField(default=0)
     new_files = models.IntegerField(default=0)
     deleted_files = models.IntegerField(default=0)
@@ -838,6 +840,9 @@ class Audit(models.Model):
 	self.endtime = datetime.utcnow()
 	self.auditstate = 'finished'
 	self.save()
+
+        # count number and volume
+        self.totals()
 	
 	if prev_audit: 
 	    result = self.compare(prev_audit)
@@ -851,6 +856,31 @@ class Audit(models.Model):
 	self.auditstate = 'analysed'
 	self.save()
 	       
+    def totals(self):
+        # record number and size totals for audit.
+        # open log file
+	LOG = open(self.logfile)
+	
+	# lists for tallies 
+	total_files = 0
+        total_volume = 0
+	
+	while 1:
+	    line = LOG.readline()
+	    if line == '': break
+            line = line.strip()
+            if line == '': continue
+            if line[0] == '#': continue
+	    
+	    (filename, algorithm, digest, size, modtime) = line.split('|')
+            total_files += 1
+            total_volume += int(size)
+            
+        self.total_files = total_files
+        self.total_volume = total_volume
+        self.save()  	
+
+
     def compare(self, prev_audit):
         # open current and previous log files
 	CLOG = open(self.logfile)

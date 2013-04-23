@@ -1,0 +1,19 @@
+{% extends "base_site.html" %}
+
+{% block title %}
+Audit Totals
+{% endblock %}
+
+
+{% block content %}
+
+
+<h1>Total from audits</h1>
+
+<p>Total files audited: {{total_files}}</p>
+<p>Total volume audited: {{total_volume|filesizeformat}}</p>
+<p>Total number of audits: {{naudits}}</p>
+
+
+
+{% endblock %}
