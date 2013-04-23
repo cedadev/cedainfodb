@@ -143,13 +143,16 @@ admin.site.register(Partition, PartitionAdmin)
 
 class AuditAdmin(admin.ModelAdmin):
     list_display = ('fileset',
-		     'auditstate','starttime','corrupted_files', 'new_files', 
+		     'auditstate','starttime','total_files','corrupted_files', 'new_files', 
 		     'deleted_files', 'modified_files', 'unchanges_files')
     actions=['delete']
     search_fields = ['fileset__logical_path']
     list_filter = ('auditstate',)  
-    readonly_fields = ('auditstate','corrupted_files', 'new_files', 
+    readonly_fields = ('fileset','auditstate','total_files','total_volume','corrupted_files', 'new_files', 
 		     'deleted_files', 'modified_files', 'unchanges_files', 'starttime', 'endtime', 'logfile')
+    def has_add_permission(self, request):
+        return False
+
 admin.site.register(Audit, AuditAdmin)
 
 class FileSetAdminForm(forms.ModelForm):
