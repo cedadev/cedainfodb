@@ -69,6 +69,7 @@ urlpatterns = patterns('',
 
     #    audit views
     (r'^audit_totals$', audit_totals),
+    (r'^audit_trace(?P<path>.*)$', audit_trace),
 
 
 )

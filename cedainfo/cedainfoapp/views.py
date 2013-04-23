@@ -230,6 +230,31 @@ def audit_totals(request):
     return render_to_response('cedainfoapp/audit_totals.html', 
            {'total_files': total_files,'total_volume':total_volume, "naudits":naudits})  
 
+@login_required()
+def audit_trace(request, path):
+    # trace a path through audits
+    filesets = FileSet.objects.all().order_by('-logical_path')
+
+    audits = []
+    for fs in filesets:     
+        if fs.logical_path == path[0:len(fs.logical_path)]: break
+ 
+    
+    fsaudits = Audit.objects.filter(auditstate="analysed", fileset=fs).order_by('starttime')
+    rel_path = path[len(fs.logical_path)+1:]
+    for a in fsaudits:
+        audits.append(a)
+        a.loglines = []
+        LOG = open(a.logfile)
+        while 1:
+            line = LOG.readline()
+            if line == '': break
+            if line[0:len(rel_path)] == rel_path: a.loglines.append(line.strip())
+         
+
+    return render_to_response('cedainfoapp/audit_trace.html', 
+           {'audits': audits, 'path':path, 'rel_path':rel_path})  
+
 
 
 

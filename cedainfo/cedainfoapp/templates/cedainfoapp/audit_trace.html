@@ -1,0 +1,23 @@
+{% extends "base_site.html" %}
+
+{% block title %}
+Audit Totals
+{% endblock %}
+
+
+{% block content %}
+
+
+<h1>Trace for path: {{path}}</h1>
+
+{% for a in audits %}
+<a href="/admin/cedainfoapp/audit/{{a.id}}">{{a.logfile}}</a><br>
+<pre>
+{% for l in a.loglines %}
+{{l}}
+{% endfor %}
+</pre>
+{% endfor %}
+
+
+{% endblock %}
