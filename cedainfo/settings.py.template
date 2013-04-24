@@ -265,7 +265,7 @@ VM_REQUEST_TYPE_CHOICES = (
 VM_STATUS_CHOICES = (
     ('created','created'),
     ('inuse', 'inuse'),
-    ('deprecated', 'deprecated')
+    ('deprecated', 'deprecated'),
     ('retired', 'retired'),
 )
 MOUNT_CHOICES = (
