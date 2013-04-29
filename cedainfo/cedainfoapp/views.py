@@ -14,6 +14,7 @@ from django.core.context_processors import csrf
 import re
 
 import datetime
+import time
 
 logging=settings.LOG
 
@@ -255,7 +256,62 @@ def audit_trace(request, path):
     return render_to_response('cedainfoapp/audit_trace.html', 
            {'audits': audits, 'path':path, 'rel_path':rel_path})  
 
+def next_audit(request):
+    # make a new audit to do next via a remote service - for parallelising on Lotus
+    # pick an audit to do: 
+    # 1) any fileset that has no privious audit
+    # 2) any fileset that has oldest audit
+    filesets = FileSet.objects.filter(storage_pot_type='archive', storage_pot__isnull=False)
+    fileset_to_audit = None
+    oldest_audit = datetime.datetime.now()
+    for f in filesets:
+        started_last_audit = f.last_audit('started')
+        finished_last_audit = f.last_audit('analysed') 
+        error_last_audit = f.last_audit('error')
+ 
+        # skip if last audit got an error
+        if error_last_audit != None:    
+            if finished_last_audit == None or error_last_audit.starttime > finished_last_audit.starttime:  
+                print "Ignore - audit got an error" 
+                continue
 
+        # if started audit but then skip this file set
+	if started_last_audit != None:
+            print " --- Already started" 
+            continue
+
+        # if no audit done before then use this one
+	if finished_last_audit == None:
+	    return f    
+
+	if finished_last_audit.starttime < oldest_audit: 
+	    oldest_audit = finished_last_audit.starttime
+	    fileset_to_audit = f
+
+    audit=Audit(fileset=fileset_to_audit, auditstate='started', starttime = datetime.datetime.utcnow())
+    audit.save()
+
+    return render_to_response('cedainfoapp/next_audit.txt', {'audit': audit})  
+
+def upload_audit_results(request, id):
+    # upload audit results from lotus job
+    audit = get_object_or_404(Audit, pk=id)
+    fileset = audit.fileset
+    error = request.POST['error']
+    checkm = request.POST['checkm']
+    audit.auditstate='finished'
+    # make checkm directory for spot is missing
+    if not os.path.exists('%s/%s' %(settings.CHECKM_DIR, fileset.storage_pot)): 
+	os.mkdir('%s/%s' %(settings.CHECKM_DIR, fileset.storage_pot))
+    audit.logfile ='%s/%s/checkm.%s.%s.log' % (settings.CHECKM_DIR, fileset.storage_pot,
+	        fileset.storage_pot, time.strftime('%Y%m%d-%H%M'))     
+    audit.save()
+    LOG = open(audit.logfile, 'w')
+    LOG.write(checkm)
+    LOG.close() 
+
+    
+    return render_to_response('cedainfoapp/next_audit.txt', {'audit': audit})  
 
 
 
