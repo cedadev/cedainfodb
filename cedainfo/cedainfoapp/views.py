@@ -265,31 +265,37 @@ def next_audit(request):
     fileset_to_audit = None
     oldest_audit = datetime.datetime.now()
     for f in filesets:
+        print f
         started_last_audit = f.last_audit('started')
-        finished_last_audit = f.last_audit('analysed') 
+        analysed_last_audit = f.last_audit('analysed') 
+        finished_last_audit = f.last_audit('finished') 
         error_last_audit = f.last_audit('error')
  
         # skip if last audit got an error
         if error_last_audit != None:    
-            if finished_last_audit == None or error_last_audit.starttime > finished_last_audit.starttime:  
+            if finished_last_audit == None or error_last_audit.starttime > analysed_last_audit.starttime:  
                 print "Ignore - audit got an error" 
                 continue
 
         # if started audit but then skip this file set
-	if started_last_audit != None:
+	if started_last_audit != None and finished_last_audit != None:
             print " --- Already started" 
             continue
 
         # if no audit done before then use this one
-	if finished_last_audit == None:
-	    return f    
+	if analysed_last_audit == None:
+            print "No audit done for fileset"
+	    fileset_to_audit = f
+            break  
 
-	if finished_last_audit.starttime < oldest_audit: 
-	    oldest_audit = finished_last_audit.starttime
+	if analysed_last_audit.starttime < oldest_audit: 
+	    oldest_audit = analysed_last_audit.starttime
 	    fileset_to_audit = f
 
-    audit=Audit(fileset=fileset_to_audit, auditstate='started', starttime = datetime.datetime.utcnow())
-    audit.save()
+    if fileset_to_audit:
+        audit=Audit(fileset=fileset_to_audit, auditstate='started', starttime = datetime.datetime.utcnow())
+        audit.save()
+    else: audit=None
 
     return render_to_response('cedainfoapp/next_audit.txt', {'audit': audit})  
 

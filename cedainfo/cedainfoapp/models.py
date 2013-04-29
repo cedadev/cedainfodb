@@ -820,12 +820,6 @@ class Audit(models.Model):
         return 'Audit of %s started %s  [[%s]]' % (self.fileset, self.starttime, self.auditstate)
         
     def start(self):
-        
-	# find the last finished audit of this fileset for comparison
-        prev_audit = self.fileset.last_audit('analysed') 
-
-	print "**** %s" % prev_audit    
-	    
  	self.starttime = datetime.utcnow()
 	self.auditstate = 'started'
 	self.save()
@@ -841,9 +835,15 @@ class Audit(models.Model):
 	self.auditstate = 'finished'
 	self.save()
 
+        # analyse the result
+        self.analyse()
+
+    def analyse(self):
         # count number and volume
         self.totals()
-	
+
+	# find the last finished audit of this fileset for comparison
+        prev_audit = self.fileset.last_audit('analysed') 
 	if prev_audit: 
 	    result = self.compare(prev_audit)
 	    print result
