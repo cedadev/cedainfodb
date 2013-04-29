@@ -54,7 +54,6 @@ class UserForm(ModelForm):
     surname      = CharField(required=False, widget=forms.TextInput(attrs={'size': '60'}))  
     othernames   = CharField(required=False, widget=forms.TextInput(attrs={'size': '60'}))  
     emailaddress = CharField(required=False, widget=forms.TextInput(attrs={'size': '60'}))  
-    webpage = CharField(required=False, widget=forms.TextInput(attrs={'size': '60'}))  
     telephoneno = CharField(required=False, widget=forms.TextInput(attrs={'size': '60'}))  
     openid = CharField(required=False, widget=forms.TextInput(attrs={'size': '60'}))  
     

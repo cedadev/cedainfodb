@@ -121,7 +121,7 @@ class Institute(models.Model):
    'Name of institute, universtity or other organisation for which you work', 
          max_length=80)
     country = models.CharField('Institute Country', 
-               help_text='home country of institue', max_length=30,
+               help_text='Home country of institue', max_length=30,
                choices=country_list.COUNTRY_LIST)
     type = models.CharField('Institute type', max_length=30,
                help_text='Commercial, Government, University, etc',
@@ -137,15 +137,15 @@ class Institute(models.Model):
 class Addresses(models.Model):
     addresskey = models.IntegerField(primary_key=True)
     institutekey = models.ForeignKey(Institute, db_column='institutekey')
-    department = models.CharField(max_length=100, help_text='department inside institute')
-    address1 = models.CharField("Department Address Line 1", max_length=150, help_text='address of department')
-    address2 = models.CharField("Department Address Line 2", max_length=100, help_text='address')
-    address3 = models.CharField("Department Address Line 3", max_length=100, blank=True, help_text='address')
-    address4 = models.CharField("Department Address Line 4", max_length=100, blank=True, help_text='address')
-    address5 = models.CharField("Department Address Line 5", max_length=100, blank=True, help_text='address')
+    department = models.CharField(max_length=100, help_text='Department within the institute')
+    address1 = models.CharField("Department Address Line 1", max_length=150, help_text='Address of department')
+    address2 = models.CharField("Department Address Line 2", max_length=100, help_text='Address')
+    address3 = models.CharField("Department Address Line 3", max_length=100, blank=True, help_text='Address')
+    address4 = models.CharField("Department Address Line 4", max_length=100, blank=True, help_text='Address')
+    address5 = models.CharField("Department Address Line 5", max_length=100, blank=True, help_text='Address')
     nerc = models.IntegerField(verbose_name='Is Department NERC funded?',
                    choices=((0, "No"), (-1, "Yes")), 
-                   help_text='Does your department get any funding from NERC?')
+                   help_text='Does your department get any funding from NERC, even if you do not?')
 
     def __unicode__ (self):
         return "%s" % self.address1
@@ -169,7 +169,7 @@ class UserManager(models.Manager):
 class User (models.Model):
     userkey = models.AutoField(primary_key=True)
 
-    title = models.CharField(max_length=10, help_text='title',
+    title = models.CharField(max_length=10, help_text='Title',
           choices=(
               ("Mr","Mr"),
               ("Mrs","Mrs"),
@@ -180,11 +180,10 @@ class User (models.Model):
           )
         ) 
 
-    surname = models.CharField(max_length=50, help_text='surname')
+    surname = models.CharField(max_length=50, help_text='Surname')
     othernames = models.CharField(max_length=50, verbose_name='Other names', help_text='Christian or Forenames')
     addresskey = models.OneToOneField(Addresses, db_column='addresskey')
     telephoneno = models.CharField('Telephone number', max_length=50, blank=True, help_text='Your institute/work number')
-    faxno = models.CharField('Fax number', max_length=50, blank=True, help_text='Your institute/work fax number')
     emailaddress = models.EmailField('Email Address', max_length=100, help_text='Your institute/work email address')
     comments = models.TextField(blank=True)
     endorsedby = models.CharField("Supervisor's name", 
@@ -229,9 +228,9 @@ class User (models.Model):
         )
     )
     
-    accountid = models.CharField('Account Id', 
+    accountid = models.CharField('User Name', 
                                  max_length=20, blank=True, 
-                                 help_text='this is your username on this system')
+                                 help_text='This is your username on this system')
     
     accounttype = models.CharField(max_length=10,
                choices=(
@@ -250,12 +249,10 @@ class User (models.Model):
     public_key = models.TextField('Public Key', blank=True, 
                                   help_text='RSA public key required for access to JASMIN') 
     startdate = models.DateTimeField()
-    webpage = models.URLField('URL of Personal Web Page', max_length=100, blank=True,
-                        help_text=' personal webpage giving your contact details, research interests etc')
 #    sharedetails = models.IntegerField()
     datacenter = models.CharField(max_length=30)
     openid_username_component = models.CharField('OpenID Username Component',max_length=100, 
-                                  help_text='the unique part of your OpenID address')
+                                  help_text='The unique part of your OpenID address')
     openid = models.URLField(max_length=100, blank=True, 
            help_text='You may log in using a "sign-on once" account by entering its address here')
     uid     = models.IntegerField(default=0, blank=True)

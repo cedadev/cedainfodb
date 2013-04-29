@@ -169,7 +169,7 @@ class UserAdmin(admin.ModelAdmin):
     fieldsets = (
             (None, {
                 'fields': (links, 'userkey', 'title', 'surname', 'othernames', 'emailaddress',
-                   'webpage', 'telephoneno', 'accountid', 'openid', 'public_key', 'accounttype',  password, 
+                   'telephoneno', 'accountid', 'openid', 'public_key', 'accounttype',  password, 
 	           'degree', 'endorsedby', 'field', 'startdate', showDatasets, 'datacenter', 'institute', 'address', 'comments')
 
             }),
