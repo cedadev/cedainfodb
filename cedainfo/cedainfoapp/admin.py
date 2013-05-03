@@ -235,7 +235,7 @@ class FileSetAdmin(admin.ModelAdmin):
     # extra context for admin view TODO!!!!
     def change_view(self, request, object_id, extra_context=None):
     
-        fssms = FileSetSizeMeasurement.objects.filter(fileset=object_id)
+        fssms = FileSetSizeMeasurement.objects.filter(fileset=object_id).order_by('date')
 	#.objects.filter(fileset=self).order_by('date')
 	#fssms = fssms.get()
 #	for in

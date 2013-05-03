@@ -85,7 +85,7 @@ if __name__=="__main__":
     # do file set measurements
     do_dus()
     # do dfs
-    do_dfs()
+    #do_dfs()
     #
     notify()
     
