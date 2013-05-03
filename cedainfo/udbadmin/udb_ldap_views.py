@@ -70,6 +70,7 @@ def write_all_ldap_groups (request):
         record = record + '\n'
         
     record = record + udb_ldap.ldap_open_group_record()
+    record = record + '\n'
 
     if os.path.exists(ADDITIONAL_LDAP_GROUP_FILE):
         f = open(ADDITIONAL_LDAP_GROUP_FILE, "r")
