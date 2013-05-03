@@ -49,7 +49,10 @@ urlpatterns = patterns('',
 
      url(r'^ldap/group/$', ldap_udb_groups),   
      url(r'^ldap/ldapgroups/$', ldap_groups),
-           
+ 
+     url(r'^ldap/groupdiff2/$', ldap_group_ldiff),
+     url(r'^ldap/groupdiff/$', ldap_group_diff),
+          
      url(r'^ldapext/nis/group/(?P<id>.+)$', write_nis_group), 
      url(r'^ldapext/nis/group/$', write_all_nis_groups),            
 
