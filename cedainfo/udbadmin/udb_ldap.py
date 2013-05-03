@@ -4,8 +4,13 @@ and group file information from the userdb.
 Django views that make use of these routines are stored separately.
 '''
 from operator import attrgetter
+import os
+import tempfile
+import subprocess
 
 from models import *
+
+ADDITIONAL_LDAP_GROUP_FILE = "/home/badc/etc/infrastructure/accounts/ldap/ldap_additional_groups.txt"
 
 ARCHIVE_ACCESS_GROUPS = {"cmip5_research": {"gid": 26059, "datasets" : ["cmip5_research"]},
                          "esacat1":        {"gid": 26017, "datasets" : ["aatsr_multimission", "atsrubt"]},                         
@@ -155,6 +160,36 @@ def checkGroups():
                 if not (user.hasDataset("system-login") or user.hasDataset("jasmin-login") or user.hasDataset("cems-login")):                 
                     badUsers.append(user)
     return badUsers
+
+def ldap_all_group_records ():
+    '''
+    Returns ldap record string for all ldap groups
+    '''
+
+    datasets = Dataset.objects.all().filter(gid__gt=0).order_by('grp')
+
+    record = ''
+        
+    for dataset in datasets:
+        record = record + ldap_group_record(dataset.datasetid)                
+        record = record + '\n'
+    
+
+    for datasetid in ARCHIVE_ACCESS_GROUPS.keys():
+        record = record + ldap_archive_access_group_record(datasetid)
+        record = record + '\n'
+        
+    record = record + ldap_open_group_record()
+    record = record + '\n'
+
+    if os.path.exists(ADDITIONAL_LDAP_GROUP_FILE):
+        f = open(ADDITIONAL_LDAP_GROUP_FILE, "r")
+
+        additional_groups = f.read()
+        f.close()
+        record = record + additional_groups    
+    
+    return record
                          
 def ldap_group_record(datasetid):
     '''Returns LDAP record for a group'''
@@ -298,6 +333,23 @@ def ldap_user_record(accountid):
          
     return record   
     
+def ldif_all_groups ():
+    """
+    Returns all group information from the userdb as a sorted LDIF file
+    Returns a filehandle for an open temporary file that can be read from.
+    """
+    a = tempfile.NamedTemporaryFile()
+    record = ldap_all_group_records()
+    a.write(record)
+    a.flush()
+    
+ 
+    bb = tempfile.NamedTemporaryFile()
+    script = "/home/badc/software/infrastructure/cedainfo_releases/current/cedainfo/udbadmin/ldifsort.pl"
+    p2 = subprocess.Popen([script, "-a", "-k", "dn", a.name], stdout=bb)
+    p2.wait()
+            
+    return bb
     
                           
 #----------------------- The following routines are used for generating the contents of the NIS password and group files

@@ -1,5 +1,6 @@
 import ldap
-
+import tempfile
+import subprocess
 from operator import itemgetter
 
 LDAP_URL    = 'ldap://homer.esc.rl.ac.uk'
@@ -220,3 +221,22 @@ def rootAccessMembers():
     memberAccounts .sort()
     
     return memberAccounts
+
+
+def ldif_all_groups ():
+    """
+    Returns all LDIF information from LDAP server for ceda groups, sorted by dn.
+    Returns a filehandle for an open temporary file that can be read from.
+    """
+    
+    b = tempfile.NamedTemporaryFile()
+    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", LDAP_URL, "-b", GROUP_BASE, "-s", "one"], stdout=b)
+    p1.wait()
+
+    bb = tempfile.NamedTemporaryFile()
+    script = "/home/badc/software/infrastructure/cedainfo_releases/current/cedainfo/udbadmin/ldifsort.pl"
+    p2 = subprocess.Popen([script, "-a", "-k", "dn", b.name], stdout=bb)
+
+    p2.wait()
+            
+    return bb

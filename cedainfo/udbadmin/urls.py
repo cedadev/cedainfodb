@@ -46,13 +46,22 @@ urlpatterns = patterns('',
      
      url(r'^ldap/user/(?P<accountid>.+)$', ldap_user_details),      
      url(r'^ldap/list_root_users$', ldap_list_root_users),
+
+     url(r'^ldap/group/$', ldap_udb_groups),   
+     url(r'^ldap/ldapgroups/$', ldap_groups),
            
      url(r'^ldapext/nis/group/(?P<id>.+)$', write_nis_group), 
      url(r'^ldapext/nis/group/$', write_all_nis_groups),            
 
      url(r'^ldapext/group/(?P<datasetid>.+)$', write_ldap_group), 
-     url(r'^ldapext/group/$', write_all_ldap_groups),            
+     url(r'^ldapext/group/$', ldap_udb_groups),   
+     url(r'^ldapext/ldapgroups/$', ldap_groups),
 
+              
+     url(r'^ldapext/groupdiff2/$', ldap_group_ldiff),
+     url(r'^ldapext/groupdiff/$', ldap_group_diff),
+
+     
      url(r'^ldapext/user/(?P<accountid>.+)$', write_ldap_user), 
      url(r'^ldapext/user/$', write_all_ldap_users),            
 
