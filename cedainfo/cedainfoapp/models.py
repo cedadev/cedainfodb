@@ -1226,6 +1226,7 @@ class GWS(models.Model):
     gws_manager = models.CharField(max_length=1024, help_text='External person who will manage the GWS during its lifetime')
     description = models.TextField(null=True, blank=True, help_text='Text description of GWS')
     requested_volume = FileSizeField(help_text="In bytes, but can be enetered using suffix e.g. '200TB'", default='0')
+    used_volume = FileSizeField(help_text="(automatically populated)", default='0')
     backup_requirement = models.CharField(max_length=127, choices=settings.GWS_BACKUP_CHOICES, default='no backup')
     related_url = models.URLField(verify_exists=False, blank=True, help_text='Link to further info relevant to this GWS')
     expiry_date = models.DateField(help_text='Date after which GWS will be deleted')
@@ -1295,7 +1296,11 @@ class GWS(models.Model):
  
     def volume_filesize(self):
         return filesize(self.requested_volume)
-    volume_filesize.short_description = 'volume'        
+    volume_filesize.short_description = 'volume'
+
+    def used_filesize(self):
+        return filesize(self.used_volume)
+    used_filesize.short_description = 'used'
    
 class VMRequest(models.Model):
     vm_name = models.CharField(max_length=127, help_text="proposed fully-qualified host name") # TODO : need regex
