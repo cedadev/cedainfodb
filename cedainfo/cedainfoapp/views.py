@@ -278,7 +278,7 @@ def next_audit(request):
                 continue
 
         # if started audit but then skip this file set
-	if started_last_audit != None and finished_last_audit != None:
+	if started_last_audit != None or finished_last_audit != None:
             print " --- Already started" 
             continue
 
