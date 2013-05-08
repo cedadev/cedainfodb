@@ -306,6 +306,7 @@ def upload_audit_results(request, id):
     error = request.POST['error']
     checkm = request.POST['checkm']
     audit.auditstate='finished'
+    audit.endtime = datetime.datetime.utcnow()
     # make checkm directory for spot is missing
     if not os.path.exists('%s/%s' %(settings.CHECKM_DIR, fileset.storage_pot)): 
 	os.mkdir('%s/%s' %(settings.CHECKM_DIR, fileset.storage_pot))
@@ -316,7 +317,8 @@ def upload_audit_results(request, id):
     LOG.write(checkm)
     LOG.close() 
 
-    
+    audit.analyse()    
+
     return render_to_response('cedainfoapp/next_audit.txt', {'audit': audit})  
 
 
