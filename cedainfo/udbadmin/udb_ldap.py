@@ -393,7 +393,7 @@ def open_group_string():
 #
 #      Temporary fix for user ttoniazzo to get around problem of NIS not handling long group lines. 
 #    
-    record = 'open:*:' + str(OPEN_GID) + ':' + 'ttoniazzo,' + \
+    record = 'open:*:' + str(OPEN_GID) + ':' + 'spepler,ttoniazzo,' + \
           userAccountsString(users, extraAccounts=ARCHIVE_ACCESS_STANDARD_USERS)
 #
 #      Trim the record to 1024 characters. This is due to a lilmitation in the NIS system
