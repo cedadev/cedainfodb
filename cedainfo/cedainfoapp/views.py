@@ -304,6 +304,12 @@ def upload_audit_results(request, id):
     audit = get_object_or_404(Audit, pk=id)
     fileset = audit.fileset
     error = request.POST['error']
+    if error =='1': 
+        audit.auditstate='error'
+        audit.endtime = datetime.datetime.utcnow()
+        audit.save()
+        return render_to_response('cedainfoapp/next_audit.txt', {'audit': audit})  
+
     checkm = request.POST['checkm']
     audit.auditstate='finished'
     audit.endtime = datetime.datetime.utcnow()
