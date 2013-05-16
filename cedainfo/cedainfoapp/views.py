@@ -40,7 +40,7 @@ def host_list(request, subset=None):
 # host_detail view: includes details of host, plus services and history entries for that host
 @login_required()
 def host_detail(request, host_id):
-    url=reverse('cedainfo.cedainfoapp.views.host_list',args=(None,))
+    url=reverse('cedainfoapp.views.host_list',args=(None,))
     try:
        host = get_object_or_404(Host, pk=host_id)
        services = Service.objects.filter(host=host)
@@ -71,7 +71,7 @@ def dataentity_search(request):
 # TODO : handle things better when we can't find it
 @login_required()
 def dataentity_find(request, dataentity_id):
-    url=reverse('cedainfo.cedainfoapp.views.dataentity_search')
+    url=reverse('cedainfoapp.views.dataentity_search')
     if dataentity_id:
         try:
             dataentity = DataEntity.objects.get(dataentity_id=dataentity_id)
