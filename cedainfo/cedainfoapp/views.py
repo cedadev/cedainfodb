@@ -92,7 +92,7 @@ def dataentity_find(request, dataentity_id):
 # Edit a dataentity
 @login_required()
 def dataentity_detail_form(request, id):
-    url=reverse('cedainfo.cedainfoapp.views.dataentity_search')
+    url=reverse('cedainfoapp.views.dataentity_search')
     try:
        dataentity = DataEntity.objects.get(pk=id)
        if request.method == 'POST':
