@@ -8,6 +8,18 @@ This table lists all users who have uploaded a public key to their CEDA account.
 information in the table by clicking on the appropriate column heading.
 <p>
 
+{% if warning_count > 0 %}
+
+    <table>
+    <tr bgcolor="#F9C7C2">
+    <td>
+    There are {{warning_count}} warnings of possible mismatches between the public key in the userdb and the
+    public key on the ldap server. Warnings are highlighted below.
+    </td>
+    </tr>
+    </table>
+{% endif %}
+<p>
 <table cellspacing="0" border="1">
 <thead>
 
@@ -23,18 +35,31 @@ information in the table by clicking on the appropriate column heading.
 
 <tbody>
 {% for user in cedausers %}
-<tr>
-<td><a href="/admin/udbadmin/user/{{user.userkey}}">{{user.userkey}}</a>
-<td>{{user.accountid}}
-<td nowrap>{{user.startdate|date:"d-M-Y H:i"}}
-<td>{{user.emailaddress}}
-<td>{{user.public_key}}
+
+    {% if user.public_key_differs %}   
+        <tr bgcolor="#F9C7C2">
+    {% else %}
+        <tr>
+    {% endif %}
+        
+    <td><a href="/admin/udbadmin/user/{{user.cedauser.userkey}}">{{user.cedauser.userkey}}</a>
+    <td>{{user.cedauser.accountid}}
+    <td>{{user.cedauser.uid}}
+    <td nowrap>{{user.cedauser.startdate|date:"d-M-Y H:i"}}
+    <td>{{user.cedauser.emailaddress}}
+    
+    <td>    
+    {% if user.public_key_differs %}  
+        Userdb: {{user.cedauser.public_key}}<br>
+        ldapdb: {{user.ldap_public_key}}<br> 
+    {% else %}
+        {{user.cedauser.public_key}} 
+    {% endif %}   
+
 </tr>
 {% endfor %}
 </tbody>
 
 </table>
-
-
 
 {% endblock %}
