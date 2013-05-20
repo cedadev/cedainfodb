@@ -7,7 +7,9 @@ LDAP_URL    = 'ldap://homer.esc.rl.ac.uk'
 GROUP_BASE  = "ou=ceda,ou=Groups,o=hpc,dc=rl,dc=ac,dc=uk"
 PEOPLE_BASE = "ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"
 
-#l = ldap.initialize(LDAP_URL)
+SORT_SCRIPT = "/home/badc/software/infrastructure/cedainfo_releases/current/cedainfo/udbadmin/ldifsort.pl"
+
+
 l = ldap.ldapobject.ReconnectLDAPObject(LDAP_URL, trace_level=0, retry_max=3)
 
 def ceda_groups():
@@ -176,7 +178,7 @@ def attribute_members (attributeName, attributeValue):
 
 def member_details (uid):
 
-    """Returns members with the given tag. If no tag is given then returns all users"""    
+    """Returns details for member with given uid (accountid)"""    
 
     base = PEOPLE_BASE
     
@@ -186,6 +188,18 @@ def member_details (uid):
         pass
          
     return userDetails[0][1]
+
+def all_member_details ():
+    """Returns details for all members"""
+    
+    base = PEOPLE_BASE
+    
+    try:    
+        userDetails = l.search_s(base , ldap.SCOPE_ONELEVEL) 
+    except:
+        pass
+         
+    return userDetails
 
 
 def peopleTagChoices():
@@ -228,15 +242,35 @@ def ldif_all_groups ():
     Returns all LDIF information from LDAP server for ceda groups, sorted by dn.
     Returns a filehandle for an open temporary file that can be read from.
     """
-    
+    LDAP_URL = "ldap://ldap03.esc.rl.ac.uk"
     b = tempfile.NamedTemporaryFile()
-    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", LDAP_URL, "-b", GROUP_BASE, "-s", "one"], stdout=b)
+    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", LDAP_URL, "-b", GROUP_BASE, "-s", "one", "-D", "cn=Andrew Harwood,ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk", "-w", "THUtu7Re"], stdout=b)
+   
+#    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", LDAP_URL, "-b", GROUP_BASE, "-s", "one"], stdout=b)
     p1.wait()
 
     bb = tempfile.NamedTemporaryFile()
-    script = "/home/badc/software/infrastructure/cedainfo_releases/current/cedainfo/udbadmin/ldifsort.pl"
-    p2 = subprocess.Popen([script, "-a", "-k", "dn", b.name], stdout=bb)
+    p2 = subprocess.Popen([SORT_SCRIPT, "-a", "-k", "dn", b.name], stdout=bb)
 
     p2.wait()
             
     return bb
+
+def ldif_all_users ():
+    """
+    Returns all LDIF information from LDAP server for ceda users, sorted by dn.
+    Returns a filehandle for an open temporary file that can be read from.
+    """
+    b = tempfile.NamedTemporaryFile()
+   
+    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", LDAP_URL, "-b", PEOPLE_BASE, "-s", "one"], stdout=b)
+    p1.wait()
+
+    bb = tempfile.NamedTemporaryFile()
+    p2 = subprocess.Popen([SORT_SCRIPT, "-a", "-k", "dn", b.name], stdout=bb)
+
+    p2.wait()
+            
+    return bb
+
+
