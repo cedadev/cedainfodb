@@ -21,8 +21,8 @@ urlpatterns = patterns('',
 
      url(r'^$', home), 
      url(r'^user/accountid/(?P<accountid>.+)/$', user_edit_by_accountid),    
-     url(r'^user/datasets/current/(?P<userkey>\d{1,6})/$', list_current_user_datasets),   
-     url(r'^user/datasets/removed/(?P<userkey>\d{1,6})/$', list_removed_user_datasets),        
+     url(r'^user/datasets/current/(?P<userkey>-?\d{1,6})/$', list_current_user_datasets),   
+     url(r'^user/datasets/removed/(?P<userkey>-?\d{1,6})/$', list_removed_user_datasets),        
 
      url(r'^user/keys/$', list_keys),        
      url(r'^external/user/account-details/(?P<userkey>\d{1,6})/$', user_account_details),
