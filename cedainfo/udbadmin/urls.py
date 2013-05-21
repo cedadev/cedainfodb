@@ -44,32 +44,42 @@ urlpatterns = patterns('',
      url(r'^jasmin/group/(?P<group>.+)$', ldap_group_details), 
      url(r'^jasmin/group/$', ldap_list_groups), 
      
-     url(r'^ldap/user/(?P<accountid>.+)$', ldap_user_details),      
+     url(r'^ldap/user/(?P<accountid>.+)$', ldap_user_details), 
+     url(r'^ldap/user/$', ldap_udb_users), 
+     
+     url(r'^ldapext/group/$', ldap_udb_groups),   
+          
      url(r'^ldap/list_root_users$', ldap_list_root_users),
+     url(r'^ldap/ldapusers/$', ldap_users),    
 
      url(r'^ldap/group/$', ldap_udb_groups),   
      url(r'^ldap/ldapgroups/$', ldap_groups),
  
-     url(r'^ldap/groupdiff2/$', ldap_group_ldiff),
      url(r'^ldap/groupdiff/$', ldap_group_diff),
+     url(r'^ldap/groupdiff2/$', ldap_group_ldiff),
+
+     url(r'^ldap/userdiff/$', ldap_user_diff),
+     url(r'^ldap/userdiff2/$', ldap_user_ldiff),
           
-     url(r'^ldapext/nis/group/(?P<id>.+)$', write_nis_group), 
+     url(r'^ldapext/nis/group/(?P<datasetid>.+)$', write_nis_group), 
      url(r'^ldapext/nis/group/$', write_all_nis_groups),            
 
      url(r'^ldapext/group/(?P<datasetid>.+)$', write_ldap_group), 
      url(r'^ldapext/group/$', ldap_udb_groups),   
      url(r'^ldapext/ldapgroups/$', ldap_groups),
 
+     url(r'^ldapext/updatecheck/$', check_udb_for_updates),
               
      url(r'^ldapext/groupdiff2/$', ldap_group_ldiff),
      url(r'^ldapext/groupdiff/$', ldap_group_diff),
 
      
      url(r'^ldapext/user/(?P<accountid>.+)$', write_ldap_user), 
-     url(r'^ldapext/user/$', write_all_ldap_users),            
+     url(r'^ldapext/user/$', ldap_udb_users),   
+      
 
            
-     url(r'^authorise/(?P<userkey>\d{1,6})/$', authorise_datasets),
+     url(r'^authorise/(?P<userkey>-?\d{1,6})/$', authorise_datasets),
      url(r'^udj/(?P<id>\d{1,6})/$', edit_user_dataset_join),
      url(r'^request/(?P<id>\d{1,6})/$', edit_dataset_request),
 

@@ -9,8 +9,10 @@ import tempfile
 import subprocess
 
 from models import *
+import LDAP
 
 ADDITIONAL_LDAP_GROUP_FILE = "/home/badc/etc/infrastructure/accounts/ldap/ldap_additional_groups.txt"
+ADDITIONAL_LDAP_USER_FILE  = "/home/badc/etc/infrastructure/accounts/ldap/ldap_additional_users.txt"
 
 ARCHIVE_ACCESS_GROUPS = {"cmip5_research": {"gid": 26059, "datasets" : ["cmip5_research"]},
                          "esacat1":        {"gid": 26017, "datasets" : ["aatsr_multimission", "atsrubt"]},                         
@@ -76,10 +78,14 @@ def all_users(order_by="userkey"):
     '''Returns user objects for all LDAP users. For efficiency this is done using an sql query.
        optionally the results can be ordered by the given field'''
 
+#    sql = "select distinct tbusers.* from tbusers where tbusers.uid > 0 " + \
+#          "order by %s" % order_by
+
     sql = "select distinct tbusers.* from tbusers, tbdatasetjoin where (tbusers.userkey=tbdatasetjoin.userkey)" + \
           "and tbdatasetjoin.removed=0 and ((datasetid='jasmin-login') or " + \
           "(datasetid='vm_access_ceda_internal') or (datasetid='system-login') or (datasetid='cems-login')) " + \
           "and tbusers.uid > 0 order by %s" % order_by
+
     users = User.objects.raw(sql)
     
     return users
@@ -190,6 +196,31 @@ def ldap_all_group_records ():
         record = record + additional_groups    
     
     return record
+
+
+def ldap_all_user_records ():
+    '''
+    Returns ldap record string for all ldap users
+    '''
+    record = ''
+        
+    users =  all_users(order_by="accountid")
+       
+    for user in users:
+        record = record + ldap_user_record(user.accountid) + '\n'
+
+    record = record + '\n'
+
+    if os.path.exists(ADDITIONAL_LDAP_USER_FILE):
+        f = open(ADDITIONAL_LDAP_USER_FILE, "r")
+
+        additional_users = f.read()
+        f.close()
+        record = record + additional_users    
+
+    return record    
+    
+    
                          
 def ldap_group_record(datasetid):
     '''Returns LDAP record for a group'''
@@ -329,8 +360,12 @@ def ldap_user_record(accountid):
     record = record + 'rootAccessGroupName: NON-STAFF\n'
     
     record = record + 'homeDirectory: %s\n' % user_home_directory(user)
-    record = record + 'sshPublicKey: %s\n' % user.public_key.strip()  
-         
+    
+    record = record + 'sshPublicKey:'
+    if user.public_key.strip():
+        record = record + ' ' + user.public_key.strip()
+    record = record + '\n'
+                 
     return record   
     
 def ldif_all_groups ():
@@ -342,15 +377,29 @@ def ldif_all_groups ():
     record = ldap_all_group_records()
     a.write(record)
     a.flush()
-    
- 
+     
     bb = tempfile.NamedTemporaryFile()
-    script = "/home/badc/software/infrastructure/cedainfo_releases/current/cedainfo/udbadmin/ldifsort.pl"
-    p2 = subprocess.Popen([script, "-a", "-k", "dn", a.name], stdout=bb)
+    p2 = subprocess.Popen([LDAP.SORT_SCRIPT, "-a", "-k", "dn", a.name], stdout=bb)
     p2.wait()
             
     return bb
-    
+
+def ldif_all_users ():
+    """
+    Returns all user information from the userdb as a sorted LDIF file
+    Returns a filehandle for an open temporary file that can be read from.
+    """
+    a = tempfile.NamedTemporaryFile()
+    record = ldap_all_user_records()
+    a.write(record)
+    a.flush()
+     
+    bb = tempfile.NamedTemporaryFile()
+    p2 = subprocess.Popen([LDAP.SORT_SCRIPT, "-a", "-k", "dn", a.name], stdout=bb)
+    p2.wait()
+            
+    return bb
+     
                           
 #----------------------- The following routines are used for generating the contents of the NIS password and group files
 
