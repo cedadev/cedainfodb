@@ -8,8 +8,15 @@ PROJDIR="/home/badc/software/infrastructure/cedainfo/cedainfo"
 PIDFILE="$PROJDIR/cedainfo.pid"
 SOCKET="/var/www/fastcgi/cedadb.sock"
 LOG_DIR="/var/www/cedainfo_site/logs"
+MACHINE="tranquil.badc.rl.ac.uk"
 
 APP="cedainfo Django server"
+
+if [ $HOSTNAME != $MACHINE ]
+then
+    echo "You need to be logged in to $MACHINE to run this script"
+    exit
+fi
 
 cd $PROJDIR
 
