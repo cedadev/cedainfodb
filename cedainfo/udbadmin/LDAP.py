@@ -242,11 +242,12 @@ def ldif_all_groups ():
     Returns all LDIF information from LDAP server for ceda groups, sorted by dn.
     Returns a filehandle for an open temporary file that can be read from.
     """
-    LDAP_URL = "ldap://ldap03.esc.rl.ac.uk"
     b = tempfile.NamedTemporaryFile()
-    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", LDAP_URL, "-b", GROUP_BASE, "-s", "one", "-D", "cn=Andrew Harwood,ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk", "-w", "THUtu7Re"], stdout=b)
+    
+#    LDAP_URL = "ldap://ldap03.esc.rl.ac.uk"
+#    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", LDAP_URL, "-b", GROUP_BASE, "-s", "one", "-D", "cn=Andrew Harwood,ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk", "-w", "THUtu7Re"], stdout=b)
    
-#    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", LDAP_URL, "-b", GROUP_BASE, "-s", "one"], stdout=b)
+    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", LDAP_URL, "-b", GROUP_BASE, "-s", "one"], stdout=b)
     p1.wait()
 
     bb = tempfile.NamedTemporaryFile()
