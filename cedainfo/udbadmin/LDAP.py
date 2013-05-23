@@ -1,16 +1,18 @@
 import ldap
+import os
 import tempfile
 import subprocess
 from operator import itemgetter
 
-LDAP_URL    = 'ldap://homer.esc.rl.ac.uk'
+from django.conf import settings
+
 GROUP_BASE  = "ou=ceda,ou=Groups,o=hpc,dc=rl,dc=ac,dc=uk"
 PEOPLE_BASE = "ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"
 
 SORT_SCRIPT = "/home/badc/software/infrastructure/cedainfo_releases/current/cedainfo/udbadmin/ldifsort.pl"
 
 
-l = ldap.ldapobject.ReconnectLDAPObject(LDAP_URL, trace_level=0, retry_max=3)
+l = ldap.ldapobject.ReconnectLDAPObject(settings.LDAP_URL, trace_level=0, retry_max=3)
 
 def ceda_groups():
 
@@ -244,10 +246,9 @@ def ldif_all_groups ():
     """
     b = tempfile.NamedTemporaryFile()
     
-#    LDAP_URL = "ldap://ldap03.esc.rl.ac.uk"
-#    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", LDAP_URL, "-b", GROUP_BASE, "-s", "one", "-D", "cn=Andrew Harwood,ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk", "-w", "THUtu7Re"], stdout=b)
+#    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", settings.LDAP_URL, "-b", GROUP_BASE, "-s", "one", "-D", "cn=Andrew Harwood,ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk", "-w", "THUtu7Re"], stdout=b)
    
-    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", LDAP_URL, "-b", GROUP_BASE, "-s", "one"], stdout=b)
+    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", settings.LDAP_URL, "-b", GROUP_BASE, "-s", "one"], stdout=b)
     p1.wait()
 
     bb = tempfile.NamedTemporaryFile()
@@ -264,7 +265,7 @@ def ldif_all_users ():
     """
     b = tempfile.NamedTemporaryFile()
    
-    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", LDAP_URL, "-b", PEOPLE_BASE, "-s", "one"], stdout=b)
+    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", settings.LDAP_URL, "-b", PEOPLE_BASE, "-s", "one"], stdout=b)
     p1.wait()
 
     bb = tempfile.NamedTemporaryFile()
@@ -274,4 +275,29 @@ def ldif_all_users ():
             
     return bb
 
+def ldif_write (ldif):
+    """
+    Write the given ldif commands to the ldif server
+    """
+    output = tempfile.NamedTemporaryFile()
+       
+    (fh, input_file_name) = tempfile.mkstemp()
+
+    os.write(fh, ldif)
+    os.close(fh)
+    
+    tmp2 = open(input_file_name, 'r')
+    
+    p1 = subprocess.Popen(["ldapmodify", "-ZZZ", "-H", settings.LDAP_WRITE_URL, "-D", 
+                            "cn=Andrew Harwood,ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk", 
+                            "-w", "THUtu7Re"], stdin=tmp2, stdout=output, stderr=output)
+   
+    p1.wait()
+
+    os.remove(input_file_name)
+    
+    tmp3 = open(output.name, 'r')
+    stdout = tmp3.readlines()
+            
+    return stdout
 

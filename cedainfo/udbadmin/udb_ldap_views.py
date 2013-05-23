@@ -8,7 +8,7 @@ import psycopg2
 
 from django.http import HttpResponse
 from django.conf import settings
-
+from django.shortcuts import *
 
 from models import Dataset
 
@@ -117,7 +117,8 @@ def ldap_groups (request):
   
     e = open(fh.name, 'r')
     record = e.readlines()
-    record = ['LDIF group information from LDAP server\n\n'] + record
+    header = 'LDIF group information from LDAP server %s\n\n' % settings.LDAP_URL
+    record = [header] + record
     
     return HttpResponse(record, content_type="text/plain")
 
@@ -237,3 +238,16 @@ def check_udb_for_updates (request):
               
     return HttpResponse(msg, content_type="text/plain")
     
+def write_to_ldap_server(request):
+        
+    server = settings.LDAP_WRITE_URL
+
+    if request.method == 'POST':
+     
+        ldif = request.POST.get('ldif', '') 
+      
+        if ldif:
+            output = LDAP.ldif_write(ldif)
+#           return HttpResponse(out, content_type="text/html")
+	 
+    return render_to_response('write_to_ldap_server.html', locals())

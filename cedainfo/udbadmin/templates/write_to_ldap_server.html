@@ -1,0 +1,30 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>Write to LDAP server</h1>
+
+LDAP server: {{server}}
+<p>
+<font color="red">This is currently connected to a test server, not the live LDAP server.</font>
+
+<form method="post">
+
+
+<textarea name="ldif" cols="80" rows="15">
+{{ldif}}
+</textarea>
+<p/>
+<input type="submit">
+</form>
+
+{% if output %}
+<h2>Output:</h2>
+<pre>
+{% for line in output %}
+{{line}}
+{% endfor %}
+</pre>
+{% endif %}
+
+{% endblock %}
