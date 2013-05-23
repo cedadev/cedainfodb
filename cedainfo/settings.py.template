@@ -279,7 +279,7 @@ MOUNT_CHOICES = (
     ('/datacentre/arrivals ro','/datacentre/arrivals ro : CEDA internal ingest machines only'),
     ('/datacentre/requests rw','/datacentre/requests rw : User Requests area'),
     ('/datacentre/stats rw', '/datacentre/stats rw : CEDA internal management machines only'),
-    #('/datacentre/opshome', '/datacentre/opshome rw : CEDA internal management machines only'),
+    ('/datacentre/opshome', '/datacentre/opshome rw : CEDA internal management machines only'),
     #('/datacentre/backupcache rw','/datacentre/backupcache rw : CEDA internal backup systems only'),    
 )
 
@@ -290,3 +290,12 @@ ADMIN_USERS_PATCH_RESPONSIBLE = [
     35, # Jonathan
     36, # Cristina
 ]
+
+#
+# Url for LDAP server
+#
+LDAP_URL       = 'ldap://homer.esc.rl.ac.uk'
+#
+# Url of writable LDAP server (test server at present)
+#
+LDAP_WRITE_URL = "ldap://ldap03.esc.rl.ac.uk"
