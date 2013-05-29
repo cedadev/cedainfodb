@@ -341,8 +341,8 @@ class FileSet(models.Model):
         self.storage_pot = spotname
         try:
             os.makedirs(self.storage_path())
-            gid = grp.getgrnam("byacl").gr_gid
-            os.chown(self.storage_path(), -1, gid)
+            #gid = grp.getgrnam("byacl").gr_gid
+            #os.chown(self.storage_path(), -1, gid)
         except:
             return ("os.makedirs(%s)" % self.storage_path(), sys.exc_value )
         try:
@@ -657,6 +657,9 @@ class VolFeed(Feed):
 
     def item_link(self, item): 
         return "link"
+        
+    def item_pubdate(self, item):
+        return datetime.now()
         
 class DataEntity(models.Model):
     '''Collection of data treated together. Has corresponding MOLES DataEntity record.'''
