@@ -197,20 +197,7 @@ def check_linux_groups(request):
 
            
     return render_to_response ('check_linux_groups.html', locals())
-      
      
-
-
-ARCHIVE_ACCESS_GROUPS = {"cmip5_research":["cmip5_research"],
-                         "esacat1":       ["aatsr_multimission"],                         
-                         "ecmwf":         ["era", "ecmwfop"],
-                         "ukmo" :         ["surface"],
-                         "eurosat":       ["metop_iasi"],
-                         "open":          [],
-}
-
-
-
 def group_members(datasetid, server='external'):
     """
     Returns list of accountids that should be able to access the given group
@@ -243,7 +230,7 @@ def get_nis_group_entries(server='external'):
     else:
        groupFile = NISaccounts.getIntGroupFile()   
 
-    for accessGroup in ARCHIVE_ACCESS_GROUPS.keys():
+    for accessGroup in udb_ldap.ARCHIVE_ACCESS_GROUPS.keys():
         if not accessGroup in groupFile:
             continue    
  
@@ -253,7 +240,7 @@ def get_nis_group_entries(server='external'):
                
         accounts = []
         
-        for datasetid in ARCHIVE_ACCESS_GROUPS[accessGroup]:
+        for datasetid in udb_ldap.ARCHIVE_ACCESS_GROUPS[accessGroup]["datasets"]:
             accounts = accounts + group_members(datasetid, server=server)
 #
 #             Sort and remove any duplicates
@@ -275,7 +262,7 @@ def get_nis_group_entries(server='external'):
         group_info['diff1'] = _list_difference(group_info['accounts'] , group_info['nisAccounts'])
         group_info['diff2'] = _list_difference(group_info['nisAccounts'], group_info['accounts'])
 
-        group_info['datasets'] = ARCHIVE_ACCESS_GROUPS[accessGroup]
+        group_info['datasets'] = udb_ldap.ARCHIVE_ACCESS_GROUPS[accessGroup]["datasets"]
         nis_groups.append(group_info)   
              
     return nis_groups
