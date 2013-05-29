@@ -341,8 +341,8 @@ class FileSet(models.Model):
         self.storage_pot = spotname
         try:
             os.makedirs(self.storage_path())
-            #gid = grp.getgrnam("byacl").gr_gid
-            #os.chown(self.storage_path(), -1, gid)
+            gid = grp.getgrnam("byacl").gr_gid
+            os.chown(self.storage_path(), -1, gid)
         except:
             return ("os.makedirs(%s)" % self.storage_path(), sys.exc_value )
         try:
