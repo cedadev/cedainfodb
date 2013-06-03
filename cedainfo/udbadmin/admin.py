@@ -164,13 +164,13 @@ class UserAdmin(admin.ModelAdmin):
     list_per_page = 200
     
 #    exclude = ('encpasswd', 'md5passwd', 'onlinereg')
-    readonly_fields = (showDatasets, 'datacenter', 'userkey', 'address', 'accountid', 'addresskey', 'startdate', 'encpasswd', 'md5passwd', 'institute', links, password)
+    readonly_fields = (showDatasets, 'datacenter', 'userkey', 'accountid', 'addresskey', 'startdate', 'encpasswd', 'md5passwd', 'institute', links, password)
 
     fieldsets = (
             (None, {
                 'fields': (links, 'userkey', 'title', 'surname', 'othernames', 'emailaddress',
                    'telephoneno', 'accountid', 'openid', 'public_key', 'accounttype',  password, 
-	           'degree', 'endorsedby', 'field', 'startdate', showDatasets, 'datacenter', 'institute', 'address', 'comments')
+	           'degree', 'endorsedby', 'field', 'startdate', showDatasets, 'datacenter', 'institute', 'comments')
 
             }),
             ('LDAP account info - only relevant if they have a JASMIN/CEMS/system-login account', {'fields': ('uid', 'home_directory', 'shell', 'gid')}),

@@ -138,17 +138,9 @@ class Addresses(models.Model):
     addresskey = models.IntegerField(primary_key=True)
     institutekey = models.ForeignKey(Institute, db_column='institutekey')
     department = models.CharField(max_length=100, help_text='Department within the institute')
-    address1 = models.CharField("Department Address Line 1", max_length=150, help_text='Address of department')
-    address2 = models.CharField("Department Address Line 2", max_length=100, help_text='Address')
-    address3 = models.CharField("Department Address Line 3", max_length=100, blank=True, help_text='Address')
-    address4 = models.CharField("Department Address Line 4", max_length=100, blank=True, help_text='Address')
-    address5 = models.CharField("Department Address Line 5", max_length=100, blank=True, help_text='Address')
-    nerc = models.IntegerField(verbose_name='Is Department NERC funded?',
-                   choices=((0, "No"), (-1, "Yes")), 
-                   help_text='Does your department get any funding from NERC, even if you do not?')
-
+ 
     def __unicode__ (self):
-        return "%s" % self.address1
+        return "%s" % self.addresskey
        
     class Meta:
         in_db = USERDB
@@ -266,21 +258,9 @@ class User (models.Model):
         return self.addresskey.institutekey.name
     
     def address (self):
-        """Returns full address as string. Each line is separated by a comma."""
-        
-        a1 = self.addresskey.address1.rstrip(", ")
-        a2 = self.addresskey.address2.rstrip(", ")
-        a3 = self.addresskey.address3.rstrip(", ")
-        a4 = self.addresskey.address4.rstrip(", ")
-        a5 = self.addresskey.address5.rstrip(", ")
-        
-        addressLine = a1
-        if a2: addressLine = addressLine + ", " + a2
-        if a3: addressLine = addressLine + ", " + a3
-        if a4: addressLine = addressLine + ", " + a4
-        if a5: addressLine = addressLine + ", " + a5
-                
-        return addressLine
+        """Dummy routine. Address no longer used."""
+                       
+        return ""
                
     def displayName (self, titleFirst=True):
         """ Displays name """
