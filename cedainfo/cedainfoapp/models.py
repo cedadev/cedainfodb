@@ -595,13 +595,13 @@ class FileSet(models.Model):
             return None
     last_size.allow_tags = True
 
-    def last_audit(self, state='finished'):
+    def last_audit(self):
         # display most recent audit
-        try:
-            audit = Audit.objects.filter(fileset=self, auditstate=state).order_by('-starttime')[0]
+        audit = Audit.objects.filter(fileset=self)
+        if len(audit) ==0: return None
+        else:
+            audit = audit.order_by('-starttime')[0]
             return audit
-        except:
-            return None
     last_size.allow_tags = True
         
 
@@ -841,15 +841,23 @@ class Audit(models.Model):
         # analyse the result
         self.analyse()
 
+    def prev_audit(self):
+        # return privious audit
+        audit = Audit.objects.filter(fileset=self.fileset, starttime__lt=self.starttime).order_by('-starttime')
+        if len(audit) <0: return None
+        else:
+            audit = audit[0]
+            return audit
+        
     def analyse(self):
         # count number and volume
         self.totals()
 
 	# find the last finished audit of this fileset for comparison
-        prev_audit = self.fileset.last_audit('analysed') 
-	if prev_audit: 
+        prev_audit = self.prev_audit() 
+        print "PREV_AUDIT: ",prev_audit, prev_audit.auditstate
+	if prev_audit and prev_audit.auditstate =='analysed': 
 	    result = self.compare(prev_audit)
-	    print result
 	    self.corrupted_files = len(result['corrupt'])
 	    self.modified_files = result['modified']
 	    self.new_files = result['new']

@@ -263,39 +263,27 @@ def next_audit(request):
     # 2) any fileset that has oldest audit
     filesets = FileSet.objects.filter(storage_pot_type='archive', storage_pot__isnull=False)
     fileset_to_audit = None
-    oldest_audit = datetime.datetime.now()
+    oldest_audit = datetime.datetime.utcnow()
     for f in filesets:
         print f
-        started_last_audit = f.last_audit('started')
-        analysed_last_audit = f.last_audit('analysed') 
-        finished_last_audit = f.last_audit('finished') 
-        error_last_audit = f.last_audit('error')
- 
-        # skip if last audit got an error
-        if error_last_audit != None:    
-            if finished_last_audit == None or error_last_audit.starttime > analysed_last_audit.starttime:  
-                print "Ignore - audit got an error" 
-                continue
-
-        # if started audit but then skip this file set
-	if started_last_audit != None or finished_last_audit != None:
-            print " --- Already started" 
-            continue
-
+        last_audit = f.last_audit()
         # if no audit done before then use this one
-	if analysed_last_audit == None:
-            print "No audit done for fileset"
+	if last_audit == None:
+	    return f    
+        # skip if last audit not an analysed state then skip
+        if last_audit.auditstate != 'analysed':    
+            print "Ignore - audit got an error" 
+            continue
+        # see if this is the oldest audit
+        print  last_audit.starttime , oldest_audit, last_audit.starttime < oldest_audit
+	if last_audit.starttime < oldest_audit:
+	    oldest_audit = last_audit.starttime
 	    fileset_to_audit = f
-            break  
-
-	if analysed_last_audit.starttime < oldest_audit: 
-	    oldest_audit = analysed_last_audit.starttime
-	    fileset_to_audit = f
-
+ 
     if fileset_to_audit:
         audit=Audit(fileset=fileset_to_audit, auditstate='started', starttime = datetime.datetime.utcnow())
         audit.save()
-    else: audit=None
+    else: audit=None 
 
     return render_to_response('cedainfoapp/next_audit.txt', {'audit': audit})  
 
