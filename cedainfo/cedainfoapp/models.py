@@ -806,6 +806,7 @@ class Audit(models.Model):
             ("copy verified","copy verified"),
             ("analysed","analysed"),
             ("error","error"),
+            ("corruption","corruption"),
         ),
         default="not started",
         help_text="state of this audit"
