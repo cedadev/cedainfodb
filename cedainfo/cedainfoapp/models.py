@@ -625,7 +625,7 @@ class VolFeed(Feed):
         vol, nfiles = 0,0
         for f in filesets:
             slashcount = f.logical_path.count('/')
-            if slashcount == 4: 
+            if slashcount == 2: 
                 table[toplevel] = (vol,nfiles)
                 vol, nfiles = 0,0
                 toplevel = f.logical_path
