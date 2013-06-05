@@ -269,7 +269,9 @@ def next_audit(request):
         last_audit = f.last_audit()
         # if no audit done before then use this one
 	if last_audit == None:
-	    return f    
+            audit=Audit(fileset=f, auditstate='started', starttime = datetime.datetime.utcnow())
+            audit.save()
+	    return render_to_response('cedainfoapp/next_audit.txt', {'audit': audit})    
         # skip if last audit not an analysed state then skip
         if last_audit.auditstate != 'analysed':    
             print "Ignore - audit got an error" 
