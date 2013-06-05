@@ -855,7 +855,6 @@ class Audit(models.Model):
 
 	# find the last finished audit of this fileset for comparison
         prev_audit = self.prev_audit() 
-        print "PREV_AUDIT: ",prev_audit, prev_audit.auditstate
 	if prev_audit and prev_audit.auditstate =='analysed': 
 	    result = self.compare(prev_audit)
 	    self.corrupted_files = len(result['corrupt'])
