@@ -863,7 +863,8 @@ class Audit(models.Model):
 	    self.deleted_files = result['deleted']
 	    self.unchanges_files = result['unchanged']
 
-	self.auditstate = 'analysed'
+        if self.corrupted_files != 0: self.auditstate = 'corruption'
+        else: self.auditstate = 'analysed'
 	self.save()
 	       
     def totals(self):
