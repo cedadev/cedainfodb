@@ -261,7 +261,7 @@ def next_audit(request):
     # pick an audit to do: 
     # 1) any fileset that has no privious audit
     # 2) any fileset that has oldest audit
-    filesets = FileSet.objects.filter(storage_pot_type='archive', storage_pot__isnull=False)
+    filesets = FileSet.objects.filter(storage_pot_type='archive', storage_pot__isnull=False).exclude(storage_pot='')
     fileset_to_audit = None
     oldest_audit = datetime.datetime.utcnow()
     for f in filesets:
@@ -501,7 +501,7 @@ def detailed_spotlist(request):
 # needs to be open for automation
 #
 def make_secondary_copies(request):
-    filesets = FileSet.objects.filter(secondary_partition__isnull=False)
+    filesets = FileSet.objects.filter(secondary_partition__isnull=False).exclude(storage_pot='')
     return render_to_response('cedainfoapp/make_secondary_copies.txt', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
 
 # make list filesets for depositserver
