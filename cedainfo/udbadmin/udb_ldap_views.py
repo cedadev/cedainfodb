@@ -73,7 +73,7 @@ def ldap_group_ldiff (request):
     the information generated from the userdb using the ldifdiff.pl program
     """
  
-    ldif = LDAP.ldif_all_groups()                  
+    ldif = LDAP.ldif_all_groups(filter_scarf_users=True)                  
     udb_ldif = udb_ldap.ldif_all_groups()
              
     tmp_out = tempfile.NamedTemporaryFile()
@@ -94,7 +94,7 @@ def ldap_group_diff (request):
     the information generated from the userdb using the diff2html program
     """
     
-    ldif = LDAP.ldif_all_groups()                  
+    ldif = LDAP.ldif_all_groups(filter_scarf_users=False)                  
     udb_ldif = udb_ldap.ldif_all_groups()
            
     tmp_out = tempfile.NamedTemporaryFile()

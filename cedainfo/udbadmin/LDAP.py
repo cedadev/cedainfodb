@@ -239,10 +239,13 @@ def rootAccessMembers():
     return memberAccounts
 
 
-def ldif_all_groups ():
+def ldif_all_groups (filter_scarf_users=False):
     """
     Returns all LDIF information from LDAP server for ceda groups, sorted by dn.
     Returns a filehandle for an open temporary file that can be read from.
+
+    if filter_scarf_users is set then scarf users are removed from the output 
+    using grep.
     """
     b = tempfile.NamedTemporaryFile()
     
@@ -252,10 +255,17 @@ def ldif_all_groups ():
     p1.wait()
 
     bb = tempfile.NamedTemporaryFile()
-    p2 = subprocess.Popen([SORT_SCRIPT, "-a", "-k", "dn", b.name], stdout=bb)
 
-    p2.wait()
-            
+    if filter_scarf_users:
+        p2 = subprocess.Popen([SORT_SCRIPT, "-a", "-k", "dn", b.name], stdout=subprocess.PIPE)
+        p2.wait()
+
+        p3 = subprocess.Popen(["grep", "-v", "memberUid: scarf"], stdin=p2.stdout, stdout=bb)
+        p3.wait() 
+    else:
+        p2 = subprocess.Popen([SORT_SCRIPT, "-a", "-k", "dn", b.name], stdout=bb)
+        p2.wait()
+  
     return bb
 
 def ldif_all_users ():
