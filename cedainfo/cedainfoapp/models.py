@@ -845,7 +845,7 @@ class Audit(models.Model):
     def prev_audit(self):
         # return privious audit
         audit = Audit.objects.filter(fileset=self.fileset, starttime__lt=self.starttime).order_by('-starttime')
-        if len(audit) <0: return None
+        if len(audit) ==0: return None
         else:
             audit = audit[0]
             return audit
