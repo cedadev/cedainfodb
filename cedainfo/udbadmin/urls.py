@@ -58,10 +58,10 @@ urlpatterns = patterns('',
      url(r'^ldap/ldapgroups/$', ldap_groups),
  
      url(r'^ldap/groupdiff/$', ldap_group_diff),
-     url(r'^ldap/groupdiff2/$', ldap_group_ldiff),
+     url(r'^ldap/groupldif/$', ldap_group_ldiff),
 
      url(r'^ldap/userdiff/$', ldap_user_diff),
-     url(r'^ldap/userdiff2/$', ldap_user_ldiff),
+     url(r'^ldap/userldif/$', ldap_user_ldiff),
           
      url(r'^ldapext/nis/group/(?P<datasetid>.+)$', write_nis_group), 
      url(r'^ldapext/nis/group/$', write_all_nis_groups),            
@@ -72,13 +72,13 @@ urlpatterns = patterns('',
 
      url(r'^ldapext/updatecheck/$', check_udb_for_updates),
               
-     url(r'^ldapext/groupdiff2/$', ldap_group_ldiff),
+     url(r'^ldapext/groupldif/$', ldap_group_ldiff),
      url(r'^ldapext/groupdiff/$', ldap_group_diff),
 
      
      url(r'^ldapext/user/(?P<accountid>.+)$', write_ldap_user), 
      url(r'^ldapext/user/$', ldap_udb_users),   
-      
+      url(r'^ldapext/userldif/$', ldap_user_ldiff),    
 
            
      url(r'^authorise/(?P<userkey>-?\d{1,6})/$', authorise_datasets),
