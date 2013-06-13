@@ -64,28 +64,50 @@ def write_ldap_user (request, accountid=''):
     record = udb_ldap.ldap_user_record(accountid)    
 
     return HttpResponse(record, content_type="text/plain")
-
-       
-
+ 
 def ldap_group_ldiff (request):
     """
     Displays differences between current LDAP information for ceda groups and 
-    the information generated from the userdb using the ldifdiff.pl program
+    the information generated from the userdb using the ldifdiff.pl program.
+    You can then send the commands to the LDAP server to update it.
     """
  
-    ldif = LDAP.ldif_all_groups(filter_scarf_users=True)                  
-    udb_ldif = udb_ldap.ldif_all_groups()
-             
-    tmp_out = tempfile.NamedTemporaryFile()
-    script = settings.PROJECT_DIR + "/udbadmin/ldifdiff.pl"
-    p1 = subprocess.Popen([script, "-k", "dn", "--sharedattrs", 
-                          "memberUid", udb_ldif.name, ldif.name], stdout=tmp_out)
-    p1.wait()
-    
-    tmp_out2 = open(tmp_out.name, 'r')
-    out = tmp_out2.readlines()
-    
-    return HttpResponse(out, content_type="text/plain")
+    server = settings.LDAP_URL
+
+    if request.method == 'POST':
+        
+        ldif = request.POST.get('ldif', '') 
+        
+        if ldif:
+#
+#           Need to remove \r as otherwise ldap modify does not recognise
+#           the '-' separator
+#
+            ldif = ldif.replace('\r', '')
+            output = LDAP.ldif_write(ldif, server=server)
+
+    else:
+        server_ldif = LDAP.ldif_all_groups(filter_scarf_users=True, server=server)                  
+        udb_ldif = udb_ldap.ldif_all_groups()
+                    
+        tmp_out = tempfile.NamedTemporaryFile()
+        script = settings.PROJECT_DIR + "/udbadmin/ldifdiff.pl"
+        p1 = subprocess.Popen([script, "-k", "dn", "--sharedattrs", 
+                                "memberUid", udb_ldif.name, server_ldif.name], stdout=tmp_out)
+        p1.wait()
+        
+        tmp_out2 = open(tmp_out.name, 'r')
+        diffoutput = tmp_out2.readlines()
+
+        stringout = ""
+
+        for i in range(len(diffoutput)):
+            stringout += diffoutput[i]
+        
+ 
+
+ 	 
+    return render_to_response('ldap_update_groups.html', locals())   
  
      
 def ldap_group_diff (request):

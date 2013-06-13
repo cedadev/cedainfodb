@@ -1,0 +1,43 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>Update group information on LDAP server</h1>
+
+LDAP server: {{server}}
+<p>
+<font color="red">At the moment the live LDAP server cannot be updated.</font>
+<p/>
+The following LDIF commands need to be executed to bring the LDAP server group information
+in line with the contents of the user database. You can edit the commands if required and then submit
+them to the LDAP server to make the updates.
+<p/>
+
+{% if output %}
+    <h2>LDIF commands entered:</h2>
+    <pre>
+    {{ldif}}
+    </pre>
+    <h2>Output:</h2>
+    {% for line in output %}
+    {{line}}<br>
+    {% endfor %}
+<p/>
+<form method="get">
+<p/>
+<input type="submit" value="Back">
+</form>
+
+{% else %}
+<form method="post">
+
+<textarea name="ldif" cols="80" rows="30">
+{{stringout}}
+</textarea>
+<p/>
+<input type="submit" value="Update LDAP server">
+</form>
+{% endif %}
+
+
+{% endblock %}

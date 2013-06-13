@@ -239,7 +239,7 @@ def rootAccessMembers():
     return memberAccounts
 
 
-def ldif_all_groups (filter_scarf_users=False):
+def ldif_all_groups (filter_scarf_users=False, server=settings.LDAP_URL):
     """
     Returns all LDIF information from LDAP server for ceda groups, sorted by dn.
     Returns a filehandle for an open temporary file that can be read from.
@@ -248,10 +248,8 @@ def ldif_all_groups (filter_scarf_users=False):
     using grep.
     """
     b = tempfile.NamedTemporaryFile()
-    
-#    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", settings.LDAP_URL, "-b", GROUP_BASE, "-s", "one", "-D", "cn=Andrew Harwood,ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk", "-w", "THUtu7Re"], stdout=b)
    
-    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", settings.LDAP_URL, "-b", GROUP_BASE, "-s", "one"], stdout=b)
+    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", server, "-b", GROUP_BASE, "-s", "one"], stdout=b)
     p1.wait()
 
     bb = tempfile.NamedTemporaryFile()
@@ -285,7 +283,7 @@ def ldif_all_users ():
             
     return bb
 
-def ldif_write (ldif):
+def ldif_write (ldif, server=settings.LDAP_WRITE_URL):
     """
     Write the given ldif commands to the ldif server
     """
@@ -298,8 +296,8 @@ def ldif_write (ldif):
     
     tmp2 = open(input_file_name, 'r')
     
-    p1 = subprocess.Popen(["ldapmodify", "-ZZZ", "-H", settings.LDAP_WRITE_URL, "-D", 
-                            "cn=Andrew Harwood,ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk", 
+    p1 = subprocess.Popen(["ldapmodify", "-ZZZ", "-H", server, "-D", 
+                            "cn=cedainfodb,ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk", 
                             "-w", "THUtu7Re"], stdin=tmp2, stdout=output, stderr=output)
    
     p1.wait()

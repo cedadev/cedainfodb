@@ -29,7 +29,7 @@ group_updated = update_check.group_updated(connection, reset=True, name=NAME_PRE
 user_updated = update_check.user_updated(connection, reset=True, name=NAME_PREFIX + '_user')
 
 
-if not (group_updated or user_updated):
+if (group_updated or user_updated):
 
     server = smtplib.SMTP('localhost')
     messageFrom = "udbcheck <badc@stfc.ac.uk>"
