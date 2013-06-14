@@ -310,16 +310,25 @@ def ldap_user_tags(user):
     if user.hasDataset("system-login") or user.isJasminCemsUser():
         record = record + 'description: cluster:ceda-external\n'
 
-    datasetjoins = user.currentDatasets()
+    datasetjoins = user.currentDatasets(filter_duplicates=True)
     
+
     for datasetjoin in datasetjoins:
-       if datasetjoin.datasetid.datasetid.startswith('vm_access_'):
-           record = record + 'description: %s\n' % datasetjoin.datasetid.grp       
-       if datasetjoin.datasetid.datasetid == 'jasmin-login':
-           record = record + 'description: cluster:jasmin-login\n'
-       if datasetjoin.datasetid.datasetid == 'cems-login':
-           record = record + 'description: cluster:cems-login\n'
-  
+#
+#      Wrap the following in try-except block as it has been known for
+#      the foreign key integrity in the userdb to be broken...
+#
+       try:
+           if datasetjoin.datasetid.datasetid.startswith('vm_access_'):
+               grp = datasetjoin.datasetid.grp
+               if grp.strip():
+                   record = record + 'description: %s\n' % datasetjoin.datasetid.grp       
+           if datasetjoin.datasetid.datasetid == 'jasmin-login':
+               record = record + 'description: cluster:jasmin-login\n'
+           if datasetjoin.datasetid.datasetid == 'cems-login':
+               record = record + 'description: cluster:cems-login\n'
+       except:
+           pass 
     
     return record
     

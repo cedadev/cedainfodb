@@ -108,7 +108,8 @@ def personAttributeValues (attribute):
     tags = []
 
     for dn, entry in results:
-        tags = tags + entry[attribute]
+        if entry:
+            tags = tags + entry[attribute]
 
     tags = list(set(tags))
     tags.sort()  
@@ -125,7 +126,8 @@ def groupTags ():
     tags = []
 
     for dn, entry in results:
-        tags = tags + entry['description']
+        if entry:
+            tags = tags + entry['description']
 
     tags = list(set(tags))
     tags.sort()  
@@ -266,14 +268,14 @@ def ldif_all_groups (filter_scarf_users=False, server=settings.LDAP_URL):
   
     return bb
 
-def ldif_all_users ():
+def ldif_all_users (server=settings.LDAP_URL):
     """
     Returns all LDIF information from LDAP server for ceda users, sorted by dn.
     Returns a filehandle for an open temporary file that can be read from.
     """
     b = tempfile.NamedTemporaryFile()
    
-    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", settings.LDAP_URL, "-b", PEOPLE_BASE, "-s", "one"], stdout=b)
+    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", server, "-b", PEOPLE_BASE, "-s", "one"], stdout=b)
     p1.wait()
 
     bb = tempfile.NamedTemporaryFile()
@@ -289,6 +291,8 @@ def ldif_write (ldif, server=settings.LDAP_WRITE_URL):
     """
     output = tempfile.NamedTemporaryFile()
        
+    ldif = ldif.replace('\r', '')
+
     (fh, input_file_name) = tempfile.mkstemp()
 
     os.write(fh, ldif)

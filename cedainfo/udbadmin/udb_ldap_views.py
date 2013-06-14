@@ -204,20 +204,32 @@ def ldap_user_ldiff (request):
     Displays differences between current LDAP information for ceda users and 
     the information generated from the userdb using the ldifdiff.pl program
     """
- 
-    ldif = LDAP.ldif_all_users()                  
-    udb_ldif = udb_ldap.ldif_all_users()
+    server = settings.LDAP_URL
+
+    if request.method == 'POST':
+        
+        ldif = request.POST.get('ldif', '') 
+        output = LDAP.ldif_write(ldif, server=server)
+
+    else:
+        ldif = LDAP.ldif_all_users(server=server)                  
+        udb_ldif = udb_ldap.ldif_all_users()
              
-    d = tempfile.NamedTemporaryFile()
-    script = settings.PROJECT_DIR + "/udbadmin/ldifdiff.pl"
-    p1 = subprocess.Popen([script, "-k", "dn", "--sharedattrs", "memberUid", 
+        d = tempfile.NamedTemporaryFile()
+        script = settings.PROJECT_DIR + "/udbadmin/ldifdiff.pl"
+        p1 = subprocess.Popen([script, "-k", "dn", "--sharedattrs", "memberUid", 
                            udb_ldif.name, ldif.name], stdout=d)
-    p1.wait()
+        p1.wait()
     
-    e = open(d.name, 'r')
-    out = e.readlines()
-    
-    return HttpResponse(out, content_type="text/plain")
+        e = open(d.name, 'r')
+        out = e.readlines()
+        stringout = ""
+
+        for i in range(len(out)):
+            stringout += out[i]
+     
+    return render_to_response('ldap_update_users.html', locals())   
+
 
 
 def check_udb_for_updates (request):

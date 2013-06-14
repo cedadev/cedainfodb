@@ -270,20 +270,38 @@ class User (models.Model):
         else:
             return '%s, %s %s' % (self.surname, self.title, self.othernames)
        
-    def datasets(self, removed=False):
-#
-#             Returns list of dataset objects belonging to this user. By default returns only current datasets. Optionally can
-#             return removed datasets
-#    
+    def datasets(self, removed=False, filter_duplicates=False):
+
+        '''Returns list of dataset objects belonging to this user. 
+           By default returns only current datasets. Optionally can
+           return removed datasets. Can also optionally remove any
+           duplicate datasets from current datasets (probably no
+           point in doing this for removed datasets).
+        '''
+    
         if removed:
             datasets=self.datasetjoin_set.all().filter(removed__exact=-1)
         else:
             datasets=self.datasetjoin_set.all().filter(removed__exact=0)
-           
+
+            if filter_duplicates:
+                filtered_datasets = []
+                datasetids = []
+                for dataset in datasets:
+                        try:
+                            if dataset.datasetid in datasetids:
+                                pass
+                            else:
+                                filtered_datasets.append(dataset)
+                                datasetids.append(dataset.datasetid)
+                        except:
+                            pass 
+                return filtered_datasets
+               
         return datasets
 
-    def currentDatasets(self):
-        return self.datasets(removed=False)
+    def currentDatasets(self, filter_duplicates=False):
+        return self.datasets(removed=False, filter_duplicates=filter_duplicates)
 
     def removedDatasets(self):
         return self.datasets(removed=True)
