@@ -18,30 +18,30 @@ print progs
 for p in progs:
     
     # make a programme a dmp
-    dmpgroup=DMPGroup(name=p.name, desc='')
+    projectgroup=ProjectGroup(name=p.name, desc='')
 
-    if p.title: dmpgroup.desc += "%s\n\n" % p.title 
-    if p.description: dmpgroup.desc += "%s\n" % p.description 
-    if p.scienceContact: dmpgroup.desc += "Science contact: %s\n" % p.scienceContact 
-    if p.fundingContact: dmpgroup.desc += "Funding contact: %s\n" % p.fundingContact 
-    if p.programmeSize: dmpgroup.desc += "Programme size: %s\n" % p.programmeSize 
-    if p.startDate: dmpgroup.desc += "Start date: %s\n" % p.startDate 
-    if p.endDate: dmpgroup.desc += "End date: %s\n" % p.endDate 
-    if p.state: dmpgroup.desc += "Status: %s\n" % p.state 
-    dmpgroup.desc += '\n'
+    if p.title: projectgroup.desc += "%s\n\n" % p.title 
+    if p.description: projectgroup.desc += "%s\n" % p.description 
+    if p.scienceContact: projectgroup.desc += "Science contact: %s\n" % p.scienceContact 
+    if p.fundingContact: projectgroup.desc += "Funding contact: %s\n" % p.fundingContact 
+    if p.programmeSize: projectgroup.desc += "Programme size: %s\n" % p.programmeSize 
+    if p.startDate: projectgroup.desc += "Start date: %s\n" % p.startDate 
+    if p.endDate: projectgroup.desc += "End date: %s\n" % p.endDate 
+    if p.state: projectgroup.desc += "Status: %s\n" % p.state 
+    projectgroup.desc += '\n'
 
     notes = PI.ProgrammeNote.objects.filter(prog=p)
     for n in notes:
-        dmpgroup.desc += "[%s %s]: %s\n" % (n.who, n.added, n.text)
-    dmpgroup.save()
+        projectgroup.desc += "[%s %s]: %s\n" % (n.who, n.added, n.text)
+    projectgroup.save()
 
     # add projects...
     projects = PI.Project.objects.filter(prog=p)
     
     for proj in projects:
-        dmp= DMP(title=proj.title, 
+        newproject= Project(title=proj.title, 
                  desc=proj.desc, 
-                 dateAdded = proj.added,
+                 date_added = proj.added,
                  PI=proj.PI,
                  Contact1 = proj.CoI1,
                  Contact2 = proj.CoI2,
@@ -54,7 +54,7 @@ for p in progs:
 
 
         if proj.grant: 
-            g=Grant(number=proj.grant, dmp=dmp)
+            g=Grant(number=proj.grant, project=newproject)
             g.save()
 
         notes = PI.ProjectNote.objects.filter(proj=proj)
@@ -62,11 +62,11 @@ for p in progs:
         if proj.thirdpartydata: note += "Third party data: %s" % proj.thirdpartydata
         for n in notes:
             note += "[%s %s]: %s\n" % (n.who, n.added, n.text)
-        dmp.notes= note
-        dmp.save()
+        newproject.notes= note
+        newproject.save()
 
         # add dmp to dmp group
-        dmpgroup.dmps.add(dmp)
+        projectgroup.projects.add(newproject)
              
         # add data products...
         dataprods = PI.DataProduct.objects.filter(proj=proj)
@@ -93,10 +93,9 @@ for p in progs:
             for n in notes:
                 note += "[%s %s]: %s\n" % (n.who, n.added, n.text)
             dp.notes= note
+            dp.project = newproject
             dp.save()
 
-            dmp.data_outputs.add(dp)
-        dmp.save()
 
 
 

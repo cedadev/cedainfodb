@@ -1,0 +1,29 @@
+
+
+{% extends "base_site.html" %}
+{% load i18n %}
+
+
+{% block content %}
+
+
+
+<h1>Project for review my {{user}}</h1>
+
+<table>
+
+{% for p in projects %}
+ <tr>
+ <td> <a href="/admin/dmp/project/{{ p.id }}">{{p}}</a> </td>
+ <td> {{p.status}} </td>
+ <td> {{p.startdate}} </td>
+ <td> {{p.enddate}} </td>
+ <td> {{p.PI}} </td>
+ <td> {% for g in p.grants %} {{g.gotw|safe}} {% endfor %}</td>
+ <td> {% for dp in p.data_outputs %} <a class="history" href="/admin/dmp/dataproduct/{{dp.pk}}">{{dp}}</a> {% endfor %}</td>
+ </tr>
+{% endfor %}
+</table>
+
+	
+{% endblock %}

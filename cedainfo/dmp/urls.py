@@ -4,5 +4,7 @@ from views import *
 
 urlpatterns = patterns('',
 
-     url(r'^dmp/(?P<dmp_id>\d+)$', dmp_draft),
+     url(r'^project/(?P<project_id>\d+)$', dmp_draft),
+     url(r'^project/(?P<project_id>\d+)/adddataproduct$', add_dataproduct),
+     url(r'^myprojects$', my_projects),
 )

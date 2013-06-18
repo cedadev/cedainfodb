@@ -8,9 +8,10 @@
   <ul class="object-tools">
     {% block object-tools-items %}
     <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-    <li>{{original.dmp_groups|safe}}</li>
+    <li><a href="/dmp/myprojects" class="historylink">My projects</a></li>
+    <li>{{original.project_groups|safe}}</li>
     <li>{{original.grant_links|safe}}</li>
-    <li><a href="/dmp/dmp/{{original.id}}" class="historylink">Draft DMP</li>
+    <li><a href="/dmp/project/{{original.id}}" class="historylink">Draft DMP</a></li>
     {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
     {% endblock %}
   </ul>
@@ -19,11 +20,16 @@
 
 {% block after_related_objects %}
 Data products: 
-{% for d in original.data_outputs.all %} 
+{% for d in original.data_outputs %} 
 <a href="/admin/dmp/dataproduct/{{d.id}}">{{d}}</a>
 {% endfor %}
+<br>
+<a href="/dmp/project/{{original.id}}/adddataproduct">Add new data product</a>
+
+<div>
 Third party data: 
 {% for d in original.third_party_data.all %} 
 <a href="/admin/dmp/dataproduct/{{d.id}}">{{d}}</a>
+</div>
 {% endfor %}
 {% endblock %}

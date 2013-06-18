@@ -12,36 +12,34 @@ class DataProductAdmin(admin.ModelAdmin):
     list_display = ('title', 'status','sciSupContact',)
     search_fields = ('title', 'contact')
     list_filter = ('sciSupContact','status',)
-
-
 admin.site.register(DataProduct, DataProductAdmin)
 
 
 #-----
 # This is the interface for the projects
 
-class DMPAdmin(admin.ModelAdmin):
+class ProjectAdmin(admin.ModelAdmin):
     save_on_top = True
-    list_display = ('title', 'dmp_groups', 'status', 'ndata','sciSupContact',)
+    list_display = ('title', 'project_groups', 'status', 'ndata','sciSupContact',)
     search_fields = ('title', 'desc', 'PI', 'CoI1', 'CoI2')
     list_filter = ('status', 'sciSupContact')
-    filter_horizontal = ('data_outputs', 'third_party_data')
+    filter_horizontal = ('third_party_data','vms', 'groupworkspaces')
 
-admin.site.register(DMP, DMPAdmin)
+admin.site.register(Project, ProjectAdmin)
 
 
 class GrantAdmin(admin.ModelAdmin):
     save_on_top = True
-    list_display = ('number', 'title', 'dmp', 'gotw')
+    list_display = ('number', 'title', 'project', 'gotw')
     search_fields = ('number', 'title', 'desc')
 admin.site.register(Grant, GrantAdmin)
 
-class DMPGroupAdmin(admin.ModelAdmin):
+class ProjectGroupAdmin(admin.ModelAdmin):
     save_on_top = True
     list_display = ('name', 'desc')
     search_fields = ('name', 'desc')
-    filter_horizontal = ('dmps',)
-admin.site.register(DMPGroup, DMPGroupAdmin)
+    filter_horizontal = ('projects', )
+admin.site.register(ProjectGroup, ProjectGroupAdmin)
 
 
 

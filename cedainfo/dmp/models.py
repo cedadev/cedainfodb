@@ -10,26 +10,27 @@ import re
 
 # import users 
 from django.contrib.auth.models import *
+from cedainfoapp.models import *
 from sizefield.models import FileSizeField
+
 #-----
 
-class DMP(models.Model):
+class Project(models.Model):
 
     # Projects are activities under funding programmes that are examined
     # for their data management needs.
 
     title = models.CharField(max_length=200)
-    dateAdded = models.DateTimeField(auto_now_add=True)
+    date_added = models.DateTimeField(auto_now_add=True)
     desc = models.TextField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
     startdate = models.DateField(blank=True, null=True)
     enddate = models.DateField(blank=True, null=True)
-    sciSupContact = models.ForeignKey(User, help_text="CEDA person contact for this DMP", blank=True, null=True)
+    sciSupContact = models.ForeignKey(User, help_text="CEDA person contact for this Project", blank=True, null=True)
     PI = models.CharField(max_length=200, blank=True, null=True)
     Contact1 = models.CharField(max_length=200, blank=True, null=True)
     Contact2 = models.CharField(max_length=200, blank=True, null=True)
     projectcost = models.IntegerField(blank=True, null=True)
-    #thirdpartydata = models.TextField(blank=True, null=True)
     services = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=200, blank=True, null=True,
             choices=(("Proposal","Proposal"),
@@ -41,34 +42,39 @@ class DMP(models.Model):
                  ("Defaulted","Defaulted"),
                  ("Complete","Complete")))
     modified = models.DateTimeField(auto_now=True)
-    data_outputs = models.ManyToManyField('DataProduct', related_name='outputs+', blank=True, null=True)
     third_party_data = models.ManyToManyField('DataProduct', related_name='requirements+', 
                         blank=True, null=True)
+    vms = models.ManyToManyField(VM, blank=True, null=True)
+    groupworkspaces = models.ManyToManyField(GWS, blank=True, null=True)
     project_URL = models.URLField(blank=True, null=True)
 	
     def __unicode__(self):
         return "%s" % self.title
 
     def ndata(self):
-        return len(self.data_outputs.all())
+        dps = DataProduct.objects.filter(project=self)
+        return len(dps)
 
+    def data_outputs(self):
+        dps = DataProduct.objects.filter(project=self)
+        return dps
 
-    def dmp_groups(self):
+    def project_groups(self):
         output = ''
-        for dmpg in self.dmpgroup_set.all():
-            output += '<a href="/admin/dmp/dmpgroup/%s">%s</a> ' % (dmpg.id, dmpg.name)
+        for g in self.projectgroup_set.all():
+            output += '<a href="/admin/dmp/projectgroup/%s">%s</a> ' % (g.id, g.name)
         return output
-    dmp_groups.allow_tags = True    
+    project_groups.allow_tags = True    
 
     def grants(self):
-        return Grant.objects.filter(dmp=self)
+        return Grant.objects.filter(project=self)
 
     def grant_links(self):
         output = ''
-        for g in self.grants:
+        for g in self.grants():
             output += '<a href="/admin/dmp/grant/%s">%s</a> ' % (g.id, g.number)
         return output
-    dmp_groups.allow_tags = True    
+    grant_links.allow_tags = True    
 
 
 
@@ -82,6 +88,7 @@ class DataProduct(models.Model):
     desc = models.TextField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
     datavol = FileSizeField(default=0)
+    project = models.ForeignKey(Project, help_text="Project producing this data", blank=True, null=True)
     sciSupContact = models.ForeignKey(User, help_text="CEDA person contact for this data", blank=True, null=True)
     contact1 = models.CharField(max_length=200, blank=True, null=True)
     contact2 = models.CharField(max_length=200, blank=True, null=True)
@@ -95,6 +102,7 @@ class DataProduct(models.Model):
                  ("TBD","TBD")))
     added = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    review_date = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=200, blank=True, null=True,
             choices=( ("WithProjectTeam","With Project Team"),
                  ("Ingesting","Ingesting"),
@@ -106,16 +114,11 @@ class DataProduct(models.Model):
     def __unicode__(self):
         return "%s" % self.title
 
-#    def dmps_where_output(self): 
-#        return DMP.objects.filter('data_outputs__contains'==self)
-
-    def dmps_where_output(self): 
-        return DMP.objects.filter(data_outputs=self)
-    def dmps_where_thirdparty(self): 
-        return DMP.objects.filter(third_party_data=self)
+    def projects_where_thirdparty(self): 
+        return Projects.objects.filter(third_party_data=self)
 
 class Grant(models.Model):
-    dmp = models.ForeignKey('DMP', blank=True, null=True)
+    project = models.ForeignKey('Project', blank=True, null=True)
     number = models.CharField(max_length=200)
     title = models.CharField(max_length=800, blank=True, null=True)
     desc = models.TextField(blank=True, null=True)
@@ -133,10 +136,10 @@ class Grant(models.Model):
     gotw.allow_tags = True    
 
 
-class DMPGroup(models.Model):
+class ProjectGroup(models.Model):
     name = models.CharField(max_length=200)
     desc = models.TextField(blank=True, null=True)
-    dmps = models.ManyToManyField('DMP', blank=True, null=True)
+    projects = models.ManyToManyField('Project', blank=True, null=True)
 
     def __unicode__(self):
         return "%s" % self.name
