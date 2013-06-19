@@ -4,6 +4,11 @@
 
 
 {% block object-tools %}
+
+
+<img style="height:40px; align:right" src="/static_files/projecticon.jpg"/>
+
+
 {% if change %}{% if not is_popup %}
   <ul class="object-tools">
     {% block object-tools-items %}
@@ -19,12 +24,14 @@
 {% endblock %}
 
 {% block after_related_objects %}
-Data products: 
+<div  id="dataproducts">Data products: 
 {% for d in original.data_outputs %} 
 <a href="/admin/dmp/dataproduct/{{d.id}}">{{d}}</a>
 {% endfor %}
 <br>
 <a href="/dmp/project/{{original.id}}/adddataproduct">Add new data product</a>
+
+</div>
 
 <div>
 Third party data: 

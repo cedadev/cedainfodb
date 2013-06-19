@@ -20,7 +20,7 @@
  <td> {{p.enddate}} </td>
  <td> {{p.PI}} </td>
  <td> {% for g in p.grants %} {{g.gotw|safe}} {% endfor %}</td>
- <td> {% for dp in p.data_outputs %} <a class="history" href="/admin/dmp/dataproduct/{{dp.pk}}">{{dp}}</a> {% endfor %}</td>
+ <td> {% for dp in p.data_outputs %} <a style="border:solid 1px red; border-radius:5px; background-color:pink" href="/admin/dmp/dataproduct/{{dp.pk}}">{{dp}}</a> {% endfor %}</td>
  </tr>
 {% endfor %}
 </table>

@@ -32,6 +32,7 @@ class GrantAdmin(admin.ModelAdmin):
     save_on_top = True
     list_display = ('number', 'title', 'project', 'gotw')
     search_fields = ('number', 'title', 'desc')
+    readonly_fields=('title', 'pi', 'desc')
 admin.site.register(Grant, GrantAdmin)
 
 class ProjectGroupAdmin(admin.ModelAdmin):

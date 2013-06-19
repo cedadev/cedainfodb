@@ -121,6 +121,7 @@ class Grant(models.Model):
     project = models.ForeignKey('Project', blank=True, null=True)
     number = models.CharField(max_length=200)
     title = models.CharField(max_length=800, blank=True, null=True)
+    pi = models.CharField(max_length=200, blank=True, null=True)
     desc = models.TextField(blank=True, null=True)
     
     def __unicode__(self):
@@ -130,10 +131,11 @@ class Grant(models.Model):
 
     def gotw(self):
         if self.number: 
-            return '<a href="http://gotw.nerc.ac.uk/list_full.asp?pcode=%s">%s</a>' %(self.number, self.number)
+            return '<a style="color:red; background-color:lightblue; border:2px blue dashed" href="http://gotw.nerc.ac.uk/list_full.asp?pcode=%s">%s</a>' %(self.number, self.number)
         else:
             return '-'
     gotw.allow_tags = True    
+
 
 
 class ProjectGroup(models.Model):
