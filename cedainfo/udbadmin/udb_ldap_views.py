@@ -71,8 +71,11 @@ def ldap_group_ldiff (request):
     the information generated from the userdb using the ldifdiff.pl program.
     You can then send the commands to the LDAP server to update it.
     """
- 
-    server = settings.LDAP_URL
+    if 'dev' in request.GET:
+        server = settings.LDAP_WRITE_URL
+    else:
+        server = settings.LDAP_URL 
+
 
     if request.method == 'POST':
         
@@ -135,7 +138,7 @@ def ldap_groups (request):
     """
     Print out all group information from the LDAP server
     """
-    fh = LDAP.ldif_all_groups()            
+    fh = LDAP.ldif_all_groups(filter_scarf_users=False)            
   
     e = open(fh.name, 'r')
     record = e.readlines()
@@ -159,7 +162,7 @@ def ldap_users (request):
     """
     Print out all user information from the current LDAP server
     """
-    fh = LDAP.ldif_all_users()            
+    fh = LDAP.ldif_all_users(filter_root_users=False)            
   
     e = open(fh.name, 'r')
     record = e.readlines()
@@ -185,7 +188,7 @@ def ldap_user_diff (request):
     the information generated from the userdb using the diff2html program
     """
     
-    ldif = LDAP.ldif_all_users()                  
+    ldif = LDAP.ldif_all_users(filter_root_users=True)                  
     udb_ldif = udb_ldap.ldif_all_users()
            
     d = tempfile.NamedTemporaryFile()
@@ -204,7 +207,11 @@ def ldap_user_ldiff (request):
     Displays differences between current LDAP information for ceda users and 
     the information generated from the userdb using the ldifdiff.pl program
     """
-    server = settings.LDAP_URL
+
+    if 'dev' in request.GET:
+        server = settings.LDAP_WRITE_URL
+    else:
+        server = settings.LDAP_URL
 
     if request.method == 'POST':
         
@@ -212,7 +219,7 @@ def ldap_user_ldiff (request):
         output = LDAP.ldif_write(ldif, server=server)
 
     else:
-        ldif = LDAP.ldif_all_users(server=server)                  
+        ldif = LDAP.ldif_all_users(server=server,filter_root_users=True)                  
         udb_ldif = udb_ldap.ldif_all_users()
              
         d = tempfile.NamedTemporaryFile()
@@ -220,7 +227,9 @@ def ldap_user_ldiff (request):
         p1 = subprocess.Popen([script, "-k", "dn", "--sharedattrs", "memberUid", 
                            udb_ldif.name, ldif.name], stdout=d)
         p1.wait()
-    
+#
+#       Read the output and convert into a string
+#    
         e = open(d.name, 'r')
         out = e.readlines()
         stringout = ""

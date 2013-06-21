@@ -72,14 +72,6 @@ urlpatterns = patterns('',
 
      url(r'^ldapext/updatecheck/$', check_udb_for_updates),
               
-     url(r'^ldapext/groupldif/$', ldap_group_ldiff),
-     url(r'^ldapext/groupdiff/$', ldap_group_diff),
-
-     
-     url(r'^ldapext/user/(?P<accountid>.+)$', write_ldap_user), 
-     url(r'^ldapext/user/$', ldap_udb_users),   
-      url(r'^ldapext/userldif/$', ldap_user_ldiff),    
-
            
      url(r'^authorise/(?P<userkey>-?\d{1,6})/$', authorise_datasets),
      url(r'^udj/(?P<id>\d{1,6})/$', edit_user_dataset_join),

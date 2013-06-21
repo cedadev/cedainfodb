@@ -78,13 +78,13 @@ def all_users(order_by="userkey"):
     '''Returns user objects for all LDAP users. For efficiency this is done using an sql query.
        optionally the results can be ordered by the given field'''
 
-#    sql = "select distinct tbusers.* from tbusers where tbusers.uid > 0 " + \
-#          "order by %s" % order_by
+    sql = "select distinct tbusers.* from tbusers where tbusers.uid > 0 " + \
+          "order by %s" % order_by
 
-    sql = "select distinct tbusers.* from tbusers, tbdatasetjoin where (tbusers.userkey=tbdatasetjoin.userkey)" + \
-          "and tbdatasetjoin.removed=0 and ((datasetid='jasmin-login') or " + \
-          "(datasetid='vm_access_ceda_internal') or (datasetid='system-login') or (datasetid='cems-login')) " + \
-          "and tbusers.uid > 0 order by %s" % order_by
+#    sql = "select distinct tbusers.* from tbusers, tbdatasetjoin where (tbusers.userkey=tbdatasetjoin.userkey)" + \
+#          "and tbdatasetjoin.removed=0 and ((datasetid='jasmin-login') or " + \
+#          "(datasetid='vm_access_ceda_internal') or (datasetid='system-login') or (datasetid='cems-login')) " + \
+#          "and tbusers.uid > 0 order by %s" % order_by
 
     users = User.objects.raw(sql)
     
@@ -306,6 +306,12 @@ def ldap_archive_access_group_record(datasetid):
 def ldap_user_tags(user):
 
     record = ''
+#
+#   Don't write any tags if account is not valid. This should already be
+#   sorted in the userdb, but I have added this check just to make sure...
+#
+    if not is_ldap_user(user):
+        return record + 'description: cluster:EX-login\n'
 
     if user.hasDataset("system-login") or user.isJasminCemsUser():
         record = record + 'description: cluster:ceda-external\n'
@@ -366,13 +372,17 @@ def ldap_user_record(accountid):
     record = record + 'cn: %s\n' % user.accountid
     
     record = record + ldap_user_tags(user)
-    record = record + 'rootAccessGroupName: NON-STAFF\n'
+##    record = record + 'rootAccessGroupName: NON-STAFF\n'
     
     record = record + 'homeDirectory: %s\n' % user_home_directory(user)
     
     record = record + 'sshPublicKey:'
-    if user.public_key.strip():
-        record = record + ' ' + user.public_key.strip()
+
+    if not is_ldap_user (user):
+        record = record + ' ' + 'Account_inactive'
+    else:
+        if user.public_key.strip():
+            record = record + ' ' + user.public_key.strip()
     record = record + '\n'
                  
     return record   
@@ -408,8 +418,7 @@ def ldif_all_users ():
     p2.wait()
             
     return bb
-     
-                          
+                
 #----------------------- The following routines are used for generating the contents of the NIS password and group files
 
 def userAccountsString(users, extraAccounts=[]):

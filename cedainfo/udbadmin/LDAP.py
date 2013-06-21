@@ -268,10 +268,15 @@ def ldif_all_groups (filter_scarf_users=False, server=settings.LDAP_URL):
   
     return bb
 
-def ldif_all_users (server=settings.LDAP_URL):
+def ldif_all_users (filter_root_users=False, server=settings.LDAP_URL):
     """
     Returns all LDIF information from LDAP server for ceda users, sorted by dn.
     Returns a filehandle for an open temporary file that can be read from.
+
+    NB I found that using stdout=subprocess.PIPE did not work when callling the
+    sort script, so I had to create temporary files for piping output between 
+    commands.
+
     """
     b = tempfile.NamedTemporaryFile()
    
@@ -279,16 +284,31 @@ def ldif_all_users (server=settings.LDAP_URL):
     p1.wait()
 
     bb = tempfile.NamedTemporaryFile()
-    p2 = subprocess.Popen([SORT_SCRIPT, "-a", "-k", "dn", b.name], stdout=bb)
 
-    p2.wait()
-            
+    if filter_root_users:
+        cc = tempfile.NamedTemporaryFile()
+
+        p2 = subprocess.Popen([SORT_SCRIPT, "-a", "-k", "dn", b.name], stdout=cc)
+        p2.wait()
+
+        ccin = open(cc.name, 'r')
+        p3 = subprocess.Popen(["grep", "-v", "rootAccessGroupName"], stdin=ccin, stdout=bb)
+        p3.wait() 
+ 
+    else:
+        p2 = subprocess.Popen([SORT_SCRIPT, "-a", "-k", "dn", b.name], stdout=bb)
+        p2.wait()
+        
     return bb
 
 def ldif_write (ldif, server=settings.LDAP_WRITE_URL):
     """
     Write the given ldif commands to the ldif server
     """
+
+#
+#   Write ldif commands to a temporary file
+#
     output = tempfile.NamedTemporaryFile()
        
     ldif = ldif.replace('\r', '')
@@ -297,7 +317,9 @@ def ldif_write (ldif, server=settings.LDAP_WRITE_URL):
 
     os.write(fh, ldif)
     os.close(fh)
-    
+#
+#   Call ldapmodify and read input from temporary file
+#    
     tmp2 = open(input_file_name, 'r')
     
     p1 = subprocess.Popen(["ldapmodify", "-ZZZ", "-H", server, "-D", 
