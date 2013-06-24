@@ -28,19 +28,21 @@
 {% endblock %}
 
 {% block after_related_objects %}
-<div  id="dataproducts">Data products: 
+
+<table style="background-color:#ddddff; margin:10px 10px 10px 10px">
+<tr><td>Data Products</td><td>contact</td><td>status</td><td>Delivery date</td></tr>
 {% for d in original.data_outputs %} 
-<a href="/admin/dmp/dataproduct/{{d.id}}">{{d}}</a>
+<tr>
+  <td><a href="/admin/dmp/dataproduct/{{d.id}}">{{d}}</a></td>
+  <td>{{d.contact1}}</td>
+  <td>{{d.status}}</td>
+  <td>{{d.deliverydate}}</td>
+</tr>
 {% endfor %}
-<br>
-<a href="/dmp/project/{{original.id}}/adddataproduct">Add new data product</a>
+</table>
 
-</div>
+<a style="margin:10px 10px 10px 10px; border:2px solid #333399; background-color:#ccccff; border-radius:5px" href="/dmp/project/{{original.id}}/adddataproduct">Add new data product</a>
 
-<div>
-Third party data: 
-{% for d in original.third_party_data.all %} 
-<a href="/admin/dmp/dataproduct/{{d.id}}">{{d}}</a>
-</div>
-{% endfor %}
+
+
 {% endblock %}

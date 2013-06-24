@@ -69,6 +69,9 @@ def gotw_scrape(request, id):
     return redirect('/admin/dmp/grant/%s' % id)
 
 
+
+
+
 def make_project_from_scrape(request, id):
     grant = get_object_or_404(Grant, pk=id)
 
@@ -135,3 +138,10 @@ def make_project_from_scrape(request, id):
     return redirect('/admin/dmp/grant/%s' % id)
 
 
+
+def vmreg(request):
+    # make page to register for vm and gws
+    projs = Project.objects.exclude(vms__isnull=True)
+    return render_to_response('vmreg.html', {'projects': projs})
+
+    

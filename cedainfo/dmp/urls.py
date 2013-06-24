@@ -9,4 +9,5 @@ urlpatterns = patterns('',
      url(r'^myprojects$', my_projects),
      url(r'^grant/(?P<id>\d+)/scrape$', gotw_scrape),
      url(r'^grant/(?P<id>\d+)/scrape_project$', make_project_from_scrape),
+     url(r'^vmreg$', vmreg),
 )

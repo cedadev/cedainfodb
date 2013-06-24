@@ -47,6 +47,7 @@ class Project(models.Model):
     vms = models.ManyToManyField(VM, blank=True, null=True)
     groupworkspaces = models.ManyToManyField(GWS, blank=True, null=True)
     project_URL = models.URLField(blank=True, null=True)
+    project_usergroup = models.CharField(max_length=200, blank=True, null=True, help_text="Group name for registration for this group")
 	
     def __unicode__(self):
         return "%s" % self.title
@@ -78,6 +79,26 @@ class Project(models.Model):
             output += '<a href="/admin/dmp/grant/%s">%s</a> ' % (g.id, g.number)
         return output
     grant_links.allow_tags = True    
+
+    def is_jasmin(self):
+        #look for jasmin in vm mountpoints 
+        for vm in self.vms.all():
+            for mount in vm.mountpoints_required:
+                if mount.find("jasmin") != -1: return True
+        #look for jasmin in groupworkspaces
+        for gws in self.groupworkspaces.all():
+            if gws.path.find("jasmin") != -1: return True
+        return False
+
+    def is_cems(self):
+        #look for cems in vm mountpoints 
+        for vm in self.vms.all():
+            for mount in vm.mountpoints_required:
+                if mount.find("cems") != -1: return True
+        #look for cems in groupworkspaces
+        for gws in self.groupworkspaces.all():
+            if gws.path.find("cems") != -1: return True
+        return False
 
 
 
