@@ -14,8 +14,12 @@
     {% block object-tools-items %}
     <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
     <li><a href="/dmp/myprojects" class="historylink">My projects</a></li>
-    <li>{{original.project_groups|safe}}</li>
-    <li>{{original.grant_links|safe}}</li>
+    {% for g in original.grants %}
+       <li><a style="background-color:pink" href="/admin/dmp/grant/{{g.pk}}">{{g.number}}</a></li> 
+    {% endfor %}
+    {% for pg in original.project_groups %}
+       <li><a style="background-color:#ccdd99" href="/admin/dmp/projectgroup/{{pg.pk}}">{{pg.name}}</a></li> 
+    {% endfor %}
     <li><a href="/dmp/project/{{original.id}}" class="historylink">Draft DMP</a></li>
     {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
     {% endblock %}

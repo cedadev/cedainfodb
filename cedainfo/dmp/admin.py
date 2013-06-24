@@ -20,7 +20,7 @@ admin.site.register(DataProduct, DataProductAdmin)
 
 class ProjectAdmin(admin.ModelAdmin):
     save_on_top = True
-    list_display = ('title', 'project_groups', 'status', 'ndata','sciSupContact',)
+    list_display = ('title', 'project_groups_links', 'status', 'ndata','sciSupContact',)
     search_fields = ('title', 'desc', 'PI', 'CoI1', 'CoI2')
     list_filter = ('status', 'sciSupContact')
     filter_horizontal = ('third_party_data','vms', 'groupworkspaces')

@@ -21,7 +21,7 @@
     <li><a href="/dmp/grant/{{original.id}}/scrape_project" class="historylink">Make new project from scrape</a></li>
     {% endif %}    
     {% if original.project %}
-    <li><a href="/admin/dmp/project/{{original.project.id}}" class="historylink">Edit Project Info</a></li>
+    <li><a style="background-color:#99ddcc" href="/admin/dmp/project/{{original.project.id}}" class="historylink">{{original.project.title}}</a></li>
     {% endif %}
     {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
     {% endblock %}

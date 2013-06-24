@@ -127,7 +127,7 @@ def make_project_from_scrape(request, id):
             # redirect back to project page
             return redirect('/admin/dmp/project/%s' % p.pk)
         else:
-            return redirect('/admin/dmp/grant/%s' % id)
+            return render_to_response('dup_title.html', {'projs': projs, 'grant':grant})
  
     #except:
     #    pass

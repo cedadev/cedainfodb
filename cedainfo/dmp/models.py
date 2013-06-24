@@ -59,12 +59,15 @@ class Project(models.Model):
         dps = DataProduct.objects.filter(project=self)
         return dps
 
-    def project_groups(self):
+    def project_groups_links(self):
         output = ''
         for g in self.projectgroup_set.all():
             output += '<a href="/admin/dmp/projectgroup/%s">%s</a> ' % (g.id, g.name)
         return output
-    project_groups.allow_tags = True    
+    project_groups_links.allow_tags = True    
+
+    def project_groups(self):
+        return ProjectGroup.objects.filter(projects=self)   
 
     def grants(self):
         return Grant.objects.filter(project=self)
