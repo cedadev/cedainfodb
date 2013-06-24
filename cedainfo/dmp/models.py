@@ -24,6 +24,7 @@ class Project(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     desc = models.TextField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
+    data_activities = models.TextField(blank=True, null=True, help_text="Short description of data generation activities. eg Data will be collected by FAAM aircraft/ground instruments. Are there intensive measurement campaigns?")
     startdate = models.DateField(blank=True, null=True)
     enddate = models.DateField(blank=True, null=True)
     sciSupContact = models.ForeignKey(User, help_text="CEDA person contact for this Project", blank=True, null=True)
