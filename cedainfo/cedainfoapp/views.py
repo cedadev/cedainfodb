@@ -512,6 +512,13 @@ def make_secondary_copies(request):
 def complete_filesets(request):
     filesets = FileSet.objects.all()
     return render_to_response('cedainfoapp/complete.txt', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
+
+# make list filesets for access stats
+# needs to be open for automation
+#
+def spotlist(request):
+    filesets = FileSet.objects.all()
+    return render_to_response('cedainfoapp/spotlist.txt', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
 	
 # create ftp mount script for a host - chroot jail mounting
 @login_required() 
