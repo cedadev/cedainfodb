@@ -5,12 +5,14 @@ Django views for ldap information generated from userdb
 import tempfile
 import subprocess
 import psycopg2
+import os
 
 from django.http import HttpResponse
 from django.conf import settings
 from django.shortcuts import *
 
 from models import Dataset
+from models import User
 
 import udb_ldap
 import update_check
@@ -170,6 +172,45 @@ def ldap_users (request):
     
     return HttpResponse(record, content_type="text/plain")
 
+def ldap_user (request, userkey):
+    """
+    Print out user information from the current LDAP server
+    for the given uid
+    """
+    try:
+        user    = User.objects.get(userkey=userkey)
+    except:
+        return HttpResponse('Error reading details from database for UserKey %s' % userkey)
+ 
+    if user.uid <=0:
+        return HttpResponse('No UID set for user')
+
+    fh  = LDAP.ldif_user(uid=user.uid)            
+     
+    e = open(fh.name, 'r')
+    record = e.readlines()
+    record = ['Information from current LDAP server\n\n'] + record
+    
+    return HttpResponse(record, content_type="text/plain")
+
+def ldap_udb_user (request, userkey):
+    '''
+    Writes LDAP information for given user in userdb
+    '''
+    try:
+        user    = User.objects.get(userkey=userkey)
+    except:
+        return HttpResponse('Error reading details from database for UserKey %s' % userkey)
+    
+    record = udb_ldap.ldap_user_record(user.accountid)
+
+    body = record.split('\n')[1:]
+    dn = record.split('\n')[0]
+
+    output = 'Information from user database\n\n' + dn + '\n'.join(sorted(body))
+
+    return HttpResponse(output, content_type="text/plain")
+
 def ldap_udb_users (request):
     '''
     Writes ldap entries for all LDAP users managed by the userdb
@@ -182,6 +223,113 @@ def ldap_udb_users (request):
 
     return HttpResponse(record, content_type="text/plain")
 
+def ldap_udb_user_diff (request, userkey):
+    '''
+    Shows difference between ldap information from current server
+    and ldap information from udb for single user.
+    '''
+    try:
+        user    = User.objects.get(userkey=userkey)
+    except:
+        return HttpResponse('Error reading details from database for UserKey %s' % userkey)
+
+    if user.uid <=0:
+        return HttpResponse('No UID set for user')
+
+    record = udb_ldap.ldap_user_record(user.accountid)
+#
+#   Sort the records, but leave the 'dn' at the top
+#
+    body = record.split('\n')[1:]
+    dn = record.split('\n')[0]
+    udb_output = dn + '\n'.join(sorted(body)) + '\n\n'
+#
+#   Write results to temporary file
+#
+    udb_file = tempfile.NamedTemporaryFile(delete=False)
+    udb_file.write(udb_output)
+    udb_file.close()
+    udb_file = open(udb_file.name, 'r')
+
+    ldif_fh  = LDAP.ldif_user(uid=user.uid)            
+     
+    d = tempfile.NamedTemporaryFile()
+##    script = settings.PROJECT_DIR + "/udbadmin/diff2html"
+    script = "/usr/bin/diff"
+    p1 = subprocess.Popen([script, ldif_fh.name, udb_file.name], stdout=d)   
+    p1.wait()
+
+    os.remove(udb_file.name)
+
+    e = open(d.name, 'r')
+    output = e.readlines()
+
+    return HttpResponse(output, content_type="text/plain")
+
+def ldap_udb_user_ldif (request, userkey):
+    '''
+    Shows difference between ldap information from current server
+    and ldap information from udb for single user.
+    '''
+    try:
+        user    = User.objects.get(userkey=userkey)
+    except:
+        return HttpResponse('Error reading details from database for UserKey %s' % userkey)
+
+    if user.uid <=0:
+        return HttpResponse('No UID set for user')
+
+    record = udb_ldap.ldap_user_record(user.accountid)
+#
+#   Sort the records, but leave the 'dn' at the top
+#
+    body = record.split('\n')[1:]
+    dn = record.split('\n')[0]
+    udb_output = dn + '\n'.join(sorted(body)) + '\n\n'
+#
+#   Write results to temporary file
+#
+    udb_file = tempfile.NamedTemporaryFile(delete=False)
+    udb_file.write(udb_output)
+    udb_file.close()
+    udb_file = open(udb_file.name, 'r')
+
+    ldif  = LDAP.ldif_user(uid=user.uid)            
+
+    d = tempfile.NamedTemporaryFile()
+    script = settings.PROJECT_DIR + "/udbadmin/ldifdiff.pl"
+    p1 = subprocess.Popen([script, "-k", "dn", "--sharedattrs", "description", "--sharedattrs", "objectClass",
+                        udb_file.name, ldif.name], stdout=d)
+    p1.wait()
+#
+#       Read the output and convert into a string
+#    
+    e = open(d.name, 'r')
+    out = e.readlines()
+    stringout = ""
+
+    for i in range(len(out)):
+        stringout += out[i]
+   
+    os.remove(udb_file.name)
+
+##    return render_to_response('ldap_update_user.html', locals())
+    return HttpResponse(stringout, content_type="text/plain")
+
+def udp_ldap_new_members(request):
+
+    udb_users = udb_ldap.all_users(order_by="accountid")
+
+    ldap_accounts = LDAP.all_member_accountids()
+
+    out = ""
+
+    for udb_user in udb_users:
+        if udb_user.accountid not in ldap_accounts:
+            out = out + udb_ldap.ldap_user_record(udb_user.accountid) + '\n\n'
+    return HttpResponse(out, content_type="text/plain")
+
+
 def ldap_user_diff (request):
     """
     Displays differences between current LDAP information for ceda users and 
@@ -189,7 +337,7 @@ def ldap_user_diff (request):
     """
     
     ldif = LDAP.ldif_all_users(filter_root_users=True)                  
-    udb_ldif = udb_ldap.ldif_all_users()
+    udb_ldif = udb_ldap.ldif_all_users(write_root_access=False)
            
     d = tempfile.NamedTemporaryFile()
     script = settings.PROJECT_DIR + "/udbadmin/diff2html"
@@ -220,11 +368,11 @@ def ldap_user_ldiff (request):
 
     else:
         ldif = LDAP.ldif_all_users(server=server,filter_root_users=True)                  
-        udb_ldif = udb_ldap.ldif_all_users()
+        udb_ldif = udb_ldap.ldif_all_users(write_root_access=False)
              
         d = tempfile.NamedTemporaryFile()
         script = settings.PROJECT_DIR + "/udbadmin/ldifdiff.pl"
-        p1 = subprocess.Popen([script, "-k", "dn", "--sharedattrs", "memberUid", 
+        p1 = subprocess.Popen([script, "-k", "dn", "--sharedattrs", "description",  "--sharedattrs", "objectClass",
                            udb_ldif.name, ldif.name], stdout=d)
         p1.wait()
 #
@@ -235,7 +383,8 @@ def ldap_user_ldiff (request):
         stringout = ""
 
         for i in range(len(out)):
-            stringout += out[i]
+            if out[i].find('rootAccessGroup') == -1:
+                stringout += out[i]
      
     return render_to_response('ldap_update_users.html', locals())   
 

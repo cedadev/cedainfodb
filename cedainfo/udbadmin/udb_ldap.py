@@ -198,7 +198,7 @@ def ldap_all_group_records ():
     return record
 
 
-def ldap_all_user_records ():
+def ldap_all_user_records (write_root_access=True, add_additional_users=True):
     '''
     Returns ldap record string for all ldap users
     '''
@@ -207,16 +207,26 @@ def ldap_all_user_records ():
     users =  all_users(order_by="accountid")
        
     for user in users:
-        record = record + ldap_user_record(user.accountid) + '\n'
+        record = record + ldap_user_record(user.accountid, 
+                          write_root_access=write_root_access) + '\n'
 
     record = record + '\n'
 
-    if os.path.exists(ADDITIONAL_LDAP_USER_FILE):
-        f = open(ADDITIONAL_LDAP_USER_FILE, "r")
+    if add_additional_users:
+        if os.path.exists(ADDITIONAL_LDAP_USER_FILE):
+            f = open(ADDITIONAL_LDAP_USER_FILE, "r")
+            
+            additional_users = ''
 
-        additional_users = f.read()
-        f.close()
-        record = record + additional_users    
+            if write_root_access:        
+                additional_users = f.read()
+            else:
+                for line in f:
+                    if (line.find('rootAccessGroup') == -1):
+                        additional_users += line
+ 
+            f.close()
+            record = record + additional_users    
 
     return record    
     
@@ -271,7 +281,7 @@ def ldap_open_group_record():
 
     for account in sorted(accounts):
        record = record + 'memberUid: ' + account + '\n'
-        
+
     return record   
 
 def ldap_archive_access_group_record(datasetid):
@@ -335,11 +345,11 @@ def ldap_user_tags(user):
                record = record + 'description: cluster:cems-login\n'
        except:
            pass 
-    
+
     return record
     
         
-def ldap_user_record(accountid):
+def ldap_user_record(accountid, write_root_access=True):
     '''Returns LDAP record for given user'''
     
     
@@ -355,16 +365,24 @@ def ldap_user_record(accountid):
     
 #    if not user.uid > 0:
 #        return 'uid not set for %s' % accountid
-        
-    record = "dn: cn=%s,ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk\n" % user.accountid
-       
+
+    record = "dn: cn=%s,ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk\n" % user.accountid    
     record = record + 'loginShell: %s\n' % user_shell(user)
-    record = record + 'sn: %s\n' % user.surname
+
+    surname = user.surname.strip()
+    
+    if not surname:
+        surname = 'Not specified'
+    record = record + 'sn: %s\n' % surname
+
     record = record + 'objectClass: top\n'
     record = record + 'objectClass: person\n'
     record = record + 'objectClass: posixAccount\n'
     record = record + 'objectClass: ldapPublicKey\n'
-    record = record + 'objectClass: rootAccessGroup\n'
+
+    if write_root_access:
+        record = record + 'objectClass: rootAccessGroup\n'
+    
     record = record + 'gidNumber: %s\n' % user_gid(user)
     record = record + 'uid: %s\n' % user.accountid
     record = record + 'gecos: %s %s\n' % (user.othernames, user.surname)   
@@ -372,7 +390,9 @@ def ldap_user_record(accountid):
     record = record + 'cn: %s\n' % user.accountid
     
     record = record + ldap_user_tags(user)
-##    record = record + 'rootAccessGroupName: NON-STAFF\n'
+
+    if write_root_access:
+        record = record + 'rootAccessGroupName: NON-STAFF\n'
     
     record = record + 'homeDirectory: %s\n' % user_home_directory(user)
     
@@ -384,7 +404,12 @@ def ldap_user_record(accountid):
         if user.public_key.strip():
             record = record + ' ' + user.public_key.strip()
     record = record + '\n'
-                 
+#
+#   Sort records alphabetically then add dn at top
+#                
+#    record = '\n'.join(sorted(record.split('\n')))
+
+
     return record   
     
 def ldif_all_groups ():
@@ -403,13 +428,13 @@ def ldif_all_groups ():
             
     return bb
 
-def ldif_all_users ():
+def ldif_all_users (write_root_access=True):
     """
     Returns all user information from the userdb as a sorted LDIF file
     Returns a filehandle for an open temporary file that can be read from.
     """
     a = tempfile.NamedTemporaryFile()
-    record = ldap_all_user_records()
+    record = ldap_all_user_records(write_root_access=write_root_access)
     a.write(record)
     a.flush()
      

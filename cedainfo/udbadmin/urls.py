@@ -44,7 +44,13 @@ urlpatterns = patterns('',
      url(r'^jasmin/group/(?P<group>.+)$', ldap_group_details), 
      url(r'^jasmin/group/$', ldap_list_groups), 
      
+    url(r'^ldap/user/diff/(?P<userkey>-?\d{1,6})', ldap_udb_user_diff), 
+     url(r'^ldap/user/ldif/(?P<userkey>-?\d{1,6})', ldap_udb_user_ldif),
+    url(r'^ldap/newusers/$', udp_ldap_new_members),
+  
      url(r'^ldap/user/(?P<accountid>.+)$', ldap_user_details), 
+     url(r'^ldap/udbuser/(?P<userkey>-?\d{1,6})', ldap_udb_user), 
+ 
      url(r'^ldap/user/$', ldap_udb_users), 
      
      url(r'^ldapext/group/$', ldap_udb_groups),   
@@ -53,6 +59,7 @@ urlpatterns = patterns('',
           
      url(r'^ldap/list_root_users$', ldap_list_root_users),
      url(r'^ldap/ldapusers/$', ldap_users),    
+     url(r'^ldap/ldapuser/(?P<userkey>-?\d{1,6})', ldap_user),    
 
      url(r'^ldap/group/$', ldap_udb_groups),   
      url(r'^ldap/ldapgroups/$', ldap_groups),

@@ -107,7 +107,6 @@ class UserAdmin(admin.ModelAdmin):
        latestUserkey   = User.objects.maxUserkey()
        firstUserkey    = User.objects.minUserkey()
        
-       
        a = '<table border="0"><tr><td>'
        a += ' <a href="/%s/user/datasets/current/%s">Current datasets (%s)</a> | ' % (self._meta.app_label, self.userkey, currentDatasets)
        a += ' <a href="/%s/user/datasets/removed/%s">Removed datasets (%s)</a> | ' % (self._meta.app_label, self.userkey, removedDatasets)
@@ -120,9 +119,24 @@ class UserAdmin(admin.ModelAdmin):
        a += '<a href="/admin/udbadmin/user/%s">Next</a> | ' % nextUserkey
        a += '<a href="/admin/udbadmin/user/%s">Last</a>' % latestUserkey       
        a += '</td></tr></table>'
-       return mark_safe(a)
-       
-    links.short_description = 'Related pages'
+
+       return mark_safe(a) 
+
+       links.short_description = 'Related pages'
+
+    def ldap_links(self):
+
+        a = '<table border="0"><tr><td>'
+        a += ' <a href="/%s/ldap/ldapuser/%s">Current LDAP entry</a> | ' % (self._meta.app_label, self.userkey) 
+        a += ' <a href="/%s/ldap/udbuser/%s">Userdb LDAP entry</a> | ' % (self._meta.app_label, self.userkey) 
+        a += ' <a href="/%s/ldap/user/diff/%s">Diff</a> | ' % (self._meta.app_label, self.userkey) 
+        a += ' <a href="/%s/ldap/user/ldif/%s">LDIF</a> | ' % (self._meta.app_label, self.userkey) 
+    
+        a += '</td></tr></table>'
+        
+        return mark_safe(a)
+ 
+    ldap_links.short_description = 'LDAP links'
 
     def password (self):
           
@@ -164,7 +178,7 @@ class UserAdmin(admin.ModelAdmin):
     list_per_page = 200
     
 #    exclude = ('encpasswd', 'md5passwd', 'onlinereg')
-    readonly_fields = (showDatasets, 'datacenter', 'userkey', 'accountid', 'addresskey', 'startdate', 'encpasswd', 'md5passwd', 'institute', links, password)
+    readonly_fields = (showDatasets, 'datacenter', 'userkey', 'accountid', 'addresskey', 'startdate', 'encpasswd', 'md5passwd', 'institute', links, ldap_links, password)
 
     fieldsets = (
             (None, {
@@ -173,7 +187,8 @@ class UserAdmin(admin.ModelAdmin):
 	           'degree', 'endorsedby', 'field', 'startdate', showDatasets, 'datacenter', 'institute', 'comments')
 
             }),
-            ('LDAP account info - only relevant if they have a JASMIN/CEMS/system-login account', {'fields': ('uid', 'home_directory', 'shell', 'gid')}),
+            ('LDAP account info - only relevant if they have a JASMIN/CEMS/system-login account', 
+                {'fields': (ldap_links, 'uid', 'home_directory', 'shell', 'gid')}),
             )
        
 

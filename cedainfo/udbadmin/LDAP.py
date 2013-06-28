@@ -205,6 +205,17 @@ def all_member_details ():
          
     return userDetails
 
+def all_member_accountids ():
+    """Returns list of all accountid values in LDAP database"""
+
+    ldap_member_details = all_member_details()
+
+    accountids = []
+
+    for member in ldap_member_details:
+        accountids.append(member[1]['uid'][0])
+
+    return accountids
 
 def peopleTagChoices():
     """Returns peopleTags as list suitable for use as 'choices' argument in forms"""
@@ -292,7 +303,7 @@ def ldif_all_users (filter_root_users=False, server=settings.LDAP_URL):
         p2.wait()
 
         ccin = open(cc.name, 'r')
-        p3 = subprocess.Popen(["grep", "-v", "rootAccessGroupName"], stdin=ccin, stdout=bb)
+        p3 = subprocess.Popen(["grep", "-v", "rootAccessGroup"], stdin=ccin, stdout=bb)
         p3.wait() 
  
     else:
@@ -300,6 +311,24 @@ def ldif_all_users (filter_root_users=False, server=settings.LDAP_URL):
         p2.wait()
         
     return bb
+
+def ldif_user (uid, server=settings.LDAP_URL):
+    """
+    Returns all LDIF information from LDAP server the given uid
+    """
+    b = tempfile.NamedTemporaryFile()
+   
+    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", server, "-b", PEOPLE_BASE, 
+                            "-s", "one", "(uidNumber=%s)" % uid], stdout=b)
+    p1.wait()
+
+    bb = tempfile.NamedTemporaryFile(delete=True)
+
+    p2 = subprocess.Popen([SORT_SCRIPT, "-a", "-k", "dn", b.name], stdout=bb)
+    p2.wait()
+        
+    return bb
+
 
 def ldif_write (ldif, server=settings.LDAP_WRITE_URL):
     """
