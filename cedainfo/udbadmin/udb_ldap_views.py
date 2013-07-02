@@ -9,6 +9,7 @@ import os
 
 from django.http import HttpResponse
 from django.conf import settings
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import *
 
 from models import Dataset
@@ -18,7 +19,16 @@ import udb_ldap
 import update_check
 import LDAP
 
+def user_has_ldap_write_access(user):
+    '''Indicates if logged in user is allowed to write to ldap server'''
 
+    if user:
+        if user.groups.filter(name='update_ldap_server').count() > 0:
+            return True
+ 
+    return False
+
+@login_required()
 def write_nis_group (request, datasetid):
     '''
      Write nis group file entry for the given group
@@ -28,7 +38,7 @@ def write_nis_group (request, datasetid):
                    
     return HttpResponse(record, content_type="text/plain")
 
-
+@login_required()
 def write_all_nis_groups (request):
     '''
     Writes nis group file entries for all groups managed by the userdb
@@ -37,8 +47,7 @@ def write_all_nis_groups (request):
                  
     return HttpResponse(record, content_type="text/plain")
     
-
-
+@login_required()
 def write_ldap_group (request, datasetid=''):
     '''
     Write ldap entry for the given group
@@ -58,7 +67,7 @@ def write_ldap_group (request, datasetid=''):
                                  
     return HttpResponse(record, content_type="text/plain")
      
-
+@login_required()
 def write_ldap_user (request, accountid=''):
     '''
     Write ldap entry for the given user
@@ -67,20 +76,20 @@ def write_ldap_user (request, accountid=''):
 
     return HttpResponse(record, content_type="text/plain")
  
+@login_required()
 def ldap_group_ldiff (request):
     """
     Displays differences between current LDAP information for ceda groups and 
     the information generated from the userdb using the ldifdiff.pl program.
     You can then send the commands to the LDAP server to update it.
     """
-    if 'dev' in request.GET:
-        server = settings.LDAP_WRITE_URL
-    else:
-        server = settings.LDAP_URL 
 
-
+    server = settings.LDAP_WRITE_URL
+ 
     if request.method == 'POST':
-        
+        if not user_has_ldap_write_access(request.user):   
+            return redirect('/udbadmin/ldap/accessdenied')
+
         ldif = request.POST.get('ldif', '') 
         
         if ldif:
@@ -114,7 +123,7 @@ def ldap_group_ldiff (request):
  	 
     return render_to_response('ldap_update_groups.html', locals())   
  
-     
+@login_required()     
 def ldap_group_diff (request):
     """
     Displays differences between current LDAP information for ceda groups and 
@@ -135,7 +144,7 @@ def ldap_group_diff (request):
     
     return HttpResponse(out, content_type="text/html")
     
-
+@login_required()
 def ldap_groups (request):
     """
     Print out all group information from the LDAP server
@@ -149,6 +158,7 @@ def ldap_groups (request):
     
     return HttpResponse(record, content_type="text/plain")
 
+@login_required()
 def ldap_udb_groups (request):
     '''
     Writes ldap entries for all groups managed by the userdb
@@ -160,6 +170,7 @@ def ldap_udb_groups (request):
     record = ['Sorted LDIF group information from userdb\n\n'] + record
     return HttpResponse(record, content_type="text/plain")
 
+@login_required()
 def ldap_users (request):
     """
     Print out all user information from the current LDAP server
@@ -172,6 +183,7 @@ def ldap_users (request):
     
     return HttpResponse(record, content_type="text/plain")
 
+@login_required()
 def ldap_user (request, userkey):
     """
     Print out user information from the current LDAP server
@@ -193,6 +205,7 @@ def ldap_user (request, userkey):
     
     return HttpResponse(record, content_type="text/plain")
 
+@login_required()
 def ldap_udb_user (request, userkey):
     '''
     Writes LDAP information for given user in userdb
@@ -211,6 +224,7 @@ def ldap_udb_user (request, userkey):
 
     return HttpResponse(output, content_type="text/plain")
 
+@login_required()
 def ldap_udb_users (request):
     '''
     Writes ldap entries for all LDAP users managed by the userdb
@@ -223,6 +237,7 @@ def ldap_udb_users (request):
 
     return HttpResponse(record, content_type="text/plain")
 
+@login_required()
 def ldap_udb_user_diff (request, userkey):
     '''
     Shows difference between ldap information from current server
@@ -266,6 +281,7 @@ def ldap_udb_user_diff (request, userkey):
 
     return HttpResponse(output, content_type="text/plain")
 
+@login_required()
 def ldap_udb_user_ldif (request, userkey):
     '''
     Shows difference between ldap information from current server
@@ -316,6 +332,7 @@ def ldap_udb_user_ldif (request, userkey):
 ##    return render_to_response('ldap_update_user.html', locals())
     return HttpResponse(stringout, content_type="text/plain")
 
+@login_required()
 def udp_ldap_new_members(request):
 
     udb_users = udb_ldap.all_users(order_by="accountid")
@@ -329,7 +346,7 @@ def udp_ldap_new_members(request):
             out = out + udb_ldap.ldap_user_record(udb_user.accountid) + '\n\n'
     return HttpResponse(out, content_type="text/plain")
 
-
+@login_required()
 def ldap_user_diff (request):
     """
     Displays differences between current LDAP information for ceda users and 
@@ -350,18 +367,19 @@ def ldap_user_diff (request):
     
     return HttpResponse(out, content_type="text/html")
     
+@login_required()
 def ldap_user_ldiff (request):
     """
     Displays differences between current LDAP information for ceda users and 
     the information generated from the userdb using the ldifdiff.pl program
     """
 
-    if 'dev' in request.GET:
-        server = settings.LDAP_WRITE_URL
-    else:
-        server = settings.LDAP_URL
+    server = settings.LDAP_WRITE_URL
 
     if request.method == 'POST':
+
+        if not user_has_ldap_write_access(request.user):   
+            return redirect('/udbadmin/ldap/accessdenied')
         
         ldif = request.POST.get('ldif', '') 
         output = LDAP.ldif_write(ldif, server=server)
@@ -389,7 +407,7 @@ def ldap_user_ldiff (request):
     return render_to_response('ldap_update_users.html', locals())   
 
 
-
+@login_required()
 def check_udb_for_updates (request):
     '''
     Check if any updates have been made to the userdb that may require the 
@@ -429,7 +447,9 @@ def check_udb_for_updates (request):
         msg = msg + 'group_updated=False\n'
               
     return HttpResponse(msg, content_type="text/plain")
-    
+
+@login_required()
+@user_passes_test(user_has_ldap_write_access, login_url='/udbadmin/ldap/accessdenied')
 def write_to_ldap_server(request):
         
     server = settings.LDAP_WRITE_URL

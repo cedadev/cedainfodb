@@ -291,12 +291,18 @@ ADMIN_USERS_PATCH_RESPONSIBLE = [
     35, # Jonathan
     36, # Cristina
 ]
-
 #
 # Url for LDAP server
 #
 LDAP_URL       = 'ldap://homer.esc.rl.ac.uk'
 #
-# Url of writable LDAP server (test server at present)
+# Details for writable LDAP server
 #
-LDAP_WRITE_URL = "ldap://ldap03.esc.rl.ac.uk"
+##LDAP_WRITE_URL    = 'ldap://ldap03.esc.rl.ac.uk'
+##LDAP_WRITE_PASSWD = 'THUtu7Re'
+##LDAP_WRITE_DN     = 'cn=cedaadmin,ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk'
+
+LDAP_WRITE_URL    = "ldap://homer.esc.rl.ac.uk"
+LDAP_WRITE_PASSWD = 'TUbr7kUj'
+LDAP_WRITE_DN     =  cn=cedaadmin,ou=software,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"
+

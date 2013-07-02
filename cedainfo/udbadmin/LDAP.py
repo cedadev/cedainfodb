@@ -352,9 +352,8 @@ def ldif_write (ldif, server=settings.LDAP_WRITE_URL):
     tmp2 = open(input_file_name, 'r')
     
     p1 = subprocess.Popen(["ldapmodify", "-ZZZ", "-H", server, "-D", 
-                            "cn=cedainfodb,ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk", 
-                            "-w", "THUtu7Re"], stdin=tmp2, stdout=output, stderr=output)
-   
+                            settings.LDAP_WRITE_DN, 
+                            "-w", settings.LDAP_WRITE_PASSWD], stdin=tmp2, stdout=output, stderr=output)
     p1.wait()
 
     os.remove(input_file_name)

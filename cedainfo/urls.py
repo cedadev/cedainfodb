@@ -48,7 +48,7 @@ urlpatterns = patterns('',
     (r'^newprojects$', newprojects),
     (r'^newproj$', add_proj_gotw),
 
-    #(r'^udbadmin/', include('cedainfo.udbadmin.urls')),   
+    (r'^udbadmin/', include('cedainfo.udbadmin.urls')),   
 
     (r'^dmp/', include('cedainfo.dmp.urls')),   
 )
