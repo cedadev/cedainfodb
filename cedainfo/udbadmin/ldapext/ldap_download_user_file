@@ -1,0 +1,41 @@
+#!/usr/bin/python
+'''
+Downloads user information from LDAP server and stores in dated file.
+Only stores a copy if there are any changes from the previous latest file
+downloaded, so can be run as a regular cron job.
+'''
+import os
+import sys
+import shutil
+import subprocess
+import tempfile
+
+FILEDIR   = "/home/badc/etc/infrastructure/accounts/ldap/ldap_server_backups/users/"
+LATEST    = FILEDIR + 'users.ldif'
+
+tmp_file = tempfile.NamedTemporaryFile()
+
+dated_file = FILEDIR  +  \
+             os.popen("date +'%Y%m%d_%H%M'").readline().rstrip('\n') + \
+             '_users.ldif'
+
+cmd = 'ldapsearch -LLL -x -H ldap://homer.esc.rl.ac.uk -b "ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"'  
+cmd = cmd + ' > %s ' % tmp_file.name      
+
+print "Executing: %s" % cmd
+os.system(cmd)
+
+if os.path.exists(LATEST):
+    print '%s exists' % LATEST
+    differ = subprocess.call(["diff", "--brief", tmp_file.name, LATEST])
+
+    if differ:
+        print "%s and %s differ" % (tmp_file.name, LATEST)
+
+        shutil.copy2(tmp_file.name, LATEST)
+        shutil.copy2(LATEST, dated_file)
+else:
+    print "%s does not exist" % LATEST
+    shutil.copy2(tmp_file.name, LATEST)
+    shutil.copy2(LATEST, dated_file)
+

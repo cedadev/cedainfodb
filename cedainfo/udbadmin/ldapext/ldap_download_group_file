@@ -1,0 +1,37 @@
+#!/usr/bin/python
+'''
+Downloads group information from LDAP server and stores in dated file.
+Only stores a copy if there are any changes from the previous latest file
+downloaded, so can be run as a regular cron job.
+'''
+import os
+import sys
+import shutil
+import subprocess
+import tempfile
+
+FILEDIR   = "/home/badc/etc/infrastructure/accounts/ldap/ldap_server_backups/groups/"
+LATEST    = FILEDIR + 'groups.ldif'
+
+tmp_file = tempfile.NamedTemporaryFile()
+
+dated_file = FILEDIR  +  \
+             os.popen("date +'%Y%m%d_%H%M'").readline().rstrip('\n') + \
+             '_groups.ldif'
+
+cmd = 'ldapsearch -LLL -x -H ldap://homer.esc.rl.ac.uk -b "ou=ceda,ou=Groups,o=hpc,dc=rl,dc=ac,dc=uk"'  
+cmd = cmd + ' > %s ' % tmp_file.name      
+
+print "Executing: %s" % cmd
+os.system(cmd)
+
+if os.path.exists(LATEST):
+    differ = subprocess.call(["diff", "--brief", tmp_file.name, LATEST])
+
+    if differ:
+        shutil.copy2(tmp_file.name, LATEST)
+        shutil.copy2(LATEST, dated_file)
+else:
+    shutil.copy2(tmp_file.name, LATEST)
+    shutil.copy2(LATEST, dated_file)
+
