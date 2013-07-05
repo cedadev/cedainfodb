@@ -37,8 +37,10 @@ def write_nis_group (request, datasetid):
     record = udb_ldap.dataset_group_string (datasetid)
                    
     return HttpResponse(record, content_type="text/plain")
-
-@login_required()
+#
+# Don't add login_required here as this is called from storm
+# by a cron job 
+#
 def write_all_nis_groups (request):
     '''
     Writes nis group file entries for all groups managed by the userdb
@@ -447,6 +449,42 @@ def check_udb_for_updates (request):
         msg = msg + 'group_updated=False\n'
               
     return HttpResponse(msg, content_type="text/plain")
+
+@login_required()
+def display_nis_external_passwd (request):
+    '''Displays entries that should go in external nis passwd file.
+       There may be other users to be added which are not in the user database, so
+       this output should not be used without checking it.'''
+
+    users = User.objects.all().order_by('accountid')
+
+    output  = ''
+
+    for user in users:
+        if user.uid != 0:
+ 
+            if user.hasDataset("system-login") or user.isJasminCemsUser():
+                output = output + udb_ldap.user_passwd_file_entry(user) + '\n'
+
+    return HttpResponse(output,content_type="text/plain")
+
+@login_required()
+def display_nis_internal_passwd (request):
+    '''Displays entries that should go in internal nis passwd file.
+       There may be other users to be added which are not in the user database, so
+       this output should not be used without checking it.'''
+
+    users = User.objects.all().order_by('accountid')
+
+    output  = ''
+
+    for user in users:
+        if user.uid != 0:
+ 
+            if user.hasDataset("vm_access_ceda_internal"):
+                output = output + udb_ldap.user_passwd_file_entry(user) + '\n'
+
+    return HttpResponse(output,content_type="text/plain")
 
 @login_required()
 @user_passes_test(user_has_ldap_write_access, login_url='/udbadmin/ldap/accessdenied')

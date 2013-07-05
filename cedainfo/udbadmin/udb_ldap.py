@@ -54,6 +54,11 @@ def user_shell (user):
     else:
         return DEFAULT_SHELL
 
+def user_gecos (user):
+    '''Returns gecos string for user'''
+ 
+    return '%s %s' % (user.othernames, user.surname)   
+ 
 def user_gid (user):
     ''' Returns initial group to be used for user. If no specific value has been set 
         for user then use default'''
@@ -71,6 +76,19 @@ def user_home_directory (user):
         return user.home_directory
     else:
         return "/home/users/%s" % user.accountid
+
+def user_passwd_file_entry (user):
+    '''Returns passwd file entry for user. Note that it is up to the calling
+       program to determin if the user should actually have an entry in a 
+       passwd file'''
+
+    gid   = user_gid(user)
+    gecos = user_gecos(user)  
+    home  = user_home_directory(user)
+    shell = user_shell(user)
+
+    return "%s:x:%s:%s:%s:%s:%s" % (user.accountid, user.uid, gid, gecos, home, shell)
+
         
              
 
@@ -385,7 +403,7 @@ def ldap_user_record(accountid, write_root_access=True):
     
     record = record + 'gidNumber: %s\n' % user_gid(user)
     record = record + 'uid: %s\n' % user.accountid
-    record = record + 'gecos: %s %s\n' % (user.othernames, user.surname)   
+    record = record + 'gecos: %s %s\n' % user_gecos(user)   
     record = record + 'uidNumber: %s\n' % user.uid      
     record = record + 'cn: %s\n' % user.accountid
     
@@ -399,7 +417,8 @@ def ldap_user_record(accountid, write_root_access=True):
     record = record + 'sshPublicKey:'
 
     if not is_ldap_user (user):
-        record = record + ' ' + 'Account_inactive'
+         pass
+#        record = record + ' ' + 'Account_inactive'
     else:
         if user.public_key.strip():
             record = record + ' ' + user.public_key.strip()

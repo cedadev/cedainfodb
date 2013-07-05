@@ -54,6 +54,9 @@ urlpatterns = patterns('',
 
     url(r'^ldap/user/$', ldap_udb_users), 
 
+    url(r'^ldap/nis/external/passwd$', display_nis_external_passwd), 
+    url(r'^ldap/nis/internal/passwd$', display_nis_internal_passwd), 
+
     url(r'^ldapext/group/$', ldap_udb_groups),   
 
     url(r'^ldap/write/$', write_to_ldap_server),
