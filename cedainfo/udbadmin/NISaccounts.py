@@ -33,7 +33,7 @@ def getIntGroupFile():
 
 def getExtPasswdFile():
 #
-#      Return group file for internal NIS
+#      Return group file for external NIS
 #
     a = tempfile.NamedTemporaryFile()
     p1 = subprocess.Popen(["ssh", "ypinfo@storm.badc.rl.ac.uk",  "ypcat", "passwd"], stdout=a)

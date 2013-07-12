@@ -77,7 +77,7 @@ def user_home_directory (user):
     else:
         return "/home/users/%s" % user.accountid
 
-def user_passwd_file_entry (user):
+def user_passwd_file_entry (user, overide_shell=None):
     '''Returns passwd file entry for user. Note that it is up to the calling
        program to determin if the user should actually have an entry in a 
        passwd file'''
@@ -85,7 +85,12 @@ def user_passwd_file_entry (user):
     gid   = user_gid(user)
     gecos = user_gecos(user)  
     home  = user_home_directory(user)
-    shell = user_shell(user)
+
+
+    if overide_shell:
+        shell = overide_shell
+    else:
+        shell = user_shell(user)
 
     return "%s:x:%s:%s:%s:%s:%s" % (user.accountid, user.uid, gid, gecos, home, shell)
 
@@ -403,7 +408,7 @@ def ldap_user_record(accountid, write_root_access=True):
     
     record = record + 'gidNumber: %s\n' % user_gid(user)
     record = record + 'uid: %s\n' % user.accountid
-    record = record + 'gecos: %s %s\n' % user_gecos(user)   
+    record = record + 'gecos: %s\n' % user_gecos(user)   
     record = record + 'uidNumber: %s\n' % user.uid      
     record = record + 'cn: %s\n' % user.accountid
     

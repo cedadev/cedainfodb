@@ -6,6 +6,7 @@ import tempfile
 import subprocess
 import psycopg2
 import os
+from datetime import datetime
 
 from django.http import HttpResponse
 from django.conf import settings
@@ -18,6 +19,7 @@ from models import User
 import udb_ldap
 import update_check
 import LDAP
+import NISaccounts
 
 def user_has_ldap_write_access(user):
     '''Indicates if logged in user is allowed to write to ldap server'''
@@ -456,6 +458,9 @@ def display_nis_external_passwd (request):
        There may be other users to be added which are not in the user database, so
        this output should not be used without checking it.'''
 
+    EXTERNAL_LOGIN_DATASET =  "system-login"
+    CUTOFFDATE = datetime.strptime('01/07/2013', '%d/%m/%Y')
+
     users = User.objects.all().order_by('accountid')
 
     output  = ''
@@ -463,8 +468,21 @@ def display_nis_external_passwd (request):
     for user in users:
         if user.uid != 0:
  
-            if user.hasDataset("system-login") or user.isJasminCemsUser():
+            if user.hasDataset(EXTERNAL_LOGIN_DATASET) or user.isJasminCemsUser():
                 output = output + udb_ldap.user_passwd_file_entry(user) + '\n'
+            else:
+#
+#               Add any users removed after we started using the LDAP system, but make sure
+#               their shell is set to 'nologin'. 
+#
+                udjs = user.removedDatasets()
+
+                for udj in udjs:
+ 
+                    if udj.datasetid.datasetid == EXTERNAL_LOGIN_DATASET and \
+                       udj.removeddate > CUTOFFDATE:
+                            output = output + udb_ldap.user_passwd_file_entry(user, overide_shell='/sbin/nologin') + '\n'
+
 
     return HttpResponse(output,content_type="text/plain")
 
@@ -485,6 +503,74 @@ def display_nis_internal_passwd (request):
                 output = output + udb_ldap.user_passwd_file_entry(user) + '\n'
 
     return HttpResponse(output,content_type="text/plain")
+
+@login_required()
+def display_free_uids (request):
+    '''Display uid numbers to allow selection of a new one'''
+
+    ext_users = NISaccounts.getExtPasswdFile()
+
+    ext_uids = {}
+
+    for account in ext_users.keys():
+        ext_uids[ext_users[account].uid] = account 
+
+    int_users = NISaccounts.getIntPasswdFile()
+
+    int_uids = {}
+
+    for account in int_users.keys():
+        int_uids[int_users[account].uid] = account 
+   
+    output = []
+    next_uid = 0
+    free_count = 0
+
+#    for uid in range(1, 26399):
+    for uid in range(26001, 26399):
+        
+        rec = {}
+        rec['uid'] = uid
+        rec['free'] = True
+
+        if ext_uids.has_key(uid):
+           rec['ext_accountid']  = ext_uids[uid]
+           rec['ext_shell']      = ext_users[rec['ext_accountid']].shell
+           rec['free']           = False
+
+           if rec['ext_shell'].find('nologin') > -1:
+               rec['ext_nologin'] = True
+ 
+        if int_uids.has_key(uid):
+            rec['int_accountid'] = int_uids[uid]
+            rec['int_shell']     = int_users[rec['int_accountid']].shell           
+            rec['free']          = False
+
+            if rec['int_shell'].find('nologin') > -1:
+               rec['int_nologin'] = True
+
+        try:
+            user = User.objects.get(uid=uid)
+            rec['accountid'] = user.accountid
+            rec['userkey']   = userkey   = user.userkey
+            rec['free']      = False
+        except:
+            pass
+
+        if uid > 26130 and next_uid == 0:
+            if rec['free']:
+                next_uid =  uid
+
+        if rec['free']:
+            free_count = free_count + 1
+
+        if uid < 26001:
+           if rec.has_key('accountid') or rec.has_key('int_accountid')  or rec.has_key('ext_accountid'):
+               output.append(rec)
+        else: 
+            output.append(rec)
+        
+    return render_to_response('display_free_uids.html', locals())
 
 @login_required()
 @user_passes_test(user_has_ldap_write_access, login_url='/udbadmin/ldap/accessdenied')

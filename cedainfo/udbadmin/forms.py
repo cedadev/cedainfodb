@@ -1,6 +1,7 @@
 from django.forms import *
 from models import *
 from django.contrib.admin import widgets
+from django.utils.safestring import mark_safe
 import choices
 import LDAP
 
@@ -58,7 +59,8 @@ class UserForm(ModelForm):
     openid = CharField(required=False, widget=forms.TextInput(attrs={'size': '60'}))  
     
     public_key = CharField(required=False, widget=forms.Textarea(attrs={'rows':'5', 'cols': '100'}))
-    uid = IntegerField(initial=0, required=False, label='Associated Linux user ID (0 if not used)', max_value=90000, min_value=0)
+    label = 'Associated Linux user ID (0 if not used) <a target="_blank" href="/udbadmin/ldap/freeuids">Find free uid</a>'
+    uid = IntegerField(initial=0, required=False, label=mark_safe(label), max_value=90000, min_value=0)
     gid = IntegerField(initial=0, required=False, label='Primary group id (0= use default)', max_value=90000, min_value=0)
     shell = CharField(required=False, label='Shell - leave blank to use default')
     home_directory = CharField(required=False, label='Home directory. Leave blank to use default')
