@@ -69,6 +69,8 @@ urlpatterns = patterns('',
     url(r'^ldap/group/$', ldap_udb_groups),   
     url(r'^ldap/ldapgroups/$', ldap_groups),
 
+    url(r'^ldap/ldapusergroups/(?P<userkey>-?\d{1,6})$', ldap_user_groups),
+
     url(r'^ldap/groupdiff/$', ldap_group_diff),
     url(r'^ldap/groupldif/$', ldap_group_ldiff),
 

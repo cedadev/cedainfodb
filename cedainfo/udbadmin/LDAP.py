@@ -56,7 +56,7 @@ def group_members (group):
 
 def member_groups (accountID):
 #
-#      Returns groups that the fiven member belongs to
+#      Returns groups that the given member belongs to
 #    
     groups = []
     

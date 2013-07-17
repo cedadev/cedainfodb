@@ -131,8 +131,12 @@ class UserAdmin(admin.ModelAdmin):
         a += ' <a href="/%s/ldap/udbuser/%s">Userdb LDAP entry</a> | ' % (self._meta.app_label, self.userkey) 
         a += ' <a href="/%s/ldap/user/diff/%s">Diff</a> | ' % (self._meta.app_label, self.userkey) 
         a += ' <a href="/%s/ldap/user/ldif/%s">LDIF</a> | ' % (self._meta.app_label, self.userkey) 
-    
+        a += '&nbsp; &nbsp; <strong>Group info:</strong> '
+        a += ' <a href="/%s/ldap/ldapusergroups/%s">LDAP groups</a>  ' % (self._meta.app_label, self.userkey) 
+     
         a += '</td></tr></table>'
+
+        
         
         return mark_safe(a)
  

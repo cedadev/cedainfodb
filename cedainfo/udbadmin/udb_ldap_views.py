@@ -7,6 +7,7 @@ import subprocess
 import psycopg2
 import os
 from datetime import datetime
+from operator import itemgetter
 
 from django.http import HttpResponse
 from django.conf import settings
@@ -571,6 +572,22 @@ def display_free_uids (request):
             output.append(rec)
         
     return render_to_response('display_free_uids.html', locals())
+
+@login_required()
+def ldap_user_groups (request, userkey):
+
+    try:
+        user    = User.objects.get(userkey=userkey)
+    except:
+        return HttpResponse('Error reading details from database for UserKey %s' % userkey)
+ 
+    if user.uid <=0:
+        return HttpResponse('No UID set for user')
+
+    groups = LDAP.member_groups(user.accountid)
+    groups = sorted(groups, key=itemgetter('cn'))
+
+    return render_to_response ('list_ldap_user_groups.html', locals()) 
 
 @login_required()
 @user_passes_test(user_has_ldap_write_access, login_url='/udbadmin/ldap/accessdenied')
