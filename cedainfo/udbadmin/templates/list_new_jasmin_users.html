@@ -1,0 +1,28 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>New JASMIN/CEMS users</h1>
+
+The following users have been granted access to jasmin-login or cems-login in the userdb, but do net yet appear on the LDAP server.
+If their uid is set to zero then they need to have a uid allocated. If their uid is non-zero then they need adding to the LDAP server. Details
+of how to allocate a uid and copy the account to the LDAP server can be found
+<a href="http://team.ceda.ac.uk/trac/ceda/wiki/opman/jasmincems/adduser">here</a>
+
+<p/>
+
+<table border="1">
+<th>Accountid<th>Name<th>UID<th>Public key
+{% for user in new_users %}
+
+<tr>
+<td><a href="/admin/udbadmin/user/{{user.userkey}}" title="View/Edit user details in userdb">{{user.accountid}}</a>
+<td>{{user.displayName}}
+<td>{{ user.uid}}
+<td>{{user.public_key}}
+
+{% endfor %}
+
+</table>
+
+{% endblock %}

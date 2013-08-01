@@ -340,16 +340,17 @@ def ldap_udb_user_ldif (request, userkey):
 @login_required()
 def udp_ldap_new_members(request):
 
-    udb_users = udb_ldap.all_users(order_by="accountid")
+    udb_users = udb_ldap.all_jasmin_cems_users(order_by="accountid")
 
     ldap_accounts = LDAP.all_member_accountids()
 
-    out = ""
+    new_users = []
 
     for udb_user in udb_users:
         if udb_user.accountid not in ldap_accounts:
-            out = out + udb_ldap.ldap_user_record(udb_user.accountid) + '\n\n'
-    return HttpResponse(out, content_type="text/plain")
+            new_users.append(udb_user)
+
+    return render_to_response('list_new_jasmin_users.html', locals())   
 
 @login_required()
 def ldap_user_diff (request):

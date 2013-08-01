@@ -10,7 +10,7 @@ from udbadmin.forms import *
 from udbadmin.SortHeaders import SortHeaders
 import LDAP
 import public_keys
-
+import udb_ldap
 #
 # sort table headers: djangosnippets.org/snippets/308
 #
@@ -85,9 +85,9 @@ def list_keys(request):
 
     sort_headers = SortHeaders(request, KEY_HEADERS)
     headers = list(sort_headers.headers())
-##    users = User.objects.filter(uid__gt=0).order_by(sort_headers.get_order_by())
+##    users = User.objects.filter(uid__gt=0).order_by(sort_headers.get_order_by())    
     users = User.objects.exclude(public_key__exact=' ').exclude(public_key__exact='').order_by(sort_headers.get_order_by())
-
+##    users = udb_ldap.all_users()
 #
 #      Get public keys for all members in ldap database
 #    
@@ -103,6 +103,9 @@ def list_keys(request):
     warning_count = 0
     
     for user in users:
+        if not user.isJasminCemsUser():
+            continue
+    
         ldap_public_key = ''
         public_key_differs = False
          

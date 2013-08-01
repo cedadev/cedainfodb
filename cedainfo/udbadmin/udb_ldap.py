@@ -50,7 +50,7 @@ def user_shell (user):
         for user then use default'''
         
     if user.shell:
-        return user.shell
+        return user.shell.strip()
     else:
         return DEFAULT_SHELL
 
@@ -73,7 +73,7 @@ def user_home_directory (user):
         for user then use default'''
         
     if user.home_directory:
-        return user.home_directory
+        return user.home_directory.strip()
     else:
         return "/home/users/%s" % user.accountid
 
@@ -94,8 +94,17 @@ def user_passwd_file_entry (user, overide_shell=None):
 
     return "%s:x:%s:%s:%s:%s:%s" % (user.accountid, user.uid, gid, gecos, home, shell)
 
-        
-             
+def all_jasmin_cems_users(order_by="userkey"):
+    '''Returns user objects for all jasmin/cems users according to the userdb'''
+
+    sql = "select distinct tbusers.* from tbusers, tbdatasetjoin where (tbusers.userkey=tbdatasetjoin.userkey)" + \
+          "and tbdatasetjoin.removed=0 and ((datasetid='jasmin-login') or " + \
+          "(datasetid='cems-login')) " + \
+          "order by %s" % order_by
+
+    users = User.objects.raw(sql)
+
+    return users
 
 def all_users(order_by="userkey"):
     '''Returns user objects for all LDAP users. For efficiency this is done using an sql query.
@@ -389,8 +398,8 @@ def ldap_user_record(accountid, write_root_access=True):
 #    if not user.uid > 0:
 #        return 'uid not set for %s' % accountid
 
-    record = "dn: cn=%s,ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk\n" % user.accountid    
-    record = record + 'loginShell: %s\n' % user_shell(user)
+    record = "dn: cn=%s,ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk\n" % user.accountid.strip()    
+    record = record + 'loginShell: %s\n' % user_shell(user).strip()
 
     surname = user.surname.strip()
     
@@ -407,10 +416,10 @@ def ldap_user_record(accountid, write_root_access=True):
         record = record + 'objectClass: rootAccessGroup\n'
     
     record = record + 'gidNumber: %s\n' % user_gid(user)
-    record = record + 'uid: %s\n' % user.accountid
-    record = record + 'gecos: %s\n' % user_gecos(user)   
+    record = record + 'uid: %s\n' % user.accountid.strip()
+    record = record + 'gecos: %s\n' % user_gecos(user).strip()   
     record = record + 'uidNumber: %s\n' % user.uid      
-    record = record + 'cn: %s\n' % user.accountid
+    record = record + 'cn: %s\n' % user.accountid.strip()
     
     record = record + ldap_user_tags(user)
 
