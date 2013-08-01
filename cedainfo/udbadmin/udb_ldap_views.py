@@ -575,6 +575,54 @@ def display_free_uids (request):
     return render_to_response('display_free_uids.html', locals())
 
 @login_required()
+def display_free_gids (request):
+
+    ext_groups = NISaccounts.getExtGroupFile()
+
+    ext_gids = {}
+
+    for group in ext_groups.keys():
+        ext_gids[ext_groups[group].gid] = group 
+        print group, ext_groups[group].gid
+
+    int_groups = NISaccounts.getIntGroupFile()
+
+    int_gids = {}
+
+    for group in int_groups.keys():
+        int_gids[int_groups[group].gid] = group 
+        print group, int_groups[group].gid
+
+    output = []
+    next_gid = 0
+    free_count = 0
+
+    for gid in range(26001, 26399):
+        
+        rec = {}
+        rec['gid'] = gid
+        rec['free'] = True
+
+        if ext_gids.has_key(gid):
+            rec['ext_group']      = ext_gids[gid]
+            rec['free']           = False
+
+        if int_gids.has_key(gid):
+            rec['int_group']     = int_gids[gid]     
+            rec['free']          = False
+
+        if gid > 26076 and next_gid == 0:
+            if rec['free']:
+                next_gid =  gid
+
+        if rec['free']:
+            free_count = free_count + 1
+
+        output.append(rec)
+        
+    return render_to_response('display_free_gids.html', locals())
+
+@login_required()
 def ldap_user_groups (request, userkey):
 
     try:

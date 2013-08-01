@@ -1,0 +1,36 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>Free GIDS</h1>
+
+Next GID to use: {{next_gid}}
+
+<p/>
+Free gids in range: {{free_count}}
+
+<table border="1">
+<th>gid</th><th>Internal NIS</th><th>External NIS</th>
+
+{% for rec in output %}
+
+{% if rec.gid == next_gid %}
+   <tr bgcolor="green">
+{% elif rec.free %}
+   <tr bgcolor="#E0EDC5">
+{% else %}
+   <tr>
+{% endif %}
+
+<td>{{rec.gid}}</td>
+
+<td>{{rec.int_group}}</td>
+
+<td>{{rec.ext_group}}</td>
+
+</tr>
+
+{% endfor %}
+</table>
+
+{% endblock %}
