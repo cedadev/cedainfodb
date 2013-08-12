@@ -28,7 +28,8 @@ class DatasetForm(ModelForm):
     directory = CharField(required=False, widget=forms.TextInput(attrs={'size': '80'}))  
     infourl = CharField(required=False, widget=forms.TextInput(attrs={'size': '80'}))  
     
-    gid = IntegerField(initial=0, required=False, label='Associated Linux group ID (0 if not used)', max_value=90000, min_value=0)
+    label = 'Associated Linux Group ID (0 if not used) <a target="_blank" href="/udbadmin/ldap/freegids">Find free gid</a>'
+    gid = IntegerField(initial=0, required=False, label=mark_safe(label), max_value=90000, min_value=0)
 #
 #      Make sure we can cope with a blank gid
 #     
