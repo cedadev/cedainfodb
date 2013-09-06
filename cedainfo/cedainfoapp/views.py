@@ -786,3 +786,95 @@ def gws_list(request):
     })        
     c.update(csrf(request))
     return render_to_response('cedainfoapp/gws_list.html', c)
+
+#
+# The following 'txt' views provide a simple text dump of selected tables. These are intended to be called
+# using 'curl' or 'wget' from the command line rather than via a browser. Fields are separated by a tab
+# character, which allows them to be simply cut up using the 'cut' command. The list of vms was requested by
+# Peter Chiu. I added the host list for good measure (actually, I implemented it by mistake!). 
+#
+# Note that they should not require a django login - curl or wget can't get past this. Instead, any
+# security required should be added via the apache configuration for the site.
+#
+# Andrew 06/09/13
+#
+def txt_host_list (request):
+
+    o = request.GET.get('o', 'id') # default order is ascending id
+    subset = request.GET.get('subset', None) # default order is ascending id
+
+    # define the queryset, using the subset if available
+    if (subset == 'active'):
+	    hosts = Host.objects.filter(retired_on=None).order_by(o)
+    else:
+        hosts = Host.objects.all().order_by(o)
+ 
+    output = ''
+
+    fields = ("hostname", 
+                     "ip_addr", \
+                     "serial_no",\
+                     "po_no", \
+                     "organization",\
+                     "supplier", \
+                     "arrival_date",\
+                     "planned_end_of_life",\
+                     "retired_on",\
+                     "mountpoints",\
+                     "ftpmountpoints",\
+                     "host_type",\
+                     "os",\
+                     "capacity")
+ 
+
+    for field in fields:
+        output += field + '\t'
+    output += '\n'
+
+    for host in hosts:
+        for field in fields:
+            output += str(getattr(host, field))
+            output += '\t'
+  
+        output += '\n'
+    
+    return HttpResponse(output, content_type="text/plain")
+
+
+def txt_vms_list (request):
+
+    vms = VM.objects.all().order_by('name')
+ 
+    output = ''
+
+    fields = ("name", \
+              "type",\
+              "operation_type", \
+              "internal_requester",\
+              "date_required",\
+              "cpu_required", \
+              "memory_required", \
+              "disk_space_required", \
+              "disk_activity_required", \
+              "network_required", \
+              "os_required", \
+              "other_info", \
+              "patch_responsible",\
+              "status", \
+              "created",\
+              "end_of_life",\
+              "retired",\
+              "timestamp")
+
+    for field in fields:
+        output += field + '\t'
+    output += '\n'
+
+    for vm in vms:
+        for field in fields:
+            output += str(getattr(vm, field))
+            output += '\t'
+  
+        output += '\n'
+
+    return HttpResponse(output, content_type="text/plain")

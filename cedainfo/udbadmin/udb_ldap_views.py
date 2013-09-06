@@ -473,6 +473,13 @@ def display_nis_external_passwd (request):
             if user.hasDataset(EXTERNAL_LOGIN_DATASET) or user.isJasminCemsUser():
                 output = output + udb_ldap.user_passwd_file_entry(user) + '\n'
             else:
+                if (user.accountid == 'mkochan' or \
+                    user.accountid == 'myoshioka' or \
+                    user.accountid == 'rtorres' or \
+                    user.accountid == 'tjnightingale' or \
+                    user.accountid == 'pwhitfield'):
+
+                     output = output + udb_ldap.user_passwd_file_entry(user, overide_shell='/sbin/nologin') + '\n'
 #
 #               Add any users removed after we started using the LDAP system, but make sure
 #               their shell is set to 'nologin'. 
@@ -481,8 +488,8 @@ def display_nis_external_passwd (request):
 
                 for udj in udjs:
  
-                    if udj.datasetid.datasetid == EXTERNAL_LOGIN_DATASET and \
-                       udj.removeddate > CUTOFFDATE:
+                    if (udj.datasetid.datasetid == EXTERNAL_LOGIN_DATASET and \
+                       udj.removeddate > CUTOFFDATE):
                             output = output + udb_ldap.user_passwd_file_entry(user, overide_shell='/sbin/nologin') + '\n'
 
 

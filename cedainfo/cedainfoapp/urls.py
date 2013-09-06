@@ -13,6 +13,10 @@ urlpatterns = patterns('',
     (r'^hosts/$', host_list),
     #   - list view of hosts subsetted (e.g. in_pool, not_retired)
     (r'^hosts/(?P<subset>\w+)$', host_list),
+
+    (r'^txt/hosts/$', txt_host_list),
+    (r'^txt/vms/$', txt_vms_list),
+ 
     #   - detail view of 1 host, by id
     (r'^host/(?P<host_id>\d+)/$', host_detail),
     (r'^host/(?P<host>.*)/ftpmountscript/()$', ftpmount_script),
