@@ -106,22 +106,23 @@ def ldap_group_ldiff (request):
             output = LDAP.ldif_write(ldif, server=server)
 
     else:
-        server_ldif = LDAP.ldif_all_groups(filter_scarf_users=True, server=server)                  
-        udb_ldif = udb_ldap.ldif_all_groups()
-                    
-        tmp_out = tempfile.NamedTemporaryFile()
-        script = settings.PROJECT_DIR + "/udbadmin/ldifdiff.pl"
-        p1 = subprocess.Popen([script, "-k", "dn", "--sharedattrs", 
-                                "memberUid", udb_ldif.name, server_ldif.name], stdout=tmp_out)
-        p1.wait()
-        
-        tmp_out2 = open(tmp_out.name, 'r')
-        diffoutput = tmp_out2.readlines()
-
-        stringout = ""
-
-        for i in range(len(diffoutput)):
-            stringout += diffoutput[i]
+        stringout = udb_ldap.ldif_all_group_updates (server=server)
+#       server_ldif = LDAP.ldif_all_groups(filter_scarf_users=True, server=server)                  
+#       udb_ldif = udb_ldap.ldif_all_groups()
+#                   
+#       tmp_out = tempfile.NamedTemporaryFile()
+#       script = settings.PROJECT_DIR + "/udbadmin/ldifdiff.pl"
+#       p1 = subprocess.Popen([script, "-k", "dn", "--sharedattrs", 
+#                               "memberUid", udb_ldif.name, server_ldif.name], stdout=tmp_out)
+#       p1.wait()
+#       
+#       tmp_out2 = open(tmp_out.name, 'r')
+#       diffoutput = tmp_out2.readlines()
+#
+#        stringout = ""
+#
+#        for i in range(len(diffoutput)):
+#            stringout += diffoutput[i]
         
  
 

@@ -8,6 +8,8 @@ import os
 import tempfile
 import subprocess
 
+from django.conf import settings
+
 from models import *
 import LDAP
 
@@ -460,6 +462,30 @@ def ldif_all_groups ():
     p2.wait()
             
     return bb
+
+def ldif_all_group_updates (server=settings.LDAP_URL):
+    """
+    Returns ldiff commands to update LDAP group server as string array
+    """
+
+    server_ldif = LDAP.ldif_all_groups(filter_scarf_users=True, server=server)                  
+    udb_ldif = ldif_all_groups()
+                
+    tmp_out = tempfile.NamedTemporaryFile()
+    script = settings.PROJECT_DIR + "/udbadmin/ldifdiff.pl"
+    p1 = subprocess.Popen([script, "-k", "dn", "--sharedattrs", 
+                            "memberUid", udb_ldif.name, server_ldif.name], stdout=tmp_out)
+    p1.wait()
+    
+    tmp_out2 = open(tmp_out.name, 'r')
+    diffoutput = tmp_out2.readlines()
+
+    stringout = ""
+
+    for i in range(len(diffoutput)):
+        stringout += diffoutput[i]
+
+    return stringout
 
 def ldif_all_users (write_root_access=True):
     """
