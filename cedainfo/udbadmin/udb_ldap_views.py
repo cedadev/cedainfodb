@@ -392,27 +392,9 @@ def ldap_user_ldiff (request):
         output = LDAP.ldif_write(ldif, server=server)
 
     else:
-        ldif = LDAP.ldif_all_users(server=server,filter_root_users=True)                  
-        udb_ldif = udb_ldap.ldif_all_users(write_root_access=False)
-             
-        d = tempfile.NamedTemporaryFile()
-        script = settings.PROJECT_DIR + "/udbadmin/ldifdiff.pl"
-        p1 = subprocess.Popen([script, "-k", "dn", "--sharedattrs", "description",  "--sharedattrs", "objectClass",
-                           udb_ldif.name, ldif.name], stdout=d)
-        p1.wait()
-#
-#       Read the output and convert into a string
-#    
-        e = open(d.name, 'r')
-        out = e.readlines()
-        stringout = ""
+        stringout = udb_ldap.ldif_all_user_updates (server=server)   
 
-        for i in range(len(out)):
-            if out[i].find('rootAccessGroup') == -1:
-                stringout += out[i]
-     
     return render_to_response('ldap_update_users.html', locals())   
-
 
 @login_required()
 def check_udb_for_updates (request):

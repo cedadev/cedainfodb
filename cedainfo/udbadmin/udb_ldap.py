@@ -487,6 +487,32 @@ def ldif_all_group_updates (server=settings.LDAP_URL):
 
     return stringout
 
+def ldif_all_user_updates(server=settings.LDAP_URL):
+    """
+    Returns ldiff commands to update LDAP user server as string array
+    """
+
+    ldif = LDAP.ldif_all_users(server=server,filter_root_users=True)                  
+    udb_ldif = ldif_all_users(write_root_access=False)
+
+    d = tempfile.NamedTemporaryFile()
+    script = settings.PROJECT_DIR + "/udbadmin/ldifdiff.pl"
+    p1 = subprocess.Popen([script, "-k", "dn", "--sharedattrs", "description",  "--sharedattrs", "objectClass",
+                       udb_ldif.name, ldif.name], stdout=d)
+    p1.wait()
+    #
+    #       Read the output and convert into a string
+    #    
+    e = open(d.name, 'r')
+    out = e.readlines()
+    stringout = ""
+
+    for i in range(len(out)):
+        if out[i].find('rootAccessGroup') == -1:
+            stringout += out[i]
+
+    return stringout
+    
 def ldif_all_users (write_root_access=True):
     """
     Returns all user information from the userdb as a sorted LDIF file
