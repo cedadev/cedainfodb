@@ -190,24 +190,20 @@ def ldap_users (request):
     return HttpResponse(record, content_type="text/plain")
 
 @login_required()
-def ldap_user (request, userkey):
+def ldap_user (request, uid):
     """
     Print out user information from the current LDAP server
     for the given uid
     """
-    try:
-        user    = User.objects.get(userkey=userkey)
-    except:
-        return HttpResponse('Error reading details from database for UserKey %s' % userkey)
  
-    if user.uid <=0:
+    if int(uid) <=0:
         return HttpResponse('No UID set for user')
 
-    fh  = LDAP.ldif_user(uid=user.uid)            
+    fh  = LDAP.ldif_user(uid=uid)            
      
     e = open(fh.name, 'r')
     record = e.readlines()
-    record = ['Information from current LDAP server\n\n'] + record
+    record = ['Information from current LDAP server for uid: %s\n\n' % uid] + record
     
     return HttpResponse(record, content_type="text/plain")
 

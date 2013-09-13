@@ -127,7 +127,7 @@ class UserAdmin(admin.ModelAdmin):
     def ldap_links(self):
 
         a = '<table border="0"><tr><td>'
-        a += ' <a href="/%s/ldap/ldapuser/%s">Current LDAP entry</a> | ' % (self._meta.app_label, self.userkey) 
+        a += ' <a href="/%s/ldap/ldapuser/%s">Current LDAP entry</a> | ' % (self._meta.app_label, self.uid) 
         a += ' <a href="/%s/ldap/udbuser/%s">Userdb LDAP entry</a> | ' % (self._meta.app_label, self.userkey) 
         a += ' <a href="/%s/ldap/user/diff/%s">Diff</a> | ' % (self._meta.app_label, self.userkey) 
         a += ' <a href="/%s/ldap/user/ldif/%s">LDIF</a> | ' % (self._meta.app_label, self.userkey) 

@@ -65,7 +65,7 @@ urlpatterns = patterns('',
         
     url(r'^ldap/list_root_users$', ldap_list_root_users),
     url(r'^ldap/ldapusers/$', ldap_users),    
-    url(r'^ldap/ldapuser/(?P<userkey>-?\d{1,6})', ldap_user),    
+    url(r'^ldap/ldapuser/(?P<uid>-?\d{1,6})', ldap_user),    
 
     url(r'^ldap/group/$', ldap_udb_groups),   
     url(r'^ldap/ldapgroups/$', ldap_groups),
