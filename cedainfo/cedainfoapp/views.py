@@ -787,6 +787,17 @@ def gws_list(request):
     c.update(csrf(request))
     return render_to_response('cedainfoapp/gws_list.html', c)
 
+# GWS dashboard
+#@login_required()    
+def gws_dashboard(request):
+
+	items = GWS.objects.all()
+	c = RequestContext(request, {
+		'items': items,
+	})        
+	c.update(csrf(request))
+	return render_to_response('cedainfoapp/gws_dashboard.html', c)
+
 #
 # The following 'txt' views provide a simple text dump of selected tables. These are intended to be called
 # using 'curl' or 'wget' from the command line rather than via a browser. Fields are separated by a tab

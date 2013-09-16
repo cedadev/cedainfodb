@@ -263,7 +263,7 @@ class CurationCategory(models.Model):
 
 class BackupPolicy(models.Model):
     '''Backup policy'''
-    tool = models.CharField(max_length=45, help_text="e.g. DMF /  / tape")
+    tool = models.CharField(max_length=45, help_text="e.g. DMF / tape")
     destination = models.CharField(max_length=1024, blank=True, help_text="Path made up of e.g. dmf:/path_within_dmf, rsync:/path_to_nas_box, tape:/tape_number")
     frequency = models.CharField(max_length=45, help_text="Daily, weekly, monthly...")
     type = models.CharField(max_length=45, help_text="Full, incremental, versioned")
@@ -1293,7 +1293,7 @@ class GWS(models.Model):
     def update_link(self):
 		return u'<a href="/gws/%i/update">update</a>' % self.id
     update_link.allow_tags = True
-
+	
     def save(self, *args, **kwargs):
         # Custom save method : will only save an instance if there is no PK, i.e. if the model is a new instance
         # Logic : If you want to change a request, you can't, you need to make a new one & have that approved.
@@ -1306,14 +1306,14 @@ class GWS(models.Model):
         # OK, sometimes we need to update individual fields (e.g. "approved")"
         super(GWS, self).save(*args, **kwargs)
  
-    def volume_filesize(self):
+    def requested_volume_filesize(self):
         return filesize(self.requested_volume)
-    volume_filesize.short_description = 'volume'
+    requested_volume_filesize.short_description = 'volume'
 
-    def used_filesize(self):
+    def used_volume_filesize(self):
         return filesize(self.used_volume)
-    used_filesize.short_description = 'used'
-   
+    used_volume_filesize.short_description = 'used'
+
 class VMRequest(models.Model):
     vm_name = models.CharField(max_length=127, help_text="proposed fully-qualified host name") # TODO : need regex
     type = models.CharField(max_length=16, choices=settings.VM_TYPE_CHOICES, help_text="Type of VM, see REF") # TODO update REF

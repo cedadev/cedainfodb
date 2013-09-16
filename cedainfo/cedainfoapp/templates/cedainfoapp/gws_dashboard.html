@@ -1,0 +1,82 @@
+{% extends "base_site.html" %}
+{% load sizefieldtags  %}
+
+{% block title %}
+Group Workspaces Dashboard
+{% endblock %}
+
+{% block content %}
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+    google.load("visualization", "1", {packages:["corechart", "table"]});
+	google.setOnLoadCallback(drawVisualization);
+      function drawVisualization() {
+        var dataTable = google.visualization.arrayToDataTable([
+		['GWS', 'Path', 'Manager', 'Used', 'Requested'],
+		{% for i in items %}
+          [
+			'{{i.name}}',
+			'{{i.path}}',
+			'{{i.gws_manager}}',
+			{{i.used_volume}},
+			{{i.requested_volume}}],
+			
+		{% endfor %}
+        ]);
+		
+
+		
+		function UsedBytesToTb(dataTable, rowNum) {
+			return dataTable.getValue(rowNum, 3) / (1024 * 1024 * 1024 * 1024);
+		}
+		function RequestedBytesToTb(dataTable, rowNum) {
+			return dataTable.getValue(rowNum, 4) / (1024 * 1024 * 1024 * 1024);
+		}
+		function RequestedBytesStackedTb(dataTable, rowNum) {
+			return (dataTable.getValue(rowNum, 4) - dataTable.getValue(rowNum, 3)) / (1024 * 1024 * 1024 * 1024)
+		}
+
+		var tableView = new google.visualization.DataView(dataTable);
+		tableView.setColumns(
+		[
+			0,
+			1,
+			2
+		]);
+		
+		var barChartDataView = new google.visualization.DataView(dataTable);
+		barChartDataView.setColumns(
+		[
+			0,
+			{calc:UsedBytesToTb, type:'number', label:'Used Tb'},
+			{calc:RequestedBytesStackedTb, type:'number', label:'Requested Tb'},
+			{calc:RequestedBytesToTb, type:'number', label:'Requested Tb', role:'tooltip'}
+		]);
+
+		
+        var options = {
+          title: 'Group Workspaces',
+          vAxis: {title: 'GWS',  titleTextStyle: {color: 'red'}},
+		  hAxis: {title: 'Volume (units)',  titleTextStyle: {color: 'red'}, }, //logScale: true},
+		  isStacked: true,
+		  colors: ['red','#0000FF']
+        };
+
+        chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+        chart.draw(barChartDataView, options);
+		
+		table = new google.visualization.Table(document.getElementById('table_div'));
+		table.draw(tableView, null);
+      }
+</script>
+<h2>Group Workspaces Dashboard</h2>
+
+<h3>Filters</h3>
+
+<div id="table_div" style="width: 600px;"></div>
+<div id="chart_div" style="width: 800px; height: 1000px;"></div>
+
+
+{% endblock %}
+
+

@@ -33,8 +33,8 @@ Group Workspaces
         </tr>
 	    {% for i in items %}
 		    <tr>
-	            <td><a href="/gws/{{i.id}}">{{i.id}}</a></td>
-	            <td><a href="/gws/{{i.id}}">{{i.name}}</a></td>
+	            <td><a href="/admin/cedainfoapp/gws/{{i.id}}">{{i.id}}</a></td>
+	            <td><a href="/admin/cedainfoapp/gws/{{i.id}}">{{i.name}}</a></td>
 	            <td>{{i.path}}</td>
 	            <td>{{i.requested_volume|filesize}}</td>
                 <td>{{i.internal_requester}}</td>
