@@ -56,11 +56,13 @@ class Base64Field(models.TextField):
         setattr(cls, name, property(self.get_data, self.set_data))
 
     def get_data(self, obj):
-        return base64.decodestring(getattr(obj, self.field_name))
+        if getattr(obj, self.field_name):
+            return base64.decodestring(getattr(obj, self.field_name))
+        return ''
 
     def set_data(self, obj, data):
         setattr(obj, self.field_name, base64.encodestring(data))
-         
+                 
 class Dataset(models.Model):
     datasetid = models.CharField(max_length=40, primary_key=True)
 
@@ -111,8 +113,6 @@ class Dataset(models.Model):
         db_table = u'tbdatasets'
         ordering = ['datasetid']
         managed  = False
- 
- 
 
 class Institute(models.Model):
     institutekey = models.IntegerField(primary_key=True)
@@ -126,7 +126,7 @@ class Institute(models.Model):
     type = models.CharField('Institute type', max_length=30,
                help_text='Commercial, Government, University, etc',
                choices=choices.INSTITUTE_TYPES)
-    link = models.CharField('Institute URL',
+    link = models.CharField('Institute URL', blank=True,
                 help_text='Public web page of Institute',
                 max_length=100)
     class Meta:
@@ -137,8 +137,8 @@ class Institute(models.Model):
 class Addresses(models.Model):
     addresskey = models.IntegerField(primary_key=True)
     institutekey = models.ForeignKey(Institute, db_column='institutekey')
-    department = models.CharField(max_length=100, help_text='Department within the institute')
- 
+    department = models.CharField(max_length=100, blank=True, help_text='Department within the institute')
+
     def __unicode__ (self):
         return "%s" % self.addresskey
        
@@ -251,6 +251,8 @@ class User (models.Model):
     home_directory = models.CharField(max_length=150, blank=True)
     shell = models.CharField(max_length=50, blank=True)  
     gid   = models.IntegerField(default=0, blank=True)  
+    reset_token = models.CharField(max_length=40, blank=True)  
+    token_expire = models.DateTimeField(blank=True)
     
 #    onlinereg = models.IntegerField()
 
@@ -400,6 +402,7 @@ class Datasetjoin(models.Model):
     openpub = models.CharField(max_length=1) # This field type is a guess.
     extrainfo = models.CharField(max_length=3000)
     expiredate = models.DateTimeField()
+    agreement = Base64Field(null=True, blank=True)
                 
     def removeDataset(self):
         self.removed = -1
@@ -434,6 +437,7 @@ class Datasetrequest(models.Model):
     extrainfo = models.CharField(max_length=1000)
     fromhost = models.CharField(max_length=80)
     status = models.CharField(max_length=12)
+    agreement = Base64Field(null=True, blank=True)
     
     def accountid (self):
         '''Return user accountid associated with this request.'''
@@ -463,7 +467,8 @@ class Datasetrequest(models.Model):
                         grantref=self.grantref,
                         openpub=self.openpub,
                         extrainfo=self.extrainfo,
-                        expiredate=expireDate)
+                        expiredate=expireDate,
+                        agreement=self.agreement)
         b.save()
          
         self.status = self.ACCEPTED
