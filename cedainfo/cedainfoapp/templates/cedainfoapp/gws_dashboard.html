@@ -8,9 +8,9 @@ Group Workspaces Dashboard
 {% block content %}
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript">
-    google.load("visualization", "1", {packages:["corechart", "table"]});
-	google.setOnLoadCallback(drawVisualization);
-      function drawVisualization() {
+    google.load('visualization', '1.1', {packages:['corechart', 'table', 'controls']});
+	google.setOnLoadCallback(drawDashboard);
+      function drawDashboard() {
 	  
 	    // Initial data table
         var dataTable = google.visualization.arrayToDataTable([
@@ -25,62 +25,104 @@ Group Workspaces Dashboard
 			
 		{% endfor %}
         ]);
-		
 
-		// Functions
-		function UsedBytesToTb(dataTable, rowNum) {
-			return dataTable.getValue(rowNum, 3) / (1024 * 1024 * 1024 * 1024);
-		}
-		function RequestedBytesToTb(dataTable, rowNum) {
-			return dataTable.getValue(rowNum, 4) / (1024 * 1024 * 1024 * 1024);
-		}
-		function RequestedBytesStackedTb(dataTable, rowNum) {
-			return (dataTable.getValue(rowNum, 4) - dataTable.getValue(rowNum, 3)) / (1024 * 1024 * 1024 * 1024)
-		}
-
-		// Read-only DataView of initial DataTable, for use in displayed table
-		var tableView = new google.visualization.DataView(dataTable);
-		tableView.setColumns(
-		[
-			0,
-			1,
-			2
-		]);
-		
-		// Read-only DataView of initial DataTable, for use in bar chart
-		var barChartDataView = new google.visualization.DataView(dataTable);
-		barChartDataView.setColumns(
-		[
-			0,
-			{calc:UsedBytesToTb, type:'number', label:'Used Tb'},
-			{calc:RequestedBytesStackedTb, type:'number', label:'Requested Tb'},
-			{calc:RequestedBytesToTb, type:'number', label:'Requested Tb', role:'tooltip'}
-		]);
-
-		// Options for bar chart
-        var options = {
-          title: 'Group Workspaces',
-          vAxis: {title: 'GWS',  titleTextStyle: {color: 'red'}},
-		  hAxis: {title: 'Volume (units)',  titleTextStyle: {color: 'red'}, }, //logScale: true},
-		  isStacked: true,
-		  colors: ['red','#0000FF']
-        };
-
-		// Draw the bar chart
-        chart = new google.visualization.BarChart(document.getElementById('chart_div'));
-        chart.draw(barChartDataView, options);
-		
-		// Draw the table
-		table = new google.visualization.Table(document.getElementById('table_div'));
-		table.draw(tableView, null);
+    // Functions
+    function UsedBytesToTb(dataTable, rowNum) {
+      return dataTable.getValue(rowNum, 3) / (1024 * 1024 * 1024 * 1024);
+    }
+    function RequestedBytesToTb(dataTable, rowNum) {
+      return dataTable.getValue(rowNum, 4) / (1024 * 1024 * 1024 * 1024);
+    }
+    function RequestedBytesStackedTb(dataTable, rowNum) {
+      return (dataTable.getValue(rowNum, 4) - dataTable.getValue(rowNum, 3)) / (1024 * 1024 * 1024 * 1024)
+    }
+        
+    // Read-only DataView of initial DataTable, with added calc'd columns
+    var myDataView = new google.visualization.DataView(dataTable);
+    myDataView .setColumns(
+    [
+      0,
+      1,
+      2,
+      3,
+      4,
+      {calc:UsedBytesToTb, type:'number', label:'Used Tb'},
+      {calc:RequestedBytesStackedTb, type:'number', label:'Requested Tb'},
+      {calc:RequestedBytesToTb, type:'number', label:'Requested Tb', role:'tooltip'}
+    ]);
+      
+        // Define a category picker control for the Gender column
+        var categoryPicker = new google.visualization.ControlWrapper({
+          'controlType': 'CategoryFilter',
+          'containerId': 'control1',
+          'options': {
+            'filterColumnLabel': 'Path',
+            'ui': {
+            'labelStacking': 'vertical',
+              'allowTyping': false,
+              'allowMultiple': false
+            }
+          }
+        });
+      
+        // Define a Pie chart
+        var barChart = new google.visualization.ChartWrapper({
+          'chartType': 'BarChart',
+          'containerId': 'chart1',
+          'options': {
+            'width': 650,
+            'height': 700,
+            'vAxis': {title: 'GWS',  titleTextStyle: {color: 'red'}},
+            'hAxis': {title: 'Volume (units)',  titleTextStyle: {color: 'red'}, },
+            'title': 'GWS Usage',
+            'chartArea': {left:160,top:30,width:"55%",height:"65%"},
+            'isStacked': true
+          },
+          'view': {'columns': [0, 5, 6, 7]}
+        });
+      
+        // Define a table
+        var table = new google.visualization.ChartWrapper({
+          'chartType': 'Table',
+          'containerId': 'chart2',
+          'options': {
+            'width': 900
+          },
+          'view': {'columns': [0,1,2,5,7]}
+        });
+      
+        // Create a dashboard
+        new google.visualization.Dashboard(document.getElementById('dashboard')).
+            // Establish bindings, declaring the both the slider and the category
+            // picker will drive both charts.
+            bind([categoryPicker], [barChart, table]).
+            // Draw the entire dashboard.
+            draw(myDataView);
       }
-</script>
+      
+
+      google.setOnLoadCallback(drawVisualization);
+    </script>
 <h2>Group Workspaces Dashboard</h2>
 
-<h3>Filters</h3>
-
-<div id="table_div" style="width: 600px;"></div>
-<div id="chart_div" style="width: 800px; height: 1000px;"></div>
+    <div id="dashboard">
+      <table>
+        <tr style='vertical-align: top'>
+          <td>
+            <div id="control1"></div>
+            <div id="control2"></div>
+            <div id="control3"></div>
+          </td>
+		</tr>
+		<tr>
+          <td>
+            <div style="float: left;" id="chart1"></div>
+            <div style="float: left;" id="chart2"></div>
+            <div style="float: left;" id="chart3"></div>
+          </td>
+        </tr>
+      </table>
+    </div>
 
 
 {% endblock %}
