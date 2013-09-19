@@ -28,14 +28,32 @@ Group Workspaces Dashboard
 
     // Functions
     function UsedBytesToTb(dataTable, rowNum) {
-      return dataTable.getValue(rowNum, 3) / (1024 * 1024 * 1024 * 1024);
+      return Math.round( 100 * (dataTable.getValue(rowNum, 3) / (1024 * 1024 * 1024 * 1024))) / 100;
     }
+	
     function RequestedBytesToTb(dataTable, rowNum) {
-      return dataTable.getValue(rowNum, 4) / (1024 * 1024 * 1024 * 1024);
+      return Math.round( 100 * (dataTable.getValue(rowNum, 4) / (1024 * 1024 * 1024 * 1024))) / 100;
     }
+	
     function RequestedBytesStackedTb(dataTable, rowNum) {
-      return (dataTable.getValue(rowNum, 4) - dataTable.getValue(rowNum, 3)) / (1024 * 1024 * 1024 * 1024)
+      return Math.round( 100 * ((dataTable.getValue(rowNum, 4) - dataTable.getValue(rowNum, 3)) / (1024 * 1024 * 1024 * 1024))) / 100;
     }
+	
+	function getColumnTotalByMatch(dataTable, columnNum, matchColumn, matchValue) {
+		// Sum values in column of a table, where there is a match matchValue in matchColumn
+		var row_count = dataTable.getNumberOfRows();
+		var columnTotal = 0;
+		
+		for (i = 0; i < row_count; i++) { // iterate over rows
+			// if value in matchColumn matches matchValue, add to the total
+			if (dataTable.getValue(i, matchColumn) == matchValue) {
+			  columnTotal += dataTable.getValue(i, columnNum);
+			}
+		}
+		columnTotalFormatted = Math.round(columnTotal*100)/100;
+		
+		return columnTotalFormatted;
+	}
         
     // Read-only DataView of initial DataTable, with added calc'd columns
     var myDataView = new google.visualization.DataView(dataTable);
@@ -81,8 +99,8 @@ Group Workspaces Dashboard
           'view': {'columns': [0, 5, 6, 7]}
         });
       
-        // Define a table
-        var table = new google.visualization.ChartWrapper({
+        // Define a table with data about the Group Workspaces
+        var table1 = new google.visualization.ChartWrapper({
           'chartType': 'Table',
           'containerId': 'chart2',
           'options': {
@@ -90,14 +108,30 @@ Group Workspaces Dashboard
           },
           'view': {'columns': [0,1,2,5,7]}
         });
+	
+		// Define dataTable object to hold totals
+		totalData = new google.visualization.DataTable();
+		totalData.addColumn('string', 'Path');
+		totalData.addColumn('number', 'Total Used');
+		totalData.addColumn('number', 'Total Requested');
+		
+		totalData.addRows([
+			['CEMS', getColumnTotalByMatch(myDataView, 5, 1, '/group_workspaces/cems/'), getColumnTotalByMatch(myDataView, 7, 1, '/group_workspaces/cems/'),],
+			['JASMIN', getColumnTotalByMatch(myDataView, 5, 1, '/group_workspaces/jasmin/'), getColumnTotalByMatch(myDataView, 7, 1, '/group_workspaces/jasmin/'),]
+
+		]);
+		var totalDataTable = new google.visualization.Table(document.getElementById('chart3'));
       
         // Create a dashboard
         new google.visualization.Dashboard(document.getElementById('dashboard')).
             // Establish bindings, declaring the both the slider and the category
             // picker will drive both charts.
-            bind([categoryPicker], [barChart, table]).
+            bind([categoryPicker], [barChart, table1]).
             // Draw the entire dashboard.
             draw(myDataView);
+			
+		// draw totals table separately for now
+		totalDataTable.draw(totalData, null);
       }
       
 
@@ -107,18 +141,17 @@ Group Workspaces Dashboard
 
     <div id="dashboard">
       <table>
-        <tr style='vertical-align: top'>
+        <tr style='vertical-align: top;'>
           <td>
-            <div id="control1"></div>
-            <div id="control2"></div>
-            <div id="control3"></div>
+            <div style="float: left;" id="control1"></div>
+
+			<div style="float: right;" id="chart3"></div>
           </td>
 		</tr>
 		<tr>
           <td>
             <div style="float: left;" id="chart1"></div>
             <div style="float: left;" id="chart2"></div>
-            <div style="float: left;" id="chart3"></div>
           </td>
         </tr>
       </table>
