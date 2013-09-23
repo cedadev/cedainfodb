@@ -273,7 +273,7 @@ class GWSRequestAdmin(admin.ModelAdmin):
 admin.site.register(GWSRequest, GWSRequestAdmin)
 
 class GWSAdmin(admin.ModelAdmin):
-    list_display = ('name', 'path', 'requested_volume_filesize', 'used_volume_filesize')
+    list_display = ('name', 'path', 'requested_volume_filesize', 'used_volume_filesize', 'action_links',)
     list_filter = ('status','path',)
     search_fields = ('name', 'path')
     def has_add_permission(self, request):
@@ -281,6 +281,8 @@ class GWSAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 admin.site.register(GWS, GWSAdmin)
+
+admin.site.register(GWSSizeMeasurement)
 
 class VMRequestAdmin(admin.ModelAdmin):
     list_display=('vm_name', 'action_links', 'type', 'operation_type', 'internal_requester', 'patch_responsible', 'date_required','timestamp', 'request_type', 'request_status','vm_link',)

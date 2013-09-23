@@ -797,6 +797,13 @@ def gws_dashboard(request):
 	})        
 	c.update(csrf(request))
 	return render_to_response('cedainfoapp/gws_dashboard.html', c)
+	
+# do du for a gws and redirect back to gws list
+@login_required()
+def gwsdu(request, id):
+    gws = GWS.objects.get(pk=id)
+    gws.du()
+    return redirect(request.META['HTTP_REFERER'])
 
 #
 # The following 'txt' views provide a simple text dump of selected tables. These are intended to be called

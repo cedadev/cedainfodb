@@ -791,8 +791,7 @@ class FileSetSizeMeasurement(models.Model):
 	else:                     no_files = self.no_files; funit= "files"
 	
         return u'%s %s; %s %s (%s)' % (size, unit, no_files, funit, self.date.strftime("%Y-%m-%d %H:%M"))
-
-
+		
 class Audit(models.Model):
     '''A record of inspecting a fileset'''
     fileset = models.ForeignKey(FileSet, help_text="FileSet which this audit related to at time of creation", on_delete=models.SET_NULL, null=True, blank=True)
@@ -1313,7 +1312,49 @@ class GWS(models.Model):
     def used_volume_filesize(self):
         return filesize(self.used_volume)
     used_volume_filesize.short_description = 'used'
+	
+    def du(self):
+        '''Report disk usage of GWS by creating a GWSSizeMeasurement.'''
+        gws_dir = os.path.join(self.path, self.name)
+        if os.path.isdir(gws_dir):
+            # find volume using du
+            output = subprocess.Popen(['/usr/bin/du', '-sk', '--apparent', gws_dir],stdout=subprocess.PIPE).communicate()[0]
+            lines = output.split('\n')
+            if len(lines) == 2: size, path = lines[0].split()
 
+            # find number of files
+            p1 = subprocess.Popen(["find", gws_dir, "-type", "f"], stdout=subprocess.PIPE)
+            p2 = subprocess.Popen(["wc", "-l"], stdin=p1.stdout, stdout=subprocess.PIPE)
+            p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
+            nfiles = p2.communicate()[0]
+
+            gwssm = GWSSizeMeasurement(gws=self, date=datetime.utcnow(), size=int(size)*1024, no_files=int(nfiles))
+            gwssm.save() 
+        return   
+		
+    def action_links(self):
+        return u'<a href="/gws/%i/du">du</a>' % self.id
+    action_links.allow_tags = True
+    action_links.short_description = 'actions'
+
+class GWSSizeMeasurement(models.Model):
+    '''Date-stampted size measurement of a GWS'''
+    gws = models.ForeignKey('GWS', help_text="GWS that was measured")
+    date = models.DateTimeField(default=datetime.now, help_text="Date and time of measurement")
+    size = models.BigIntegerField(help_text="Size in bytes") # in bytes
+    no_files = models.BigIntegerField(null=True, blank=True, help_text="Number of files") 
+    def __unicode__(self):
+        if self.size > 2000000000000: size =self.size/(1024*1024*1024*1024); unit = "TB"
+        if self.size > 2000000000: size =self.size/(1024*1024*1024); unit = "GB"
+        if self.size > 2000000: size =self.size/(1024*1024); unit = "MB"
+        elif self.size > 2000:    size =self.size/(1024); unit = "kB"
+	else:                     size = self.size; unit= "B"
+
+        if self.no_files > 2000000: no_files =self.no_files/(1000*1000); funit = "Mfiles"
+	else:                     no_files = self.no_files; funit= "files"
+	
+        return u'%s %s; %s %s (%s)' % (size, unit, no_files, funit, self.date.strftime("%Y-%m-%d %H:%M"))		
+		
 class VMRequest(models.Model):
     vm_name = models.CharField(max_length=127, help_text="proposed fully-qualified host name") # TODO : need regex
     type = models.CharField(max_length=16, choices=settings.VM_TYPE_CHOICES, help_text="Type of VM, see REF") # TODO update REF
