@@ -1308,9 +1308,10 @@ class GWS(models.Model):
     def requested_volume_filesize(self):
         return filesize(self.requested_volume)
     requested_volume_filesize.short_description = 'volume'
-
+			
     def used_volume_filesize(self):
-        return filesize(self.used_volume)
+        return filesize(self.last_size().size)
+        #return filesize(self.used_volume)
     used_volume_filesize.short_description = 'used'
 	
     def du(self):
@@ -1330,8 +1331,30 @@ class GWS(models.Model):
 
             gwssm = GWSSizeMeasurement(gws=self, date=datetime.utcnow(), size=int(size)*1024, no_files=int(nfiles))
             gwssm.save() 
-        return   
-		
+        return
+
+    def pan_du(self):
+        '''Report disk usage of GWS by creating a GWSSizeMeasurement.'''
+        gws_dir = os.path.join(self.path, self.name)
+        if os.path.isdir(gws_dir):
+            # find volume using pan_du
+            output = subprocess.Popen(['/usr/local/bin/pan_du', '-s', '--apparent', gws_dir],stdout=subprocess.PIPE).communicate()[0]
+            lines = output.split('\n')
+            if len(lines) == 2: (nfiles, size) =[int(s) for s in lines[0].split() if s.isdigit()]
+
+            gwssm = GWSSizeMeasurement(gws=self, date=datetime.utcnow(), size=size*1024, no_files=nfiles)
+            gwssm.save() 
+        return
+
+    def last_size(self):
+        # display most recent GWSSetSizeMeasurement
+        try:
+            gwssm = GWSSizeMeasurement.objects.filter(gws=self).order_by('-date')[0]
+            return gwssm
+        except:
+            return None
+    last_size.allow_tags = True
+	
     def action_links(self):
         return u'<a href="/gws/%i/du">du</a>' % self.id
     action_links.allow_tags = True

@@ -273,7 +273,7 @@ class GWSRequestAdmin(admin.ModelAdmin):
 admin.site.register(GWSRequest, GWSRequestAdmin)
 
 class GWSAdmin(admin.ModelAdmin):
-    list_display = ('name', 'path', 'requested_volume_filesize', 'used_volume_filesize', 'action_links',)
+    list_display = ('name', 'path', 'requested_volume_filesize', 'used_volume_filesize', 'action_links', 'last_size')
     list_filter = ('status','path',)
     search_fields = ('name', 'path')
     def has_add_permission(self, request):
