@@ -1331,6 +1331,8 @@ class GWS(models.Model):
 
             gwssm = GWSSizeMeasurement(gws=self, date=datetime.utcnow(), size=int(size)*1024, no_files=int(nfiles))
             gwssm.save() 
+            self.used_volume=size
+            self.forceSave()
         return
 
     def pan_du(self):
