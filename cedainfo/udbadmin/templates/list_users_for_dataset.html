@@ -19,18 +19,21 @@ Number of users: {{ recs|length}}
 
 <p/>
 <table border="1">
-<th>UserKey</th>
-<th>AccountID</th>
-<th>First name</th>
-<th>Surname</th>
-<th>Email</th>
-<th>Institute</th>
-<th>Endorsed</th>
-<th>Expires</th>
-<th>Research</th>
-<th>Details</th>
-{% for rec in recs %}
-   <tr>
+
+{% for header in headers %}
+   <th{{ header.class_attr }}>
+     {% if header.sortable %}<a href="{{ header.url|escape }}" title="Click to sort by this column">{% endif %}
+     {{ header.text }}
+     {% if header.sortable %}</a>{% endif %}
+   </th>{% endfor %}
+    <th>Details</th>
+</tr>
+
+
+<tbody>
+
+  {% for rec in recs %}
+   <tr class="{% cycle row1,row2 %}">
    <td><a href="/admin/udbadmin/user/{{rec.userkey}}">{{ rec.userkey }}</a>
    <td>{{ rec.userkey.accountid }}
    <td>{{ rec.userkey.othernames }}
@@ -41,10 +44,11 @@ Number of users: {{ recs|length}}
    <td>{{ rec.expiredate|date:'d/m/Y' }}
    <td>{{ rec.research }} 
    <td><a href="/udbadmin/udj/{{rec.id }}">Details</a>
+  </tr>
+  {% endfor %}
 
+</tbody>
 
-   </tr>
-{% endfor %} 
 
 </table>
 

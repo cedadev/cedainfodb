@@ -31,7 +31,7 @@
 </thead>
 
 <tbody>
-  {% for dataset in datasets %}<tr class="{% cycle odd,even %}">
+  {% for dataset in datasets %}<tr class="{% cycle row1,row2 %}">
     <td><a href="/udbadmin/udj/{{dataset.id}}">Edit</a></td>
     <td><a href="{{ dataset.datasetid.get_absolute_url|escape }}" title="Click to view dataset details">{{ dataset.datasetid|escape }}</a></td>
     <td>{{ dataset.ver|escape }}</td>

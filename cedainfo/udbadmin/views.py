@@ -45,6 +45,19 @@ KEY_HEADERS = (
   ('Public key', 'public_key')
 )
 
+DATASET_USERS_HEADERS = (
+  ('Userkey', 'userkey'),
+  ('AccountID', 'userkey__accountid'),
+  ('First name', 'userkey__othernames'),
+  ('Surname', 'userkey__surname'),
+  ('Email', 'userkey__emailaddress'),
+  ('Institute', 'userkey__addresskey__institutekey__name'),
+  ('Endorsed', 'endorseddate'),
+  ('Expires', 'expiredate'),
+  ('Research', 'research')
+)
+
+
 @login_required()
 def home(request):
     user = request.user
@@ -293,9 +306,13 @@ def list_users_for_dataset(request, datasetid):
     user = request.user
 
     try:
+       sort_headers = SortHeaders(request, DATASET_USERS_HEADERS)
+       headers = list(sort_headers.headers())
+
        dataset = Dataset.objects.get(datasetid=datasetid)   
 #       udjs = Datasetjoin.objects.filter(datasetid=datasetid)
-       recs  = Datasetjoin.objects.filter(datasetid=datasetid).filter(userkey__gt=0).filter(removed=0).order_by('-userkey')      
+       recs  = Datasetjoin.objects.filter(datasetid=datasetid).filter(userkey__gt=0).filter(removed=0).order_by(sort_headers.get_order_by())      
+
 
 #       print users[0]
 #       recs = []

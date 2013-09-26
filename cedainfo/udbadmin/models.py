@@ -538,3 +538,4 @@ class Fundingtypes(models.Model):
         in_db = USERDB
         db_table = u'fundingtypes'
         managed = False
+

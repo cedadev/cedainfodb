@@ -90,8 +90,11 @@ group_updated = update_check.group_updated(connection, reset=True, name=NAME_PRE
 
 print 'User updated: ', user_updated
 print 'Group updated: ', group_updated
-
-if user_updated or update_anyway:
+#
+# Update user details if group has been updated as some groups control the 
+# description tags for the user
+#
+if user_updated or group_updated or update_anyway:
     print 'Generating ldif user commands'
     cmds = udb_ldap.ldif_all_user_updates()
         

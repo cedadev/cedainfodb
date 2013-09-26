@@ -369,14 +369,13 @@ def ldap_user_tags(user):
 #      the foreign key integrity in the userdb to be broken...
 #
        try:
-           if datasetjoin.datasetid.datasetid.startswith('vm_access_'):
+           if datasetjoin.datasetid.grp.startswith('cluster:'):
+               record = record + 'description: %s\n' % datasetjoin.datasetid.grp
+           elif datasetjoin.datasetid.datasetid.startswith('vm_access_'):
                grp = datasetjoin.datasetid.grp
                if grp.strip():
                    record = record + 'description: %s\n' % datasetjoin.datasetid.grp       
-           if datasetjoin.datasetid.datasetid == 'jasmin-login':
-               record = record + 'description: cluster:jasmin-login\n'
-           if datasetjoin.datasetid.datasetid == 'cems-login':
-               record = record + 'description: cluster:cems-login\n'
+                      
        except:
            pass 
 
