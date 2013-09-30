@@ -20,7 +20,11 @@ ARCHIVE_ACCESS_GROUPS = {"cmip5_research": {"gid": 26059, "datasets" : ["cmip5_r
                          "esacat1":        {"gid": 26017, "datasets" : ["aatsr_multimission", "atsrubt"]},                         
                          "ecmwf":          {"gid": 26018, "datasets" : ["era", "ecmwfop"]},
                          "ukmo" :          {"gid": 26019, "datasets" : ["surface"]},
-                         "eurosat":        {"gid": 26021, "datasets" : ["metop_iasi", "avhrr-3", "gome-2"]}
+                         "eurosat":        {"gid": 26021, "datasets" : ["metop_iasi", "avhrr-3", "gome-2"]},
+                         
+                         "ukmo_wx":        {"gid": 26078, "datasets" : []},
+                         "ukmo_clim":      {"gid": 26079, "datasets" : []}
+                         
                          }
 #
 # GID for 'open' group

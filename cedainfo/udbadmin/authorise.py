@@ -88,14 +88,6 @@ def authorise_datasets(request, userkey):
    #
 
 	if datasetsAdded:
-
-#
-#                   Send message indicating that some manual processing is required
-#           
-           if manualProcessingRequired:
-               infocmd = "/home/badc/software/infrastructure/useradmin/bin/new_datasets_msg_manual_request"
-	       Popen([infocmd, "-send", "%s" % userkey])
-               infomsg = Popen([infocmd, "%s" % userkey], stdout=PIPE).communicate()[0] 
 #
 #                   Don't send email if all of the datasets are ones that require manual intervention 
 #                   
