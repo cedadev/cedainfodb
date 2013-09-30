@@ -97,12 +97,18 @@ class Dataset(models.Model):
 
     def manual_processing_required(self):
 #
-#            Temporary fudge to indicate that the dataset requires "manual processing", ie Andrew needs to do some work once this dataset/service is approved
+#            Temporary fudge to indicate that the dataset requires "manual processing". 
+#
+#            26/09/13 This is now used to indicate which datasets should not receive
+#            an automated e-mail when they are approved. 
 #
         datasetid = self.datasetid 
        
-        if datasetid.startswith('gws_') or datasetid.startswith('vm_') \
-            or datasetid == 'jasmin-login' or datasetid == 'cems-login':
+        if datasetid.startswith('gws_') or \
+           datasetid.startswith('vm_') \
+           or datasetid == 'jasmin-login' \
+           or datasetid == 'cems-login' \
+           or datasetid == 'cems-commercial-login':
             return True
         else:
             return False  
@@ -336,7 +342,9 @@ class User (models.Model):
     def isJasminCemsUser(self):
         '''Returns True if the user should have a jasmin/cems account'''
         
-        if self.hasDataset("jasmin-login") or self.hasDataset("cems-login"):
+        if self.hasDataset("jasmin-login") or \
+           self.hasDataset("cems-login") or \
+           self.hasDataset("cems-commercial-login"):
             return True
         else:
             return False                 

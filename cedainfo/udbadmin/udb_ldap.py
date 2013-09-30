@@ -105,7 +105,7 @@ def all_jasmin_cems_users(order_by="userkey"):
 
     sql = "select distinct tbusers.* from tbusers, tbdatasetjoin where (tbusers.userkey=tbdatasetjoin.userkey)" + \
           "and tbdatasetjoin.removed=0 and ((datasetid='jasmin-login') or " + \
-          "(datasetid='cems-login')) " + \
+          "(datasetid='cems-login') or (datasetid='cems-commercial-login') ) " + \
           "order by %s" % order_by
 
     users = User.objects.raw(sql)
@@ -201,7 +201,10 @@ def checkGroups():
             
             for user in users:
                 print '   ', user.accountid
-                if not (user.hasDataset("system-login") or user.hasDataset("jasmin-login") or user.hasDataset("cems-login")):                 
+                if not (user.hasDataset("system-login") or \
+                        user.hasDataset("jasmin-login") or \
+                        user.hasDataset("cems-login") or \
+                        user.hasDataset("cems-commercial-login")):                 
                     badUsers.append(user)
     return badUsers
 
