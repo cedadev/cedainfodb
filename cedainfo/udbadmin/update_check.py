@@ -73,9 +73,9 @@ def group_updated (connection, reset=True, name='jasmin_group'):
         stored_hash = ''
     
     sql = """
-    select j.id,j.userkey,j.datasetid,j.removed from tbusers,tbdatasetjoin as j, tbdatasets 
-    where tbusers.userkey=j.userkey and j.datasetid = tbdatasets.datasetid 
-    and tbusers.uid > 0 and tbdatasets.gid > 0;
+    select j.id,j.userkey,j.datasetid,j.removed from tbusers,tbdatasetjoin as j
+    where tbusers.userkey=j.userkey
+    and tbusers.uid > 0;
     """
 
     datasetjoin_str = get_udb_str(sql, cursor)
