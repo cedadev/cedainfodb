@@ -25,7 +25,7 @@ class DatasetjoinAdmin(admin.ModelAdmin):
    editLink.allow_tags = True
    editLink.short_description = 'Edit'
    
-   list_display = (editLink, 'userkey', 'datasetid', 'ver', 'research', 'removed')
+   list_display = (editLink, 'userkey', 'datasetid', 'ver', 'research', 'expiredate', 'removed')
    list_filter = ('removed', 'datasetid')
    readonly_fields = ('datasetid', 'userkey')
    search_fields =['research']

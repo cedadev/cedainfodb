@@ -18,7 +18,7 @@ cursor = connection.cursor()
 sql = """
 select logical_path, mountpoint, storage_pot  from cedainfoapp_fileset, cedainfoapp_partition
 where cedainfoapp_fileset.partition_id = cedainfoapp_partition.id
-and logical_path like '/badc/%'
+and (logical_path like '/badc/%' or logical_path like '/neodc/%')
 order by mountpoint"""
 
 cursor.execute(sql)

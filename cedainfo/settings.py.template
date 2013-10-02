@@ -4,6 +4,8 @@ import os
 import re
 PROJECT_DIR= os.path.dirname(__file__) 
 
+DATETIME_FORMAT = "d-M-Y H:i"
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -307,5 +309,5 @@ LDAP_URL       = 'ldap://homer.esc.rl.ac.uk'
 
 LDAP_WRITE_URL    = "ldap://homer.esc.rl.ac.uk"
 LDAP_WRITE_PASSWD = 'TUbr7kUj'
-LDAP_WRITE_DN     =  cn=cedaadmin,ou=software,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"
+LDAP_WRITE_DN     = 'cn=cedaadmin,ou=software,ou=People,o=hpc,dc=rl,dc=ac,dc=uk'
 
