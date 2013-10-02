@@ -145,7 +145,6 @@ INSTALLED_APPS = (
     'django_extensions',
     'sizefield',
     'cedainfo.cedainfoapp',
-    'cedainfo.proginfo',
     'cedainfo.udbadmin',
     'cedainfo.dmp',
 )
