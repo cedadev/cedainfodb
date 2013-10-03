@@ -36,20 +36,20 @@ from django.core.validators import RegexValidator
 #    def __unicode__(self):
 #        return u'%s' % self.name
 
-class NodeList(models.Model):
-    name = models.CharField(max_length=126)
-    def __unicode__(self):
-        return u'%s the nodelist' % self.name
-
-class HostList(models.Model):
-    nodelist = models.OneToOneField(NodeList)
-    def __unicode__(self):
-        return u'%s the hostlist' % self.nodelist.name
-
-class RackList(models.Model):
-    nodelist = models.OneToOneField(NodeList)
-    def __unicode__(self):
-        return u'%s the racklist' % self.nodelist.name
+#class NodeList(models.Model):
+#    name = models.CharField(max_length=126)
+#    def __unicode__(self):
+#        return u'%s the nodelist' % self.name
+#
+#class HostList(models.Model):
+#    nodelist = models.OneToOneField(NodeList)
+#    def __unicode__(self):
+#        return u'%s the hostlist' % self.nodelist.name
+#
+#class RackList(models.Model):
+#    nodelist = models.OneToOneField(NodeList)
+#    def __unicode__(self):
+#        return u'%s the racklist' % self.nodelist.name
         
 
 class Rack(models.Model):
@@ -57,7 +57,7 @@ class Rack(models.Model):
     name = models.CharField(max_length=126, help_text="Name of Rack")
     room = models.CharField(max_length=126, help_text="Physical location of Rack")
     #tag = models.ManyToManyField(NodeListTag, null=True, blank=True, help_text="tag for nodelist")
-    racklist = models.ForeignKey(RackList, null=True, blank=True, help_text="list this rack belongs to (only one)")
+#    racklist = models.ForeignKey(RackList, null=True, blank=True, help_text="list this rack belongs to (only one)")
     def __unicode__(self):
         return u'%s' % self.name
 
@@ -92,7 +92,7 @@ class Host(models.Model):
     rack = models.ForeignKey(Rack, blank=True, null=True, help_text="Rack (if virtual machine, give that of hypervisor)")
     hypervisor = models.ForeignKey('self', blank=True, null=True, help_text="If host_type=virtual_server, give the name of the hypervisor which contains this one.")
     #tag = models.ManyToManyField(NodeListTag, null=True, blank=True, help_text="tag for nodelist")
-    hostlist = models.ManyToManyField(HostList, null=True, blank=True, help_text="list(s) this host belongs to")
+   # hostlist = models.ManyToManyField(HostList, null=True, blank=True, help_text="list(s) this host belongs to")
     
     def __unicode__(self):
         return u'%s' % self.hostname

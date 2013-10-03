@@ -53,7 +53,7 @@ class ByteSizeField(forms.CharField):
 #admin.site.register(CurationCategory)
 
 # don't need to change in admin interface
-admin.site.register(AccessStatus)
+#admin.site.register(AccessStatus)
 
 class PersonAdmin(admin.ModelAdmin):
    ordering = ('name',)
@@ -67,7 +67,7 @@ admin.site.register(ServiceBackupLog)
 # customise the Host admin interface
 class HostAdmin(admin.ModelAdmin):
     list_display = ('hostname','ip_addr', 'serial_no', 'arrival_date', 'host_type','hypervisor','rack')
-    list_filter = ('supplier','planned_end_of_life', 'retired_on','host_type','rack','hostlist')
+    list_filter = ('supplier','planned_end_of_life', 'retired_on','host_type','rack',)
     ordering = ('hostname','planned_end_of_life')
     search_fields = ['hostname', 'notes', 'serial_no']
 
@@ -103,8 +103,8 @@ admin.site.register(Service, ServiceAdmin)
 
 # customise the Rack admin interface
 class RackAdmin(admin.ModelAdmin):
-    list_display = ('name', 'room', 'racklist')
-    list_filter = ('room','racklist')
+    list_display = ('name', 'room')
+    list_filter = ('room',)
     ordering = ('name', 'room')
 admin.site.register(Rack, RackAdmin)
 
@@ -253,9 +253,9 @@ admin.site.register(FileSet,FileSetAdmin)
 #    list_filter = ('fileset',)
 #admin.site.register(FileSetSizeMeasurement,FileSetSizeMeasurementAdmin)
 
-admin.site.register(NodeList)
-admin.site.register(HostList)
-admin.site.register(RackList) 
+#admin.site.register(NodeList)
+#admin.site.register(HostList)
+#admin.site.register(RackList) 
 
 
 
