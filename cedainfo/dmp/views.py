@@ -3,6 +3,8 @@ from django.shortcuts import redirect, render_to_response, get_object_or_404
 
 from django.contrib.auth.models import *
 
+import datetime
+
 def dmp_draft(request, project_id):
     # a summary of a single project
     project = get_object_or_404(Project, pk=project_id)
@@ -33,11 +35,42 @@ def my_projects(request):
 
     # if set override login user
     scisupcontact = request.GET.get('scisupcontact', None) 
+    if scisupcontact == 'None': scisupcontact=None
     if scisupcontact: user= User.objects.filter(username=scisupcontact)[0]
 
     projects = Project.objects.filter(sciSupContact=user)
+    
+    # if set override login user
+    listall = request.GET.get('listall', None)
+    if not listall:  
+        projects = projects.exclude(status='Proposal').exclude(status='NotFunded')
+        projects = projects.exclude(status='NoData').exclude(status='Defaulted').exclude(status='Complete')
 
-    return render_to_response('my_projects.html', {'projects': projects, 'user':user})
+    projects = projects.order_by('modified')
+
+    return render_to_response('my_projects.html', {'projects': projects, 'user':user, 'listall':listall, 'modchecktime':datetime.datetime.now()-datetime.timedelta( days=90)})
+
+def projects_by_person(request):
+
+    projects = Project.objects.all()
+    projects = projects.exclude(status='Proposal').exclude(status='NotFunded')
+    projects = projects.exclude(status='NoData').exclude(status='Defaulted').exclude(status='Complete')
+
+    summary = {}
+    for p in projects:
+        if p.sciSupContact: username = p.sciSupContact.username
+        else: username = None
+
+        if not summary.has_key(username): 
+            summary[username] = [1,[]]
+            for pg in p.project_groups():
+                if pg not in summary[username][1]: summary[username][1].append(pg)
+        else: 
+            summary[username] = [summary[username][0]+1, summary[username][1]]
+            for pg in p.project_groups(): 
+                if pg not in summary[username][1]: summary[username][1].append(pg)
+
+    return render_to_response('projects_by_person.html', {'summary': summary})
 
 
 def gotw_scrape(request, id):
@@ -74,7 +107,6 @@ def gotw_scrape(request, id):
 
 def make_project_from_scrape(request, id):
     grant = get_object_or_404(Grant, pk=id)
-
  
     import os, sys, subprocess, re, time, string, datetime
     months = {'Jan':1, 'Feb':2, 'Mar':3, 'Apr':4, 'May':5, 'Jun':6,
