@@ -282,8 +282,6 @@ class GWSAdmin(admin.ModelAdmin):
         return False
 admin.site.register(GWS, GWSAdmin)
 
-admin.site.register(GWSSizeMeasurement)
-
 class VMRequestAdmin(admin.ModelAdmin):
     list_display=('vm_name', 'action_links', 'type', 'operation_type', 'internal_requester', 'patch_responsible', 'date_required','timestamp', 'request_type', 'request_status','vm_link',)
     list_filter=('type', 'operation_type', 'request_status', 'patch_responsible', MountpointFilter,)
