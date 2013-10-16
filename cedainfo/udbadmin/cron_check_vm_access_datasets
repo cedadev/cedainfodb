@@ -39,7 +39,8 @@ recs = recs.exclude(datasetid__datasetid='vm_access_ceda_internal')
 recs = recs.filter(userkey__gt=0).order_by('userkey')    
 
 for rec in recs:
-    if not rec.userkey.isJasminCemsUser():
+
+    if (not rec.userkey.isJasminCemsUser()) and (not rec.userkey.isSystemUser()) :
 
         infoString = "Userkey: %s Accountid: %s Datasetid: %s" % \
                (rec.userkey, rec.userkey.accountid, rec.datasetid.datasetid)

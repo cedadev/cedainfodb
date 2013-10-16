@@ -108,7 +108,7 @@ class Dataset(models.Model):
            datasetid.startswith('vm_') \
            or datasetid == 'jasmin-login' \
            or datasetid == 'cems-login' \
-           or datasetid == 'cems-commercial-login':
+           or datasetid == 'commercial-login':
             return True
         else:
             return False  
@@ -344,7 +344,15 @@ class User (models.Model):
         
         if self.hasDataset("jasmin-login") or \
            self.hasDataset("cems-login") or \
-           self.hasDataset("cems-commercial-login"):
+           self.hasDataset("commercial-login"):
+            return True
+        else:
+            return False                 
+
+    def isSystemUser(self):
+        '''Returns True if this is not a real person but a system account.'''
+        
+        if self.accountid == 'et_jasmin':
             return True
         else:
             return False                 
