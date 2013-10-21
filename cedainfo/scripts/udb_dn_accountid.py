@@ -14,5 +14,5 @@ DN_PREFIX = "/DC=uk/DC=ac/DC=ceda/O=STFC RAL/CN="
      
 def run():
 
-    for user in User.objects.filter(pk_gt=0):
+    for user in User.objects.filter(pk__gt=0).filter(openid__isnull=False).exclude(openid="").exclude(accountid=""):
         print "%s%s %s" % (DN_PREFIX, user.openid, user.accountid)
