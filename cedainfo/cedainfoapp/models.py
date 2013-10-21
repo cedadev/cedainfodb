@@ -1313,38 +1313,50 @@ class GWS(models.Model):
         #return filesize(self.used_volume)
     used_volume_filesize.short_description = 'used'
 	
-    def du(self):
+    def df(self):
         '''Report disk usage of GWS by creating a GWSSizeMeasurement.'''
         gws_dir = os.path.join(self.path, self.name)
         if os.path.isdir(gws_dir):
             # find volume using du
-            output = subprocess.Popen(['/usr/bin/du', '-sk', '--apparent', gws_dir],stdout=subprocess.PIPE).communicate()[0]
+            output = subprocess.Popen(['/usr/bin/df', '-k', gws_dir],stdout=subprocess.PIPE).communicate()[0]
             lines = output.split('\n')
-            if len(lines) == 2: size, path = lines[0].split()
-
+            if len(lines) == 3: (fs, blocks, used, available, use, mounted) = lines[1].split()
+            size = int(used)*1024
+            print "used %s, size %s" % (used, size)
+            
             # find number of files
             p1 = subprocess.Popen(["find", gws_dir, "-type", "f"], stdout=subprocess.PIPE)
             p2 = subprocess.Popen(["wc", "-l"], stdin=p1.stdout, stdout=subprocess.PIPE)
             p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
             nfiles = p2.communicate()[0]
 
-            gwssm = GWSSizeMeasurement(gws=self, date=datetime.utcnow(), size=int(size)*1024, no_files=int(nfiles))
+            gwssm = GWSSizeMeasurement(gws=self, date=datetime.utcnow(), size=size, no_files=int(nfiles))
             gwssm.save() 
             self.used_volume=size
             self.forceSave()
         return
 
-    def pan_du(self):
+    def pan_df(self):
         '''Report disk usage of GWS by creating a GWSSizeMeasurement.'''
         gws_dir = os.path.join(self.path, self.name)
         if os.path.isdir(gws_dir):
-            # find volume using pan_du
-            output = subprocess.Popen(['/usr/local/bin/pan_du', '-s', '--apparent', gws_dir],stdout=subprocess.PIPE).communicate()[0]
+            # find volume using du
+            output = subprocess.Popen(['/usr/local/bin/pan_df', '-k', gws_dir],stdout=subprocess.PIPE).communicate()[0]
             lines = output.split('\n')
-            if len(lines) == 2: (nfiles, size) =[int(s) for s in lines[0].split() if s.isdigit()]
+            if len(lines) == 3: (fs, blocks, used, available, use, mounted) = lines[1].split()
+            size = int(used)*1024
+            print "used %s, size %s" % (used, size)
+            
+            # find number of files
+            p1 = subprocess.Popen(["find", gws_dir, "-type", "f"], stdout=subprocess.PIPE)
+            p2 = subprocess.Popen(["wc", "-l"], stdin=p1.stdout, stdout=subprocess.PIPE)
+            p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
+            nfiles = p2.communicate()[0]
 
-            gwssm = GWSSizeMeasurement(gws=self, date=datetime.utcnow(), size=size*1024, no_files=nfiles)
+            gwssm = GWSSizeMeasurement(gws=self, date=datetime.utcnow(), size=size, no_files=int(nfiles))
             gwssm.save() 
+            self.used_volume=size
+            self.forceSave()
         return
 
     def last_size(self):
@@ -1368,16 +1380,13 @@ class GWSSizeMeasurement(models.Model):
     size = models.BigIntegerField(help_text="Size in bytes") # in bytes
     no_files = models.BigIntegerField(null=True, blank=True, help_text="Number of files") 
     def __unicode__(self):
-        if self.size > 2000000000000: size =self.size/(1024*1024*1024*1024); unit = "TB"
-        if self.size > 2000000000: size =self.size/(1024*1024*1024); unit = "GB"
-        if self.size > 2000000: size =self.size/(1024*1024); unit = "MB"
-        elif self.size > 2000:    size =self.size/(1024); unit = "kB"
-	else:                     size = self.size; unit= "B"
-
-        if self.no_files > 2000000: no_files =self.no_files/(1000*1000); funit = "Mfiles"
-	else:                     no_files = self.no_files; funit= "files"
-	
-        return u'%s %s; %s %s (%s)' % (size, unit, no_files, funit, self.date.strftime("%Y-%m-%d %H:%M"))		
+        if self.no_files > 2000000:
+            no_files =self.no_files/(1000*1000)
+            funit = "Mfiles"
+        else:
+            no_files = self.no_files
+            funit= "files"
+        return u'%s %s %s %s' % (filesize(self.size), self.no_files, funit, self.date.strftime("%Y-%m-%d %H:%M"))		
 		
 class VMRequest(models.Model):
     vm_name = models.CharField(max_length=127, help_text="proposed fully-qualified host name") # TODO : need regex

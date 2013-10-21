@@ -7,7 +7,7 @@ def measure(gws):
 	dir = os.path.join(gws.path, gws.name)
 	if os.path.isdir(dir):
 		print "Measuring %s at %s" % (gws.name, dir)
-        
+		gws.df()
 	else:
 		raise Exception("Directory does not exist: %s" % dir)
 	
