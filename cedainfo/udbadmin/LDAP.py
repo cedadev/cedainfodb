@@ -9,8 +9,7 @@ from django.conf import settings
 GROUP_BASE  = "ou=ceda,ou=Groups,o=hpc,dc=rl,dc=ac,dc=uk"
 PEOPLE_BASE = "ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"
 
-SORT_SCRIPT = "/home/badc/software/infrastructure/cedainfo_releases/current/cedainfo/udbadmin/ldifsort.pl"
-
+SORT_SCRIPT = settings.PROJECT_DIR + '/udbadmin/ldifsort.pl'
 
 l = ldap.ldapobject.ReconnectLDAPObject(settings.LDAP_URL, trace_level=0, retry_max=3)
 

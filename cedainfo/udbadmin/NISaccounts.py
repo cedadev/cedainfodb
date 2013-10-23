@@ -11,7 +11,12 @@ def getExtGroupFile():
 #      Return group file for external NIS
 #
     a = tempfile.NamedTemporaryFile()
-    p1 = subprocess.Popen(["ssh", "ypinfo@storm.badc.rl.ac.uk",  "ypcat", "group"], stdout=a)
+    p1 = subprocess.Popen(["ssh", 
+                           "-oBatchMode=yes", 
+                           "ypinfo@storm.badc.rl.ac.uk",  
+			   "ypcat", 
+			   "group"], 
+			   stdout=a)
     p1.wait()
     group = passwd.loadgrp(a.name)
     a.close()
@@ -24,8 +29,13 @@ def getIntGroupFile():
 #      Return group file for internal NIS
 #
     a = tempfile.NamedTemporaryFile()
-    p1 = subprocess.Popen(["ypcat", "group"], stdout=a)
-    p1.wait()
+    
+    try:
+        p1 = subprocess.Popen(["ypcat", "group"], stdout=a)
+        p1.wait()
+    except:
+        pass
+	
     group = passwd.loadgrp(a.name)
     a.close()
 
@@ -36,7 +46,12 @@ def getExtPasswdFile():
 #      Return group file for external NIS
 #
     a = tempfile.NamedTemporaryFile()
-    p1 = subprocess.Popen(["ssh", "ypinfo@storm.badc.rl.ac.uk",  "ypcat", "passwd"], stdout=a)
+    p1 = subprocess.Popen(["ssh",
+                           "-oBatchMode=yes", 
+			   "ypinfo@storm.badc.rl.ac.uk",  
+			   "ypcat", 
+			   "passwd"], 
+			   stdout=a)
     p1.wait()
     pw = passwd.loadpw(a.name)
     a.close()
@@ -49,8 +64,13 @@ def getIntPasswdFile():
 #      Return group file for internal NIS
 #
     a = tempfile.NamedTemporaryFile()
-    p1 = subprocess.Popen(["ypcat", "passwd"], stdout=a)
-    p1.wait()
+    
+    try:
+        p1 = subprocess.Popen(["ypcat", "passwd"], stdout=a)
+        p1.wait()
+    except:
+        pass
+	
     pw = passwd.loadpw(a.name)
     a.close()
 
