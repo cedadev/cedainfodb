@@ -2,12 +2,23 @@
 
 {% block content %}
 
-<h1>Free GIDS</h1>
 
-Next GID to use: {{next_gid}}
+{% if not ext_groups and int_groups %}
 
-<p/>
-Free gids in range: {{free_count}}
+    <font size="3"><b>Next GID to use: {{next_gid}}</font></b>
+
+    </p>
+    Free gids in range: {{free_count}}
+    </p>
+{% else %}
+    <font color="red" size="4">
+    Error - unable to read entries from internal/external NIS.</font><p/>
+    See <a href="http://team.ceda.ac.uk/trac/ceda/wiki/opman/CEDAinfoDB">installation information</a> in the operations manual for details.
+    
+    <p/>   
+    </font> 
+{% endif %}
+
 
 <table border="1">
 <th>gid</th><th>Internal NIS</th><th>External NIS</th>

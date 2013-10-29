@@ -2,12 +2,23 @@
 
 {% block content %}
 
-<h1>Free UIDS</h1>
 
-Next UID to use: {{next_uid}}
+{% if ext_users and int_users %}
 
-<p/>
-Free uids in range: {{free_count}}
+    <font size="3"><b>Next UID to use: {{next_uid}}</font></b>
+
+    </p>
+    Free uids in range: {{free_count}}
+    </p>
+{% else %}
+    <font color="red" size="4">
+    Error - unable to read entries from internal/external NIS.</font><p/>
+    See <a href="http://team.ceda.ac.uk/trac/ceda/wiki/opman/CEDAinfoDB">installation information</a> in the operations manual for details.
+    
+    <p/>   
+    </font> 
+{% endif %}
+
 
 <table border="1">
 <th>UID</th><th>udb accountid</th><th>External NIS</th><th>Internal NIS</th>
