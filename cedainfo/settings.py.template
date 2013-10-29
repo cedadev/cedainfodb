@@ -310,3 +310,5 @@ LDAP_WRITE_URL    = "ldap://homer.esc.rl.ac.uk"
 LDAP_WRITE_PASSWD = 'TUbr7kUj'
 LDAP_WRITE_DN     = 'cn=cedaadmin,ou=software,ou=People,o=hpc,dc=rl,dc=ac,dc=uk'
 
+ADDITIONAL_LDAP_GROUP_FILE = "/datacentre/opshome/etc/infrastructure/accounts/ldap/ldap_additional_groups.txt"
+ADDITIONAL_LDAP_USER_FILE  = "/datacentre/opshome/etc/infrastructure/accounts/ldap/ldap_additional_users.txt"
