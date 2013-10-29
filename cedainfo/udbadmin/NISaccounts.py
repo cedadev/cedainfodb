@@ -29,17 +29,18 @@ def getIntGroupFile():
 #      Return group file for internal NIS
 #
     a = tempfile.NamedTemporaryFile()
-    
-    try:
-        p1 = subprocess.Popen(["ypcat", "group"], stdout=a)
-        p1.wait()
-    except:
-        pass
-	
+    p1 = subprocess.Popen(["ssh", 
+                           "-oBatchMode=yes", 
+                           "ypinfo@twister.badc.rl.ac.uk",  
+			   "ypcat", 
+			   "group"], 
+			   stdout=a)
+    p1.wait()
     group = passwd.loadgrp(a.name)
     a.close()
 
     return group
+
 
 def getExtPasswdFile():
 #
@@ -64,13 +65,13 @@ def getIntPasswdFile():
 #      Return group file for internal NIS
 #
     a = tempfile.NamedTemporaryFile()
-    
-    try:
-        p1 = subprocess.Popen(["ypcat", "passwd"], stdout=a)
-        p1.wait()
-    except:
-        pass
-	
+    p1 = subprocess.Popen(["ssh",
+                           "-oBatchMode=yes", 
+			   "ypinfo@twister.badc.rl.ac.uk",  
+			   "ypcat", 
+			   "passwd"], 
+			   stdout=a)
+    p1.wait()
     pw = passwd.loadpw(a.name)
     a.close()
 
