@@ -13,15 +13,41 @@ from django.conf import settings
 from models import *
 import LDAP
 
+ADDITIONAL_LDAP_GROUP_FILE = "/home/badc/etc/infrastructure/accounts/ldap/ldap_additional_groups.txt"
+ADDITIONAL_LDAP_USER_FILE  = "/home/badc/etc/infrastructure/accounts/ldap/ldap_additional_users.txt"
 
 ARCHIVE_ACCESS_GROUPS = {"cmip5_research": {"gid": 26059, "datasets" : ["cmip5_research"]},
                          "esacat1":        {"gid": 26017, "datasets" : ["aatsr_multimission", "atsrubt"]},                         
-                         "ecmwf":          {"gid": 26018, "datasets" : ["era", "ecmwfop"]},
+                         "ecmwf":          {"gid": 26018, "datasets" : ["era", "ecmwfop", "ecmwftrj", "era4t", "ecmwfera"]},
                          "ukmo" :          {"gid": 26019, "datasets" : ["surface"]},
                          "eurosat":        {"gid": 26021, "datasets" : ["metop_iasi", "avhrr-3", "gome-2"]},
                          
-                         "ukmo_wx":        {"gid": 26078, "datasets" : []},
-                         "ukmo_clim":      {"gid": 26079, "datasets" : []}
+                         "ukmo_wx":        {"gid": 26078, "datasets" : ["africa_lam",
+                                                                        "assim",
+                                                                        "nimrod",
+                                                                        "radios",
+                                                                        "surface",
+                                                                        "synop",
+                                                                        "ukmo-metdb",
+                                                                        "nimrod"]},
+                         
+                         "ukmo_clim":      {"gid": 26079, "datasets" : ["cet",
+                                                                        "climod", 
+                                                                        "gmslp", 
+                                                                        "gosta", 
+                                                                        "hadat", 
+                                                                        "hadcm3con", 
+                                                                        "hadgem1", 
+                                                                        "hadisst", 
+                                                                        "hadrt", 
+                                                                        "hadsst2", 
+                                                                        "height", 
+                                                                        "higem", 
+                                                                        "link", 
+                                                                        "mslp",
+                                                                        "hadgem1-a1b", 
+                                                                        "hadgem1-ctl"]
+                                           }
                          
                          }
 #
@@ -227,8 +253,8 @@ def ldap_all_group_records ():
     record = record + ldap_open_group_record()
     record = record + '\n'
 
-    if os.path.exists(settings.ADDITIONAL_LDAP_GROUP_FILE):
-        f = open(settings.ADDITIONAL_LDAP_GROUP_FILE, "r")
+    if os.path.exists(ADDITIONAL_LDAP_GROUP_FILE):
+        f = open(ADDITIONAL_LDAP_GROUP_FILE, "r")
 
         additional_groups = f.read()
         f.close()
@@ -252,8 +278,8 @@ def ldap_all_user_records (write_root_access=True, add_additional_users=True):
     record = record + '\n'
 
     if add_additional_users:
-        if os.path.exists(settings.ADDITIONAL_LDAP_USER_FILE):
-            f = open(settings.ADDITIONAL_LDAP_USER_FILE, "r")
+        if os.path.exists(ADDITIONAL_LDAP_USER_FILE):
+            f = open(ADDITIONAL_LDAP_USER_FILE, "r")
             
             additional_users = ''
 
