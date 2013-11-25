@@ -386,6 +386,9 @@ def ldap_user_tags(user):
 #
     if not is_ldap_user(user):
         return record + 'description: cluster:EX-login\n'
+    
+    if user.isJasminCemsUser():
+        record = record + 'description: cluster:lotus\n'
 
     if user.hasDataset("system-login") or user.isJasminCemsUser():
         record = record + 'description: cluster:ceda-external\n'
