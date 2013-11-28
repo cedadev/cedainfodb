@@ -1307,7 +1307,13 @@ class GWS(models.Model):
     def requested_volume_filesize(self):
         return filesize(self.requested_volume)
     requested_volume_filesize.short_description = 'volume'
-			
+    
+    def used_volume(self):
+        if self.last_size() is not None:
+            return self.last_size().size
+        else:
+            return 0
+    
     def used_volume_filesize(self):
         return filesize(self.last_size().size)
         #return filesize(self.used_volume)
@@ -1361,10 +1367,10 @@ class GWS(models.Model):
 
     def last_size(self):
         # display most recent GWSSetSizeMeasurement
-        try:
-            gwssm = GWSSizeMeasurement.objects.filter(gws=self).order_by('-date')[0]
-            return gwssm
-        except:
+        gwssms = GWSSizeMeasurement.objects.filter(gws=self).order_by('-date')
+        if len(gwssms) > 0:
+            return gwssms[0]
+        else:
             return None
     last_size.allow_tags = True
 	
