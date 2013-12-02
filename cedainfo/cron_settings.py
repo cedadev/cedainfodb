@@ -25,6 +25,9 @@ DATABASES = {
 DATABASE_ROUTERS = ['dbrouter.DatabaseAppsRouter']
 DATABASE_APPS_MAPPING= {'udbadmin': 'userdb'}
 
+ADDITIONAL_LDAP_GROUP_FILE = "/home/badc/etc/infrastructure/accounts/ldap/ldap_additional_groups.txt"
+ADDITIONAL_LDAP_USER_FILE  = "/home/badc/etc/infrastructure/accounts/ldap/ldap_additional_users.txt"
+
 #
 # Url for LDAP server
 #
