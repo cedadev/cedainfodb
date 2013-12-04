@@ -96,14 +96,9 @@ def authorise_datasets(request, userkey):
        ##        userkey = 1  # Just for testing, so all messages go to Andrew rather than the user!
 	       userkey = datasetRequest.userkey
 
-	       if datasetRequest.datasetid.datacentre.lower() == "neodc":
-	          cmd = "/home/badc/software/infrastructure/useradmin/bin/new_datasets_msg_neodc"
-	          Popen([cmd, "-send", "%s" % userkey])
-                  mailmsg = Popen([cmd, "%s" % userkey], stdout=PIPE).communicate()[0] 
-	       else:
-	          cmd = "/home/badc/software/infrastructure/useradmin/bin/new_datasets_msg"
-                  Popen([cmd, "-send", "%s" % userkey])
-                  mailmsg = Popen([cmd, "%s" % userkey], stdout=PIPE).communicate()[0] 
+	       cmd = "/usr/local/userdb/releases/current/new_datasets_notification/new_datasets_msg.py"
+	       Popen([cmd, "-send", "%s" % userkey])
+               mailmsg = Popen([cmd, "%s" % userkey], stdout=PIPE).communicate()[0] 
 
 	return render_to_response ('authorise_datasets_response.html', locals())
       
