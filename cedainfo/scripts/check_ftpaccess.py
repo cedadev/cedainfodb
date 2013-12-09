@@ -5,8 +5,36 @@
 #
 import os
 import sys
+import filecmp
+import shutil
+import subprocess
 
 import psycopg2
+
+
+FILE = '.ftpaccess'
+
+
+def find_nearest_ftpaccess_file (dirname):
+    '''
+    Returns the location of the 'nearest' ftpaccess file to the given
+    location. Returns an empty string if nothing is found.
+    '''   
+    dirname = dirname.rstrip('/')
+    
+    while True:
+    
+        ftpaccess = dirname + '/' + FILE
+		
+        if os.path.exists(ftpaccess):
+	    return ftpaccess
+	       
+        dirname = os.path.dirname(dirname)
+
+        if dirname.count('/') == 1:
+            break
+
+    return ''
 
 
 connection = psycopg2.connect(dbname="cedainfo", 
@@ -35,11 +63,12 @@ for rec in recs:
    
    if not os.path.exists(logical_path):
        print 'ERROR path %s does not exist' % logical_path
+       continue
    
    else:
        if not os.path.islink(logical_path):
            print 'ERROR %s is not a logical path' % logical_path
-   
+           continue
        else:
            link_destination = os.readlink(logical_path)
 	   
@@ -49,14 +78,27 @@ for rec in recs:
            if link_destination != directory:
 	       print 'ERROR: link mismatch: %s %s' % \
 	          (link_destination, directory)
-	   
+	       continue
+	       
    if not os.path.exists(directory):
        print 'ERROR directory %s does not exist' % directory
        continue
    
-   if not os.path.exists(directory + '/.ftpaccess'):
-       print logical_path, directory 
-
+   nearest = find_nearest_ftpaccess_file(logical_path)
+   current = directory + '/.ftpaccess'
+   
+   if not os.path.exists(current):
+       print 'No ftpaccess file: ', logical_path, directory 
+       print 'cp %s %s (%s)' % (nearest, current, logical_path)
+       subprocess.call(["cp", "-p", nearest, current])
+       
+   else:
+#       print 'Checking %s against %s' % (current, nearest)
+       
+       same = filecmp.cmp(current, nearest)
+       
+       if not same:
+          print "%s and %s differ" % (nearest, current)
 
 
     
