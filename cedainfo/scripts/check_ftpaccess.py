@@ -98,7 +98,7 @@ for rec in recs:
        same = filecmp.cmp(current, nearest)
        
        if not same:
-          print "%s and %s differ" % (nearest, current)
+          print "WARNING: %s and %s differ" % (nearest, current)
 
 
     
