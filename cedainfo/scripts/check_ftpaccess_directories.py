@@ -1,3 +1,8 @@
+#
+# Checks all the links in a given file to make sure they have .ftpaccess
+# files in place.
+#
+
 import os
 
 links_file = open ('links.lis', 'r')
