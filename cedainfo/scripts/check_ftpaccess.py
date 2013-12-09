@@ -30,6 +30,30 @@ for rec in recs:
    logical_path = rec[0]
    directory = rec[1] + '/archive/' + rec[2]
    
+   if logical_path.count('/') <= 2:
+       continue
+   
+   if not os.path.exists(logical_path):
+       print 'ERROR path %s does not exist' % logical_path
+   
+   else:
+       if not os.path.islink(logical_path):
+           print 'ERROR %s is not a logical path' % logical_path
+   
+       else:
+           link_destination = os.readlink(logical_path)
+	   
+	   link_destination = link_destination.rstrip('/')
+	   directory = directory.rstrip('/')
+	   
+           if link_destination != directory:
+	       print 'ERROR: link mismatch: %s %s' % \
+	          (link_destination, directory)
+	   
+   if not os.path.exists(directory):
+       print 'ERROR directory %s does not exist' % directory
+       continue
+   
    if not os.path.exists(directory + '/.ftpaccess'):
        print logical_path, directory 
 
