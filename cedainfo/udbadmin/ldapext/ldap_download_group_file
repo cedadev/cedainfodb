@@ -10,7 +10,7 @@ import shutil
 import subprocess
 import tempfile
 
-FILEDIR   = "/home/badc/etc/infrastructure/accounts/ldap/ldap_server_backups/groups/"
+FILEDIR   = "/datacentre/opshome/backups/ldap_accounts/groups/"
 LATEST    = FILEDIR + 'groups.ldif'
 
 tmp_file = tempfile.NamedTemporaryFile()
@@ -26,12 +26,16 @@ print "Executing: %s" % cmd
 os.system(cmd)
 
 if os.path.exists(LATEST):
+    print '%s exists' % LATEST
     differ = subprocess.call(["diff", "--brief", tmp_file.name, LATEST])
 
     if differ:
+        print "%s and %s differ" % (tmp_file.name, LATEST)
+    
         shutil.copy2(tmp_file.name, LATEST)
         shutil.copy2(LATEST, dated_file)
 else:
+    print "%s does not exist" % LATEST
     shutil.copy2(tmp_file.name, LATEST)
     shutil.copy2(LATEST, dated_file)
 

@@ -10,7 +10,7 @@ import shutil
 import subprocess
 import tempfile
 
-FILEDIR   = "/home/badc/etc/infrastructure/accounts/ldap/ldap_server_backups/users/"
+FILEDIR   = "/datacentre/opshome/backups/ldap_accounts/users/"
 LATEST    = FILEDIR + 'users.ldif'
 
 tmp_file = tempfile.NamedTemporaryFile()
