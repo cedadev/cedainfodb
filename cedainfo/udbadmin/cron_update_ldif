@@ -20,7 +20,7 @@ import time
 
 from django.core.management import setup_environ
 
-sys.path.append('/home/badc/software/infrastructure/cedainfo_releases/current/cedainfo')
+sys.path.append('/usr/local/cedainfodb/releases/current/cedainfo')
 
 import cron_settings as dbsettings
 setup_environ(dbsettings)
@@ -31,7 +31,7 @@ import udbadmin.udb_ldap as udb_ldap
 
 from django.db import connections
 
-LOG_DIR = '/datacentre/stats/ldap_accounts/'
+LOG_DIR = '/datacentre/opshome/backups/ldap_accounts/updates/'
 RUN_LOG = LOG_DIR + 'update_run.log'
 
 NAME_PREFIX = 'ceda_cron_check2' 
@@ -99,6 +99,8 @@ if user_updated or group_updated or update_anyway:
     cmds = udb_ldap.ldif_all_user_updates()
         
     if cmds:
+        print 'cmds: ', cmds
+        out = ''
         out = LDAP.ldif_write(cmds)
         output = "".join(out)
 
@@ -115,6 +117,8 @@ if group_updated or update_anyway:
     cmds = udb_ldap.ldif_all_group_updates()
         
     if cmds:
+        print 'cmds: ', cmds
+        out = ''
         out = LDAP.ldif_write(cmds)
         output = "".join(out)
 
