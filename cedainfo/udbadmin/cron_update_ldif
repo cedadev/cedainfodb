@@ -1,4 +1,4 @@
-#!/home/badc/software/infrastructure/cedainfo_releases/venv/bin/python
+#!/usr/local/cedainfodb/venv/bin/python
 #
 # Checks if any updates are required to the LDAP server. If so it
 # sends the updates to the LDAP server. Sends a notification email and writes
