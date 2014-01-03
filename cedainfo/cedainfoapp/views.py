@@ -341,12 +341,12 @@ def partition_list(request):
     elif partfilter == 'overalloc': 
         for p in partitions:
             allocated = p.allocated() + p.secondary_allocated()
-            if 100.0* allocated/(p.capacity_bytes+1) > 99.0 and p.status != 'Retired' :filtered_partitions.append(p)
+            if 100.0* allocated/(p.capacity_bytes+1) > 85.0 and p.status != 'Retired' :filtered_partitions.append(p)
     # list unalloced files on partition
     elif partfilter == 'unalloc': 
         for p in partitions:
             unalloc = p.used_bytes - p.used_by_filesets() + p.secondary_used_by_filesets()
-            if 100.0* unalloc/(p.capacity_bytes+1) > 1.0 and p.status != 'Retired' :filtered_partitions.append(p)
+            if 100.0* unalloc/(p.capacity_bytes+1) > 15.0 and p.status != 'Retired' :filtered_partitions.append(p)
     else: filtered_partitions = partitions
            
     # Use the object_list view.
