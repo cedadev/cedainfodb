@@ -145,13 +145,17 @@ class AuditAdmin(admin.ModelAdmin):
     list_display = ('fileset',
 		     'auditstate','starttime','total_files','corrupted_files', 'new_files', 
 		     'deleted_files', 'modified_files', 'unchanges_files')
-    actions=['delete']
+    actions=['remove']
     search_fields = ['fileset__logical_path']
     list_filter = ('auditstate',)  
     readonly_fields = ('fileset','auditstate','total_files','total_volume','corrupted_files', 'new_files', 
 		     'deleted_files', 'modified_files', 'unchanges_files', 'starttime', 'endtime', 'logfile')
     def has_add_permission(self, request):
         return False
+
+    def remove(self, request, queryset):
+        queryset.delete()
+    remove.short_description = "Delete audits"
 
 admin.site.register(Audit, AuditAdmin)
 
