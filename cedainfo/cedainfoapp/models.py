@@ -1346,20 +1346,13 @@ class GWS(models.Model):
         '''Report disk usage of GWS by creating a GWSSizeMeasurement.'''
         gws_dir = os.path.join(self.path, self.name)
         if os.path.isdir(gws_dir):
-            # find volume using du
+            # find volume using pan_df
             output = subprocess.Popen(['/usr/local/bin/pan_df', '-k', gws_dir],stdout=subprocess.PIPE).communicate()[0]
             lines = output.split('\n')
-            if len(lines) == 3: (fs, blocks, used, available, use, mounted) = lines[1].split()
+            if len(lines) == 4: (blocks, used, available, use, mounted) = lines[2].split()
             size = int(used)*1024
-            print "used %s, size %s" % (used, size)
             
-            # find number of files
-            p1 = subprocess.Popen(["find", gws_dir, "-type", "f"], stdout=subprocess.PIPE)
-            p2 = subprocess.Popen(["wc", "-l"], stdin=p1.stdout, stdout=subprocess.PIPE)
-            p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
-            nfiles = p2.communicate()[0]
-
-            gwssm = GWSSizeMeasurement(gws=self, date=datetime.utcnow(), size=size, no_files=int(nfiles))
+            gwssm = GWSSizeMeasurement(gws=self, date=datetime.utcnow(), size=size)
             gwssm.save() 
             self.used_volume=size
             self.forceSave()
