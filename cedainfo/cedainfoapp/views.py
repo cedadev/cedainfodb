@@ -15,6 +15,7 @@ import re
 
 import datetime
 import time
+import random
 
 logging=settings.LOG
 
@@ -265,19 +266,16 @@ def next_audit(request):
     fileset_to_audit = None
     oldest_audit = datetime.datetime.utcnow()
     for f in filesets:
-        print f
         last_audit = f.last_audit()
         # if no audit done before then use this one
 	if last_audit == None:
-            audit=Audit(fileset=f, auditstate='started', starttime = datetime.datetime.utcnow())
-            audit.save()
-	    return render_to_response('cedainfoapp/next_audit.txt', {'audit': audit})    
+            fileset_to_audit = f
+            break    
         # skip if last audit not an analysed state then skip
-        if last_audit.auditstate != 'analysed':    
-            print "Ignore - audit got an error" 
+        if last_audit.auditstate != 'analysed' and last_audit.auditstate != 'copy verified':    
+            print "Ignore - last audit not 'analysed' or 'copy verified' state.  state=%s" % last_audit.auditstate 
             continue
         # see if this is the oldest audit
-        print  last_audit.starttime , oldest_audit, last_audit.starttime < oldest_audit
 	if last_audit.starttime < oldest_audit:
 	    oldest_audit = last_audit.starttime
 	    fileset_to_audit = f
@@ -285,6 +283,13 @@ def next_audit(request):
     if fileset_to_audit:
         audit=Audit(fileset=fileset_to_audit, auditstate='started', starttime = datetime.datetime.utcnow())
         audit.save()
+        # wait a ramdom time and then check there are no other started audits for this fileset 
+        # this is to solve a race condition 
+        time.sleep(0.1*random.randint(1,100)) 
+        started_audits = Audit.objects.filter(fileset=fileset_to_audit, auditstate='started') 
+        if len(started_audits) != 1:  
+            audit.delete() 
+            audit=None        
     else: audit=None 
 
     return render_to_response('cedainfoapp/next_audit.txt', {'audit': audit})  
