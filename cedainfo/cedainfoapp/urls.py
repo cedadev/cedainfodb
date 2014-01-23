@@ -64,6 +64,7 @@ urlpatterns = patterns('',
 	(r'^gws/dashboard/$', gws_dashboard), # dashboard with more detail
     (r'^gws/(?P<id>\d+)/du$', gwsdu), # du to create size measurement for GWS
     (r'^gws/(?P<id>\d+)/df$', gwsdf), # du to create size measurement for GWS
+    (r'^gws/etexport/$', gws_list_etexport), # list for export to Elastic Tape system
     
     (r'^vmrequest/(?P<id>\d+)/approve', approve_vmrequest),
     (r'^vmrequest/(?P<id>\d+)/reject', reject_vmrequest),

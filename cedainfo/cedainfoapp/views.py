@@ -816,6 +816,13 @@ def gwsdf(request, id):
     gws = GWS.objects.get(pk=id)
     gws.pan_df()
     return redirect(request.META['HTTP_REFERER'])
+    
+# GWS Manager list, for digestion by Elastic Tape system
+# needs to be public to interact with scripts.
+def gws_list_etexport(request):
+
+    gwss = GWS.objects.all()
+    return render_to_response('cedainfoapp/gws_list_etexport.html', {'items':gwss}, mimetype="text/plain")      
 
 #
 # The following 'txt' views provide a simple text dump of selected tables. These are intended to be called
