@@ -185,6 +185,12 @@ def get_dataset_users(datasetids):
         udjs = Datasetjoin.objects.filter(datasetid=datasetid).filter(removed=0)     
         
         for udj in udjs:
+#
+#           Skip if no user for this record (it can happen!)
+#
+            if not hasattr(udj, 'userkey'):
+	        continue
+ 	
             user = udj.userkey
 
             if user.userkey not in all_valid_userkeys:
