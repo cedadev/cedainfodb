@@ -1,4 +1,4 @@
-#!/home/badc/software/infrastructure/cedainfo_releases/venv/bin/python
+#!/usr/local/cedainfodb/venv/bin/python
 #
 # Search for users who have 'vm_access' datasets, but no cems/jasmin
 # vm account. Optionally remove these datasets if called with the 
@@ -11,8 +11,8 @@ import time
 
 from django.core.management import setup_environ
 
-sys.path.append('/home/badc/software/infrastructure/cedainfo_releases/current/cedainfo')
-LOG_DIR = '/datacentre/stats/ldap_accounts/'
+sys.path.append('/usr/local/cedainfodb/releases/current/cedainfo')
+LOG_DIR = '/datacentre/opshome/backups/ldap_accounts/updates/'
 RUN_LOG = LOG_DIR + 'remove_vm_access.log'
 
 import cron_settings as dbsettings
