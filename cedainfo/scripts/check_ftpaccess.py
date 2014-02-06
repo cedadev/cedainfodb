@@ -46,7 +46,7 @@ cursor = connection.cursor()
 sql = """
 select logical_path, mountpoint, storage_pot  from cedainfoapp_fileset, cedainfoapp_partition
 where cedainfoapp_fileset.partition_id = cedainfoapp_partition.id
-and (logical_path like '/badc/%' or logical_path like '/neodc/%')
+and (logical_path like '/badc/%' or logical_path like '/neodc/%' or logical_path like '/sparc/%')
 order by mountpoint"""
 
 cursor.execute(sql)
@@ -57,6 +57,8 @@ for rec in recs:
    
    logical_path = rec[0]
    directory = rec[1] + '/archive/' + rec[2]
+   
+#   print logical_path, directory
    
    if logical_path.count('/') <= 2:
        continue
@@ -89,8 +91,10 @@ for rec in recs:
    
    if not os.path.exists(current):
        print 'No ftpaccess file: ', logical_path, directory 
-       print 'cp %s %s (%s)' % (nearest, current, logical_path)
-       subprocess.call(["cp", "-p", nearest, current])
+       
+       if nearest:
+          print 'cp %s %s (%s)' % (nearest, current, logical_path)
+          subprocess.call(["cp", "-p", nearest, current])
        
    else:
 #       print 'Checking %s against %s' % (current, nearest)
