@@ -182,7 +182,7 @@ class User (models.Model):
     othernames = models.CharField(max_length=50, verbose_name='Other names', help_text='Christian or Forenames')
     addresskey = models.OneToOneField(Addresses, db_column='addresskey')
     telephoneno = models.CharField('Telephone number', max_length=50, blank=True, help_text='Your institute/work number')
-    emailaddress = models.EmailField('Email Address', max_length=100, help_text='Your institute/work email address')
+    emailaddress = models.EmailField('Email Address', max_length=100, unique=False, help_text='Your institute/work email address')
     comments = models.TextField(blank=True)
     endorsedby = models.CharField("Supervisor's name", 
                            max_length=50, 
