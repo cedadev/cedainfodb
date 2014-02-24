@@ -65,6 +65,13 @@ class UserForm(ModelForm):
     gid = IntegerField(initial=0, required=False, label='Primary group id (0= use default)', max_value=90000, min_value=0)
     shell = CharField(required=False, label='Shell - leave blank to use default')
     home_directory = CharField(required=False, label='Home directory. Leave blank to use default')
+
+#
+#   Insert empty email addresses as null so we can have a unique constraint on this field
+#
+    def clean_emailaddress(self):
+        return self.cleaned_data['emailaddress'] or None
+
     
 #
 #      Make sure we can cope with a blank uid
