@@ -25,8 +25,11 @@ DATABASES = {
 DATABASE_ROUTERS = ['dbrouter.DatabaseAppsRouter']
 DATABASE_APPS_MAPPING= {'udbadmin': 'userdb'}
 
-ADDITIONAL_LDAP_GROUP_FILE = "/home/badc/etc/infrastructure/accounts/ldap/ldap_additional_groups.txt"
-ADDITIONAL_LDAP_USER_FILE  = "/home/badc/etc/infrastructure/accounts/ldap/ldap_additional_users.txt"
+ADDITIONAL_LDAP_GROUP_FILE = "/datacentre/opshome/etc/infrastructure/accounts/ldap/ldap_additional_groups.txt"
+ADDITIONAL_LDAP_USER_FILE  = "/datacentre/opshome/etc/infrastructure/accounts/ldap/ldap_additional_users.txt"
+
+# Make this unique, and don't share it with anybody.
+SECRET_KEY = ')p*zn!&dkeiji48jkdjkkljd880rutxe%av0_oa*4kc(57_rkda8!c&o7w$#^'
 
 #
 # Url for LDAP server
