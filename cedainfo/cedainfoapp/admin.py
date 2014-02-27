@@ -269,7 +269,7 @@ admin.site.register(FileSet,FileSetAdmin)
 
 
 class GWSRequestAdmin(admin.ModelAdmin):
-    list_display = ('gws_name', 'action_links','internal_requester', 'gws_manager', 'volume_filesize', 'backup_requirement', 'expiry_date', 'request_type', 'request_status', 'gws_link',  'timestamp')
+    list_display = ('gws_name', 'action_links','internal_requester', 'gws_manager', 'volume_filesize', 'et_quota_filesize', 'backup_requirement', 'expiry_date', 'request_type', 'request_status', 'gws_link',  'timestamp')
     list_filter = ('request_status',)
     #readonly_fields = ('request_status',)
     ordering = ('timestamp',)
@@ -277,7 +277,7 @@ class GWSRequestAdmin(admin.ModelAdmin):
 admin.site.register(GWSRequest, GWSRequestAdmin)
 
 class GWSAdmin(admin.ModelAdmin):
-    list_display = ('name', 'path', 'requested_volume_filesize', 'used_volume_filesize', 'action_links', 'last_size')
+    list_display = ('name', 'path', 'requested_volume_filesize', 'et_quota_filesize', 'used_volume_filesize', 'et_used', 'action_links', 'last_size')
     list_filter = ('status','path',)
     search_fields = ('name', 'path')
     def has_add_permission(self, request):

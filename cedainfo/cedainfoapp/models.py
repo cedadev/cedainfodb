@@ -1095,8 +1095,12 @@ class GWSRequest(models.Model):
     path = models.CharField(max_length=2048, help_text='storage path to this group workspace excluding GWS name', choices=settings.GWS_PATH_CHOICES)
     internal_requester = models.ForeignKey(User, help_text='CEDA person sponsoring the request')
     gws_manager = models.CharField(max_length=1024, help_text='External person who will manage the GWS during its lifetime')
+    gws_manager_email = models.EmailField(help_text="Email address")
+    gws_manager_username = models.CharField(max_length=45, help_text="System username")
+    #et_quota uses requested_volume as default unless other value specified: doesn't have to be the same)
     description = models.TextField(null=True, blank=True, help_text='Text description of proposed GWS')
     requested_volume = FileSizeField(help_text="In bytes, but can be enetered using suffix e.g. '200TB'", default='0')
+    et_quota = FileSizeField(help_text="In bytes, but can be entered using suffix e.g. '200TB'", default='0')
     backup_requirement = models.CharField(max_length=127, choices=settings.GWS_BACKUP_CHOICES, default='no backup')
     related_url = models.URLField(verify_exists=False, blank=True, help_text='Link to further info relevant to this GWS')
     expiry_date = models.DateField(default = datetime.now()+timedelta(days=2*365), help_text="date after which GWS will be deleted") # approx 2 years from now
@@ -1149,8 +1153,11 @@ class GWSRequest(models.Model):
                 status = 'active',
                 internal_requester = self.internal_requester,
                 gws_manager = self.gws_manager,
+                gws_manager_email = self.gws_manager_email,
+                gws_manager_username = self.gws_manager_username,
                 description = self.description,
                 requested_volume = self.requested_volume,
+                et_quota = self.et_quota,
                 backup_requirement = self.backup_requirement,
                 related_url = self.related_url,
                 expiry_date = self.expiry_date,
@@ -1171,8 +1178,11 @@ class GWSRequest(models.Model):
                 #gws.status = 'approved' #DISABLED : don't need to update this
                 gws.internal_requester = self.internal_requester
                 gws.gws_manager = self.gws_manager
+                gws_manager_email = self.gws_manager_email
+                gws_manager_username = self.gws_manager_username
                 gws.description = self.description
                 gws.requested_volume = self.requested_volume
+                gws.et_quota = self.et_quota
                 gws.backup_requirement = self.backup_requirement
                 gws.related_url = self.related_url
                 gws.expiry_date = self.expiry_date
@@ -1212,7 +1222,10 @@ class GWSRequest(models.Model):
         return filesize(self.requested_volume)
     volume_filesize.short_description = 'volume' 
     
-
+    def et_quota_filesize(self):
+        return filesize(self.et_quota)
+    et_quota_filesize.short_description = 'et_quota'
+    
 class GWS(models.Model):
 
     class Meta:
@@ -1235,6 +1248,11 @@ class GWS(models.Model):
     path = models.CharField(max_length=2048, help_text='storage path to this group workspace excluding GWS name', choices=settings.GWS_PATH_CHOICES)
     internal_requester = models.ForeignKey(User, help_text='CEDA person sponsoring the GWS')
     gws_manager = models.CharField(max_length=1024, help_text='External person who will manage the GWS during its lifetime')
+    gws_manager_email = models.EmailField(help_text="Email address")
+    gws_manager_username = models.CharField(max_length=45, help_text="System username")
+    #et_quota uses requested_volume as default unless other value specified: doesn't have to be the same)
+    et_quota = FileSizeField(help_text="In bytes, but can be entered using suffix e.g. '200TB'", default='0')
+    
     description = models.TextField(null=True, blank=True, help_text='Text description of GWS')
     requested_volume = FileSizeField(help_text="In bytes, but can be entered using suffix e.g. '200TB'", default='0')
     backup_requirement = models.CharField(max_length=127, choices=settings.GWS_BACKUP_CHOICES, default='no backup')
@@ -1246,6 +1264,7 @@ class GWS(models.Model):
     last_reviewed = models.DateTimeField(null=True, blank=True, help_text='date of last review')
     review_notes = models.TextField(blank=True, help_text='notes from reviews (append)')
     status = models.CharField(max_length=127, choices=settings.GWS_STATUS_CHOICES, default='active', help_text='status of GWS')
+    et_used = FileSizeField(help_text="In bytes, but can be entered using suffix e.g. '200TB'", default='0')
 
     
     def get_current_gwsrequest(self):
@@ -1318,7 +1337,15 @@ class GWS(models.Model):
         return filesize(self.last_size().size)
         #return filesize(self.used_volume)
     used_volume_filesize.short_description = 'used'
+    
+    def et_quota_filesize(self):
+        return filesize(self.et_quota)
+    et_quota_filesize.short_description = 'et_quota'
 	
+    def et_used_filesize(self):
+        return filesize(self.et_used)
+    et_used_filesize.short_description = 'et_used'
+
     def df(self):
         '''Report disk usage of GWS by creating a GWSSizeMeasurement.'''
         gws_dir = os.path.join(self.path, self.name)
