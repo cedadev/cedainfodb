@@ -1097,10 +1097,10 @@ class GWSRequest(models.Model):
     gws_manager = models.CharField(max_length=1024, help_text='External person who will manage the GWS during its lifetime')
     gws_manager_email = models.EmailField(help_text="Email address")
     gws_manager_username = models.CharField(max_length=45, help_text="System username")
-    #et_quota uses requested_volume as default unless other value specified: doesn't have to be the same)
     description = models.TextField(null=True, blank=True, help_text='Text description of proposed GWS')
     requested_volume = FileSizeField(help_text="In bytes, but can be enetered using suffix e.g. '200TB'", default='0')
-    et_quota = FileSizeField(help_text="In bytes, but can be entered using suffix e.g. '200TB'", default='0')
+    #et_quota uses requested_volume as default unless other value specified: doesn't have to be the same)    
+    et_quota = FileSizeField(help_text="Elastic Tape quota. In bytes, but can be entered using suffix e.g. '200TB'", default='0')
     backup_requirement = models.CharField(max_length=127, choices=settings.GWS_BACKUP_CHOICES, default='no backup')
     related_url = models.URLField(verify_exists=False, blank=True, help_text='Link to further info relevant to this GWS')
     expiry_date = models.DateField(default = datetime.now()+timedelta(days=2*365), help_text="date after which GWS will be deleted") # approx 2 years from now
@@ -1295,8 +1295,11 @@ class GWS(models.Model):
             path = self.path,
             internal_requester = self.internal_requester, 
             gws_manager = self.gws_manager,
+            gws_manager_email = self.gws_manager_email,
+            gws_manager_username = self.gws_manager_username,
             description = self.description,
             requested_volume = self.requested_volume,
+            et_quota = self.et_quota,
             backup_requirement = self.backup_requirement,
             related_url = self.related_url,
             expiry_date = self.expiry_date,
@@ -1340,11 +1343,11 @@ class GWS(models.Model):
     
     def et_quota_filesize(self):
         return filesize(self.et_quota)
-    et_quota_filesize.short_description = 'et_quota'
+    et_quota_filesize.short_description = 'ET quota'
 	
     def et_used_filesize(self):
         return filesize(self.et_used)
-    et_used_filesize.short_description = 'et_used'
+    et_used_filesize.short_description = 'ET used'
 
     def df(self):
         '''Report disk usage of GWS by creating a GWSSizeMeasurement.'''
