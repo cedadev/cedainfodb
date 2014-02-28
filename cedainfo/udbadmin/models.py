@@ -233,10 +233,8 @@ class User (models.Model):
     accounttype = models.CharField(max_length=10,
                choices=(
                        ("Web", "Web"), 
-                       ("Tornado", "Tornado"), 
                        ("Openid", "Openid"),
                        ("None", "None"),   
-                       ("Removed", "Removed"),
                        ("Suspended", "Suspended"),                                     
                        )
     )
