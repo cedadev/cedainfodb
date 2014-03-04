@@ -165,8 +165,12 @@ fsc_manager_csv_cols = {
     'path' : 1
 }
 
-# ckeckm files dir
+# checkm files dir
 CHECKM_DIR='/home/badc/checkm'
+
+# import file for RSS exported grant information from DataMAD system
+#DATAMAD_RSS_FILE = '/home/badc/datamad/rss_export.xml'
+DATAMAD_RSS_FILE = '/tmp/rss_export.xml'
 
 # Settings used for both GWSRequest and GWS
 GWS_BACKUP_CHOICES = (
