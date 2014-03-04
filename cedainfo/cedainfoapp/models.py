@@ -1178,8 +1178,8 @@ class GWSRequest(models.Model):
                 #gws.status = 'approved' #DISABLED : don't need to update this
                 gws.internal_requester = self.internal_requester
                 gws.gws_manager = self.gws_manager
-                gws_manager_email = self.gws_manager_email
-                gws_manager_username = self.gws_manager_username
+                gws.gws_manager_email = self.gws_manager_email
+                gws.gws_manager_username = self.gws_manager_username
                 gws.description = self.description
                 gws.requested_volume = self.requested_volume
                 gws.et_quota = self.et_quota
