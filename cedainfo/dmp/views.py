@@ -2,6 +2,7 @@ from cedainfo.dmp.models import *
 from django.shortcuts import redirect, render_to_response, get_object_or_404
 
 from django.contrib.auth.models import *
+import settings
 
 import datetime
 
@@ -85,7 +86,7 @@ def gotw_scrape(request, id):
         time.sleep(4)
         G = open(tmpfile)
         content = G.read()
-        os.unlink(tmpfile)
+#        os.unlink(tmpfile)
 
         m = re.search('<p class="awardtitle"><b>(.*?)</b></p>', content)
         grant.title=str(m.group(1))
@@ -103,69 +104,82 @@ def gotw_scrape(request, id):
 
 
 
-
-
-def make_project_from_scrape(request, id):
+def make_project_from_rss_export(request, id):
     grant = get_object_or_404(Grant, pk=id)
- 
+    
+    exports_file = settings.DATAMAD_RSS_FILE
+    
     import os, sys, subprocess, re, time, string, datetime
     months = {'Jan':1, 'Feb':2, 'Mar':3, 'Apr':4, 'May':5, 'Jun':6,
               'Jul':7, 'Aug':8, 'Sep':9, 'Oct':10, 'Nov':11, 'Dec':12}
+                        
     if not grant.number: redirect('/admin/dmp/grant/%s' % id)
-    tmpfile = "/tmp/grantscrape.html" 
-    url='http://gotw.nerc.ac.uk/list_full.asp?pcode=%s&cookieConsent=A' %grant.number
-    #try:
-    if 1:
-        subprocess.check_call('wget -O %s %s' % (tmpfile, url), shell=True)
-        time.sleep(4)
-        G = open(tmpfile)
-        content = G.read()
-        os.unlink(tmpfile)
 
-        p = Project()
-        m = re.search('<p class="awardtitle"><b>(.*?)</b></p>', content)
-        title=str(m.group(1))
-        m = re.search('<p class="small"><b>Abstract:</b> (.*?)</p>', content)
-        desc=m.group(1)
-        desc = ''.join(filter(lambda x: x in string.printable, desc))
-        m = re.search('<b>Principal Investigator</b>: <a href="list_med_pi.asp\?pi=.*?">(.*?)</a>', content)
-        pi=str(m.group(1))
-        notes = "Added via grants on the web scrap %s.\n" % time.strftime("%Y-%m-%d %H:%M")
-        m = re.search('<b>Period of Award</b>:\s*<span class="detailsText">(\d+) (.*?) (\d+) - (\d+) (.*?) (\d+)</span>', content)
-        startdate = datetime.date(int(m.group(3)),months[m.group(2)],int(m.group(1)))
-        enddate = datetime.date(int(m.group(6)),months[m.group(5)],int(m.group(4)))
-   
-        scisupcontact=request.user
-        m = re.search('<b>Programme</b>: <span class="detailsText"> <a href="list_them.asp\?them=.*?">(.*?)</a></span>', content)
-        programme = m.group(1)
-        print programme
+    import xml.etree.ElementTree as ET
+    import re
 
-        # make new project
-        projs = Project.objects.filter(title=title)
-        if len(projs) == 0:
-            p  = Project(startdate=startdate, enddate=enddate, PI=pi, notes=notes, title=title, desc=desc, status="Active", sciSupContact=scisupcontact)
-            p.save()
+    tree = ET.parse(exports_file)
+    root = tree.getroot()
+    channel = root.findall('channel')[0]
 
-            # link grant to new project
-            grant.project=p
-            grant.save()
+    def find_field(desc, text):
+        m = re.search('<div><b>%s:</b>(.*?)</div>' % text ,desc)
+        if m: return m.group(1).strip()
+        else: return ''
+    
+    def find_long_field(desc, text):
+        m = re.search('<div><b>%s:</b> <div class=".*?">(.*?)</div>' % text ,desc, re.S)
+        if m: return m.group(1).strip()
+        else: return ''
 
-            # make new programme if on found
-            progs = ProjectGroup.objects.filter(name=programme)
-            if len(progs) == 0:
-                pg = ProjectGroup(name=programme)
-                pg.save()
-                pg.projects.add(p)
-            else:
-                progs[0].projects.add(p)
+    for item in channel.findall('item'):
+        desc = item.find('description').text
+        title = item.find('title').text
+        grant_ref =  find_field(desc, 'Grant Reference')
+        if grant_ref == grant.number: break
+    else:
+        redirect('/admin/dmp/grant/%s' % id)
+        
+        
+    PI =  find_field(desc, 'Grant Holder')
+    abstract =  find_long_field(desc, 'Abstract')
+    objectives =  find_long_field(desc, 'Objectives')
+    project_description="Abstract: %s\n\nObjectives: %s" % (abstract, objectives)
+    startdate =  find_field(desc, 'Actual Start Date')
+    enddate =  find_field(desc, 'Actual End Date')
+    startdate = datetime.datetime.strptime(startdate, "%d/%m/%Y")
+    enddate = datetime.datetime.strptime(enddate, "%d/%m/%Y")
+    programme =  find_field(desc, 'Call')
 
-            # redirect back to project page
-            return redirect('/admin/dmp/project/%s' % p.pk)
+    notes = "Added via DataMAD RSS export %s.\n" % time.strftime("%Y-%m-%d %H:%M")
+    scisupcontact=request.user
+
+    # make new project
+    projs = Project.objects.filter(title=title)
+    if len(projs) == 0:
+        p  = Project(startdate=startdate, enddate=enddate, PI=PI, notes=notes, 
+                     title=title, desc=project_description, 
+                     status="Active", sciSupContact=scisupcontact)
+        p.save()
+
+        # link grant to new project
+        grant.project=p
+        grant.save()
+
+        # make new programme if on found
+        progs = ProjectGroup.objects.filter(name=programme)
+        if len(progs) == 0:
+            pg = ProjectGroup(name=programme)
+            pg.save()
+            pg.projects.add(p)
         else:
-            return render_to_response('dup_title.html', {'projs': projs, 'grant':grant})
+            progs[0].projects.add(p)
+
+        # redirect back to project page
+        return redirect('/admin/dmp/project/%s' % p.pk)
+    else:
+        return render_to_response('dup_title.html', {'projs': projs, 'grant':grant})
  
-    #except:
-    #    pass
     
     return redirect('/admin/dmp/grant/%s' % id)
 

@@ -6,18 +6,22 @@
 {% block object-tools %}
 
 
-<img style="height:40px; align:right" src="/static_files/projecticon.jpg"/>
 
 
 {% if change %}{% if not is_popup %}
   <ul class="object-tools">
     {% block object-tools-items %}
     <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-    {% for p in original.projects.all %}
-       <li><a style="background-color:#99ddcc" href="/admin/dmp/project/{{p.pk}}">{{p.title}}</a></li> 
-    {% endfor %}
     {% endblock %}
   </ul>
 {% endif %}{% endif %}
-{% endblock %}
 
+<h4>Project list:</h4>
+<ul>
+    {% for p in original.projects.all %}
+       <li><a style="background-color:#99ddcc; color:#ffffff; padding:2px; border:1px solid white;" href="/admin/dmp/project/{{p.pk}}"><b>{{p.PI}}</b>: 
+         {{p.title|truncatewords:6}}</a></li> 
+    {% endfor %}
+</ul>
+
+{% endblock %}
