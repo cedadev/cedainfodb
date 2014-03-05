@@ -97,7 +97,9 @@ def authorise_datasets(request, userkey):
 	       userkey = datasetRequest.userkey
 
 	       cmd = "/usr/local/userdb/releases/current/new_datasets_notification/new_datasets_msg.py"
-	       Popen([cmd, "-send", "%s" % userkey])
+	       m = Popen([cmd, "-send", "%s" % userkey])
+	       m.wait()
+               msg_status = m.returncode
                mailmsg = Popen([cmd, "%s" % userkey], stdout=PIPE).communicate()[0] 
 
 	return render_to_response ('authorise_datasets_response.html', locals())
