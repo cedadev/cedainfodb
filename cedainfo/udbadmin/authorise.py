@@ -100,6 +100,7 @@ def authorise_datasets(request, userkey):
 	       m = Popen([cmd, "-send", "%s" % userkey])
 	       m.wait()
                msg_status = m.returncode
+
                mailmsg = Popen([cmd, "%s" % userkey], stdout=PIPE).communicate()[0] 
 
 	return render_to_response ('authorise_datasets_response.html', locals())

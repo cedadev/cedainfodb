@@ -20,8 +20,17 @@ to ensure that the ftp server is updated.
 
 <p/>
 
-{% if mailmsg %}
+{% if msg_status != 0 %}
+    <font color="red" size="3"><b>Error sending notification email. Error code: {{msg_status}}</b></font><p/>
+    <b>The message that should have been sent is shown below:</b><br>
+{% else %}
    <b>The following mail message has been sent to the user:</b><br>
+{% endif %}
+
+<p/>
+
+{% if mailmsg %}
+ 
       <font size="1"><em>Sent using script {{cmd }}</em></font>
    <p>
 
