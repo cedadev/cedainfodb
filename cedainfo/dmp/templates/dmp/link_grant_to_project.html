@@ -14,8 +14,13 @@
 <input type="text" name="search" value="{{search}}"/>
 <input type="submit" value="Search"/>
 </form>
+<a href="?search={{grant.title}}">Search for grant title</a> |
+<a href="?search={{grant.pi}}">Search for grant PI</a> |
+<a href="?search={{grant.number}}">Search for grant reference</a> |
+<a href="/dmp/grant/{{grant.id}}/project_from_rss_export">Make new project from DataMAD</a>
 
-Projects with "{{search}}" in title
+
+<h3>Projects with "{{search}}" in title</h3>
 <table>
 {% for p in projects_bytitle %}
  <tr> 
@@ -26,7 +31,7 @@ Projects with "{{search}}" in title
 {% endfor %}
 </table>
 
-Projects with "{{search}}" in description
+<h3>Projects with "{{search}}" in description</h3>
 <table>
 {% for p in projects_bydesc %}
  <tr> 
@@ -37,7 +42,7 @@ Projects with "{{search}}" in description
 {% endfor %}
 </table>
 
-Projects with "{{search}}" in PI
+<h3>Projects with "{{search}}" in PI</h3>
 <table>
 {% for p in projects_bypi %}
  <tr> 
@@ -47,6 +52,7 @@ Projects with "{{search}}" in PI
  </tr>
 {% endfor %}
 </table>
+
 
 	
 {% endblock %}
