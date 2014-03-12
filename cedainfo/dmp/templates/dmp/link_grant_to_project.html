@@ -1,0 +1,52 @@
+
+
+{% extends "base_site.html" %}
+{% load i18n %}
+
+
+{% block content %}
+
+
+
+<h1>Link {{grant.title}} to a project</h1>
+
+<form>
+<input type="text" name="search" value="{{search}}"/>
+<input type="submit" value="Search"/>
+</form>
+
+Projects with "{{search}}" in title
+<table>
+{% for p in projects_bytitle %}
+ <tr> 
+ <td> <a href="/admin/dmp/project/{{p.pk}}">{{p.title}}</a></td>
+ <td> {{p.PI}} </td>
+ <td> <a href=?project={{p.pk}}>Link grant to project</a></td>
+ </tr>
+{% endfor %}
+</table>
+
+Projects with "{{search}}" in description
+<table>
+{% for p in projects_bydesc %}
+ <tr> 
+ <td> <a href="/admin/dmp/project/{{p.pk}}">{{p.title}}</a></td>
+ <td> {{p.PI}} </td>
+ <td> <a href=?project={{p.pk}}>Link grant to project</a></td>
+ </tr>
+{% endfor %}
+</table>
+
+Projects with "{{search}}" in PI
+<table>
+{% for p in projects_bypi %}
+ <tr> 
+ <td> <a href="/admin/dmp/project/{{p.pk}}">{{p.title}}</a></td>
+ <td> {{p.PI}} </td>
+ <td> <a href=?project={{p.pk}}>Link grant to project</a></td>
+ </tr>
+{% endfor %}
+</table>
+
+	
+{% endblock %}

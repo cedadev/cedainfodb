@@ -9,6 +9,7 @@ urlpatterns = patterns('',
      url(r'^myprojects$', my_projects),
      url(r'^projectsbyperson$', projects_by_person),
      url(r'^grant/(?P<id>\d+)/scrape$', gotw_scrape),
+     url(r'^grant/(?P<id>\d+)/link$', link_grant_to_project),
      url(r'^grant/(?P<id>\d+)/project_from_rss_export$', make_project_from_rss_export),
      url(r'^vmreg$', vmreg),
 )

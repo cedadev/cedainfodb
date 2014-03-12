@@ -51,6 +51,34 @@ def my_projects(request):
 
     return render_to_response('my_projects.html', {'projects': projects, 'user':user, 'listall':listall, 'modchecktime':datetime.datetime.now()-datetime.timedelta( days=90)})
 
+def link_grant_to_project(request, id):
+    # list projects for logged in user
+    if request.user.is_authenticated(): user=request.user
+    else: user = None
+
+    grant = get_object_or_404(Grant, pk=id)
+
+    # if set override login user
+    searchstring = request.GET.get('search', '') 
+    project_id = request.GET.get('project', None) 
+
+    # if projectid set then set and redirest back to grant page
+    if project_id: 
+        project = get_object_or_404(Project, pk=project_id)
+        grant.project = project
+        grant.save()
+        return redirect('/admin/dmp/grant/%s' % grant.pk)
+       
+    projects_bytitle = Project.objects.filter(title__icontains=searchstring)
+    projects_bypi = Project.objects.filter(PI__icontains=searchstring)
+    projects_bydesc = Project.objects.filter(desc__icontains=searchstring)
+    
+    context = {'projects_bytitle':projects_bytitle, 'projects_bypi':projects_bypi, 
+               'projects_bydesc':projects_bydesc, 'grant':grant, 'user':user, 
+               'search':searchstring}
+    
+    return render_to_response('link_grant_to_project.html', context)
+
 def projects_by_person(request):
 
     projects = Project.objects.all()

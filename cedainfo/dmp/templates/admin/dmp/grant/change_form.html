@@ -19,6 +19,7 @@
     <li>{{original.gotw|safe}}</li>
     {% if not original.project %}
     <li><a href="/dmp/grant/{{original.id}}/scrape_project" class="historylink">Make new project from scrape</a></li>
+    <li><a href="/dmp/grant/{{original.id}}/link?search={{original.pi}}" class="historylink">search for project</a></li>
     <li><a href="/dmp/grant/{{original.id}}/project_from_rss_export" class="historylink">Make new project from DataMAD</a></li>
     {% endif %}    
     {% if original.project %}
