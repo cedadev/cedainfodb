@@ -15,10 +15,13 @@ def run():
 
     for line in f:
         username = line.strip()
+	if not username:
+	    continue
     #   print username
         try: 
             user = User.objects.get(accountid=username)
+	    print user.accountid, user.emailaddress.lower()
         except:
             print 'ERROR: %s not found' % username
 
-        print user.accountid, user.emailaddress.lower()
+        
