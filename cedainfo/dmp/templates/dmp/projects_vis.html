@@ -1,0 +1,40 @@
+
+
+{% extends "base_site.html" %}
+{% load i18n %}
+
+{% block extrahead %}
+<link rel="stylesheet" type="text/css" href="/static/dmp.css" />
+<script type="text/javascript" src="/static/jquery-1.11.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $("div.project").click(function() {
+        $(this).fadeOut('slow');
+    });
+});
+</script>  
+{% endblock %}
+
+
+{% block content %}
+
+<h1>Project for review my {{user}}</h1>
+
+{%if listall %}
+<a href='?listall='>List active projects</a>
+{% else %}
+<a href='?listall=1'>List all project</a>
+{% endif %}
+
+<a href='/dmp/projectsbyperson'>Projects summary</a>
+
+
+
+{% for p in projects %}
+<div class="project {{p.status|lower}}">{{p.PI}}</div>
+
+{% endfor %}
+</table>
+
+	
+{% endblock %}

@@ -101,6 +101,29 @@ def projects_by_person(request):
 
     return render_to_response('projects_by_person.html', {'summary': summary})
 
+def projects_vis(request):
+
+    # list projects for logged in user
+    if request.user.is_authenticated(): user=request.user
+    else: user = None
+
+    # if set override login user
+    scisupcontact = request.GET.get('scisupcontact', None) 
+    if scisupcontact == 'None': scisupcontact=None
+    if scisupcontact: user= User.objects.filter(username=scisupcontact)[0]
+
+    projects = Project.objects.filter(sciSupContact=user)
+    
+    # if set override login user
+    listall = request.GET.get('listall', None)
+    if not listall:  
+        projects = projects.exclude(status='Proposal').exclude(status='NotFunded')
+        projects = projects.exclude(status='NoData').exclude(status='Defaulted').exclude(status='Complete')
+
+    projects = projects.order_by('modified')
+
+    return render_to_response('projects_vis.html', {'projects': projects, 'user':user, 'listall':listall, 'modchecktime':datetime.datetime.now()-datetime.timedelta( days=90)})
+
 
 def gotw_scrape(request, id):
     grant = get_object_or_404(Grant, pk=id)
