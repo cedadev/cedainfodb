@@ -193,6 +193,7 @@ def make_project_from_rss_export(request, id):
         
         
     PI =  find_field(desc, 'Grant Holder')
+    email =  find_field(desc, 'E-Mail')
     abstract =  find_long_field(desc, 'Abstract')
     objectives =  find_long_field(desc, 'Objectives')
     project_description="Abstract: %s\n\nObjectives: %s" % (abstract, objectives)
@@ -208,7 +209,8 @@ def make_project_from_rss_export(request, id):
     # make new project
     projs = Project.objects.filter(title=title)
     if len(projs) == 0:
-        p  = Project(startdate=startdate, enddate=enddate, PI=PI, notes=notes, 
+        p  = Project(startdate=startdate, enddate=enddate, PI="%s (%s)"%(PI,email), 
+                     notes=notes, 
                      title=title, desc=project_description, 
                      status="Active", sciSupContact=scisupcontact)
         p.save()

@@ -44,6 +44,7 @@ for item in channel.findall('item'):
     print desc
     grant_ref =  find_field(desc, 'Grant Reference')
     PI =  find_field(desc, 'Grant Holder')
+    PIemail = find_field(desc, 'E-Mail')
     abstract =  find_long_field(desc, 'Abstract')
     objectives =  find_long_field(desc, 'Objectives')
     
