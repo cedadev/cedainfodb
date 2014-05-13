@@ -58,7 +58,6 @@ def link_grant_to_project(request, id):
 
     grant = get_object_or_404(Grant, pk=id)
 
-    # if set override login user
     searchstring = request.GET.get('search', '') 
     project_id = request.GET.get('project', None) 
 
@@ -67,17 +66,43 @@ def link_grant_to_project(request, id):
         project = get_object_or_404(Project, pk=project_id)
         grant.project = project
         grant.save()
-        return redirect('/admin/dmp/grant/%s' % grant.pk)
-       
-    projects_bytitle = Project.objects.filter(title__icontains=searchstring)
-    projects_bypi = Project.objects.filter(PI__icontains=searchstring)
-    projects_bydesc = Project.objects.filter(desc__icontains=searchstring)
+        return redirect('/admin/dmp/grant?o=3' )
+ 
+    projectscores = {}
+    searchstrings = searchstring.split()
     
-    context = {'projects_bytitle':projects_bytitle, 'projects_bypi':projects_bypi, 
-               'projects_bydesc':projects_bydesc, 'grant':grant, 'user':user, 
+    stopwords = "a,an,and,are,as,at,by,for,from,had,has,have,how,if,in,into,is,it,"
+    stopwords += "its,no,not,of,off,on,or,so,some,than,that,the,then,there,these,they,"
+    stopwords += "this,to,too,us,wants,was,were,what,when,where,which,while,who,why,"
+    stopwords += "will,with,would,dr,prof,doctor,professor"
+    stopwords = stopwords.split(',')
+    
+    for s in searchstrings:
+        if s.lower() in stopwords: continue
+           
+        projects_bytitle = Project.objects.filter(title__icontains=s)
+        projects_bypi = Project.objects.filter(PI__icontains=s)
+
+        for p in projects_bytitle: 
+            if projectscores.has_key(p): projectscores[p] += 1
+            else: projectscores[p] = 1 
+        for p in projects_bypi: 
+            if projectscores.has_key(p): projectscores[p] += 1
+            else: projectscores[p] = 1 
+
+    topprojectscores = sorted(projectscores, key=projectscores.get) 
+    topprojectscores = topprojectscores[-8:]
+    topprojectscores.reverse()
+    for i in range(len(topprojectscores)):
+        project = topprojectscores[i]
+        score = projectscores[project]
+        topprojectscores[i] = (project, score)
+    context = {'projectscores':topprojectscores, 'grant':grant, 'user':user, 
                'search':searchstring}
     
     return render_to_response('link_grant_to_project.html', context)
+
+
 
 def projects_by_person(request):
 
@@ -228,8 +253,8 @@ def make_project_from_rss_export(request, id):
         else:
             progs[0].projects.add(p)
 
-        # redirect back to project page
-        return redirect('/admin/dmp/project/%s' % p.pk)
+        # redirect back to grants list
+        return redirect('/admin/dmp/grant?o=3' )
     else:
         return render_to_response('dup_title.html', {'projs': projs, 'grant':grant})
  

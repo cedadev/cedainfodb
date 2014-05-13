@@ -8,47 +8,31 @@
 
 
 
-<h1>Link {{grant.title}} to a project</h1>
+<h1>Link a grant to a project</h1>
+
+Selected grant: <br>
+Title: {{grant.title}} <br>
+PI: {{grant.pi}} <br>
+Grant Ref: {{grant.number}}
 
 <form>
 <input type="text" name="search" value="{{search}}"/>
 <input type="submit" value="Search"/>
 </form>
-<a href="?search={{grant.title}}">Search for grant title</a> |
-<a href="?search={{grant.pi}}">Search for grant PI</a> |
-<a href="?search={{grant.number}}">Search for grant reference</a> |
+
 <a href="/dmp/grant/{{grant.id}}/project_from_rss_export">Make new project from DataMAD</a>
 
 
-<h3>Projects with "{{search}}" in title</h3>
-<table>
-{% for p in projects_bytitle %}
- <tr> 
- <td> <a href="/admin/dmp/project/{{p.pk}}">{{p.title}}</a></td>
- <td> {{p.PI}} </td>
- <td> <a href=?project={{p.pk}}>Link grant to project</a></td>
- </tr>
-{% endfor %}
-</table>
+<h3>Projects matching</h3>
 
-<h3>Projects with "{{search}}" in description</h3>
-<table>
-{% for p in projects_bydesc %}
- <tr> 
- <td> <a href="/admin/dmp/project/{{p.pk}}">{{p.title}}</a></td>
- <td> {{p.PI}} </td>
- <td> <a href=?project={{p.pk}}>Link grant to project</a></td>
- </tr>
-{% endfor %}
-</table>
 
-<h3>Projects with "{{search}}" in PI</h3>
 <table>
-{% for p in projects_bypi %}
+{% for p, s in projectscores %}
  <tr> 
  <td> <a href="/admin/dmp/project/{{p.pk}}">{{p.title}}</a></td>
  <td> {{p.PI}} </td>
  <td> <a href=?project={{p.pk}}>Link grant to project</a></td>
+ <td>{{s}}</td>
  </tr>
 {% endfor %}
 </table>
