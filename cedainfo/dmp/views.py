@@ -133,6 +133,7 @@ def projects_vis(request):
     else: user = None
 
     # if set override login user
+    order = request.GET.get('order', None) 
     scisupcontact = request.GET.get('scisupcontact', None) 
     if scisupcontact == 'None': scisupcontact=None
     if scisupcontact: user= User.objects.filter(username=scisupcontact)[0]
@@ -145,7 +146,8 @@ def projects_vis(request):
         projects = projects.exclude(status='Proposal').exclude(status='NotFunded')
         projects = projects.exclude(status='NoData').exclude(status='Defaulted').exclude(status='Complete')
 
-    projects = projects.order_by('modified')
+    if not order: projects = projects.order_by('modified')
+    else: projects = projects.order_by(order)
 
     return render_to_response('projects_vis.html', {'projects': projects, 'user':user, 'listall':listall, 'modchecktime':datetime.datetime.now()-datetime.timedelta( days=90)})
 

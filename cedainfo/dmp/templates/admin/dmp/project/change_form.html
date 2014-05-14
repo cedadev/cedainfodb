@@ -14,6 +14,7 @@
     {% block object-tools-items %}
     <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
     <li><a href="/dmp/myprojects" class="historylink">My projects</a></li>
+    <li><a href="/dmp/projectsvis?listall=1" class="historylink">Vis</a></li>
     {% for g in original.grants %}
        <li><a style="background-color:pink" href="/admin/dmp/grant/{{g.pk}}">{{g.number}}</a></li> 
     {% endfor %}

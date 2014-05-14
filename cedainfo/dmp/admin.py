@@ -24,6 +24,21 @@ class ProjectAdmin(admin.ModelAdmin):
     search_fields = ('title', 'desc', 'PI', 'Contact1', 'Contact2')
     list_filter = ('status', 'sciSupContact')
     filter_horizontal = ('third_party_data','vms', 'groupworkspaces')
+    fieldsets = (
+        (None, {
+            'fields': (('title', 'PI'), 'desc', 'notes', 'data_activities',
+            ('startdate', 'enddate'), ('initial_contact','dmp_agreed'),
+            ('sciSupContact', 'status'))
+        }),
+        ('Advanced options', {
+            'classes': ('collapse',),
+            'fields': ('Contact1', 'Contact2', 'projectcost',
+                      'services', 'third_party_data', 'vms', 'groupworkspaces',
+                      'project_URL', 'project_usergroup')
+        }),
+    )
+
+
 
 admin.site.register(Project, ProjectAdmin)
 

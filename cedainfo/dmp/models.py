@@ -13,7 +13,7 @@ from django.contrib.auth.models import *
 from cedainfoapp.models import *
 from sizefield.models import FileSizeField
 
-#-----
+#----- 
 
 class Project(models.Model):
 
@@ -27,6 +27,8 @@ class Project(models.Model):
     data_activities = models.TextField(blank=True, null=True, help_text="Short description of data generation activities. eg Data will be collected by FAAM aircraft/ground instruments. Are there intensive measurement campaigns?")
     startdate = models.DateField(blank=True, null=True)
     enddate = models.DateField(blank=True, null=True)
+    dmp_agreed = models.DateField(blank=True, null=True)
+    initial_contact = models.DateField(blank=True, null=True)
     sciSupContact = models.ForeignKey(User, help_text="CEDA person contact for this Project", blank=True, null=True)
     PI = models.CharField(max_length=200, blank=True, null=True)
     Contact1 = models.CharField(max_length=200, blank=True, null=True)
@@ -49,6 +51,7 @@ class Project(models.Model):
     groupworkspaces = models.ManyToManyField(GWS, blank=True, null=True)
     project_URL = models.URLField(blank=True, null=True)
     project_usergroup = models.CharField(max_length=200, blank=True, null=True, help_text="Group name for registration for this group")
+
 	
     def __unicode__(self):
         return "%s" % self.title
@@ -60,6 +63,36 @@ class Project(models.Model):
     def data_outputs(self):
         dps = DataProduct.objects.filter(project=self)
         return dps
+
+    def datastatecount(self):
+        dps = DataProduct.objects.filter(project=self, status='WithProjectTeam')
+        nteam = len(dps)
+        dps = DataProduct.objects.filter(project=self, status='Ingesting')
+        ningest = len(dps)
+        dps = DataProduct.objects.filter(project=self, status='Archived')
+        ndone = len(dps)
+        dps = DataProduct.objects.filter(project=self, status='Defaulted')
+        ndone += len(dps)
+        dps = DataProduct.objects.filter(project=self, status='NotArchived')
+        ndone += len(dps)
+        return (nteam, ningest, ndone)
+
+    def summary_text(self):
+        title = self.title
+        m = re.search('\(([A-Z]{4,})', title)
+        if m: acronym = m.group(1)
+        else: 
+            m = re.search('([A-Z]\w*[A-Z]\w*)', title)
+            if m: acronym = m.group(1)
+            else: 
+                acronym = ''
+
+        pi = self.PI
+        m = re.search('( \w+ \()', pi)
+        if m: pi = m.group(1)
+        else: pi = pi
+        
+        return "%s %s"% (acronym, pi)
 
     def project_groups_links(self):
         output = ''

@@ -6,35 +6,52 @@
 {% block extrahead %}
 <link rel="stylesheet" type="text/css" href="/static/dmp.css" />
 <script type="text/javascript" src="/static/jquery-1.11.0.min.js"></script>
+
 <script type="text/javascript">
 $(document).ready(function() {
-    $("div.project").click(function() {
-        $(this).fadeOut('slow');
+    $("div.project").mouseenter(function() {
+        var projectdivid = $(this).attr("id")
+        projectdivid = projectdivid.slice(4)
+        $( "#showproj" ).load( "/admin/dmp/project/".concat(projectdivid) );
+  //      $( "#showproj" ).load( "/admin/" );
+    });
+    $("div.project").mouseleave(function() {
+        var projectdivid = $(this).attr("id")
+        projectdivid = projectdivid.slice(4)
+        $( "#showproj" ).empty();
     });
 });
-</script>  
+</script>
+  
 {% endblock %}
 
 
 {% block content %}
 
 <h1>Project for review my {{user}}</h1>
-
+<div>
 {%if listall %}
 <a href='?listall='>List active projects</a>
 {% else %}
 <a href='?listall=1'>List all project</a>
 {% endif %}
 
-<a href='/dmp/projectsbyperson'>Projects summary</a>
-
+| <a href='/dmp/projectsbyperson'>Projects summary</a>
+| <a href="?order=PI">by PI</a>
+| <a href="?order=modified">by modified date</a>
+| <a href="?order=status">by status</a>
+</div>
 
 
 {% for p in projects %}
-<div class="project {{p.status|lower}}">{{p.PI}}</div>
+<a href="/admin/dmp/project/{{p.pk}}"><div id="proj{{p.pk}}" class="project {{p.status|lower}} {% if not p.dmp_agreed %}nodmp{% endif %} {% if not p.initial_contact %}nocontact{% endif %}">
+{{p.summary_text}} {{p.datastatecount}}
+</div></a>
 
 {% endfor %}
 </table>
 
+<div id="showproj">
+</div>
 	
 {% endblock %}
