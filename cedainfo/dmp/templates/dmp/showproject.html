@@ -1,0 +1,14 @@
+
+
+<h1>{{project.title}}</h1>
+ 
+ 
+<table>
+<tr><td colspan=2 style='font-size:larger'><b>Project Information</b></td></tr>
+<tr><td>Project Name</td><td BGCOLOR='lightgrey'>{{ project.title }}</td></tr>
+<tr><td>Grant Reference(s)</td><td BGCOLOR='lightgrey'>{% for grant in project.grants %}{{ grant.number }} {% endfor %}</td></tr>
+<tr><td>Principle Investigator</td><td BGCOLOR='lightgrey'>{{ project.PI }}</td></tr>
+<tr><td>Start/End Dates</td><td BGCOLOR='lightgrey'>{{ project.startdate }} to {{ project.enddate }}</td></tr>
+</table>	
+ 
+

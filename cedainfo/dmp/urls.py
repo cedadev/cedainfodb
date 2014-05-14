@@ -6,6 +6,7 @@ urlpatterns = patterns('',
 
      url(r'^project/(?P<project_id>\d+)$', dmp_draft),
      url(r'^project/(?P<project_id>\d+)/adddataproduct$', add_dataproduct),
+     url(r'^project/(?P<project_id>\d+)/show$', showproject),
      url(r'^myprojects$', my_projects),
      url(r'^projectsvis$', projects_vis),
      url(r'^projectsbyperson$', projects_by_person),

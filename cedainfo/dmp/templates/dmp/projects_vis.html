@@ -12,8 +12,8 @@ $(document).ready(function() {
     $("div.project").mouseenter(function() {
         var projectdivid = $(this).attr("id")
         projectdivid = projectdivid.slice(4)
-        $( "#showproj" ).load( "/admin/dmp/project/".concat(projectdivid) );
-  //      $( "#showproj" ).load( "/admin/" );
+        $( "#showproj" ).load( "/dmp/project/".concat(projectdivid).concat("/show") );
+  //      $( "#showproj" ).load( "/dmp/showproject/" );
     });
     $("div.project").mouseleave(function() {
         var projectdivid = $(this).attr("id")
@@ -50,7 +50,7 @@ $(document).ready(function() {
 
 {% endfor %}
 </table>
-
+<hr/>
 <div id="showproj">
 </div>
 	

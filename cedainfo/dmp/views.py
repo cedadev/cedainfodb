@@ -151,6 +151,11 @@ def projects_vis(request):
 
     return render_to_response('projects_vis.html', {'projects': projects, 'user':user, 'listall':listall, 'modchecktime':datetime.datetime.now()-datetime.timedelta( days=90)})
 
+def showproject(request, project_id):
+    # a summary of a single project
+    project = get_object_or_404(Project, pk=project_id)
+    return render_to_response('showproject.html', {'project': project,})
+
 
 def gotw_scrape(request, id):
     grant = get_object_or_404(Grant, pk=id)
