@@ -31,6 +31,8 @@ class Project(models.Model):
     initial_contact = models.DateField(blank=True, null=True)
     sciSupContact = models.ForeignKey(User, help_text="CEDA person contact for this Project", blank=True, null=True)
     PI = models.CharField(max_length=200, blank=True, null=True)
+    PIemail = models.EmailField(max_length=200, blank=True, null=True)
+    PIinst = models.CharField(max_length=200, blank=True, null=True)
     Contact1 = models.CharField(max_length=200, blank=True, null=True)
     Contact2 = models.CharField(max_length=200, blank=True, null=True)
     projectcost = models.IntegerField(blank=True, null=True)

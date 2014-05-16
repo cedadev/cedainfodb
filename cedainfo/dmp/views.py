@@ -134,6 +134,7 @@ def projects_vis(request):
 
     # if set override login user
     order = request.GET.get('order', None) 
+    show = request.GET.get('show', None) 
     scisupcontact = request.GET.get('scisupcontact', None) 
     if scisupcontact == 'None': scisupcontact=None
     if scisupcontact: user= User.objects.filter(username=scisupcontact)[0]
@@ -149,7 +150,9 @@ def projects_vis(request):
     if not order: projects = projects.order_by('modified')
     else: projects = projects.order_by(order)
 
-    return render_to_response('projects_vis.html', {'projects': projects, 'user':user, 'listall':listall, 'modchecktime':datetime.datetime.now()-datetime.timedelta( days=90)})
+    return render_to_response('projects_vis.html', {'projects': projects, 'user':user, 
+                              'listall':listall, 'show':show,
+                              'modchecktime':datetime.datetime.now()-datetime.timedelta( days=90)})
 
 def showproject(request, project_id):
     # a summary of a single project

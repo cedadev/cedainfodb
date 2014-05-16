@@ -9,17 +9,24 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-    $("div.project").mouseenter(function() {
+    var currentdiv = 'xx';
+    $("div.project").click(function() {
+        if (currentdiv !== 'xx') {
+            console.log('hi')
+            currentdiv.toggleClass("selected"); 
+        };
+        currentdiv = $(this);
         var projectdivid = $(this).attr("id")
         projectdivid = projectdivid.slice(4)
         $( "#showproj" ).load( "/dmp/project/".concat(projectdivid).concat("/show") );
-  //      $( "#showproj" ).load( "/dmp/showproject/" );
+        currentdiv.toggleClass("selected"); 
     });
-    $("div.project").mouseleave(function() {
+    $("div.project").dblclick(function() {
         var projectdivid = $(this).attr("id")
         projectdivid = projectdivid.slice(4)
-        $( "#showproj" ).empty();
+        location.href = "/admin/dmp/project/".concat(projectdivid);
     });
+    {% if show %}$("#showproj").load( "/dmp/project/".concat({{show}}).concat("/show") ); {%endif%}
 });
 </script>
   
@@ -29,6 +36,8 @@ $(document).ready(function() {
 {% block content %}
 
 <h1>Project for review my {{user}}</h1>
+
+
 <div>
 {%if listall %}
 <a href='?listall='>List active projects</a>
@@ -42,16 +51,17 @@ $(document).ready(function() {
 | <a href="?order=status">by status</a>
 </div>
 
+<div id="showproj">
+
+</div>
+
 
 {% for p in projects %}
-<a href="/admin/dmp/project/{{p.pk}}"><div id="proj{{p.pk}}" class="project {{p.status|lower}} {% if not p.dmp_agreed %}nodmp{% endif %} {% if not p.initial_contact %}nocontact{% endif %}">
+<div title="{{p.title}} - {{p.PI}}" id="proj{{p.pk}}" class="project {{p.status|lower}} {% if not p.dmp_agreed %}nodmp{% endif %} {% if not p.initial_contact %}nocontact{% endif %}">
 {{p.summary_text}} {{p.datastatecount}}
-</div></a>
+</div>
 
 {% endfor %}
 </table>
-<hr/>
-<div id="showproj">
-</div>
 	
 {% endblock %}

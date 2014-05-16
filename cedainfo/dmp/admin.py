@@ -26,7 +26,7 @@ class ProjectAdmin(admin.ModelAdmin):
     filter_horizontal = ('third_party_data','vms', 'groupworkspaces')
     fieldsets = (
         (None, {
-            'fields': (('title', 'PI'), 'desc', 'notes', 'data_activities',
+            'fields': (('title', 'PI', 'PIemail'), 'desc', 'notes', 'data_activities',
             ('startdate', 'enddate'), ('initial_contact','dmp_agreed'),
             ('sciSupContact', 'status'))
         }),

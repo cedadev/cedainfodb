@@ -2,13 +2,38 @@
 
 <h1>{{project.title}}</h1>
  
+ <script>
+    function initial_contact () {
+       var email = "{{project.PIemail}}";
+       var subject = encodeURI("sub");
+       var body = encodeURI("boby");
+       console.log("Hi");
+       var uri = "mailto:".concat(email).concat('?subject=').concat(subject).concat("&body=").concat(body);
+       location.href=uri;
+       };
+    function dmp_draft_email () {
+       var email = "{{project.PIemail}}";
+       var subject = encodeURI("sub");
+       var body = encodeURI("{{project.title}}");
+       console.log("Hi");
+       var uri = "mailto:".concat(email).concat('?subject=').concat(subject).concat("&body=").concat(body);
+       location.href=uri;
+       };       
+       
+ </script>
  
 <table>
-<tr><td colspan=2 style='font-size:larger'><b>Project Information</b></td></tr>
-<tr><td>Project Name</td><td BGCOLOR='lightgrey'>{{ project.title }}</td></tr>
 <tr><td>Grant Reference(s)</td><td BGCOLOR='lightgrey'>{% for grant in project.grants %}{{ grant.number }} {% endfor %}</td></tr>
 <tr><td>Principle Investigator</td><td BGCOLOR='lightgrey'>{{ project.PI }}</td></tr>
 <tr><td>Start/End Dates</td><td BGCOLOR='lightgrey'>{{ project.startdate }} to {{ project.enddate }}</td></tr>
+<tr><td>Contacted/DMP Agreed</td><td BGCOLOR='lightgrey'>{{ project.initial_contact }}/{{ project.dmp_agreed }}</td></tr>
 </table>	
  
-
+<h2>Actions</h2>
+<ul>
+<li><button onclick="location.href='/admin/dmp/project/{{project.pk}}';">Edit</button></li>
+<li><button onclick="location.href='/dmp/project/{{project.pk}}';">DMP draft</button></li>
+<li><button onclick="initial_contact();">Initial contact email</button></li>
+<li><button onclick="dmp_draft_email();">DMP draft email</button></li>
+<li><button onclick="location.href='/dmp/project/{{project.pk}}/adddataproduct';">Add a data product</button></li>
+</ul>

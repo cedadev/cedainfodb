@@ -8,51 +8,61 @@ a:visited.gotwlink {color:red; background-color:blue}
           border-color:#000000;
           border-width:2px;
           border-style:solid;
-          border-radius:5px;
+          border-radius:10px;
           font-size:8px;
           padding:2px;
-          margin:2px;
+          margin:4px;
           clear:none;
           float:left;
           }
 
 .nodata {background-color:#99aa99; 
+          opacity:0.5;
+
           }
-.active {background-color:#ccffcc; 
+.active {background-color:#99ff88; 
           }
-.proposal {background-color:#ccccff; 
+.proposal {background-color:#ffffff; 
           }
 .defaulted {background-color:#ff5555; 
           }
 
-.notfunded {background-color:#aa9999; 
+.notfunded {background-color:#ffffee; 
+          border-style:solid;
+          opacity:0.5;
           }
 
-.complete {background-color:#cccccc; 
+.complete {background-color:#9999ff;
+           opacity:0.5; 
           }
 
-.notstarted {background-color:#ffffcc; 
+.notstarted {background-color:#ffff00; 
           }
 
-.endedwithdatatocome {background-color:#aaffbb; 
+.endedwithdatatocome {background-color:#ffcc00; 
           }
 
 .nodmp {border-color:#cc0000;
         border-style:solid;
-        border-width:4px;
-
 }
 .nocontact {border-color:#ff0000;
         border-style:dotted;
-        border-width:3px;
-
 }
 
-.projectbox {background-color:blue; width:400px; 
+.selected {
+          border-width:5px;
+          padding:1px;
+          margin:2px;          
+          }
+
+#showproj {background-color:#fffff0; width:400px; 
           height:400px; 
           border-color:#000000;
-          border-width:3px;
+          border-width:2px;
           border-style:solid;
-          border-radius:4px;
-          font-size:6px;
+          border-radius:10px;
+          font-size:16px;
+          float: right;
+          margin:20px;
+          padding:5px;
           }
