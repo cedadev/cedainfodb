@@ -517,6 +517,13 @@ def make_secondary_copies(request):
     filesets = FileSet.objects.filter(secondary_partition__isnull=False).exclude(storage_pot='')
     return render_to_response('cedainfoapp/make_secondary_copies.txt', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
 
+# make list of download stats configuration
+# needs to be open for automation
+#
+def download_conf(request):
+    filesets = FileSet.objects.all().exclude(storage_pot='')
+    return render_to_response('cedainfoapp/download_conf.txt', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
+
 # make list filesets for depositserver
 # needs to be open for automation
 #
