@@ -4,20 +4,21 @@
 #    python manage.py runscript <script-name-without-py-extension>
 #
 #
-#  Reads a list of accountids from file 'users.lis' and prints out the 
+#  Reads a list of accountids piped into standard input and prints out the 
 #  associated email address
 #
+import sys
+
 from udbadmin.models import User
 
-f = open('users.lis', 'r')
 
 def run():
 
-    for line in f:
+    for line in sys.stdin:
         username = line.strip()
+	
 	if not username:
 	    continue
-    #   print username
         try: 
             user = User.objects.get(accountid=username)
 	    print user.accountid, user.emailaddress.lower()
