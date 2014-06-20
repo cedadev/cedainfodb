@@ -521,6 +521,17 @@ class FileSet(models.Model):
         else: backupsize, backupfiles, nagg, firstfiletime, lastupdated =  0, 0, 0, '--', '--'
         return "%s files, %s bytes last stored %s" %(backupfiles,backupsize, lastupdated)
 
+    # find last time processed for storage-D... 
+    def sd_backup_process_log(self):
+        SDLOG = open('/datacentre/stats/storaged/lastprocessing-latest.txt')
+        while 1:
+            line = SDLOG.readline()
+            if line == '': break
+            if line.find(self.storage_pot) != -1: return line
+        return 'Not in log'
+        
+        
+        
 # migration allocation don by hand at the moment
 
     #def allocate_m(self):
