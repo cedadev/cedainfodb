@@ -61,8 +61,9 @@ class PersonAdmin(admin.ModelAdmin):
    
 admin.site.register(Person, PersonAdmin)
 
-admin.site.register(HostHistory)
-admin.site.register(ServiceBackupLog)
+#admin.site.register(HostHistory)
+#admin.site.register(FileSetSizeMeasurement)
+#admin.site.register(ServiceBackupLog)
 
 # customise the Host admin interface
 class HostAdmin(admin.ModelAdmin):
