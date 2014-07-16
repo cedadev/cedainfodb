@@ -510,7 +510,7 @@ class FileSet(models.Model):
 
     # crude storage-d size finder via screen scrape... 
     def backup_summary2(self):
-        url = 'http://storaged-monitor.esc.rl.ac.uk/storaged_ceda/CEDA_Fileset_Summary_XML.php?%s' % self.storage_pot
+        url = 'http://storaged-monitor.esc.rl.ac.uk/storaged_ceda/CEDA_Fileset_Summary_XML.php?fileset=%s&level=top' % self.storage_pot
         import urllib2
         f = urllib2.urlopen(url)
         backup = f.read()
