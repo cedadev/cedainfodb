@@ -1035,7 +1035,7 @@ class Audit(models.Model):
             path = os.path.join(directory,n)     
             relpath = os.path.join(reldir,n)                     
             # if path is reg file
-            if os.path.isfile(path): 
+            if os.path.isfile(path) and not os.path.islink(path):
 	        size = os.path.getsize(path)
 		mtime = datetime.utcfromtimestamp(os.path.getmtime(path)).strftime('%Y-%m-%dT%H:%M:%SZ')
                 F=open(path)
