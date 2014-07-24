@@ -143,7 +143,7 @@ class PartitionAdmin(admin.ModelAdmin):
 admin.site.register(Partition, PartitionAdmin)
 
 class AuditAdmin(admin.ModelAdmin):
-    list_display = ('fileset',
+    list_display = ('pk','fileset_link',
 		     'auditstate','starttime','total_files','corrupted_files', 'new_files', 
 		     'deleted_files', 'modified_files', 'unchanges_files')
     actions=['remove']

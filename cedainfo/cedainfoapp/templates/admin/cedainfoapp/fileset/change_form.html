@@ -8,6 +8,7 @@
   <ul class="object-tools">
     {% block object-tools-items %}
     <li><a href="/fileset/{{ original.id }}/markcomplete" class="historylink">Mark as Complete</a></li>
+    <li><a href="/admin/cedainfoapp/audit/?fileset__exact={{original.pk}}" class="historylink">Audits</a></li>
     <li><a href="/admin/cedainfoapp/partition/{{ original.partition.id }}" class="historylink">On {{ original.partition.mountpoint }}</a></li>
     {%if original.dataentity %}<li><a href="/admin/cedainfoapp/dataentity/{{ original.dataentity.id }}" class="historylink">Data Entity</a></li>{%endif%}
     <li><a href="history/" class="historylink">{% trans "History" %}</a></li>

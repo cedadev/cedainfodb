@@ -832,6 +832,11 @@ class Audit(models.Model):
            
     def __unicode__(self):
         return 'Audit of %s started %s  [[%s]]' % (self.fileset, self.starttime, self.auditstate)
+
+    def fileset_link(self):
+        return '<a href="/admin/cedainfoapp/fileset/%s">%s</a>' % (self.fileset.pk, self.fileset)
+    fileset_link.allow_tags = True
+    fileset_link.short_description = "Fileset" 
         
     def start(self):
  	self.starttime = datetime.utcnow()
