@@ -149,6 +149,9 @@ def projects_vis(request):
 
     if not order: projects = projects.order_by('modified')
     else: projects = projects.order_by(order)
+    
+    for p in projects:
+        p.alert_type, p.alert_text = p.alerts()
 
     return render_to_response('projects_vis.html', {'projects': projects, 'user':user, 
                               'listall':listall, 'show':show,

@@ -5,6 +5,7 @@ from django.db import models
 from django.db import models
 
 import datetime
+from datetime import datetime, timedelta, date
 
 import re
 
@@ -54,6 +55,12 @@ class Project(models.Model):
     project_URL = models.URLField(blank=True, null=True)
     project_usergroup = models.CharField(max_length=200, blank=True, null=True, help_text="Group name for registration for this group")
 
+
+    def active(self):
+        if self.status in ("Active", "EndedWithDataToCome"): return True 
+        elif self.status == "NotStarted" and self.startdate < date.today(): return True
+        elif not self.status: return True
+        else: return False
 	
     def __unicode__(self):
         return "%s" % self.title
@@ -115,6 +122,69 @@ class Project(models.Model):
             output += '<a href="/admin/dmp/grant/%s">%s</a> ' % (g.id, g.number)
         return output
     grant_links.allow_tags = True    
+
+    def alerts(self):
+        # produce alert flag (red, amber, green) and alert text to show needed actions.
+        # 
+        # 4 alert types, DMP agreement, contact, end of project, missing info.
+        month = timedelta(days=31)
+        now = date.today()
+        flag = 0  # green - default
+        text = '' # default alert text
+        if not self.active(): return ('green', 'No warnings as not active.')
+        
+        # check DMP status
+        if self.startdate + 3*month < now and not self.dmp_agreed: 
+            flag = max(flag, 2)
+            text += 'DMP not agreed after 3 months from project start. '
+        elif self.startdate + 2*month < now and not self.dmp_agreed:
+            flag = max(flag, 1)
+            text += 'DMP not agreed after 2 months from project start. '
+
+        # check contact status
+        if self.startdate + 2*month < now and not self.initial_contact: 
+            flag = max(flag, 2)
+            text += 'No contact in the first 2 months of the project. '
+        elif self.startdate + 1*month < now and not self.initial_contact:
+            flag = max(flag, 1)
+            text += 'No contact in the first 1 months of the project. '
+
+        # check contact status
+        if self.startdate < now and self.status=="NotStarted": 
+            flag = max(flag, 1)
+            text += 'Change status to active? '
+
+        # end of project
+        if self.enddate < now: 
+            flag = max(flag, 2)
+            text += 'Project ended but not marked as complete. '
+        elif self.enddate - 3*month < now:
+            flag = max(flag, 1)
+            text += '3 months before project end. '
+
+        # check critical fields
+        if not self.title:
+            flag = max(flag, 2)
+            text += 'Needs a title. '
+        if not self.startdate:
+            flag = max(flag, 2)
+            text += 'Needs a start date. '
+        if not self.enddate:
+            flag = max(flag, 2)
+            text += 'Needs a end date. '
+        if not self.sciSupContact:
+            flag = max(flag, 1)
+            text += 'Needs a science support contact. '
+        if not self.PI:
+            flag = max(flag, 2)
+            text += 'Needs a PI name. '
+        if not self.status:
+            flag = max(flag, 1)
+            text += 'Needs a status. '  
+            
+        print flag, text    
+        flag = ('green', 'ambar', 'red')[flag]
+        return (flag, text)              
 
     def is_jasmin(self):
         #look for jasmin in vm mountpoints 

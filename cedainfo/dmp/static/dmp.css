@@ -6,53 +6,33 @@ a:visited.gotwlink {color:red; background-color:blue}
 .project {width:60px; 
           height:30px; 
           border-color:#000000;
-          border-width:2px;
+          border-width:5px;
           border-style:solid;
           border-radius:10px;
           font-size:8px;
-          padding:2px;
-          margin:4px;
+          padding:1px;
+          margin:2px;
           clear:none;
           float:left;
           }
 
-.nodata {background-color:#99aa99; 
-          opacity:0.5;
+.nodata {border-color:#00ccff; opacity:0.7; }
+.active {border-color:#000000; }
+.proposal {border-color:#cccccc; }
+.defaulted {border-color:#ff0000; }
+.notfunded {border-color:#0099ff; opacity:0.7; }
+.complete {border-color:#0000ff; opacity:0.7; }
+.notstarted {border-color:#777777; }
+.endedwithdatatocome {border-color:#ffff00;  }
 
-          }
-.active {background-color:#99ff88; 
-          }
-.proposal {background-color:#ffffff; 
-          }
-.defaulted {background-color:#ff5555; 
-          }
-
-.notfunded {background-color:#ffffee; 
-          border-style:solid;
-          opacity:0.5;
-          }
-
-.complete {background-color:#9999ff;
-           opacity:0.5; 
-          }
-
-.notstarted {background-color:#ffff00; 
-          }
-
-.endedwithdatatocome {background-color:#ffcc00; 
-          }
-
-.nodmp {border-color:#cc0000;
-        border-style:solid;
-}
-.nocontact {border-color:#ff0000;
-        border-style:dotted;
-}
+.green {background-color:#22ff22;}
+.ambar {background-color:#ffff22;}
+.red {background-color:#ff2222;}
 
 .selected {
-          border-width:5px;
-          padding:1px;
-          margin:2px;          
+          border-width:8px;
+          padding:0px;
+          margin:0px;          
           }
 
 #showproj {background-color:#fffff0; width:400px; 
