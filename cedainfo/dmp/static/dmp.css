@@ -16,18 +16,18 @@ a:visited.gotwlink {color:red; background-color:blue}
           float:left;
           }
 
-.nodata {border-color:#00ccff; opacity:0.7; }
+.nodata {border-color:#00ccff; }
 .active {border-color:#000000; }
 .proposal {border-color:#cccccc; }
 .defaulted {border-color:#ff0000; }
-.notfunded {border-color:#0099ff; opacity:0.7; }
-.complete {border-color:#0000ff; opacity:0.7; }
+.notfunded {border-color:#0099ff; }
+.complete {border-color:#0000ff;  }
 .notstarted {border-color:#777777; }
 .endedwithdatatocome {border-color:#ffff00;  }
 
 .green {background-color:#22ff22;}
 .ambar {background-color:#ffff22;}
-.red {background-color:#ff2222;}
+.red {background-color:#ff5555;}
 
 .selected {
           border-width:8px;
