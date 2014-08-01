@@ -350,7 +350,7 @@ class User (models.Model):
     def isSystemUser(self):
         '''Returns True if this is not a real person but a system account.'''
         
-        if self.accountid == 'et_jasmin':
+        if self.accountid == 'et_jasmin' or self.othernames.startswith('system_user'):
             return True
         else:
             return False                 
