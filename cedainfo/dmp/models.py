@@ -132,6 +132,10 @@ class Project(models.Model):
         flag = 0  # green - default
         text = '' # default alert text
         if not self.active(): return ('green', 'No warnings as not active.')
+
+        # Need to set start and end dates to have alerts
+        if not self.startdate: return ('red', 'Need a start date.')
+        if not self.enddate: return ('red', 'Need an end date.')
         
         # check DMP status
         if self.startdate + 3*month < now and not self.dmp_agreed: 
@@ -160,18 +164,12 @@ class Project(models.Model):
             text += 'Project ended but not marked as complete. '
         elif self.enddate - 3*month < now:
             flag = max(flag, 1)
-            text += '3 months before project end. '
+            text += '3 months before project end.  '
 
         # check critical fields
         if not self.title:
             flag = max(flag, 2)
             text += 'Needs a title. '
-        if not self.startdate:
-            flag = max(flag, 2)
-            text += 'Needs a start date. '
-        if not self.enddate:
-            flag = max(flag, 2)
-            text += 'Needs a end date. '
         if not self.sciSupContact:
             flag = max(flag, 1)
             text += 'Needs a science support contact. '
