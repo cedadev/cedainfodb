@@ -95,6 +95,11 @@ print 'Group updated: ', group_updated
 # description tags for the user
 #
 if user_updated or group_updated or update_anyway:
+#
+#   Update the passwd file used by the ftp servers etc
+#
+    subprocess.call(["ssh", "-o", "StrictHostKeyChecking=no", "badc@tranquil.badc.rl.ac.uk", "/home/badc/software/infrastructure/accounts/src/make_and_copy_passwd_file"])
+    
     print 'Generating ldif user commands'
     cmds = udb_ldap.ldif_all_user_updates()
         
@@ -109,10 +114,16 @@ if user_updated or group_updated or update_anyway:
         outlog.write('\nOutput:\n')
         outlog.write(output + '\n')
         outlog.close()
-        
+       
         mail_info_msg (cmds, output, subject='user')
 
 if group_updated or update_anyway:
+#
+#   Update the group file used by the ftp servers etc
+#
+    subprocess.call(["ssh", "-o", "StrictHostKeyChecking=no", "badc@tranquil.badc.rl.ac.uk", "/home/badc/software/infrastructure/accounts/src/make_and_copy_group_file"])
+
+
     print 'Generating ldif group commands'
     cmds = udb_ldap.ldif_all_group_updates()
         

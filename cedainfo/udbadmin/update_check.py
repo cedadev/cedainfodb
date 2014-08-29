@@ -33,7 +33,7 @@ def user_updated (connection, reset=True, name='jasmin_user'):
         stored_hash = ''
     
     sql = """
-    select userkey, accountid, public_key, uid,
+    select userkey, accountid, public_key, uid, encpasswd,
     home_directory, shell, gid 
     from tbusers
     where uid>0;
