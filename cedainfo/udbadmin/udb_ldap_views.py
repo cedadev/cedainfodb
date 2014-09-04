@@ -514,8 +514,8 @@ def display_free_uids (request):
     next_uid = 0
     free_count = 0
 
-#    for uid in range(1, 26399):
-    for uid in range(26001, 26399):
+##    for uid in range(26001, 26399+1) + range (29751,29899+1) + range(35000,35099+1):
+    for uid in range(26001, 26399+1) + range (29751,29899+1):
         
         rec = {}
         rec['uid'] = uid
