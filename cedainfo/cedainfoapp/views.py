@@ -537,8 +537,83 @@ def complete_filesets(request):
 def spotlist(request):
     filesets = FileSet.objects.all()
     return render_to_response('cedainfoapp/spotlist.txt', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
-	
+
+# make a fileset from simple web request.
+# if the path already exists then split the spot
+def make_fileset(request):
+    path = request.GET.get('path', None)
+    size = request.GET.get('size', None)
+    if path==None: 
+        return render_to_response('cedainfoapp/spotcreationerror.html', {'error':'no path specified','user':request.user})   
+    if size==None: 
+        return render_to_response('cedainfoapp/spotcreationerror.html', {'error':'no size specified','user':request.user})  
+    # find parent fileset 
+    filesets = FileSet.objects.all()
+    parent = None    
+    #find fileset to break
+    for f in filesets:
+         if f.logical_path == path[0:len(f.logical_path)]:
+	     if parent == None:
+	         parent = f
+	     elif len(parent.logical_path) < len(f.logical_path):
+	         parent = f	      
+	     print f, parent
+    
+    # if no break found exit
+    if parent == None: 
+        return render_to_response('cedainfoapp/spotcreationerror.html', {'error':'no parent fileset found','user':request.user})  
+
+    # Find size
+    if size[-1].upper() == 'K': size = int(size[0:-1])*1024
+    elif size[-1].upper() == 'M': size = int(size[0:-1])*1024*1024
+    elif size[-1].upper() == 'G': size = int(size[0:-1])*1024*1024*1024
+    elif size[-1].upper() == 'T': size = int(size[0:-1])*1024*1024*1024*1024
+    else: size = int(size)
+    
+    # if the path does not exist but its perent directory exists then this is a 
+    # request for a new fileset.
+    if not os.path.exists(path) and os.path.isdir(os.path.dirname(path)):
+        new_fs = FileSet(logical_path=path, overall_final_size=size)
+        new_fs.save()
+        new_fs.allocate()
+        print new_fs.make_spot()
+        return render_to_response('cedainfoapp/spotcreationerror.html', {'error':'made new fileset','user':request.user})  
+        
+    # if break point is an existing directory        
+    elif os.path.isdir(path) and not os.path.islink(path):     
+        # make new fileset with same partition and a low size (to be changed latter)
+        new_fs = FileSet(partition=parent.partition, 
+             logical_path=path, overall_final_size=size)
+        new_fs.save() 
+        #spot tail
+        head, spottail = os.path.split(new_fs.logical_path)
+        if spottail == '': head, spottail = os.path.split(head)
+        # icreate spot name 
+        spotname = "spot-%s-split-%s" % (new_fs.pk, spottail)
+        new_fs.storage_pot = spotname
+        new_fs.save() 
+    
+        # rename the break dir as the spot
+        print "rename %s to %s" % (path, new_fs.storage_path())
+        os.rename(path, new_fs.storage_path())
+
+        # make new link
+        print "symlink %s to %s" % (new_fs.storage_path(), new_fs.logical_path)
+        os.symlink(new_fs.storage_path(), new_fs.logical_path)
+        
+        # change the parent fileset size 
+        parent.overall_final_size = max(0,parent.overall_final_size-size)
+        parent.save()
+
+        return render_to_response('cedainfoapp/spotcreationerror.html', {'error':'split fileset','user':request.user})  
+
+    else:
+        return render_to_response('cedainfoapp/spotcreationerror.html', {'error':'fileset creat error','user':request.user})  
+
+    
+ 	
 # create ftp mount script for a host - chroot jail mounting
+# REDUNDANT CAN REMMOVE?
 @login_required() 
 def ftpmount_script(request, host):
     host = Host.objects.get(hostname=host)
