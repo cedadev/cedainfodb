@@ -131,6 +131,7 @@ class Project(models.Model):
         now = date.today()
         flag = 0  # green - default
         text = '' # default alert text
+        if self.status == 'NoData' and not self.initial_contact: return ('ambar', 'Marked as no data, but not contacted?')
         if not self.active(): return ('green', 'No warnings as not active.')
 
         # Need to set start and end dates to have alerts

@@ -51,6 +51,17 @@ def my_projects(request):
 
     return render_to_response('my_projects.html', {'projects': projects, 'user':user, 'listall':listall, 'modchecktime':datetime.datetime.now()-datetime.timedelta( days=90)})
 
+def datamad_update(request):
+    projects = Project.objects.all()
+
+    order = request.GET.get('order', '')
+    if order:
+        order = order.split(',')    
+        projects = projects.order_by(*order)
+        order = ','.join(order)
+    
+    return render_to_response('datamad_update.html', {'projects': projects, 'order':order, 'modchecktime':datetime.datetime.now()-datetime.timedelta( days=90)})
+
 def link_grant_to_project(request, id):
     # list projects for logged in user
     if request.user.is_authenticated(): user=request.user
