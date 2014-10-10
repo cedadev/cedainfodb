@@ -194,8 +194,7 @@ class FileSetAdmin(admin.ModelAdmin):
     niceOverallFinalSize.short_description = 'Overall final size'     
      
     list_display = ('logical_path', niceOverallFinalSize, 
-        'partition', 'partition_display',
-        'spot_display',
+        'partition', 
 #	'status',
 	'sd_backup','responsible',
 	'links',)
@@ -225,12 +224,7 @@ class FileSetAdmin(admin.ModelAdmin):
     # TODO : add size history graph
     formfield_overrides = { ByteSizeField: {'widget': BigIntegerInput} }
     search_fields = ['logical_path', 'notes']
-    actions=['bulk_allocate','bulk_du',]
-    
-    def bulk_allocate(self, request, queryset):
-        for fs in queryset.all():
-            fs.allocate()
-    bulk_allocate.short_description = "Allocate partitions"
+    actions=['bulk_du',]
     
     def bulk_du(self, request, queryset):
         for fs in queryset.all():
@@ -249,6 +243,10 @@ class FileSetAdmin(admin.ModelAdmin):
         my_context = {'xx': 'MyContect', 'fssms':fssms}
         return super(FileSetAdmin, self).change_view(request, object_id,
             extra_context=my_context)
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
 
 admin.site.register(FileSet,FileSetAdmin)
 

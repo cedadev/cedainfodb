@@ -1,0 +1,26 @@
+{% extends "base_site.html" %}
+
+{% block title %}
+FileSet Split
+{% endblock %}
+
+{% block header %}
+    
+{% endblock %}
+
+{% block content %}
+<p>View list in <a href="/admin/cedainfoapp/fileset/">admin interface</a></p>
+
+<h2>Split</h2>
+<p>Split a fileset at the directory specified. The size given will be added to the new 
+fileset from the parent fileset.</p>
+
+<form name="input" method="get">
+Logical path: <input type="text" name="path" value="{{path|default_if_none:""}}"/>
+Size: <input type="text" name="size" value="{{size|default_if_none:""}}" />
+<input type="submit" value="Go" />
+</form>
+
+<div id="message">{{error}}</div>
+<a href="/admin/cedainfoapp/fileset/{{fs.pk}}">{{fs.logical_path}}</a>
+{% endblock %}

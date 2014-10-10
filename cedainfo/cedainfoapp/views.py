@@ -424,22 +424,6 @@ def markcomplete(request, id):
         return render_to_response('cedainfoapp/fileset_markcomplete.html', {'fileset': fileset,'user':request.user})  
  
 
-# do allocation of a fileset to a partition
-@login_required() 
-def allocate(request, id):
-    fs = FileSet.objects.get(pk=id)
-    fs.allocate()
-    return redirect(request.META['HTTP_REFERER'])
-
-# create storage pot and link archive 
-@login_required()
-def makespot(request, id):
-    fs = FileSet.objects.get(pk=id)
-    error = fs.make_spot()
-    if error: 
-        return render_to_response('cedainfoapp/spotcreationerror.html', {'error':error,'user':request.user})  
-    else:
-        return redirect(request.META['HTTP_REFERER'])
         
 # create storage pot and link archive
 @login_required() 
@@ -542,11 +526,41 @@ def spotlist(request):
 # if the path already exists then split the spot
 def make_fileset(request):
     path = request.GET.get('path', None)
-    size = request.GET.get('size', None)
+    size_in = request.GET.get('size', None)
     if path==None: 
-        return render_to_response('cedainfoapp/spotcreationerror.html', {'error':'no path specified','user':request.user})   
-    if size==None: 
-        return render_to_response('cedainfoapp/spotcreationerror.html', {'error':'no size specified','user':request.user})  
+        return render_to_response('cedainfoapp/fileset_make.html', {'path':path, 'size':size_in, 'error':'no path specified'})   
+    if not size_in: 
+        return render_to_response('cedainfoapp/fileset_make.html', {'path':path, 'size':size_in, 'error':'no size specified'})  
+        
+    # Find size
+    if size_in[-2:].upper() == 'KB': size = int(size_in[0:-2])*1024
+    elif size_in[-2:].upper() == 'MB': size = int(size_in[0:-2])*1024*1024
+    elif size_in[-2:].upper() == 'GB': size = int(size_in[0:-2])*1024*1024*1024
+    elif size_in[-2:].upper() == 'TB': size = int(size_in[0:-2])*1024*1024*1024*1024
+    else: size = int(size_in)    
+ 
+    new_fs = FileSet(logical_path=path, overall_final_size=size)
+    try: new_fs.make_fileset(path, size)    
+    except FilseSetCreationError:
+        return render_to_response('cedainfoapp/fileset_make.html', {'path':path, 'size':size_in, 'error':'Fileset creation error: %s' %sys.exc_info()[1]})
+
+    return render_to_response('cedainfoapp/fileset_make.html', {'path':'', 'size':'', 'error':'Fileset created.', 'fs':new_fs })
+
+def split_fileset(request):
+    path = request.GET.get('path', None)
+    size_in = request.GET.get('size', None)
+    if path==None: 
+        return render_to_response('cedainfoapp/fileset_split.html', {'path':path, 'size':size_in, 'error':'Need a path.'})   
+    if size_in==None: 
+        return render_to_response('cedainfoapp/fileset_split.html', {'path':path, 'size':size_in, 'error':'Need a size.'})  
+
+    # Find size
+    if size_in[-2:].upper() == 'KB': size = int(size_in[0:-2])*1024
+    elif size_in[-2:].upper() == 'MB': size = int(size_in[0:-2])*1024*1024
+    elif size_in[-2:].upper() == 'GB': size = int(size_in[0:-2])*1024*1024*1024
+    elif size_in[-2:].upper() == 'TB': size = int(size_in[0:-2])*1024*1024*1024*1024
+    else: size = int(size_in)    
+     
     # find parent fileset 
     filesets = FileSet.objects.all()
     parent = None    
@@ -559,146 +573,18 @@ def make_fileset(request):
 	         parent = f	      
 	     print f, parent
     
-    # if no break found exit
+    # if no parent found exit
     if parent == None: 
-        return render_to_response('cedainfoapp/spotcreationerror.html', {'error':'no parent fileset found','user':request.user})  
+        return render_to_response('cedainfoapp/fileset_split.html', {'path':path, 'size':size_in, 'error':'No parent fileset found'})  
 
-    # Find size
-    if size[-1].upper() == 'K': size = int(size[0:-1])*1024
-    elif size[-1].upper() == 'M': size = int(size[0:-1])*1024*1024
-    elif size[-1].upper() == 'G': size = int(size[0:-1])*1024*1024*1024
-    elif size[-1].upper() == 'T': size = int(size[0:-1])*1024*1024*1024*1024
-    else: size = int(size)
-    
-    # if the path does not exist but its perent directory exists then this is a 
-    # request for a new fileset.
-    if not os.path.exists(path) and os.path.isdir(os.path.dirname(path)):
-        new_fs = FileSet(logical_path=path, overall_final_size=size)
-        new_fs.save()
-        new_fs.allocate()
-        print new_fs.make_spot()
-        return render_to_response('cedainfoapp/spotcreationerror.html', {'error':'made new fileset','user':request.user})  
-        
-    # if break point is an existing directory        
-    elif os.path.isdir(path) and not os.path.islink(path):     
-        # make new fileset with same partition and a low size (to be changed latter)
-        new_fs = FileSet(partition=parent.partition, 
-             logical_path=path, overall_final_size=size)
-        new_fs.save() 
-        #spot tail
-        head, spottail = os.path.split(new_fs.logical_path)
-        if spottail == '': head, spottail = os.path.split(head)
-        # icreate spot name 
-        spotname = "spot-%s-split-%s" % (new_fs.pk, spottail)
-        new_fs.storage_pot = spotname
-        new_fs.save() 
-    
-        # rename the break dir as the spot
-        print "rename %s to %s" % (path, new_fs.storage_path())
-        os.rename(path, new_fs.storage_path())
+    try: new_fs = parent.split_fileset(path, size)    
+    except FilseSetCreationError:
+        return render_to_response('cedainfoapp/fileset_split.html', {'path':path, 'size':size_in, 'error':'Fileset split error: %s' %sys.exc_info()[1]})
 
-        # make new link
-        print "symlink %s to %s" % (new_fs.storage_path(), new_fs.logical_path)
-        os.symlink(new_fs.storage_path(), new_fs.logical_path)
-        
-        # change the parent fileset size 
-        parent.overall_final_size = max(0,parent.overall_final_size-size)
-        parent.save()
-
-        return render_to_response('cedainfoapp/spotcreationerror.html', {'error':'split fileset','user':request.user})  
-
-    else:
-        return render_to_response('cedainfoapp/spotcreationerror.html', {'error':'fileset creat error','user':request.user})  
-
+    return render_to_response('cedainfoapp/fileset_split.html', {'path':path, 'size':size_in, 'error':'Fileset split.', 'fs':new_fs})  
     
  	
-# create ftp mount script for a host - chroot jail mounting
-# REDUNDANT CAN REMMOVE?
-@login_required() 
-def ftpmount_script(request, host):
-    host = Host.objects.get(hostname=host)
-    mounts = host.ftpmountpoints
-    if mounts == None: mounts = []
-    else: mounts = mounts.split()
-    ftpmount_partitions = set()
-    filesets = []
-    mountlinks = []
-    
-    # ftpmounts
-    for mount in mounts:
-	rw = True
-	path = mount
-        if mount[-4:] == "(ro)": 
-	    rw = False
-	    path = mount[:-4]
-	
-        filesets = FileSet.objects.filter(logical_path__startswith=path)
-	for fs in filesets:
-	    partition = fs.partition.mountpoint
-	    ftpmount_partitions.add((partition,rw,fs.partition.host))
-	    
-	primefileset = FileSet.objects.filter(logical_path=path)
-	primefileset = primefileset.all()[0]
-	
-	mountlinks.append((path, primefileset.storage_path())) 
-	    
-    # remove ro partition mounts if rw one exists
-    discard_list = []
-    for part, rw, parthost in ftpmount_partitions:
-        if rw == True: discard_list.append((part,False,parthost) )   
-    for part in discard_list: ftpmount_partitions.discard(part)    
 
-	
-    return render_to_response('cedainfoapp/ftpmountscript.html', {'host':host, 
-        'filesets':filesets,
-	'user':request.user,
-        'ftpmount_partitions':ftpmount_partitions,
-	'mountlinks': mountlinks,
-	 }, mimetype="text/plain")  
-
-# create auto mount script for a host
-@login_required() 
-def automount_script(request, host):
-    host = Host.objects.get(hostname=host)
-    mounts = host.mountpoints
-    if mounts == None: mounts = []
-    else: mounts = mounts.split()
-    automount_partitions = set()
-    filesets = []
-    
-    # automounts
-    for mount in mounts:
-	rw = True
-	path = mount
-        if mount[-4:] == "(ro)": 
-	    rw = False
-	    path = mount[:-4]
-
-	rw = True
-	path = mount
-        if mount[-4:] == "(ro)": 
-	    rw = False
-	    path = mount[:-4]
-		
-        filesets = FileSet.objects.filter(logical_path__startswith=path)
-	for fs in filesets:
-	    partition = fs.partition.mountpoint
-	    if partition[:7] == "/disks/": 
-	        partition = partition[7:] # remove disks
-	    else: continue # can't deal with automount things that are not in disks 
-	    automount_partitions.add((partition,rw,fs.partition.host))
-
-    # remove ro partition mounts if rw one exists
-    discard_list = []
-    for part, rw, host in automount_partitions:
-        if rw == True: discard_list.append((part,False,host))    
-    for p in discard_list: automount_partitions.discard(p)    
-           
-    return render_to_response('cedainfoapp/mountscript.html', {'host':host, 
-        'filesets':filesets,
-	'user':request.user,
-        'automount_partitions':automount_partitions,
-	 }, mimetype="text/plain")
 
 # approve an existing gwsrequest
 @login_required()

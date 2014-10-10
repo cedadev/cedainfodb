@@ -50,6 +50,9 @@ from django.core.validators import RegexValidator
 #    nodelist = models.OneToOneField(NodeList)
 #    def __unicode__(self):
 #        return u'%s the racklist' % self.nodelist.name
+
+
+class FilseSetCreationError(Exception): pass
         
 
 class Rack(models.Model):
@@ -324,35 +327,6 @@ class FileSet(models.Model):
     def migrate_path(self):
         return os.path.normpath(self.migrate_to.mountpoint+'/'+self.storage_pot_type+'/'+self.storage_pot) 
 
-    def make_spot(self):
-        # create a storage pot and link
-	if self.storage_pot_type == '': return # need a spot type 
-        if self.storage_pot != '': return  #can't make a spot if it already exists in the db
-        if self.logical_path_exists(): return #can't make a spot if logical path exists  
-        if not self.partition: return #can't make a spot if no partition 
-
-        #spot tail
-        head, spottail = os.path.split(self.logical_path)
-        if spottail == '': head, spottail = os.path.split(head)
-
-        # icreate spot name 
-        spotname = "spot-%s-%s" % (self.pk, spottail)
-
-        self.storage_pot = spotname
-        try:
-            os.makedirs(self.storage_path())
-            gid = grp.getgrnam("byacl").gr_gid
-            os.chown(self.storage_path(), -1, gid)
-        except:
-            return ("os.makedirs(%s)" % self.storage_path(), sys.exc_value )
-        try:
-	    os.symlink(self.storage_path(), self.logical_path)
-        except: 
-            # remove spot dir that was make correctly, but is inconsistant because link not made
-            os.rmdir(self.storage_path())
-            return ("os.symlink(%s, %s) \n (removed spot dir for consistancy)" % (self.storage_path(),self.logical_path),sys.exc_value )
-        self.save()
-
     def migrate_spot(self, do_audit=True):
         if self.storage_pot == '': raise "can't migrate a spot does not already exists in the db"
         if not self.partition: raise "can't migrate a spot if no partition"
@@ -412,12 +386,6 @@ class FileSet(models.Model):
 	return rsynccmd
 
 
-    def spot_display(self):
-        if self.storage_pot: return "%s" % self.storage_pot
-        else: return '<a href="/fileset/%s/makespot">Create Storage</a>' % self.pk
-    spot_display.allow_tags = True
-    spot_display.short_description = 'Storage pot'
-
     def spot_exists(self):
         if self.storage_pot == '':
             return False
@@ -455,50 +423,104 @@ class FileSet(models.Model):
 	    else: return '<font color="#ff0000">Link error</font>'
     status.allow_tags = True
 
-    def partition_display(self):
-        if self.partition: return "Partition Set" 
-        else: return '<a href="/fileset/%s/allocate">Allocate</a>' % self.pk
-    partition_display.allow_tags = True
-    partition_display.short_description = 'Allocate Partition'
+
     
-    def allocate(self):
-        # find partion for this fileset
-        if self.partition: return # return if already allocated
-	
-        # if its already a link to a '/disks/'
-	if os.path.islink(self.logical_path): 
-            # get storage path
-            linkpath = os.readlink(self.logical_path)
-	    if linkpath[0:7] == '/disks/': # look like it is already allocated
-	        # find mount point
-		linkbits = linkpath.split('/')
-		if len(linkbits) != 5: raise "Not able to split %s into /disks/partition/spot_type/spotname" % linkpath
-		junk, disks, partition, spottype, spotname = linkbits 
-		mountpoint = '/disks/%s' % partition
-		self.partition = Partition.objects.get(mountpoint=mountpoint)
-	        self.storage_pot = spotname
-		self.notes += 'allocated from pre-existing links to /disks/'
-		self.save()
-		return		 
-		    
-        else:
-            if self.storage_pot_type == 'project_spaces': partitions = Partition.objects.filter(status='Allocating_ps')
-            else: partitions = Partition.objects.filter(status='Allocating')
-            # find the fullest partition which can accomidate the file set
-	    allocated_partition = None
-	    fullest_space = 10e40
-	    for p in partitions:
-	        partition_free_space = 0.80 * p.capacity_bytes - p.allocated()
-		# if this partition could accommidate file set...
-		if partition_free_space > self.overall_final_size:
-		    # ... and its the fullest so far  
-		    if partition_free_space < fullest_space:
-		        allocated_partition = p
-			fullest_space = partition_free_space
+    # make a fileset including makeing spot directoies and seting allocations.
+    # if the path already exists then split the spot
+    def make_fileset(self, path, size):
+        filesets = FileSet.objects.filter(logical_path=path)
+        if os.path.exists(path): raise FilseSetCreationError("Logical path already exists.")
+        if len(filesets)!=0: raise FilseSetCreationError("File set with same logical path already exists.")
+        if not os.path.isdir(os.path.dirname(path)): raise FilseSetCreationError("Parent directory does not exist.")
+
+        # find the fullest partition which can accomidate the file set
+        partitions = Partition.objects.filter(status='Allocating')
+	allocated_partition = None
+	fullest_space = 10e40
+	for p in partitions:
+	    partition_free_space = 0.80 * p.capacity_bytes - p.allocated()
+	    # if this partition could accommidate file set...
+	    if partition_free_space > size:
+		# ... and its the fullest so far  
+		if partition_free_space < fullest_space:
+		    allocated_partition = p
+		    fullest_space = partition_free_space
+	    print ">>>>>>> ",p, allocated_partition, fullest_space, partition_free_space	    	     
+
+        if allocated_partition==None: raise FilseSetCreationError("Can't find a partition to allocate this to.")
 		
-            self.partition = allocated_partition
-	    self.notes += '\nAllocated partition %s (%s)' % (self.partition, datetime.utcnow())
-            self.save()
+	# create a fileset in the database	
+        self.logical_path=path
+        self.overall_final_size=size
+        self.partition=allocated_partition
+	self.notes += '\nAllocated partition %s (%s)' % (self.partition, datetime.utcnow())
+        self.save()
+                
+        #create the spot name. This uses the fileset id and last directory name in the path.
+        head, spottail = os.path.split(path)
+        if spottail == '': head, spottail = os.path.split(head)
+        spotname = "spot-%s-%s" % (self.pk, spottail)
+        self.storage_pot = spotname
+        
+        try:
+            os.makedirs(self.storage_path())
+        except: 
+            self.delete()
+            raise FilseSetCreationError("Can't make storage pot directory")     
+        try:
+            # change the group ownership to be the same as the parent path.
+            gid = os.stat(os.path.dirname(path)).st_gid
+            os.chown(self.storage_path(), -1, gid)
+        except:
+            os.rmdir(self.storage_path())
+            self.delete()
+            raise FilseSetCreationError("Can't chown the storage pot directory (removed spot dir for consistancy)")     
+        try:
+	    os.symlink(self.storage_path(), self.logical_path)
+        except: 
+            # remove spot dir that was make correctly, but is inconsistant because link not made
+            os.rmdir(self.storage_path())
+            self.delete()
+            raise FilseSetCreationError("Can't make link (removed spot dir for consistancy)")
+        self.save()
+                
+    # split a fileset in two. 
+    def split_fileset(self, path, size):     
+        # find path is in scope of this fileset
+        if path==self.logical_path: raise FilseSetCreationError("Can't split: path identical to current fileset")
+        if self.logical_path != path[0:len(self.logical_path)]: raise FilseSetCreationError("Can't split: path not contained in current fileset")
+
+        # if check break point is an existing directory        
+        if not os.path.isdir(path): raise FilseSetCreationError("Can only split on a directory.")
+        if os.path.islink(path): raise FilseSetCreationError("Can't split on a symlink.")
+         
+        # make new fileset with same partition.
+        new_fs = FileSet(partition=self.partition, 
+               logical_path=path, overall_final_size=size,
+               notes="Split from %s on %s" % (self, datetime.utcnow()),
+               secondary_partition = self.secondary_partition,
+               sd_backup = self.sd_backup)
+        new_fs.save() 
+        #spot tail
+        head, spottail = os.path.split(new_fs.logical_path)
+        if spottail == '': head, spottail = os.path.split(head)
+        # create spot name 
+        spotname = "spot-%s-%s" % (new_fs.pk, spottail)
+        new_fs.storage_pot = spotname
+        new_fs.save() 
+    
+        # rename the break dir as the spot
+        os.rename(path, new_fs.storage_path())
+
+        # make new link
+        os.symlink(new_fs.storage_path(), new_fs.logical_path)
+        
+        # change the parent fileset size 
+        self.overall_final_size = max(0,self.overall_final_size-size)
+        self.notes += "\nSplit at %s on %s." % (new_fs.logical_path, datetime.utcnow())
+        self.save()
+        return new_fs
+
             
     def backup_summary(self):
         # get a text summary of storaged backup status
@@ -562,6 +584,7 @@ class FileSet(models.Model):
         if self.spot_exists():
             # find volume using du
             output = subprocess.Popen(['/usr/bin/du', '-sk', '--apparent', self.storage_path()],stdout=subprocess.PIPE).communicate()[0]
+#            output = subprocess.Popen(['/usr/bin/du', '-sk', self.storage_path()],stdout=subprocess.PIPE).communicate()[0]
             lines = output.split('\n')
             if len(lines) == 2: size, path = lines[0].split()
 

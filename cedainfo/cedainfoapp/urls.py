@@ -19,8 +19,6 @@ urlpatterns = patterns('',
  
     #   - detail view of 1 host, by id
     (r'^host/(?P<host_id>\d+)/$', host_detail),
-    (r'^host/(?P<host>.*)/ftpmountscript/()$', ftpmount_script),
-    (r'^host/(?P<host>.*)/automountscript/()$', automount_script),
     # Recreate the SDDCS "nodelist" file as a view
     (r'^nodelist$', nodelist),
 
@@ -39,10 +37,9 @@ urlpatterns = patterns('',
     (r'^fileset/complete/$', complete_filesets),
     (r'^fileset/spotlist/$', spotlist),
     (r'^fileset/make/$', make_fileset),
+    (r'^fileset/split/$', split_fileset),
     (r'^fileset/underallocated/$', underallocated_fs),
     (r'^fileset/(?P<id>\d+)/markcomplete', markcomplete),
-    (r'^fileset/(?P<id>\d+)/allocate$', allocate),
-    (r'^fileset/(?P<id>\d+)/makespot$', makespot),
     (r'^fileset/(?P<id>\d+)/du$', du),
     (r'^partition/$', partition_list),
     (r'^partition/(?P<id>\d+)/df$', df),
