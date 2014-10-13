@@ -3,6 +3,7 @@ from django.contrib import admin
 from models import *
 from filters import MountpointFilter 
 from django import forms
+from forms import *
 
 
 def prettySize(size):
@@ -115,6 +116,11 @@ class DataEntityAdmin(admin.ModelAdmin):
     list_filter = ('friendly_name', 'curation_category','responsible_officer','last_reviewed','access_status','availability_priority','availability_failover',)
     ordering = ('dataentity_id','symbolic_name','responsible_officer','last_reviewed')
     search_fields = ['dataentity_id','symbolic_name',]
+
+    formfield_overrides = {
+	   models.CharField: {'widget': TextInput(attrs={'size':'80'})},
+	}
+
 admin.site.register(DataEntity, DataEntityAdmin)
 
 class PartitionAdminForm(forms.ModelForm):
