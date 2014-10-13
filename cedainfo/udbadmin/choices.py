@@ -37,7 +37,8 @@ DATASET_REGISTRATION_TYPES=(
    ("online","online"),
    ("public","public"),
    ("signature", "signature"),
-   ("badc", "badc")
+   ("badc", "badc"),
+   ("none", "none")
 )
 
 DATACENTRES=(
