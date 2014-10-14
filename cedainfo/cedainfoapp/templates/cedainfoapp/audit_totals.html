@@ -10,9 +10,16 @@ Audit Totals
 
 <h1>Total from audits</h1>
 
+<form>
+<input name="start" value="{{start}}"/>
+<input name="end" value="{{end}}"/>
+<input type="submit"/>
+</form>
 <p>Total files audited: {{total_files}}</p>
 <p>Total volume audited: {{total_volume|filesizeformat}}</p>
 <p>Total number of audits: {{naudits}}</p>
+<p>Files per second: {{filesps}}</p>
+<p>bytes per second: {{volps}}</p>
 
 
 

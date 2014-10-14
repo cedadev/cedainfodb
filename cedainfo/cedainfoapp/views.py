@@ -220,17 +220,33 @@ def underallocated_fs(request):
 @login_required()
 def audit_totals(request):
     # view total volume of all analyses audits
-    audits = Audit.objects.filter(auditstate="analysed")
+    start = request.GET.get('start', '') 
+    end = request.GET.get('end', '') 
+    
+    audits = Audit.objects.filter(auditstate="copy verified")
+
+    if start: 
+        start_datetime =  datetime.datetime.strptime(start, "%Y-%m-%d")
+        audits = audits.filter(starttime__gte=start_datetime)
+    if end: 
+        end_datetime =  datetime.datetime.strptime(end, "%Y-%m-%d")
+        audits = audits.filter(endtime__lte=end_datetime)
+
     total_files = 0
     total_volume = 0
     naudits = 0
+    total_time = datetime.timedelta(seconds=0)
     for a in audits:
         total_files += a.total_files
         total_volume += a.total_volume
+        total_time += a.endtime - a.starttime
         naudits +=1
 
     return render_to_response('cedainfoapp/audit_totals.html', 
-           {'total_files': total_files,'total_volume':total_volume, "naudits":naudits})  
+           {'total_files': total_files,'total_volume':total_volume, 
+             "naudits":naudits, "start":start, "end":end,
+             "filesps": total_files/total_time.total_seconds(), 
+             "volps": total_volume/total_time.total_seconds() }  )
 
 @login_required()
 def audit_trace(request, path):
