@@ -13,6 +13,43 @@ The following updates have been made:
 </ul>
 <p/>
 
+
+
+
+<p/>
+
+{% if datasetsRejected > 0 %}
+If you have rejected any datasets you probably need to send an email to the user
+explaining why. This is not done automatically.
+<p/>
+{% endif %}
+
+
+{% if msg_sent %}
+
+   {% if msg_status != 0 %}
+       <font color="red" size="3"><b>Error sending notification email. Error code: {{msg_status}}</b></font><p/>
+       <b>The message that should have been sent is shown below:</b><br>
+   {% else %}
+      <b>The following mail message has been sent to the user:</b><br>
+   {% endif %}
+
+   <p/>
+
+   {% if mailmsg %}
+
+	 <font size="1"><em>Sent using script {{cmd }}</em></font>
+      <p>
+
+      <center><table><tr><td bgcolor="#ECECEC"><pre>
+      {{ mailmsg }}
+      </pre></td></tr></table>
+   {% endif %}
+   
+{% endif %}
+
+<p/>
+
 <font color="red">Note: when you have finished adding datasets you should 
 <a href="http://team.ceda.ac.uk/cgi-bin/userdb/update_group_file.cgi.pl">Update the ftp group file</a>
 to ensure that the ftp server is updated.
@@ -20,25 +57,6 @@ to ensure that the ftp server is updated.
 
 <p/>
 
-{% if msg_status != 0 %}
-    <font color="red" size="3"><b>Error sending notification email. Error code: {{msg_status}}</b></font><p/>
-    <b>The message that should have been sent is shown below:</b><br>
-{% else %}
-   <b>The following mail message has been sent to the user:</b><br>
-{% endif %}
-
-<p/>
-
-{% if mailmsg %}
- 
-      <font size="1"><em>Sent using script {{cmd }}</em></font>
-   <p>
-
-   <center><table><tr><td bgcolor="#ECECEC"><pre>
-   {{ mailmsg }}
-   </pre></td></tr></table>
-{% endif %}
-<p/>
 <center><a href="{{request.path}}">Return to dataset authorisation page</a></center>
 
 

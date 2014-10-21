@@ -14,6 +14,7 @@ from models import *
 @login_required()
 def authorise_datasets(request, userkey):
 
+    
    if request.method == 'POST':
 
      if request.POST.get('remove_datasets', ''):
@@ -27,6 +28,12 @@ def authorise_datasets(request, userkey):
 	emailuser      = request.POST.get('emailuser', 'no')
 
 	datasetsAdded = 0
+	datasetsRejected = 0
+	
+	msg_sent = False
+	msg_status = 0
+	mailmsg = ''
+
 	changes = 0
         manualProcessingRequired = 0
         
@@ -73,6 +80,7 @@ def authorise_datasets(request, userkey):
 		 infoString.append ('Accepted %s' % datasetRequest.datasetid)
 
 	      elif value == "reject":
+	         datasetsRejected += 1
 		 datasetRequest.reject()
 		 infoString.append ('Rejected %s' % datasetRequest.datasetid)
 	      elif value == "junk":
@@ -95,7 +103,7 @@ def authorise_datasets(request, userkey):
 
        ##        userkey = 1  # Just for testing, so all messages go to Andrew rather than the user!
 	       userkey = datasetRequest.userkey
-
+               msg_sent = True
 	       cmd = "/usr/local/userdb/releases/current/new_datasets_notification/new_datasets_msg.py"
 	       m = Popen([cmd, "-send", "%s" % userkey])
 	       m.wait()
