@@ -18,12 +18,6 @@ The following updates have been made:
 
 <p/>
 
-{% if datasetsRejected > 0 %}
-If you have rejected any datasets you probably need to send an email to the user
-explaining why. This is not done automatically.
-<p/>
-{% endif %}
-
 
 {% if msg_sent %}
 
@@ -46,6 +40,9 @@ explaining why. This is not done automatically.
       </pre></td></tr></table>
    {% endif %}
    
+{% else %}
+   No email has been sent. You may need to send an email to the user to 
+   explain what has happened.
 {% endif %}
 
 <p/>
