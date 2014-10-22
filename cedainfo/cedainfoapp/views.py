@@ -716,6 +716,8 @@ def gwsrequest_detail(request, id):
 # list of VMRequests presented for external viewers
 @login_required()  
 def vmrequest_list(request):
+
+    
     o = request.GET.get('o', 'id') # default order is ascending id
     
     filter = {}
@@ -726,13 +728,38 @@ def vmrequest_list(request):
     else:   # provide a blank form
         form = VMRequestListFilterForm(initial={'request_status':'ceda approved'}, )
         items = VMRequest.objects.order_by(o)
-        
+
+    for item in items:
+    
+        try:
+            item.name_found = check_dns_entry(item.vm_name)
+	except:
+	    item.name_found = False
+	    
+        try:
+            item.vm_found = check_dns_entry(item.vm.name)
+	except:
+	    item.vm_found = False
+	       
     c = RequestContext(request, {
         'form': form,
         'items': items,
     })        
     c.update(csrf(request))
     return render_to_response('cedainfoapp/vmrequest_list.html', c)
+
+def check_dns_entry (hostname):
+#
+#   Check if dns entry for given host exits
+#
+    import socket
+    
+    try:
+       address = socket.gethostbyname(hostname)
+       return True
+    except:
+       return False
+
 
 @login_required()
 def vmrequest_detail(request, id):
