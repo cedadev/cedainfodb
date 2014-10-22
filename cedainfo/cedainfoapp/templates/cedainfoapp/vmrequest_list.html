@@ -14,8 +14,9 @@ VM Request list
 </table>
 <input type="submit" value="Go">
 </form>
-
 <br>
+Highlighted names do not have a dns entry.
+<p/>
 
     <table border="1">
         <tr>
@@ -33,7 +34,16 @@ VM Request list
         {% for i in items %}
                 <tr>
                 <td><a href="/vmrequest/{{i.id}}">{{i.id}}</a></td>
-                <td><a href="/vmrequest/{{i.id}}">{{i.vm_name}}</a></td>
+		
+           {% if i.name_found %}
+	        <td><a href="/vmrequest/{{i.id}}">{{i.vm_name}}</a></td>
+		
+	    {% else %}
+	    	<td bgcolor="#FCDAD5"><a href="/vmrequest/{{i.id}}">{{i.vm_name}}</a></td>
+
+	    {% endif %}
+  
+		
             <td>{{i.type}}</td>
             <td>{{i.request_type}}</td>
                 <td>{{i.operation_type}}</td>
@@ -41,7 +51,13 @@ VM Request list
             <td>{{i.date_required}}</td>
                 <td>{{i.request_status}}</td>
                 <td>{{i.end_of_life}}</td>
-            <td>{{i.vm}}</td>
+		
+            {% if i.vm_found %}		
+                <td>{{i.vm}}</td>
+	    {% else %}
+	        <td bgcolor="#FCDAD5">{{i.vm}}</td>
+
+	    {% endif %}
                     </tr>
     {% endfor %}
     </table>
