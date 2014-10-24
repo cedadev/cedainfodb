@@ -6,6 +6,7 @@ import subprocess
 import string
 import hashlib
 import time
+import socket
 import re
 import pwd, grp
 
@@ -1596,6 +1597,18 @@ class VMRequest(models.Model):
     vm_link.allow_tags = True
     vm_link.short_description = 'VM'
 
+    def coloured_vm_name(self):
+        '''Colour the vm name if no dns entry found'''
+
+        try:
+            address = socket.gethostbyname(self.vm_name)
+	    return self.vm_name
+	except:	
+            return ('<span style="color:red;">%s</span>' % self.vm_name)
+       
+    coloured_vm_name.short_description = 'VM name'
+    coloured_vm_name.allow_tags = True
+
             
 class VM(models.Model):
     name = models.CharField(max_length=127, help_text="fully-qualified host name", unique=True) # TODO : need regex
@@ -1693,3 +1706,13 @@ class VM(models.Model):
     action_links.allow_tags = True
     action_links.short_description = 'actions'
     
+    def coloured_vm_name(self):
+        '''Colour the vm name if no dns entry found'''
+        try:
+            address = socket.gethostbyname(self.name)
+	    return self.name
+	except:	
+            return ('<span style="color:red;">%s</span>' % self.name)
+
+    coloured_vm_name.short_description = 'VM name'
+    coloured_vm_name.allow_tags = True

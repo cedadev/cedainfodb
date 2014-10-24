@@ -292,7 +292,7 @@ class GWSAdmin(admin.ModelAdmin):
 admin.site.register(GWS, GWSAdmin)
 
 class VMRequestAdmin(admin.ModelAdmin):
-    list_display=('vm_name', 'action_links', 'type', 'operation_type', 'internal_requester', 'patch_responsible', 'date_required','timestamp', 'request_type', 'request_status','vm_link',)
+    list_display=('coloured_vm_name', 'action_links', 'type', 'operation_type', 'internal_requester', 'patch_responsible', 'date_required','timestamp', 'request_type', 'request_status','vm_link',)
     list_filter=('type', 'operation_type', 'request_status', 'patch_responsible', MountpointFilter,)
     search_fields = ('vm_name',)
     #readonly_fields = ('request_status',)
@@ -300,7 +300,7 @@ class VMRequestAdmin(admin.ModelAdmin):
 admin.site.register(VMRequest, VMRequestAdmin)
 
 class VMAdmin(admin.ModelAdmin):
-    list_display=('name', 'action_links', 'type', 'operation_type', 'internal_requester', 'patch_responsible', 'timestamp', 'status', )
+    list_display=('coloured_vm_name', 'action_links', 'type', 'operation_type', 'internal_requester', 'patch_responsible', 'timestamp', 'status', )
     list_filter=('type', 'operation_type', 'status', 'patch_responsible', MountpointFilter,)
     search_fields = ('name',)
     def has_add_permission(self, request):
