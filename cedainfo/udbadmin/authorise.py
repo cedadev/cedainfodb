@@ -6,10 +6,37 @@ from django.contrib.auth.decorators import login_required
 
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-import os
+import os, sys
+import smtplib
+
 from subprocess import *
 
 from models import *
+
+
+def _add_user_to_jasmin_mailinglist (email, name):
+#
+#   Adds the given user details to the jasmin-users mailing list by
+#   sending an email command
+#
+
+    FROM = "support@ceda.ac.uk"
+    TO   = "listserv@jiscmail.ac.uk, andrew.harwood@stfc.ac.uk, badc-support@rl.ac.uk" 
+    cmd = "add jasmin-users %s %s" % (email, name)
+
+    message = """\
+From: %s
+To: %s
+Subject: Adding %s (%s ) to jasmin-users mailing list
+
+%s
+
+    """ % (FROM, TO, email, name, cmd)
+
+    server = smtplib.SMTP("localhost")
+    server.sendmail(FROM, TO, message)
+    server.quit()
+
 
 @login_required()
 def authorise_datasets(request, userkey):
@@ -31,6 +58,7 @@ def authorise_datasets(request, userkey):
 	datasetsRejected = 0
 	
 	msg_sent = False
+	added_to_jasmin_email_list = False
 	msg_status = 0
 	mailmsg = ''
 
@@ -73,9 +101,22 @@ def authorise_datasets(request, userkey):
 		 datasetRequest.accept(expireDate=expireDate, endorsedby=authorisorName)
 
 		 datasetsAdded += 1
-                 
+#
+#                If this is for jasmin-login, add to the jasmin-users mailing list
+#                 
+		 if dataset.datasetid == "jasmin-login":
+
+		     try:
+			 email = datasetRequest.userkey.emailaddress
+			 name = datasetRequest.userkey.othernames + ' ' + \
+		        	datasetRequest.userkey.surname
+			 _add_user_to_jasmin_mailinglist (email, name)
+			 added_to_jasmin_email_list = True
+                     except:
+		     	 pass		     
+		         
                  if dataset.manual_processing_required():
-                    manualProcessingRequired += 1
+                     manualProcessingRequired += 1
                     
 		 infoString.append ('Accepted %s' % datasetRequest.datasetid)
 
