@@ -105,7 +105,7 @@ def authorise_datasets(request, userkey):
 #
 #                If this is for jasmin-login, add to the jasmin-users mailing list
 #                 
-		 if dataset.datasetid == "jasmin-login":
+		 if dataset.datasetid == "jasmin-login" or dataset.datasetid == "cems-login":
 
 		     try:
 			 email = datasetRequest.userkey.emailaddress
