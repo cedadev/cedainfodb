@@ -20,8 +20,9 @@ def _add_user_to_jasmin_mailinglist (email, name):
 #   sending an email command
 #
 
+#    FROM = "badc-support@rl.ac.uk"
     FROM = "support@ceda.ac.uk"
-    TO   = "listserv@jiscmail.ac.uk, andrew.harwood@stfc.ac.uk, badc-support@rl.ac.uk" 
+    TO   = ("listserv@jiscmail.ac.uk", "andrew.harwood@stfc.ac.uk", "badc-support@rl.ac.uk") 
     cmd = "add jasmin-users %s %s" % (email, name)
 
     message = """\
@@ -31,7 +32,7 @@ Subject: Adding %s (%s ) to jasmin-users mailing list
 
 %s
 
-    """ % (FROM, TO, email, name, cmd)
+    """ % (FROM, ",".join(TO), email, name, cmd)
 
     server = smtplib.SMTP("localhost")
     server.sendmail(FROM, TO, message)
