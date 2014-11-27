@@ -41,7 +41,6 @@ def getIntGroupFile():
 
     return group
 
-
 def getExtPasswdFile():
 #
 #      Return group file for external NIS
@@ -49,6 +48,7 @@ def getExtPasswdFile():
     a = tempfile.NamedTemporaryFile()
     p1 = subprocess.Popen(["ssh",
                            "-oBatchMode=yes", 
+                           "-oStrictHostKeyChecking=no",
 			   "ypinfo@storm.badc.rl.ac.uk",  
 			   "ypcat", 
 			   "passwd"], 
@@ -66,7 +66,8 @@ def getIntPasswdFile():
 #
     a = tempfile.NamedTemporaryFile()
     p1 = subprocess.Popen(["ssh",
-                           "-oBatchMode=yes", 
+                           "-oBatchMode=yes",
+                           "-oStrictHostKeyChecking=no", 
 			   "ypinfo@twister.badc.rl.ac.uk",  
 			   "ypcat", 
 			   "passwd"], 

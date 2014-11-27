@@ -24,6 +24,16 @@ mailing list. There may be a short delay before they appear on the list.
 <p/>
 {% endif %}
 
+<p/>
+
+{% if uid > 0 %}
+  UID has been set to: {{uid}}
+{% else %}
+<font color="red">
+  UID could not be allocated for this user. You will need to do this manually. Please
+  report this to Andrew.
+  </font>
+{% endif %}
 
 <p/>
 
