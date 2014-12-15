@@ -109,6 +109,7 @@ def authorise_datasets(request, userkey):
                  if dataset.datasetid == "jasmin-login" or \
                     dataset.datasetid == "cems-login" or \
                     dataset.datasetid == "commercial-login":
+		    
                     
                     uid = _add_uid(datasetRequest.userkey)
                      
@@ -120,6 +121,20 @@ def authorise_datasets(request, userkey):
                         added_to_jasmin_email_list = True
                     except:
                         pass                     
+
+                 if dataset.datasetid == "jasmin-login" or \
+                    dataset.datasetid == "cems-login":
+
+                    if emailuser.lower() == "yes":  
+			userkey = datasetRequest.userkey
+			msg_sent = True
+			cmd = "/usr/local/userdb/releases/current/new_datasets_notification/service_msg.py"
+			m = Popen([cmd, "%s" % userkey, dataset.datasetid, "--send"])
+			m.wait()
+			msg_status = m.returncode
+
+			mailmsg = Popen([cmd, "%s" % userkey, dataset.datasetid], stdout=PIPE).communicate()[0] 
+
                          
                  if dataset.manual_processing_required():
                      manualProcessingRequired += 1
