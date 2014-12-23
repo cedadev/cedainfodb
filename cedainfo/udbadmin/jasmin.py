@@ -7,6 +7,7 @@ import os
 import sys
 import tempfile
 import LDAP
+import subprocess
 from operator import itemgetter
 
 from models import *
@@ -75,6 +76,85 @@ def ldap_list_root_users(request):
  
         
     return render_to_response ('ldap_list_root_users.html', locals())
+
+@login_required()
+def ldap_list_root_users2(request):
+
+    myform = JasminUsersForm(request.GET)
+    
+    valid = myform.is_valid()
+    
+    all_users = []
+    
+    if myform.cleaned_data['show_ceda_users']:
+        users = _get_ldap_root_users(base="ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk")
+        all_users = all_users + users
+    if myform.cleaned_data['show_jasmin_users']:
+        users = _get_ldap_root_users(base="ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk")
+        all_users = all_users + users
+#
+#   Add information from userdb if available for this user
+#
+    for user in all_users:
+        
+        user['email'] = ''
+        
+        if user['uidnumber']:
+            try:
+                udb_user = User.objects.get(uid=user['uidnumber'])
+                user['udb_user'] = udb_user 
+                user['email'] = udb_user.emailaddress.lower()
+            except:
+                user['udb_user'] = None
+                
+    all_users = sorted(all_users, key=itemgetter('email'))
+             
+    return render_to_response ('ldap_list_root_users2.html', locals())    
+
+def _get_ldap_root_users (base="ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"):
+    """
+    Returns details of root users from LDAP database for given base
+    """
+   
+    out = subprocess.check_output(["ldapsearch", "-LLL",  "-x", "-H", "ldap://homer.esc.rl.ac.uk", 
+                                   "-b", base, 
+                                   "(&(!(rootAccessGroupName=NON-STAFF))(rootAccessGroupName=*))",
+                                   "uid", "uidnumber", "gecos", "cn"])
+
+#    out = subprocess.check_output(["ldapsearch", "-LLL",  "-x", "-H", "ldap://homer.esc.rl.ac.uk", 
+#                                   "-b", base, "uid", "uidnumber", "gecos", "cn"])
+        
+    users = []
+    
+    lines = out.splitlines()
+          
+    for n in range(len(lines)):
+        if lines[n].startswith('dn:'): 
+            user = {'uid': '', 'uidnumber': None, 'gecos': '', 'cn': ''}
+            
+            for m in range(1, 5): 
+                
+                if n+m >= len(lines):
+                    break
+                
+                if lines[n+m].startswith('uid:'):
+                    user['uid'] = lines[n+m].split()[1]
+
+                if lines[n+m].startswith('uidNumber:'):
+                    user['uidnumber'] = int(lines[n+m].split()[1])
+
+                if lines[n+m].startswith('gecos:'):
+                    gecos = lines[n+m].replace('gecos: ', '')
+                    user['gecos'] = gecos
+
+                if lines[n+m].startswith('cn:'):
+                    cn = lines[n+m].replace('cn: ', '')
+                    user['cn'] = cn 
+
+            users.append(user)
+
+    return users
+
    
 @login_required()
 def list_jasmin_users(request, tag=''):

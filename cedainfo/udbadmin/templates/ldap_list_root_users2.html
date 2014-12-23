@@ -1,0 +1,59 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>LDAP root users by username</h1>
+
+This page lists any users who are marked in the LDAP database as
+having root access to one or more machines.
+<p/>
+
+<form method="get">
+
+<table border="1" cellspacing="15">
+<tr align="center">
+<td><b>Show:</b>
+<td valign="center">ceda users {{ myform.show_ceda_users }}
+<td>jasmin users {{ myform.show_jasmin_users }} 
+<tr><td><b>Options:</b>
+<td>List only email addresses {{myform.email_only }}
+<td align="center"> <input type="Submit" value="Go">
+</table>
+</form>
+&nbsp; 
+<p/>
+
+Entries: {{all_users|length}}
+<p/>
+
+{% if myform.cleaned_data.email_only %}
+    {% for user in all_users %}
+    
+    {% if user.email %}
+        {{user.email}}<br>
+    {% endif %}
+        
+    {% endfor %}
+{% else %}
+<table border="1">
+<th>Username<th>Email<th>uid<th>Gecos<th>cn
+{% for user in all_users %}
+    <tr>
+    <td>
+    {% if user.udb_user %}
+        <a href="/admin/udbadmin/user/{{user.udb_user.userkey}}">{{user.uid}}</a>
+    {% else %}
+        {{user.uid}}
+    {% endif %}
+    
+    <td>{{user.email}}
+    <td>{{user.uidnumber}}
+    <td>{{user.gecos}}
+    <td>{{user.cn}}
+{% endfor %}
+
+</table>
+
+{% endif %}
+
+{% endblock %}
