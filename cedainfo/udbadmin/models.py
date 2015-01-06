@@ -472,7 +472,7 @@ class Datasetrequest(models.Model):
         b = Datasetjoin(userkey=self.userkey, 
                         datasetid=self.datasetid,
                         ver=version,
-                        nercfunded=0,
+                        nercfunded=self.nercfunded,
                         removed=0,
                         endorsedby=endorsedby,
                         research=self.research,
