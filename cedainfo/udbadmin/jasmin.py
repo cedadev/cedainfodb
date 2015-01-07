@@ -98,6 +98,7 @@ def ldap_list_root_users2(request):
     for user in all_users:
         
         user['email'] = ''
+        user['udb_user'] = None
         
         if user['uidnumber']:
             try:
@@ -105,7 +106,8 @@ def ldap_list_root_users2(request):
                 user['udb_user'] = udb_user 
                 user['email'] = udb_user.emailaddress.lower()
             except:
-                user['udb_user'] = None
+                user['email'] =  _gt_stfc_email (user['uid'])
+                
                 
     all_users = sorted(all_users, key=itemgetter('email'))
              
@@ -155,6 +157,24 @@ def _get_ldap_root_users (base="ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"):
 
     return users
 
+def _gt_stfc_email (cn):
+    """
+    Returns stfc email for given common name (accountid), or None if not found
+    """
+    
+    out = subprocess.check_output(["ldapsearch", "-LLL",  "-x", 
+                                   "-h", "ralfed.cclrc.ac.uk", 
+                                   "-b", "DC=fed,DC=cclrc,DC=ac,DC=uk", 
+                                   "cn=%s" % cn])
+    
+    lines = out.splitlines()
+          
+    for line in lines:
+        if line.startswith('mail: '):
+            email = line.split()[1]
+            return email
+
+    return None
    
 @login_required()
 def list_jasmin_users(request, tag=''):
