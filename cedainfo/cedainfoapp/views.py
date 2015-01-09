@@ -932,3 +932,42 @@ def txt_vms_list (request):
         output += '\n'
 
     return HttpResponse(output, content_type="text/plain")
+
+def txt_vm_request_list (request):
+
+    vms = VMRequest.objects.all().order_by('vm_name')
+ 
+    output = ''
+
+    fields = ("vm_name", \
+              "type",\
+              "operation_type", \
+              "internal_requester",\
+              "date_required",\
+              "cpu_required", \
+              "memory_required", \
+              "disk_space_required", \
+              "disk_activity_required", \
+              "network_required", \
+              "os_required", \
+              "patch_responsible",\
+              "request_status", \
+              "end_of_life",\
+              "timestamp")
+
+    for field in fields:
+        output += field + '\t'
+    output += '\n'
+
+    for vm in vms:
+        for field in fields:
+            try:
+                output += str(getattr(vm, field))
+            except:
+                output += 'Error extracting'
+            
+            output += '\t'
+  
+        output += '\n'
+
+    return HttpResponse(output, content_type="text/plain")
