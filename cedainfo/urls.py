@@ -28,7 +28,7 @@ urlpatterns = patterns('',
 
     (r'^udbadmin/', include('cedainfo.udbadmin.urls')),   
 
-    (r'^dmp/', include('cedainfo.dmp.urls')),   
+    (r'^dmp/', include('dmp.urls')),   
 )
 
 urlpatterns +=  cedainfoapp_urlpatterns
