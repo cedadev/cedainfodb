@@ -22,7 +22,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'cedainfo',                      # Or path to database file if using sqlite3.
         'USER': 'cedainfo',                      # Not used with sqlite3.
-        'PASSWORD': 'xxx',                  # Not used with sqlite3.
+        'PASSWORD': 'xxxx',                  # Not used with sqlite3.
         'HOST': 'db1.ceda.ac.uk',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     },
@@ -31,7 +31,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'userdb',                      # Or path to database file if using sqlite3.
         'USER': 'badc',                      # Not used with sqlite3.
-        'PASSWORD': 'xxx',                  # Not used with sqlite3.
+        'PASSWORD': 'xxxx',                  # Not used with sqlite3.
         'HOST': 'db1.ceda.ac.uk',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
@@ -79,7 +79,7 @@ MEDIA_URL = '/media'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = '/var/www/cedainfo_site/htdocs/static'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -91,7 +91,6 @@ STATICFILES_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(PROJECT_DIR,"cedainfoapp","templates","static"),
-    os.path.join(PROJECT_DIR,"dmp","static"),
 )
 
 # List of finder classes that know how to find static files in
@@ -129,8 +128,8 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(PROJECT_DIR, "templates"),
     os.path.join(PROJECT_DIR,"cedainfoapp","templates"),
-    os.path.join(PROJECT_DIR,"dmp","templates","dmp"),
     os.path.join(PROJECT_DIR,"proginfo","templates"),
+    "/usr/local/cedainfodb/venv/lib/python2.7/site-packages/django/contrib/admin/templates/admin"
 )
 
 INSTALLED_APPS = (
@@ -146,8 +145,11 @@ INSTALLED_APPS = (
     'sizefield',
     'cedainfo.cedainfoapp',
     'cedainfo.udbadmin',
-    'cedainfo.dmp',
+    'dmp',
+    'servicevis',
 )
+
+###ALLOWED_HOSTS=['*']
 
 # ----------------------------------------------------
 # Local customisations follow
@@ -165,12 +167,12 @@ fsc_manager_csv_cols = {
     'path' : 1
 }
 
-# checkm files dir
+# ckeckm files dir
 CHECKM_DIR='/home/badc/checkm'
 
 # import file for RSS exported grant information from DataMAD system
-#DATAMAD_RSS_FILE = '/home/badc/datamad/rss_export.xml'
-DATAMAD_RSS_FILE = '/tmp/rss_export.xml'
+DATAMAD_RSS_FILE = '/home/badc/datamad/rss_export.xml'
+
 
 # Settings used for both GWSRequest and GWS
 GWS_BACKUP_CHOICES = (
@@ -196,7 +198,9 @@ GWS_NAME_REGEX = re.compile(r'^[a-z][0-9_a-z]*$')
 
 GWS_PATH_CHOICES = (
     ('/group_workspaces/jasmin/', '/group_workspaces/jasmin/'),
+    ('/group_workspaces/jasmin2/', '/group_workspaces/jasmin2/'),
     ('/group_workspaces/cems/','/group_workspaces/cems/'),
+    ('/group_workspaces/cems2/', '/group_workspaces/cems2/'),
 )
 
 # Types of VM
