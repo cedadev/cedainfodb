@@ -107,6 +107,8 @@ class Host(models.Model):
     class Meta:
        ordering = ['hostname']	
 
+
+
 class Partition(models.Model):
     '''Filesystem equipped with standard directory structure for archive storage'''
     mountpoint = models.CharField(blank=True,max_length=1024, help_text="E.g. /disks/machineN", unique=True)
@@ -546,7 +548,7 @@ class FileSet(models.Model):
 
     # find last time processed for storage-D... 
     def sd_backup_process_log(self):
-        SDLOG = open('/datacentre/stats/storaged/lastprocessing-latest.txt')
+        SDLOG = open('/datacentre/stats/storaged/lastprocessing-latest-RT.txt')
         while 1:
             line = SDLOG.readline()
             if line == '': break
