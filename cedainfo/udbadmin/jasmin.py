@@ -47,7 +47,7 @@ def ldap_list_root_users(request):
    
     for name in groupNames:
     
-        if not (name == 'NON-STAFF' or name == 'NON_STAFF'):
+        if not (name == 'NON-STAFF' or name == 'NON_STAFF' or name == 'EX-STAFF'):
             members = LDAP.attribute_members('rootAccessGroupName', name)
             
             for member in members:
