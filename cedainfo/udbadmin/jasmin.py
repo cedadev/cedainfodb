@@ -120,7 +120,7 @@ def _get_ldap_root_users (base="ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"):
    
     out = subprocess.check_output(["ldapsearch", "-LLL",  "-x", "-H", "ldap://homer.esc.rl.ac.uk", 
                                    "-b", base, 
-                                   "(&(!(rootAccessGroupName=NON-STAFF))(rootAccessGroupName=*))",
+                                   "(&(!(rootAccessGroupName=NON-STAFF))(!(rootAccessGroupName=EX-STAFF))(rootAccessGroupName=*))",
                                    "uid", "uidnumber", "gecos", "cn"])
 
 #    out = subprocess.check_output(["ldapsearch", "-LLL",  "-x", "-H", "ldap://homer.esc.rl.ac.uk", 
