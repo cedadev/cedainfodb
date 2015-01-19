@@ -66,6 +66,7 @@ def authorise_datasets(request, userkey):
 
         changes = 0
         manualProcessingRequired = 0
+        uid_update = False
         
         infoString = []
 
@@ -110,6 +111,7 @@ def authorise_datasets(request, userkey):
                     dataset.datasetid == "cems-login" or \
                     dataset.datasetid == "commercial-login":
 		    
+                    uid_update = True
                     
                     uid = _add_uid(datasetRequest.userkey)
                      
