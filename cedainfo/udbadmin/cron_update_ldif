@@ -71,6 +71,7 @@ if len(sys.argv) > 1:
  if sys.argv[1] == "--update-anyway":
      update_anyway = True
 
+runlog = open(RUN_LOG, 'a')
 
 dbconf     = dbsettings.DATABASES['userdb']
 connection = psycopg2.connect(dbname=dbconf['NAME'], 
@@ -78,7 +79,6 @@ connection = psycopg2.connect(dbname=dbconf['NAME'],
                                 user=dbconf['USER'], 
                                 password=dbconf['PASSWORD'])
 
-runlog = open(RUN_LOG, 'a')
 os.environ['TZ'] = 'GB'
 time_string = time.strftime('%Y%m%d_%H%M', time.localtime(time.time()))
 runlog.write('Running at: ' + time_string + '\n')
