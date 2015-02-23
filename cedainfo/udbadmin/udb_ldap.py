@@ -558,9 +558,11 @@ def ldif_all_users (write_root_access=True):
     """
     a = tempfile.NamedTemporaryFile()
     record = ldap_all_user_records(write_root_access=write_root_access)
+
     a.write(record)
+#    a.write(record.encode('utf8'))
     a.flush()
-     
+         
     bb = tempfile.NamedTemporaryFile()
     p2 = subprocess.Popen([LDAP.SORT_SCRIPT, "-a", "-k", "dn", a.name], stdout=bb)
     p2.wait()
