@@ -101,6 +101,7 @@ class UserAdmin(admin.ModelAdmin):
        removedDatasets = len(self.datasets(removed=True))
        currentDatasets = len(self.datasets(removed=False))
        pendingDatasets = len(self.datasetRequests(status='pending'))
+       requestDatasets = len(self.datasetRequests())
        
        nextUserkey     = self.nextUserkey()
        previousUserkey = self.previousUserkey()
@@ -111,6 +112,8 @@ class UserAdmin(admin.ModelAdmin):
        a += ' <a href="/%s/user/datasets/current/%s">Current datasets (%s)</a> | ' % (self._meta.app_label, self.userkey, currentDatasets)
        a += ' <a href="/%s/user/datasets/removed/%s">Removed datasets (%s)</a> | ' % (self._meta.app_label, self.userkey, removedDatasets)
        a += ' <a href="/%s/authorise/%s">Pending datasets (%s)</a> | ' % (self._meta.app_label, self.userkey, pendingDatasets)
+       a += ' <a href="/admin/udbadmin/datasetrequest/?userkey=%s">Request history (%s)</a> | ' % (self.userkey, requestDatasets)
+       
        a += ' <a href="/%s/user/datasets/add/%s">Add datasets</a>' % (self._meta.app_label, self.userkey)
        
        a += '</td><td>&nbsp;</td><td><b>User navigation</b>: '
@@ -159,7 +162,8 @@ class UserAdmin(admin.ModelAdmin):
          a = 'Details: '
          a += ' <a href="/%s/user/datasets/current/%s">Current datasets</a> |' % (self._meta.app_label, self.userkey)
          a += ' <a href="/%s/user/datasets/removed/%s">Removed datasets</a> |' % (self._meta.app_label, self.userkey)
-         a += ' <a href="/%s/authorise/%s">Pending datasets</a>' % (self._meta.app_label, self.userkey)	 
+         a += ' <a href="/%s/authorise/%s">Pending datasets</a> |' % (self._meta.app_label, self.userkey)	 
+	 a += ' <a href="/admin/udbadmin/datasetrequest/?userkey=%s">Request history</a>' % (self.userkey)
          a += '<p/>'
 	 
 	 a+= '<ul>'
