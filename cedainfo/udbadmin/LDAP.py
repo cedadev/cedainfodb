@@ -260,18 +260,21 @@ def ldif_all_groups (filter_scarf_users=False, server=settings.LDAP_URL):
     using grep.
     """
     b = tempfile.NamedTemporaryFile()
-   
     p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", server, "-b", GROUP_BASE, "-s", "one"], stdout=b)
     p1.wait()
 
     bb = tempfile.NamedTemporaryFile()
 
     if filter_scarf_users:
-        p2 = subprocess.Popen([SORT_SCRIPT, "-a", "-k", "dn", b.name], stdout=subprocess.PIPE)
+	cc = tempfile.NamedTemporaryFile()
+	
+        p2 = subprocess.Popen([SORT_SCRIPT, "-a", "-k", "dn", b.name], stdout=cc)
         p2.wait()
 
-        p3 = subprocess.Popen(["grep", "-v", "memberUid: scarf"], stdin=p2.stdout, stdout=bb)
+	ccin = open(cc.name, 'r')
+        p3 = subprocess.Popen(["grep", "-v", "memberUid: scarf"], stdin=ccin, stdout=bb)
         p3.wait() 
+
     else:
         p2 = subprocess.Popen([SORT_SCRIPT, "-a", "-k", "dn", b.name], stdout=bb)
         p2.wait()
