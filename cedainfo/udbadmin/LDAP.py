@@ -7,7 +7,7 @@ from operator import itemgetter
 from django.conf import settings
 
 GROUP_BASE  = "ou=ceda,ou=Groups,o=hpc,dc=rl,dc=ac,dc=uk"
-PEOPLE_BASE = "ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"
+PEOPLE_BASE = "ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"
 
 SORT_SCRIPT = settings.PROJECT_DIR + '/udbadmin/ldifsort.pl'
 

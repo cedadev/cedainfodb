@@ -19,7 +19,7 @@ dated_file = FILEDIR  +  \
              os.popen("date +'%Y%m%d_%H%M'").readline().rstrip('\n') + \
              '_users.ldif'
 
-cmd = 'ldapsearch -LLL -x -H ldap://homer.esc.rl.ac.uk -b "ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"'  
+cmd = 'ldapsearch -LLL -x -H ldap://homer.esc.rl.ac.uk -b "ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"'  
 cmd = cmd + ' > %s ' % tmp_file.name      
 
 print "Executing: %s" % cmd

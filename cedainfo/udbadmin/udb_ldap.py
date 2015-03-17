@@ -438,7 +438,7 @@ def ldap_user_record(accountid, write_root_access=True):
 #    if not user.uid > 0:
 #        return 'uid not set for %s' % accountid
 
-    record = "dn: cn=%s,ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk\n" % user.accountid.strip()    
+    record = "dn: cn=%s,ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk\n" % user.accountid.strip()    
     record = record + 'loginShell: %s\n' % user_shell(user).strip()
 
     surname = user.surname.strip()

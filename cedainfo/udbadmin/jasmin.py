@@ -87,7 +87,7 @@ def ldap_list_root_users2(request):
     all_users = []
     
     if myform.cleaned_data['show_ceda_users']:
-        users = _get_ldap_root_users(base="ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk")
+        users = _get_ldap_root_users(base="ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk")
         all_users = all_users + users
     if myform.cleaned_data['show_jasmin_users']:
         users = _get_ldap_root_users(base="ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk")
@@ -113,7 +113,7 @@ def ldap_list_root_users2(request):
              
     return render_to_response ('ldap_list_root_users2.html', locals())    
 
-def _get_ldap_root_users (base="ou=ceda,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"):
+def _get_ldap_root_users (base="ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"):
     """
     Returns details of root users from LDAP database for given base
     """
