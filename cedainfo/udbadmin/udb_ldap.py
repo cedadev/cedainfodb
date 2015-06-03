@@ -27,6 +27,7 @@ ARCHIVE_ACCESS_GROUPS = {"cmip5_research": {"gid": 26059, "datasets" : ["cmip5_r
                                                                         "surface",
                                                                         "synop",
                                                                         "ukmo-metdb",
+									"um",
                                                                         "nimrod"]},
                          
                          "ukmo_clim":      {"gid": 26079, "datasets" : ["cet",
