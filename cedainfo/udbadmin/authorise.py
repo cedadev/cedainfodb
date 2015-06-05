@@ -224,7 +224,7 @@ def _get_next_free_uid():
     #
     # Get available range of uids
     #
-    uids = range (29751,29899+1) + range(35000,35099+1)
+    uids = range (29751,29899+1) + range (29900,29999+1) + range(35000,35099+1)
     #
     # Remove any uids that we already know are allocated to NIS accounts
     #
