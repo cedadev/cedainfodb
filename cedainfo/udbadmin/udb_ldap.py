@@ -14,7 +14,7 @@ from models import *
 import LDAP
 
 
-ARCHIVE_ACCESS_GROUPS = {"cmip5_research": {"gid": 26059, "datasets" : ["cmip5_research"]},
+ARCHIVE_ACCESS_GROUPS = {"cmip5_research": {"gid": 26059, "datasets" : ["cmip5_research", "cmip3", "cmip3_ukmo"]},
                          "esacat1":        {"gid": 26017, "datasets" : ["aatsr_multimission", "atsrubt", "mipas", "sciamachy"]},                         
                          "ecmwf":          {"gid": 26018, "datasets" : ["era", "ecmwfop", "ecmwftrj", "era4t", "ecmwfera"]},
                          "ukmo" :          {"gid": 26019, "datasets" : ["surface"]},
