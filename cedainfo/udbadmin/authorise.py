@@ -87,7 +87,10 @@ def authorise_datasets(request, userkey):
 
                  dataset = Dataset.objects.get(datasetid=datasetRequest.datasetid)
 
-                 if expireMonths == 0:
+                 if expireMonths == -1:
+		     expireDate = datetime.strptime('01/01/2099', '%d/%m/%Y')   
+
+                 elif expireMonths == 0:
                     userExpireDate = request.POST.get('userexpiredate', '')
                     
                     if userExpireDate:
