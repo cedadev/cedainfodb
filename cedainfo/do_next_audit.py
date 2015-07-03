@@ -11,9 +11,9 @@ from cedainfoapp.models import FileSet, Partition, Audit
 
 
 def usage():
-    print "Cron script to du audit next fileset"
-    print "Usage: %s <N>" % sys.argv[0]
-    print " N= number of audits to do"
+    print "Script to do audit next fileset"
+    print "Usage: %s <file_set_path>" % sys.argv[0]
+    print " file_set_path = logical path of fileset to audit"
     print
 
 def pick_audit():
@@ -59,8 +59,13 @@ if __name__=="__main__":
             sys.exit()
         else:
             assert False, "unhandled option"
-    
-    fileset = pick_audit()
+     
+    if len(args) == 1:
+        fileset = FileSet.objects.filter(logical_path=args[0]) 
+        fileset = fileset[0]
+    else:
+        fileset = pick_audit()
+
     print fileset 
     # do audit
     if fileset != None: do_audit(fileset)
