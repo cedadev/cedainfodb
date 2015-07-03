@@ -223,7 +223,7 @@ def audit_totals(request):
     start = request.GET.get('start', '') 
     end = request.GET.get('end', '') 
     
-    audits = Audit.objects.filter(auditstate="copy verified")
+    audits = Audit.objects.filter(auditstate="analysed")
 
     if start: 
         start_datetime =  datetime.datetime.strptime(start, "%Y-%m-%d")
