@@ -1,9 +1,10 @@
+from operator import itemgetter
+from dateutil.relativedelta import relativedelta
+
 from django.http import HttpResponse
 from django.shortcuts import *
 from django.contrib.auth.models import User as SiteUser
 from django.contrib.auth.decorators import login_required
-
-from dateutil.relativedelta import relativedelta
 
 from udbadmin.models import *
 from udbadmin.forms import *
@@ -42,6 +43,7 @@ KEY_HEADERS = (
   ('UID', 'uid'),
   ('Start date', 'startdate'),
   ('Email', 'emailaddress'),
+  ('Key length', 'length'),
   ('Public key', 'public_key')
 )
 
@@ -98,8 +100,13 @@ def list_keys(request):
 
     sort_headers = SortHeaders(request, KEY_HEADERS)
     headers = list(sort_headers.headers())
-##    users = User.objects.filter(uid__gt=0).order_by(sort_headers.get_order_by())    
-    users = User.objects.exclude(public_key__exact=' ').exclude(public_key__exact='').order_by(sort_headers.get_order_by())
+##    users = User.objects.filter(uid__gt=0).order_by(sort_headers.get_order_by()) 
+    
+    if sort_headers.get_order_by() != 'length':       
+        users = User.objects.exclude(public_key__exact=' ').exclude(public_key__exact='').order_by(sort_headers.get_order_by())
+    else:
+    	users = User.objects.exclude(public_key__exact=' ').exclude(public_key__exact='')
+
 ##    users = udb_ldap.all_users()
 #
 #      Get public keys for all members in ldap database
@@ -130,15 +137,20 @@ def list_keys(request):
                 warning_count = warning_count + 1
                 public_key_differs = True
 
+        length = public_keys.check_public_key(user.public_key)
+	
         userhash = {'cedauser': user, 
                     'ldap_public_key': ldap_public_key, 
+		    'key_length': length, 
                     'public_key_differs': public_key_differs, 
                     'diag_udb_key': public_keys.prepare_key_for_diff(user.public_key), 
                     'diag_ldap_key': public_keys.prepare_key_for_diff(ldap_public_key)}
                      
         cedausers.append(userhash)
-         
-    
+	
+    if sort_headers.get_order_by() == 'length':          
+        cedausers = sorted(cedausers, key=itemgetter('key_length'))
+     
     return render_to_response('list_keys.html', locals())
 
     

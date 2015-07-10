@@ -36,7 +36,7 @@ information in the table by clicking on the appropriate column heading.
 <tbody>
 {% for user in cedausers %}
 
-    {% if user.public_key_differs %}   
+    {% if user.key_length == 0 %}   
         <tr bgcolor="#F9C7C2">
     {% else %}
         <tr>
@@ -47,7 +47,7 @@ information in the table by clicking on the appropriate column heading.
     <td>{{user.cedauser.uid}}
     <td nowrap>{{user.cedauser.startdate|date:"d-M-Y H:i"}}
     <td>{{user.cedauser.emailaddress}}
-    
+    <td>{{user.key_length}}
     <td>    
     {% if user.public_key_differs %}  
         Userdb: {{user.cedauser.public_key}}<br>

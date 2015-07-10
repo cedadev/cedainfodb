@@ -47,3 +47,29 @@ def public_keys_differ (a, b):
        return True
     else:
        return False  
+
+
+def check_public_key(key):
+    import subprocess
+    import tempfile
+    import os
+    import sys
+
+    length = 0
+        
+    key = key.replace('\r', '')
+    key = key.replace('\n', '')
+
+    keyfile = tempfile.NamedTemporaryFile(delete=False)
+    keyfile.write (key)
+    keyfile.close()
+
+    try:
+        out = subprocess.check_output(['ssh-keygen', '-l', '-f', keyfile.name])
+        length = int(out.split()[0])
+    except:
+        pass
+
+    os.remove(keyfile.name)
+
+    return length
