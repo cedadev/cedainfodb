@@ -297,6 +297,13 @@ class VMRequestAdmin(admin.ModelAdmin):
     search_fields = ('vm_name',)
     #readonly_fields = ('request_status',)
     # order vm dropdown by name
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+         if db_field.name == "internal_requester":
+             kwargs["queryset"] = User.objects.order_by('username')
+
+         return super(VMRequestAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)	
+    
 admin.site.register(VMRequest, VMRequestAdmin)
 
 class VMAdmin(admin.ModelAdmin):
@@ -307,4 +314,11 @@ class VMAdmin(admin.ModelAdmin):
         return False
     def has_delete_permission(self, request, obj=None):
         return False
+	
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+         if db_field.name == "internal_requester":
+             kwargs["queryset"] = User.objects.order_by('username')
+
+        return super(VMAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)	
+	
 admin.site.register(VM, VMAdmin)
