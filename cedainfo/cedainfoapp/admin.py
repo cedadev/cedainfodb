@@ -319,6 +319,6 @@ class VMAdmin(admin.ModelAdmin):
          if db_field.name == "internal_requester":
              kwargs["queryset"] = User.objects.order_by('username')
 
-        return super(VMAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)	
+         return super(VMAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)	
 	
 admin.site.register(VM, VMAdmin)
