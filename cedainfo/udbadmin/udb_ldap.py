@@ -70,7 +70,7 @@ ARCHIVE_ACCESS_STANDARD_USERS = ["badc", "prototype", "cwps", "archread"]
 def is_ldap_user (user):    
     ''' Checks if the user should be in the LDAP system'''
 
-    if user.hasDataset("system-login") or user.hasDataset("vm_access_ceda_internal") or user.isJasminCemsUser():
+    if user.hasDataset("system-login") or user.hasDataset("ldap_system_user") or user.hasDataset("vm_access_ceda_internal") or user.isJasminCemsUser():
         return True
     else:
         return False    
