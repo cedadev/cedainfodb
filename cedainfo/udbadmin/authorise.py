@@ -140,6 +140,18 @@ def authorise_datasets(request, userkey):
 
 			mailmsg = Popen([cmd, "%s" % userkey, dataset.datasetid], stdout=PIPE).communicate()[0] 
 
+                 if dataset.datasetid.startswith("gws_"):
+
+                    if emailuser.lower() == "yes":  
+			userkey = datasetRequest.userkey
+			msg_sent = True
+			cmd = "/usr/local/userdb/releases/current/new_datasets_notification/service_msg.py"
+			m = Popen([cmd, "%s" % userkey, dataset.datasetid, "--send"])
+			m.wait()
+			msg_status = m.returncode
+
+			mailmsg = Popen([cmd, "%s" % userkey, dataset.datasetid], stdout=PIPE).communicate()[0] 
+
                          
                  if dataset.manual_processing_required():
                      manualProcessingRequired += 1
