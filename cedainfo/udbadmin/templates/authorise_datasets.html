@@ -3,8 +3,9 @@
 	<SCRIPT LANGUAGE="JavaScript" SRC="/files/javascript/calendar/date.js"></SCRIPT>
 	<SCRIPT LANGUAGE="JavaScript" SRC="/files/javascript/calendar/PopupWindow.js"></SCRIPT>
 
-
 {% extends "base_site.html" %}
+
+{% load my_filters %}
 
 {% block content %}
 
@@ -43,7 +44,11 @@
        <tr>
        <td><a href="/udbadmin/request/{{ request.id|escape }}" title="Click to view or edit request details">{{ request.id }}</a></td>
        <td>{{ request.requestdate|date:"d-M-Y" }}</td>
-       <td><a href="{{ request.datasetid.get_absolute_url|escape }}" title="Click to view dataset details">{{ request.datasetid|escape }}</a></td>
+       <td><a href="{{ request.datasetid.get_absolute_url|escape }}" 
+       title="{{authstring|lookup:request.datasetid}}
+
+Click to view dataset details       
+       ">{{ request.datasetid|escape }}</a></td>
 
        <td>{{ request.research|escape }}</td>
        <td>{{ request.nercfunded|yesno:"Yes,No" }}</td>

@@ -197,8 +197,56 @@ def dataset_details(request, datasetid):
    except:
       return HttpResponse('not found')
       
-   user = request.user   
+   user = request.user
+   
+   authorisers = get_dataset_authorisers(dataset.datasetid)
+   viewers = get_dataset_viewers(dataset.datasetid)
+      
    return render_to_response('dataset_details.html', locals())
+
+
+def get_dataset_authorisers (datasetid):
+#
+#   Returns a list of dataset authorisers for the given datasetid. Authorisers are returned as a list
+#   of User objects. If no authoriser is found then "badc" user is added (as this is the default 
+#   authoriser)
+#
+    authorisers = []
+
+    try:
+    	
+	priv = Privilege.objects.filter(datasetid=datasetid, type='authorise')
+
+	for p in priv:
+            authorisers.append(p.userkey)
+
+	if not authorisers:
+            authorisers.append(User.objects.get(userkey=-1))
+    except:
+        pass
+			
+    return authorisers
+
+def get_dataset_viewers (datasetid):
+#
+#   Returns a list of users authorised to view membership for the given datasetid. Viewers are returned as a list
+#   of User objects. 
+#
+    viewers = []
+
+    try:
+    	
+	priv = Privilege.objects.filter(datasetid=datasetid, type='viewusers')
+
+	for p in priv:
+            viewers.append(p.userkey)
+    except:
+        pass
+			
+    return viewers
+
+
+
 
 @login_required()
 def edit_user_dataset_join (request, id):

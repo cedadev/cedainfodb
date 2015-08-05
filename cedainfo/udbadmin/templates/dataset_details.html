@@ -18,7 +18,37 @@
 <tr><td><b>Default registration period (months):</b></td> <td>{{ dataset.defaultreglength }}</td>
 <tr><td><b>Data centre:</b></td> <td>{{ dataset.datacentre }}</td>
 <tr><td><b>Link:</b></td> <td>{{ dataset.infourl }}</td>
+
+<tr><td><b>Authorisers:</b></td> <td>
+   {% if authorisers|length > 1 %}
+    |
+   {% endif %}
+
+{% for user in authorisers %}
+   <a href="/admin/udbadmin/user/{{user.userkey}}">{{user.displayName}}</a> 
+   {% if authorisers|length > 1 %}
+    |
+   {% endif %}
+{% endfor %}
+</td>
+
+<tr><td><b>Viewers:</b><font size="1"> <br>(Can view details of users of this dataset)</font></td> <td>
+   {% if viewers|length > 1 %}
+    |
+   {% endif %}
+
+{% for user in viewers %}
+   <a href="/admin/udbadmin/user/{{user.userkey}}">{{user.displayName}}</a> 
+   {% if viewers|length > 1 %}
+    |
+   {% endif %}
+{% endfor %}
+</td>
+
+
 <tr><td><b>Comments:</b></td> <td>{{ dataset.comments }}</td>
+
+
 
 </table>
 

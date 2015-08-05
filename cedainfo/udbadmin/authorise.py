@@ -202,12 +202,49 @@ def authorise_datasets(request, userkey):
    removed_datasets=cedauser.datasetjoin_set.all().filter(removed__exact=-1).order_by('datasetid')
 
    requests = cedauser.datasetRequests(status='pending')
+#
+#  Construct string containing authorisers name and store in a dictionary keyed on datasetid
+#   
+   authstring = {}
+   
+   for r in requests:
+       authstring[r.datasetid] = get_dataset_authoriser_string(r.datasetid)
+
    request_history = cedauser.datasetRequests().order_by('-requestdate')
 
    authorisors = SiteUser.objects.all()
 
    user = request.user
    return render_to_response('authorise_datasets.html', locals())
+
+def get_dataset_authoriser_string (datasetid):
+#
+#   Returns a list of dataset authorisers for the given datasetid. These are returned
+#   as a string suitable for inserting into a tool-tip
+#
+    
+    authoriser_string = ''
+    
+    try:
+    	
+	priv = Privilege.objects.filter(datasetid=datasetid, type='authorise')
+	
+	
+	if len(priv)==1:
+	    authoriser_string = 'Authoriser: '
+	else:
+	    authoriser_string = '%s Authorisers: ' % len(priv)
+	        
+	for p in priv:
+            authoriser_string = authoriser_string + p.userkey.displayName() + ', '
+
+        authoriser_string = authoriser_string.rstrip(', ')
+	
+    except:
+        pass
+			
+			
+    return authoriser_string
 
       
 def _add_uid(user):
