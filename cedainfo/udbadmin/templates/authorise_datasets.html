@@ -52,7 +52,23 @@ Click to view dataset details
 
        <td>{{ request.research|escape }}</td>
        <td>{{ request.nercfunded|yesno:"Yes,No" }}</td>
-      <td><input type=radio name="id_{{request.id}}" value="accept">
+            
+      {% if request.datasetid.external_authoriser %}
+      
+          <td bgcolor="#F8C473">
+	        <input type=radio name="id_{{request.id}}" value="accept">
+
+	  <a href="{{ request.datasetid.get_absolute_url|escape }}" title="This dataset has additional authorisers:
+	  
+{{authstring|lookup:request.datasetid}}
+	  ">Info</a>
+	  
+      {% else %}
+         <td><input type=radio name="id_{{request.id}}" value="accept">
+      {% endif %}	 
+      
+      
+      
       <td><input type=radio name="id_{{request.id}}" value="reject">
       <td bgcolor="red"><input type=radio  name="id_{{request.id}}" value="junk">
 
@@ -146,7 +162,12 @@ or on:
    <tbody>
      {% for dataset in datasets %}<tr class="{% cycle odd,even %}">
        <td><a href="/udbadmin/udj/{{dataset.id}}">Edit</a></td>
-       <td><a href="{{ dataset.datasetid.get_absolute_url|escape }}" title="Click to view dataset details">{{ dataset.datasetid|escape }}</a></td>
+       <td><a href="{{ dataset.datasetid.get_absolute_url|escape }}" 
+       title="{{authstring|lookup:dataset.datasetid}}
+
+Click to view dataset details       
+       ">{{ dataset.datasetid|escape }}</a></td>
+
        <td>{{ dataset.ver|escape }}</td>
        <td>{{ dataset.endorseddate|date:"d-M-Y" }}</td>
        <td>{{ dataset.expiredate|date:"d-M-Y" }}</td>
@@ -192,7 +213,13 @@ or on:
    <tbody>
      {% for dataset in removed_datasets %}<tr class="{% cycle odd,even %}">
        <td><a href="/udbadmin/udj/{{dataset.id}}">Edit</a></td>
-       <td><a href="{{ dataset.datasetid.get_absolute_url|escape }}" title="Click to view dataset details">{{ dataset.datasetid|escape }}</a></td>
+       
+       <td><a href="{{ dataset.datasetid.get_absolute_url|escape }}" 
+       title="{{authstring|lookup:dataset.datasetid}}
+
+Click to view dataset details       
+       ">{{ dataset.datasetid|escape }}</a></td>
+       
        <td>{{ dataset.ver|escape }}</td>
        <td>{{ dataset.endorseddate|date:"d-M-Y" }}</td>
        <td>{{ dataset.expiredate|date:"d-M-Y" }}</td>
@@ -234,7 +261,13 @@ or on:
    <tbody>
      {% for request in request_history %}<tr class="{% cycle odd,even %}">
        <td><a href="/udbadmin/request/{{ request.id|escape }}" title="Click to view or edit request details">{{ request.id }}</a></td>
-       <td><a href="{{ request.datasetid.get_absolute_url|escape }}" title="Click to view dataset details">{{ request.datasetid|escape }}</a></td>
+
+       <td><a href="{{ request.datasetid.get_absolute_url|escape }}" 
+       title="{{authstring|lookup:request.datasetid}}
+
+Click to view dataset details       
+       ">{{ request.datasetid|escape }}</a></td>
+
        <td>{{ request.requestdate|date:"d-M-Y" }}</td>
        <td>{{ request.nercfunded|yesno:"Yes,No" }}</td>
        <td>{{ request.research|escape }}</td>

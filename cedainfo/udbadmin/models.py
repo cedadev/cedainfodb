@@ -113,7 +113,18 @@ class Dataset(models.Model):
         else:
             return False  
 
-              
+    def external_authoriser(self):
+#
+#       Returns True if this dataset has one or more authorisers who is not CEDA/BADC/NEODC
+#        
+        priv = Privilege.objects.filter(datasetid=self.datasetid, type='authorise')
+         
+	for p in priv:
+	    if p.userkey.userkey > 0:
+	        return True	 
+
+        return False
+	      
     class Meta:
         in_db = USERDB
         db_table = u'tbdatasets'

@@ -202,15 +202,22 @@ def authorise_datasets(request, userkey):
    removed_datasets=cedauser.datasetjoin_set.all().filter(removed__exact=-1).order_by('datasetid')
 
    requests = cedauser.datasetRequests(status='pending')
+   
+   request_history = cedauser.datasetRequests().order_by('-requestdate')   
 #
 #  Construct string containing authorisers name and store in a dictionary keyed on datasetid
 #   
    authstring = {}
    
-   for r in requests:
+   for r in request_history:
        authstring[r.datasetid] = get_dataset_authoriser_string(r.datasetid)
 
-   request_history = cedauser.datasetRequests().order_by('-requestdate')
+   for r in datasets:
+       authstring[r.datasetid] = get_dataset_authoriser_string(r.datasetid)
+
+   for r in removed_datasets:
+       authstring[r.datasetid] = get_dataset_authoriser_string(r.datasetid)
+   
 
    authorisors = SiteUser.objects.all()
 
