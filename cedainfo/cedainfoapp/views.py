@@ -321,7 +321,10 @@ def upload_audit_results(request, id):
         audit.save()
         return render_to_response('cedainfoapp/next_audit.txt', {'audit': audit})  
 
-    checkm = request.POST['checkm']
+    if 'checkm_loc' in request.POST:
+        checkm = open(request.POST['checkm_loc']).read()
+    else:
+        checkm = request.POST['checkm']
     audit.auditstate='finished'
     audit.endtime = datetime.datetime.utcnow()
     # make checkm directory for spot is missing
