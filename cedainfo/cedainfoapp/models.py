@@ -291,6 +291,9 @@ class Person(models.Model):
     username = models.CharField(max_length=45, help_text="System username")
     def __unicode__(self):
         return u'%s' % self.name
+	
+    class Meta:
+        ordering = ["username"]
 
         
 class FileSet(models.Model):
@@ -769,6 +772,7 @@ class Service(models.Model):
     requester = models.ForeignKey(Person, null=True, blank=True, related_name='service_requester', help_text="CEDA Person requesting deployment")
     installer = models.ForeignKey(Person, null=True, blank=True, related_name='service_installer', help_text="CEDA Person installing the service")
     software_contact = models.ForeignKey(Person, null=True, blank=True, related_name='service_software_contact', help_text="CEDA or 3rd party contact who is responsible for the software component used for the service")
+
     def __unicode__(self):
         theHost = ''
         if self.host is not None:
@@ -1647,6 +1651,7 @@ class VM(models.Model):
     def save(self, *args, **kwargs):
         # Custom save method : will only save an instance if there is no PK, i.e. if the model is a new instance
         # Logic : If you want to change a request, you can't, you need to make a new one & have that approved.
+
         if self.pk is None:
             super(VM, self).save(*args, **kwargs)
         else:
@@ -1709,12 +1714,100 @@ class VM(models.Model):
     action_links.short_description = 'actions'
     
     def coloured_vm_name(self):
-        '''Colour the vm name if no dns entry found'''
-        try:
-            address = socket.gethostbyname(self.name)
+        '''Colour the vm name if no dns entry found. Remove legacy prefix before checking'''
+        try:	
+            address = socket.gethostbyname(self.name.replace('legacy:', ''))
 	    return self.name
 	except:	
             return ('<span style="color:red;">%s</span>' % self.name)
 
     coloured_vm_name.short_description = 'VM name'
     coloured_vm_name.allow_tags = True
+
+class ServiceKeyword (models.Model):
+    keyword = models.CharField(max_length=30)
+
+    def __unicode__(self):              # __unicode__ on Python 2
+        return self.keyword
+
+    class Meta:
+        ordering = ('keyword',)
+
+class NewService(models.Model):
+    '''Software-based service'''
+    #host = models.ManyToManyField(Host, help_text="Host machine on which service is deployed", null=True, blank=True)
+    host = models.ForeignKey(VM, help_text="Host machine on which service is deployed", null=True, blank=True)
+    name = models.CharField(max_length=512, help_text="Name of service")
+    active = models.BooleanField(default=True, help_text="Is this service active or has it been decomissioned?")
+    description = models.TextField(blank=True, help_text="Longer description if needed")
+    documentation = models.URLField(verify_exists=False, blank=True, help_text="URL to documentation for service in opman")
+##    externally_visible = models.BooleanField(default=False, help_text="Whether or not this service is visible outside the RAL firewall")
+
+    visibility = models.CharField(
+        max_length=50,
+        choices=(
+            ("public","Public"),
+            ("internal", "Internal only"),
+            ("restricted", "Restricted external access"),
+        ),
+        default="public"
+    )	
+
+    
+    availability_tolerance = models.CharField(max_length=50,
+        choices=(
+	("unspecified", "unspecified"),
+        ("immediate","must be restored ASAP"),
+        ("24 hours","must be restored within 24 hours of failure"),
+        ("1 workingday","must be restored within 1 working day of failure"),
+        ("3 workingdays","must be restored within 3 working days of failure"),
+        ("1 week","must be restored within 1 week of failure"),
+        ("2 weeks","must be restored within 2 weeks of failure"),
+        ("1 month","must be restored within 1 month of failure"),
+        ("disposable","disposable"),
+        ),
+        default="unspecified",
+        help_text="How tolerant of unavailability we should be for this service"
+    )
+
+    requester = models.ForeignKey(Person, null=True, blank=True, related_name='requester', help_text="CEDA Person requesting deployment")
+    installer = models.ForeignKey(Person, null=True, blank=True, related_name='installer', help_text="CEDA Person installing the service")
+    software_contact = models.ForeignKey(Person, null=True, blank=True, related_name='software_contact', help_text="CEDA or 3rd party contact who is responsible for the software component used for the service")
+    service_manager = models.ForeignKey(Person, null=True, blank=True, related_name='software_manager', help_text="CEDA person responsible for this service")
+
+    last_reviewed = models.DateField(null=True, blank=True, help_text="Date of last review")
+    review_status = models.CharField(
+        max_length=50,
+        choices=(
+            ("to be reviewed","To be reviewed"),
+            ("reviewed but issues", "Reviewed but issues"),
+            ("passed", "Passed"),
+        ),
+        default="to be reviewed"
+    )
+    
+    review_info = models.TextField(blank=True, help_text="Information from reviews. Please date and put most recent information at the top.")
+
+    keywords = models.ManyToManyField(ServiceKeyword, blank=True, null=True, help_text="Select any keywords that apply to this service")
+
+    def __unicode__(self):
+        theHost = ''
+        if self.host is not None:
+            theHost = self.host
+        return u'%s (%s)' % (self.name, theHost)
+
+    def summary(self):
+       '''Returns a summary string extracted from the start of the full description text'''
+           
+       SummaryLength = 60
+       summary = self.description.strip()
+       summary = ' '.join(summary.split())
+       
+       if len(summary) > SummaryLength:
+          summary = summary[0:SummaryLength-1] + '...'
+    
+       return summary
+
+    def documentationLink (self):
+    
+       return self.documentation

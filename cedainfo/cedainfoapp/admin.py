@@ -1,8 +1,11 @@
 from django.contrib import admin
+from django.contrib.admin import SimpleListFilter
 #from django.contrib.gis import admin
 from models import *
 from filters import MountpointFilter 
 from django import forms
+from django.utils.safestring import mark_safe
+
 from forms import *
 
 
@@ -67,6 +70,10 @@ admin.site.register(Person, PersonAdmin)
 #admin.site.register(ServiceBackupLog)
 
 # customise the Host admin interface
+
+admin.site.register(ServiceKeyword)
+
+
 class HostAdmin(admin.ModelAdmin):
     list_display = ('hostname','ip_addr', 'serial_no', 'arrival_date', 'host_type','hypervisor','rack')
     list_filter = ('supplier','planned_end_of_life', 'retired_on','host_type','rack',)
@@ -102,6 +109,172 @@ class ServiceAdmin(admin.ModelAdmin):
     ordering = ('-active', 'name')
     filter_horizontal= ('dependencies',)   
 admin.site.register(Service, ServiceAdmin)
+
+
+class ServiceHostFilter(SimpleListFilter):
+ 
+    title = 'Host'
+    parameter_name = 'Host'
+
+    def lookups(self, request, model_admin):
+        hosts = set([c.host for c in model_admin.model.objects.all()])
+	hosts = list(hosts)
+	hosts.sort(key=lambda x: x.name)
+        return [(c.id, c.name) for c in hosts]
+ 
+    def queryset(self, request, queryset):
+
+        if self.value():
+            return queryset.filter(host__id__exact=self.value())
+        else:
+            return queryset
+
+class SoftwareContactFilter(SimpleListFilter):
+ 
+    title = 'Software contact'
+    parameter_name = ''
+
+    def lookups(self, request, model_admin):
+        users = set([c.software_contact for c in model_admin.model.objects.all()])
+        if None in users: users.remove(None)
+#
+#       Sort results
+#	
+	users = list(users)	   
+	users.sort(key=lambda x: x.username)
+
+	count = {}
+	for u in users:
+	    count[u.username] = len(model_admin.model.objects.filter(software_contact__username=u.username))
+
+        return [(c.id, c.username + ' (%s)' % count[c.username]) for c in users]
+ 
+    def queryset(self, request, queryset):
+
+        if self.value():
+            return queryset.filter(software_contact__id__exact=self.value())
+        else:
+            return queryset
+
+
+class RequesterFilter(SimpleListFilter):
+ 
+    title = 'Requester'
+    parameter_name = ''
+
+    def lookups(self, request, model_admin):
+        users = set([c.requester for c in model_admin.model.objects.all()])
+        if None in users: users.remove(None)
+#
+#       Sort results
+#	
+	users = list(users)	   
+	users.sort(key=lambda x: x.username)
+
+	count = {}
+	for u in users:
+	    count[u.username] = len(model_admin.model.objects.filter(requester__username=u.username))
+	
+        return [(c.id, c.username + ' (%s)' % count[c.username] ) for c in users]
+ 
+    def queryset(self, request, queryset):
+
+        if self.value():
+            return queryset.filter(requester__id__exact=self.value())
+        else:
+            return queryset
+
+class InstallerFilter(SimpleListFilter):
+ 
+    title = 'Installer'
+    parameter_name = ''
+
+    def lookups(self, request, model_admin):
+        users = set([c.installer for c in model_admin.model.objects.all()])
+        if None in users: users.remove(None)
+#
+#       Sort results
+#	
+	users = list(users)	   
+	users.sort(key=lambda x: x.username)
+	
+	count = {}
+	for u in users:
+	    count[u.username] = len(model_admin.model.objects.filter(installer__username=u.username))
+	    
+        return [(c.id, c.username + ' (%s)' % count[c.username] ) for c in users]
+ 
+    def queryset(self, request, queryset):
+
+        if self.value():
+            return queryset.filter(installer__id__exact=self.value())
+        else:
+            return queryset
+
+class ManagerFilter(SimpleListFilter):
+ 
+    title = 'Manager'
+    parameter_name = ''
+
+    def lookups(self, request, model_admin):
+        users = set([c.service_manager for c in model_admin.model.objects.all()])
+        if None in users: users.remove(None)
+#
+#       Sort results
+#	
+	users = list(users)	   
+	users.sort(key=lambda x: x.username)
+	
+	count = {}
+	for u in users:
+	    count[u.username] = len(model_admin.model.objects.filter(service_manager__username=u.username))
+	    
+        return [(c.id, c.username + ' (%s)' % count[c.username] ) for c in users]
+ 
+ 
+    def queryset(self, request, queryset):
+
+        if self.value():
+            return queryset.filter(installer__id__exact=self.value())
+        else:
+            return queryset
+
+class NewServiceAdmin(admin.ModelAdmin):
+
+#    def wikiLink(self):
+#        url = self.documentation
+#	
+#	if url:
+#            return mark_safe('<a href="%s">Wiki</a>' % (url))
+#        else:
+#	    return ''
+#	    
+#    wikiLink.allow_tags = True
+#    wikiLink.short_description = 'Wiki'
+
+    def availability(self):
+        tolerance = self.availability_tolerance
+	
+	return tolerance
+	    
+
+
+    list_display = ('name', 'visibility', 'summary', 'host', 'service_manager')
+    
+    list_filter = ('visibility', 'active', 'availability_tolerance', 'keywords', ManagerFilter, SoftwareContactFilter, RequesterFilter, InstallerFilter, ServiceHostFilter)
+    search_fields = ('description', 'name')
+    ordering = ('-active', 'name')
+
+    filter_horizontal= ('keywords',)   
+    
+    formfield_overrides = {
+        models.URLField: {'widget': TextInput(attrs={'size':'120'})},
+        models.CharField: {'widget': TextInput(attrs={'size':'80'})},
+	
+    }
+    
+admin.site.register(NewService, NewServiceAdmin)
+
 
 # customise the Rack admin interface
 class RackAdmin(admin.ModelAdmin):
@@ -316,9 +489,9 @@ class VMAdmin(admin.ModelAdmin):
         return False
 	
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-         if db_field.name == "internal_requester":
-             kwargs["queryset"] = User.objects.order_by('username')
+        if db_field.name == "internal_requester":
+            kwargs["queryset"] = User.objects.order_by('username')
 
-         return super(VMAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)	
+        return super(VMAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)	
 	
 admin.site.register(VM, VMAdmin)

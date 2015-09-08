@@ -24,6 +24,13 @@
                           {% endif %}
                     {% endifequal %}
 
+                    {% ifequal field.field.name "host" %}
+                          {% if field.field.value %}
+                             <a href="/admin/cedainfoapp/vm/{{field.field.value}}" class="historylink">View host details{{field.field.contents}}</a>
+                          {% endif %}
+                    {% endifequal %}
+
+
                     {% endif %}
                     {% if field.field.help_text %}
                         <p class="help">{{ field.field.help_text|safe }}</p>
