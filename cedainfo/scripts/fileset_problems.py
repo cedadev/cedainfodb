@@ -74,7 +74,7 @@ def fileset_problems():
             if backup_processed[:3] == "Not": print_msg(f, "Not processed for backup yet")
             else:
                 date = datetime(int(backup_processed[:4]), int(backup_processed[4:6]), int(backup_processed[6:8]))
-                if today - date > timedelta(days=5):
+                if today - date > timedelta(days=10):
                     print_msg(f, "Not backed up for over 10 days")        
     
 def print_msg(obj, msg):
