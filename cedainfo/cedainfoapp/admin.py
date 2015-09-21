@@ -129,87 +129,6 @@ class ServiceHostFilter(SimpleListFilter):
         else:
             return queryset
 
-class SoftwareContactFilter(SimpleListFilter):
- 
-    title = 'Software contact'
-    parameter_name = ''
-
-    def lookups(self, request, model_admin):
-        users = set([c.software_contact for c in model_admin.model.objects.all()])
-        if None in users: users.remove(None)
-#
-#       Sort results
-#	
-	users = list(users)	   
-	users.sort(key=lambda x: x.username)
-
-	count = {}
-	for u in users:
-	    count[u.username] = len(model_admin.model.objects.filter(software_contact__username=u.username))
-
-        return [(c.id, c.username + ' (%s)' % count[c.username]) for c in users]
- 
-    def queryset(self, request, queryset):
-
-        if self.value():
-            return queryset.filter(software_contact__id__exact=self.value())
-        else:
-            return queryset
-
-
-class RequesterFilter(SimpleListFilter):
- 
-    title = 'Requester'
-    parameter_name = ''
-
-    def lookups(self, request, model_admin):
-        users = set([c.requester for c in model_admin.model.objects.all()])
-        if None in users: users.remove(None)
-#
-#       Sort results
-#	
-	users = list(users)	   
-	users.sort(key=lambda x: x.username)
-
-	count = {}
-	for u in users:
-	    count[u.username] = len(model_admin.model.objects.filter(requester__username=u.username))
-	
-        return [(c.id, c.username + ' (%s)' % count[c.username] ) for c in users]
- 
-    def queryset(self, request, queryset):
-
-        if self.value():
-            return queryset.filter(requester__id__exact=self.value())
-        else:
-            return queryset
-
-class InstallerFilter(SimpleListFilter):
- 
-    title = 'Installer'
-    parameter_name = ''
-
-    def lookups(self, request, model_admin):
-        users = set([c.installer for c in model_admin.model.objects.all()])
-        if None in users: users.remove(None)
-#
-#       Sort results
-#	
-	users = list(users)	   
-	users.sort(key=lambda x: x.username)
-	
-	count = {}
-	for u in users:
-	    count[u.username] = len(model_admin.model.objects.filter(installer__username=u.username))
-	    
-        return [(c.id, c.username + ' (%s)' % count[c.username] ) for c in users]
- 
-    def queryset(self, request, queryset):
-
-        if self.value():
-            return queryset.filter(installer__id__exact=self.value())
-        else:
-            return queryset
 
 class ManagerFilter(SimpleListFilter):
  
@@ -235,7 +154,7 @@ class ManagerFilter(SimpleListFilter):
     def queryset(self, request, queryset):
 
         if self.value():
-            return queryset.filter(installer__id__exact=self.value())
+            return queryset.filter(service_manager__id__exact=self.value())
         else:
             return queryset
 
@@ -259,11 +178,11 @@ class NewServiceAdmin(admin.ModelAdmin):
 	    
 
 
-    list_display = ('name', 'visibility', 'summary', 'host', 'service_manager')
+    list_display = ('name', 'visibility', 'status', 'summary', 'host', 'service_manager')
     
-    list_filter = ('visibility', 'active', 'availability_tolerance', 'keywords', ManagerFilter, SoftwareContactFilter, RequesterFilter, InstallerFilter, ServiceHostFilter)
+    list_filter = ('visibility', 'status', 'keywords', ManagerFilter, ServiceHostFilter)
     search_fields = ('description', 'name')
-    ordering = ('-active', 'name')
+    ordering = ('name',)
 
     filter_horizontal= ('keywords',)   
     

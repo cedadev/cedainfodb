@@ -1738,7 +1738,18 @@ class NewService(models.Model):
     #host = models.ManyToManyField(Host, help_text="Host machine on which service is deployed", null=True, blank=True)
     host = models.ForeignKey(VM, help_text="Host machine on which service is deployed", null=True, blank=True)
     name = models.CharField(max_length=512, help_text="Name of service")
-    active = models.BooleanField(default=True, help_text="Is this service active or has it been decomissioned?")
+
+    status = models.CharField(
+         max_length=50,
+         choices=(
+             ("pre-production","Pre-production"),
+             ("production", "Production"),
+             ("decomissioned", "Decomissioned"),
+	     ("other", "Other (e.g. temporarily offline)")
+         ),
+         default="to be reviewed"
+     )
+ 
     description = models.TextField(blank=True, help_text="Longer description if needed")
     documentation = models.URLField(verify_exists=False, blank=True, help_text="URL to documentation for service in opman")
 ##    externally_visible = models.BooleanField(default=False, help_text="Whether or not this service is visible outside the RAL firewall")
@@ -1750,29 +1761,10 @@ class NewService(models.Model):
             ("internal", "Internal only"),
             ("restricted", "Restricted external access"),
         ),
-        default="public"
+        default="public",
+	help_text="Intended visibility when operational"
     )	
 
-    
-    availability_tolerance = models.CharField(max_length=50,
-        choices=(
-	("unspecified", "unspecified"),
-        ("immediate","must be restored ASAP"),
-        ("24 hours","must be restored within 24 hours of failure"),
-        ("1 workingday","must be restored within 1 working day of failure"),
-        ("3 workingdays","must be restored within 3 working days of failure"),
-        ("1 week","must be restored within 1 week of failure"),
-        ("2 weeks","must be restored within 2 weeks of failure"),
-        ("1 month","must be restored within 1 month of failure"),
-        ("disposable","disposable"),
-        ),
-        default="unspecified",
-        help_text="How tolerant of unavailability we should be for this service"
-    )
-
-    requester = models.ForeignKey(Person, null=True, blank=True, related_name='requester', help_text="CEDA Person requesting deployment")
-    installer = models.ForeignKey(Person, null=True, blank=True, related_name='installer', help_text="CEDA Person installing the service")
-    software_contact = models.ForeignKey(Person, null=True, blank=True, related_name='software_contact', help_text="CEDA or 3rd party contact who is responsible for the software component used for the service")
     service_manager = models.ForeignKey(Person, null=True, blank=True, related_name='software_manager', help_text="CEDA person responsible for this service")
 
     last_reviewed = models.DateField(null=True, blank=True, help_text="Date of last review")
