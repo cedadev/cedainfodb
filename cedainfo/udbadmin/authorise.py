@@ -21,9 +21,8 @@ def _add_user_to_jasmin_mailinglist (email, name):
 #   sending an email command
 #
 
-#    FROM = "badc-support@rl.ac.uk"
     FROM = "support@ceda.ac.uk"
-    TO   = ("listserv@jiscmail.ac.uk", "andrew.harwood@stfc.ac.uk", "badc-support@rl.ac.uk") 
+    TO   = ("listserv@jiscmail.ac.uk", "andrew.harwood@stfc.ac.uk") 
     cmd = "add jasmin-users %s %s" % (email, name)
 
     message = """\
