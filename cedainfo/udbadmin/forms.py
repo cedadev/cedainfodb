@@ -8,6 +8,8 @@ import LDAP
 class JasminUsersForm(forms.Form):
     show_ceda_users  = BooleanField(required=False)
     show_jasmin_users = BooleanField(required=False)
+    show_jasmin2_users  = BooleanField(required=False)
+    
     email_only = BooleanField(required=False)
     
 class LDAPuserForm(forms.Form):

@@ -47,7 +47,7 @@ def ldap_list_root_users(request):
    
     for name in groupNames:
     
-        if not (name == 'NON-STAFF' or name == 'NON_STAFF' or name == 'EX-STAFF'):
+        if ('.' in name):
             members = LDAP.attribute_members('rootAccessGroupName', name)
             
             for member in members:
@@ -90,8 +90,12 @@ def ldap_list_root_users2(request):
         users = _get_ldap_root_users(base="ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk")
         all_users = all_users + users
     if myform.cleaned_data['show_jasmin_users']:
-        users = _get_ldap_root_users(base="ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk")
+        users = _get_ldap_root_users(base="ou=jasmin_root_users,ou=People,o=hpc,dc=rl,dc=ac,dc=uk")
         all_users = all_users + users
+    if myform.cleaned_data['show_jasmin2_users']:
+        users = _get_ldap_root_users(base="ou=jasmin2,ou=People,o=hpc,dc=rl,dc=ac,dc=uk")
+        all_users = all_users + users
+
 #
 #   Add information from userdb if available for this user
 #
