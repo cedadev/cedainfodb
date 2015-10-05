@@ -936,6 +936,31 @@ def txt_vms_list (request):
 
     return HttpResponse(output, content_type="text/plain")
 
+def txt_service_list (request, vmname=''):
+
+    if vmname:
+        fields = ("name", "documentation")
+        recs = NewService.objects.filter(host__name=vmname).exclude(status='decomissioned')
+    else:
+        fields = ("name", "documentation", "host", "status")
+        recs = NewService.objects.all().exclude(status='decomissioned').order_by('host')
+      
+    output = ''
+	      
+    for field in fields:
+        output += field + '\t'
+    output += '\n'
+    
+    for rec in recs:
+        for field in fields:
+            output += str(getattr(rec, field))
+            output += '\t'
+  	    
+        output += '\n'
+
+    return HttpResponse(output, content_type="text/plain")
+
+
 def txt_vm_request_list (request):
 
     vms = VMRequest.objects.all().order_by('vm_name')
