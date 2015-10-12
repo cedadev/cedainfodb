@@ -898,41 +898,71 @@ def txt_host_list (request):
     return HttpResponse(output, content_type="text/plain")
 
 
-def txt_vms_list (request):
+def txt_vms_list (request, vmname=''):
 
-    vms = VM.objects.all().order_by('name')
- 
-    output = ''
+    if vmname:
+	vm = VM.objects.filter(name=vmname)[0]
+	
+	output = ''
 
-    fields = ("name", \
-              "type",\
-              "operation_type", \
-              "internal_requester",\
-              "date_required",\
-              "cpu_required", \
-              "memory_required", \
-              "disk_space_required", \
-              "disk_activity_required", \
-              "network_required", \
-              "os_required", \
-              "other_info", \
-              "patch_responsible",\
-              "status", \
-              "created",\
-              "end_of_life",\
-              "retired",\
-              "timestamp")
+	fields = ("name", \
+        	  "type",\
+        	  "operation_type", \
+        	  "internal_requester",\
+		  "description",\
+        	  "date_required",\
+        	  "cpu_required", \
+        	  "memory_required", \
+        	  "disk_space_required", \
+        	  "disk_activity_required", \
+        	  "network_required", \
+        	  "os_required", \
+        	  "other_info", \
+        	  "patch_responsible",\
+        	  "status", \
+        	  "created",\
+        	  "end_of_life",\
+        	  "retired",\
+        	  "timestamp")
 
-    for field in fields:
-        output += field + '\t'
-    output += '\n'
+	for field in fields:
+            output += field + ':\t'
+	    output += str(getattr(vm, field)) + '\n'
+	    
+    else:
+	vms = VM.objects.all().order_by('name')
 
-    for vm in vms:
-        for field in fields:
-            output += str(getattr(vm, field))
-            output += '\t'
-  
-        output += '\n'
+	output = ''
+
+	fields = ("name", \
+        	  "type",\
+        	  "operation_type", \
+        	  "internal_requester",\
+        	  "date_required",\
+        	  "cpu_required", \
+        	  "memory_required", \
+        	  "disk_space_required", \
+        	  "disk_activity_required", \
+        	  "network_required", \
+        	  "os_required", \
+        	  "other_info", \
+        	  "patch_responsible",\
+        	  "status", \
+        	  "created",\
+        	  "end_of_life",\
+        	  "retired",\
+        	  "timestamp")
+
+	for field in fields:
+            output += field + '\t'
+	output += '\n'
+
+	for vm in vms:
+            for field in fields:
+        	output += str(getattr(vm, field))
+        	output += '\t'
+
+            output += '\n'
 
     return HttpResponse(output, content_type="text/plain")
 
