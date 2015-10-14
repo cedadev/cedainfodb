@@ -514,7 +514,7 @@ def display_free_uids (request):
     next_uid = 0
     free_count = 0
 
-    for uid in range(26001, 26399+1) + range (29751,29899+1) + range(29900,29999+1) + range(35000,35099+1):
+    for uid in range (25000,25174+1) + range(26001, 26469+1) + range (29751,29899+1) + range(29900,29999+1) + range(35000,35099+1):
 ##    for uid in range(26001, 26399+1) + range (29751,29899+1):
         
         rec = {}
@@ -552,11 +552,7 @@ def display_free_uids (request):
         if rec['free']:
             free_count = free_count + 1
 
-        if uid < 26001:
-           if rec.has_key('accountid') or rec.has_key('int_accountid')  or rec.has_key('ext_accountid'):
-               output.append(rec)
-        else: 
-            output.append(rec)
+        output.append(rec)
         
     return render_to_response('display_free_uids.html', locals())
 
