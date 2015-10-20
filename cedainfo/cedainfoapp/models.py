@@ -119,10 +119,12 @@ class Partition(models.Model):
     status = models.CharField(max_length=50,       
               choices=(("Blank","Blank"),
                  ("Allocating","Allocating"),
-                 ("Allocating_ps","Allocating_ps"),
+                 ("Allocating_tape","Allocating_tape"),
                  ("Closed","Closed"),
                  ("Migrating","Migrating"),
                  ("Retired","Retired")) )
+    notes = models.TextField(blank=True)
+
 
     def df(self):
         """Report disk usage.
@@ -306,9 +308,9 @@ class FileSet(models.Model):
     partition = models.ForeignKey(Partition, blank=True, null=True, limit_choices_to = {'status': 'Allocating'},help_text="Actual partition where this FileSet is physically stored")
     storage_pot_type = models.CharField(max_length=64, blank=True, default='archive', 
             help_text="The 'type' directory under which the data is held. This is archive for archive data and project_space for project space etc. DO NOT CHANGE AFTER SPOT CREATION", 
-	    choices=(("archive","archive"),
-                 ("project_spaces","project_spaces"),
-                 ("group_workspace","group_workspace")) )
+            choices=(("archive","archive"),
+                     ("project_spaces","project_spaces"),
+                     ("group_workspace","group_workspace")) )
     storage_pot = models.CharField(max_length=1024, blank=True, default='', help_text="The directory under which the data is held")
     migrate_to = models.ForeignKey(Partition, blank=True, null=True,help_text="Target partition for migration", related_name='fileset_migrate_to_partition')
     secondary_partition = models.ForeignKey(Partition, blank=True, null=True, help_text="Target for secondary disk copy", related_name='fileset_secondary_partition')
@@ -316,6 +318,7 @@ class FileSet(models.Model):
     sd_backup = models.BooleanField(default=False, help_text="Backup to Storage-D")
     complete = models.BooleanField(default=False, help_text="Is the fileset complete. If this is set then we are not anticipating the files to change, be deleted or added to.")
     complete_date = models.DateField(null=True, blank=True, help_text="Date when fileset was set to complete.")
+    primary_on_tape = models.BooleanField(default=False, help_text="Primary media storage on tape.")
     
     def __unicode__(self):
         return u'%s' % (self.logical_path,)
@@ -326,9 +329,9 @@ class FileSet(models.Model):
 
     def secondary_storage_path(self):
         if self.secondary_partition: 
-	    return os.path.normpath(self.secondary_partition.mountpoint+'/backup/'+self.storage_pot_type+'/'+self.storage_pot)
-	else:
-	    return None 
+            return os.path.normpath(self.secondary_partition.mountpoint+'/backup/'+self.storage_pot_type+'/'+self.storage_pot)
+        else:
+            return None
 
     def migrate_path(self):
         return os.path.normpath(self.migrate_to.mountpoint+'/'+self.storage_pot_type+'/'+self.storage_pot) 
@@ -374,23 +377,21 @@ class FileSet(models.Model):
 	self.partition = self.migrate_to
  	self.migrate_to = None
         self.save()
-	
-	
+
     def _migration_copy(self):	
         # copy - exception  copy is ok
-	rsynccmd = 'rsync -av %s/ %s' % (self.storage_path(),self.migrate_path())
-	print ">>> %s" %rsynccmd      
+        rsynccmd = 'rsync -av %s/ %s' % (self.storage_path(),self.migrate_path())
+        print ">>> %s" %rsynccmd
         subprocess.check_call(rsynccmd.split())
 
     def secondary_copy_command(self):	
         '''make an rsync command to create a secondary copy'''
-	if not self.secondary_partition: return ''
+        if not self.secondary_partition: return ''
         host = self.partition.host.hostname
-	frompath = self.storage_path()
-	topath = "badc@%s:%s" % (self.secondary_partition.host.hostname,self.secondary_storage_path())
-	rsynccmd = 'ssh %s rsync -Puva --delete %s %s' % (host, frompath, topath)
-	return rsynccmd
-
+        frompath = self.storage_path()
+        topath = "badc@%s:%s" % (self.secondary_partition.host.hostname,self.secondary_storage_path())
+        rsynccmd = 'ssh %s rsync -Puva --delete %s %s' % (host, frompath, topath)
+        return rsynccmd
 
     def spot_exists(self):
         if self.storage_pot == '':
@@ -403,13 +404,16 @@ class FileSet(models.Model):
     logical_path_exists.boolean = True
 
     def logical_path_right(self):
-        if not os.path.exists(self.logical_path): return False
-	if not os.path.islink(self.logical_path): 
-	    return False
-	else:
-	    linkpath = os.readlink(self.logical_path)
-	    if linkpath == self.storage_path(): return True
-	    else: return False
+        if not os.path.exists(self.logical_path):
+            return False
+        if not os.path.islink(self.logical_path):
+            return False
+        else:
+            linkpath = os.readlink(self.logical_path)
+            if linkpath == self.storage_path():
+                return True
+            else:
+                return False
 
     def status(self):
         "return text showing fileset status"
@@ -429,40 +433,49 @@ class FileSet(models.Model):
 	    else: return '<font color="#ff0000">Link error</font>'
     status.allow_tags = True
 
-
-    
     # make a fileset including makeing spot directoies and seting allocations.
     # if the path already exists then split the spot
-    def make_fileset(self, path, size):
+    def make_fileset(self, path, size, on_tape=False):
         filesets = FileSet.objects.filter(logical_path=path)
-        if os.path.exists(path): raise FilseSetCreationError("Logical path already exists.")
-        if len(filesets)!=0: raise FilseSetCreationError("File set with same logical path already exists.")
+        if os.path.exists(path):
+            raise FilseSetCreationError("Logical path already exists.")
+        if len(filesets) != 0:
+            raise FilseSetCreationError("File set with same logical path already exists.")
         if not os.path.isdir(os.path.dirname(path)): raise FilseSetCreationError("Parent directory does not exist.")
 
-        # find the fullest partition which can accomidate the file set
-        partitions = Partition.objects.filter(status='Allocating')
-	allocated_partition = None
-	fullest_space = 10e40
-	for p in partitions:
-	    partition_free_space = 0.80 * p.capacity_bytes - p.allocated()
-	    # if this partition could accommidate file set...
-	    if partition_free_space > size:
-		# ... and its the fullest so far  
-		if partition_free_space < fullest_space:
-		    allocated_partition = p
-		    fullest_space = partition_free_space
-	    print ">>>>>>> ",p, allocated_partition, fullest_space, partition_free_space	    	     
+        # select partitions to search for space
+        if on_tape:
+            self.primary_on_tape = True
+            partitions = Partition.objects.filter(status='Allocating_tape')
+            fill_factor = 20.0
+        else:
+            partitions = Partition.objects.filter(status='Allocating')
+            fill_factor = 0.8
 
-        if allocated_partition==None: raise FilseSetCreationError("Can't find a partition to allocate this to.")
-		
-	# create a fileset in the database	
-        self.logical_path=path
-        self.overall_final_size=size
-        self.partition=allocated_partition
-	self.notes += '\nAllocated partition %s (%s)' % (self.partition, datetime.utcnow())
+        # find the fullest partition which can accomidate the file set
+        allocated_partition = None
+        fullest_space = 10e40
+        for p in partitions:
+            partition_free_space = fill_factor * p.capacity_bytes - p.allocated()
+            # if this partition could accommidate file set...
+            if partition_free_space > size:
+                # ... and its the fullest so far
+                if partition_free_space < fullest_space:
+                    allocated_partition = p
+                    fullest_space = partition_free_space
+                    print ">>>>>>> ", p, allocated_partition, fullest_space, partition_free_space
+
+        if allocated_partition is None:
+            raise FilseSetCreationError("Can't find a partition to allocate this to.")
+
+        # create a fileset in the database
+        self.logical_path = path
+        self.overall_final_size = size
+        self.partition = allocated_partition
+        self.notes += '\nAllocated partition %s (%s)' % (self.partition, datetime.utcnow())
         self.save()
                 
-        #create the spot name. This uses the fileset id and last directory name in the path.
+        # create the spot name. This uses the fileset id and last directory name in the path.
         head, spottail = os.path.split(path)
         if spottail == '': head, spottail = os.path.split(head)
         spotname = "spot-%s-%s" % (self.pk, spottail)
@@ -482,8 +495,8 @@ class FileSet(models.Model):
             self.delete()
             raise FilseSetCreationError("Can't chown the storage pot directory (removed spot dir for consistancy)")     
         try:
-	    os.symlink(self.storage_path(), self.logical_path)
-        except: 
+            os.symlink(self.storage_path(), self.logical_path)
+        except:
             # remove spot dir that was make correctly, but is inconsistant because link not made
             os.rmdir(self.storage_path())
             self.delete()
@@ -587,12 +600,15 @@ class FileSet(models.Model):
     
     def du(self):
         '''Report disk usage of FileSet by creating as FileSetSizeMeasurement.'''
-        if self.spot_exists():
+        # switch off du if primary archive on tape.
+        if self.spot_exists() and not self.primary_on_tape:
             # find volume using du
-            output = subprocess.Popen(['/usr/bin/du', '-sk', '--apparent', self.storage_path()],stdout=subprocess.PIPE).communicate()[0]
-#            output = subprocess.Popen(['/usr/bin/du', '-sk', self.storage_path()],stdout=subprocess.PIPE).communicate()[0]
+            output = subprocess.Popen(['/usr/bin/du', '-sk', '--apparent', self.storage_path()],
+                                      stdout=subprocess.PIPE).communicate()[0]
+            # output = subprocess.Popen(['/usr/bin/du', '-sk', self.storage_path()],stdout=subprocess.PIPE).communicate()[0]
             lines = output.split('\n')
-            if len(lines) == 2: size, path = lines[0].split()
+            if len(lines) == 2:
+                size, path = lines[0].split()
 
             # find number of files
             p1 = subprocess.Popen(["find", self.storage_path(), "-type", "f"], stdout=subprocess.PIPE)
@@ -600,7 +616,8 @@ class FileSet(models.Model):
             p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
             nfiles = p2.communicate()[0]
 
-            fssm = FileSetSizeMeasurement(fileset=self, date=datetime.utcnow(), size=int(size)*1024, no_files=int(nfiles))
+            fssm = FileSetSizeMeasurement(fileset=self, date=datetime.utcnow(),
+                                          size=int(size)*1024, alloc=self.overall_final_size, no_files=int(nfiles))
             fssm.save() 
         return      
 
@@ -820,19 +837,36 @@ class FileSetSizeMeasurement(models.Model):
     fileset = models.ForeignKey(FileSet, help_text="FileSet that was measured")
     date = models.DateTimeField(default=datetime.now, help_text="Date and time of measurement")
     size = models.BigIntegerField(help_text="Size in bytes") # in bytes
-    no_files = models.BigIntegerField(null=True, blank=True, help_text="Number of files") 
-    def __unicode__(self):
-        if self.size > 2000000000000: size =self.size/(1024*1024*1024*1024); unit = "TB"
-        if self.size > 2000000000: size =self.size/(1024*1024*1024); unit = "GB"
-        if self.size > 2000000: size =self.size/(1024*1024); unit = "MB"
-        elif self.size > 2000:    size =self.size/(1024); unit = "kB"
-	else:                     size = self.size; unit= "B"
+    alloc = models.BigIntegerField(help_text="Allocatoion Size in bytes") # in bytes
+    no_files = models.BigIntegerField(null=True, blank=True, help_text="Number of files")
 
-        if self.no_files > 2000000: no_files =self.no_files/(1000*1000); funit = "Mfiles"
-	else:                     no_files = self.no_files; funit= "files"
-	
+    def __unicode__(self):
+        if self.size > 2000000000000:
+            size = self.size/(1024*1024*1024*1024)
+            unit = "TB"
+        elif self.size > 2000000000:
+            size = self.size/(1024*1024*1024)
+            unit = "GB"
+        elif self.size > 2000000:
+            size = self.size/(1024*1024)
+            unit = "MB"
+        elif self.size > 2000:
+            size = self.size/(1024)
+            unit = "kB"
+        else:
+            size = self.size
+            unit = "B"
+
+        if self.no_files > 2000000:
+            no_files = self.no_files/(1000*1000)
+            funit = "Mfiles"
+        else:
+            no_files = self.no_files
+            funit = "files"
+
         return u'%s %s; %s %s (%s)' % (size, unit, no_files, funit, self.date.strftime("%Y-%m-%d %H:%M"))
-		
+
+
 class Audit(models.Model):
     '''A record of inspecting a fileset'''
     fileset = models.ForeignKey(FileSet, help_text="FileSet which this audit related to at time of creation", on_delete=models.SET_NULL, null=True, blank=True)

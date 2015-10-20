@@ -278,7 +278,9 @@ def next_audit(request):
     # pick an audit to do: 
     # 1) any fileset that has no privious audit
     # 2) any fileset that has oldest audit
-    filesets = FileSet.objects.filter(storage_pot_type='archive', storage_pot__isnull=False).exclude(storage_pot='')
+    # dont audit fileset where the primary is on tape
+    filesets = FileSet.objects.filter(storage_pot_type='archive', primary_on_tape=False,
+                                      storage_pot__isnull=False).exclude(storage_pot='')
     fileset_to_audit = None
     oldest_audit = datetime.datetime.utcnow()
     for f in filesets:
@@ -479,12 +481,20 @@ def storagesummary(request):
     return render_to_response('cedainfoapp/sumtable.html', {'sumtable':sumtable, 'user':request.user})  
 
 # needs to be public to interact with scripts.
+def primary_on_tape(request):
+    """List filesets where the data is parimary on tape. """
+    filesets = FileSet.objects.filter(sd_backup=True, storage_pot__isnull=False,
+                                      primary_on_tape=True).exclude(storage_pot='')
+    return render_to_response('cedainfoapp/primary_on_tape.txt', {'filesets':filesets,'user':request.user},
+                              mimetype="text/plain")
+
+# needs to be public to interact with scripts.
 def storaged_spotlist(request):
 #    filesets = FileSet.objects.filter(logical_path__startswith='/badc')
-    withpath = request.GET.get('withpath', None) 
+    withpath = request.GET.get('withpath', None)
     filesets = FileSet.objects.filter(sd_backup=True, storage_pot__isnull=False ).exclude(storage_pot='')
-    if withpath != None: return render_to_response('cedainfoapp/storage-d_spotlist_withpath.html', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
-    else: return render_to_response('cedainfoapp/storage-d_spotlist.html', {'filesets':filesets,'user':request.user}, mimetype="text/plain")  
+    if withpath != None: return render_to_response('cedainfoapp/storage-d_spotlist_withpath.html', {'filesets':filesets,'user':request.user}, mimetype="text/plain")
+    else: return render_to_response('cedainfoapp/storage-d_spotlist.html', {'filesets':filesets,'user':request.user}, mimetype="text/plain")
 
 #
 # Provide 'external' access to simple list of spots for use by e-science. Login is disabled for this view. If any access protection is required then it can be added to the apache configuration file.
@@ -546,7 +556,8 @@ def spotlist(request):
 def make_fileset(request):
     path = request.GET.get('path', None)
     size_in = request.GET.get('size', None)
-    if path==None: 
+    on_tape = request.GET.get('on_tape', False)
+    if path==None:
         return render_to_response('cedainfoapp/fileset_make.html', {'path':path, 'size':size_in, 'error':'no path specified'})   
     if not size_in: 
         return render_to_response('cedainfoapp/fileset_make.html', {'path':path, 'size':size_in, 'error':'no size specified'})  
@@ -559,7 +570,7 @@ def make_fileset(request):
     else: size = int(size_in)    
  
     new_fs = FileSet(logical_path=path, overall_final_size=size)
-    try: new_fs.make_fileset(path, size)    
+    try: new_fs.make_fileset(path, size, on_tape)
     except FilseSetCreationError:
         return render_to_response('cedainfoapp/fileset_make.html', {'path':path, 'size':size_in, 'error':'Fileset creation error: %s' %sys.exc_info()[1]})
 

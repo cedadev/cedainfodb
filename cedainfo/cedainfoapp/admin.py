@@ -313,8 +313,8 @@ class FileSetAdmin(admin.ModelAdmin):
     'storage_pot',
     'migrate_to',
     'secondary_partition',
-    'dmf_backup',
     'sd_backup',
+    'primary_on_tape',
     'complete',
     'complete_date',  
     )	
