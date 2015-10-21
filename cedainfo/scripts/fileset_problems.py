@@ -9,7 +9,7 @@ from cedainfoapp.models import *
 
 
 def audit_problems():
-    audits = Audit.objects.filter(auditstate='corrupt')
+    audits = Audit.objects.filter(auditstate='corruption')
     for a in audits:
         print_msg(a, "Audit detected corruption")
 
@@ -65,7 +65,7 @@ def fileset_problems():
         else: 
             print_msg(f, "Not measured yet")
 
-        if too_many_files: print_msg(f, "Too Many files %s")
+        if too_many_files: print_msg(f, "Too Many files")
         if too_big: print_msg(f, "Too Big")
         if over_alloc: print_msg(f, "Over allocation")
 
