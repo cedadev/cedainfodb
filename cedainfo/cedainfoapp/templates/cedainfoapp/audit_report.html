@@ -15,7 +15,7 @@ Audit report
     <tr><td>Fileset</td> <td><a href="/admin/cedainfoapp/fileset/{{ audit.fileset.pk }}">{{ audit.fileset }}</a></td></tr>
     <tr><td>Fileset notes</td> <td>{{ audit.fileset.notes }}</td></tr>
     <tr><td>Partition</td> <td>{{ audit.fileset.partition }}</td></tr>
-    <tr><td>Storage-D?</td> <td>{{ audit.fileset.sd_backup }} {{ audit.fileset.sd_backup_process_log }}</td></tr>
+    <tr><td>Storage-D</td> <td>{{ audit.fileset.sd_backup }} (last done:{{ audit.fileset.sd_backup_process_log }})</td></tr>
 
 
 </table>
