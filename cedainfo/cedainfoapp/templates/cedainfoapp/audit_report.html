@@ -1,0 +1,47 @@
+{% extends "base_site.html" %}
+
+{% block title %}
+Audit report
+{% endblock %}
+
+
+{% block content %}
+
+<h1>Audit report for {{audit.fileset.logical_path}}</h1>
+
+<h2>Audited fileset</h2>
+<table>
+    <tr><td>Storage path</td> <td>{{ audit.fileset.storage_path }}</td></tr>
+    <tr><td>Fileset</td> <td><a href="/admin/cedainfoapp/fileset/{{ audit.fileset.pk }}">{{ audit.fileset }}</a></td></tr>
+    <tr><td>Fileset notes</td> <td>{{ audit.fileset.notes }}</td></tr>
+    <tr><td>Partition</td> <td>{{ audit.fileset.partition }}</td></tr>
+    <tr><td>Storage-D?</td> <td>{{ audit.fileset.sd_backup }} {{ audit.fileset.sd_backup_process_log }}</td></tr>
+
+
+</table>
+
+<h2>Audit comparision</h2>
+<table>
+    <tr><td></td><td>This Audit</td><td>Last Audit</td><tr>
+    <tr><td>Audit number</td><td><a href="/admin/cedainfoapp/audit/{{ audit.pk }}">{{ audit.pk }}</a></td>
+        <td><a href="/admin/cedainfoapp/audit/{{ prev_audit.pk }}">{{ prev_audit.pk }}</a></td><tr>
+    <tr><td>State</td><td>{{ audit.auditstate }}</td><td>{{ prev_audit.auditstate }}</td><tr>
+    <tr><td>Total files</td><td>{{ audit.total_files }}</td><td>{{ prev_audit.total_files }}</td><tr>
+    <tr><td>Total volume</td><td>{{ audit.total_volume }}</td><td>{{ prev_audit.total_volume }}</td><tr>
+    <tr><td>New files</td><td>{{ audit.new_files }}</td><td>{{ prev_audit.new_files }}</td><tr>
+    <tr><td>Deleted files</td><td>{{ audit.deleted_files }}</td><td>{{ prev_audit.deleted_files }}</td><tr>
+    <tr><td>Modified files</td><td>{{ audit.modified_files }}</td><td>{{ prev_audit.modified_files }}</td><tr>
+    <tr><td>Unchanged files</td><td>{{ audit.unchanges_files }}</td><td>{{ prev_audit.unchanges_files }}</td><tr>
+    <tr><td>Start time</td><td>{{ audit.starttime }}</td><td>{{ prev_audit.starttime }}</td><tr>
+    <tr><td>End time</td><td>{{ audit.endtime }}</td><td>{{ prev_audit.endtime }}</td><tr>
+    <tr><td>Corrupt files</td><td>{{ audit.corrupted_files }}</td><td>{{ prev_audit.corrupted_files }}</td><tr>
+</table>
+
+<h2>corrupt files</h2>
+    <p>
+{% for f in result.corrupt %}
+    {{ f }}</br>
+{% endfor %}
+</p>
+
+{% endblock %}

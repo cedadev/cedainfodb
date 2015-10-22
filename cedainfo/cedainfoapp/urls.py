@@ -83,6 +83,7 @@ urlpatterns = patterns('',
     (r'^audit_trace(?P<path>.*)$', audit_trace),
     (r'^next_audit$', next_audit),
     (r'^upload_audit_results/(?P<id>\d+)$', upload_audit_results),
+    (r'^audit/(?P<id>\d+)/report$', audit_report),
 
 
 )

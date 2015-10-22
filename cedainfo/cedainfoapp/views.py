@@ -343,9 +343,18 @@ def upload_audit_results(request, id):
 
     return render_to_response('cedainfoapp/next_audit.txt', {'audit': audit})  
 
+def audit_report(request, id):
+    # report against a previous audit results
+    audit = get_object_or_404(Audit, pk=id)
+    prev_audit = audit.prev_audit()
+    if prev_audit:
+        result = audit.compare(prev_audit)
+    else:
+        result = None
+    return render_to_response('cedainfoapp/audit_report.html', {'audit': audit, 'prev_audit': prev_audit,
+                                                                'result': result, 'user': request.user})
 
-
-@login_required()    
+@login_required()
 def partition_list(request):
     o = request.GET.get('o', 'id') # default order is ascending id
     partfilter = request.GET.get('filter', None) # default order is ascending id
