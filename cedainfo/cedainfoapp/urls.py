@@ -46,6 +46,7 @@ urlpatterns = patterns('',
     (r'^partition/$', partition_list),
     (r'^partition/(?P<id>\d+)/df$', df),
     (r'^partition/(?P<id>\d+)/vis$', partition_vis),
+    (r'^partition/(?P<id>\d+)/peplerdiagram$', partition_peplerdiagram),
     (r'^latest/volumes/$', VolFeed()),
 
     (r'^rack/services/(?P<rack_id>\d+)$', services_by_rack),

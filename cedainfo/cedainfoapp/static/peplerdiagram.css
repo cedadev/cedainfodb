@@ -1,0 +1,49 @@
+
+.filled {
+           stroke: #ff0000;
+           fill:none;
+           stroke-width:4;
+           stroke-dasharray:10 5;
+        }
+.capacity {
+           stroke: #000000;
+           fill:none;
+           stroke-width:4;
+        }
+.totalused {
+           stroke: #0000ff;
+           fill:none;
+           stroke-width:4;
+           stroke-dasharray:10 5;
+        }
+.totalalloc {
+           stroke: #9999ff;
+           fill:none;
+           stroke-width:4;
+           stroke-dasharray:10 5;
+        }
+.used {
+           stroke: #3333ff;
+           fill:#6666ff;
+           stroke-width:1;
+        }
+.alloc {
+           stroke: #ffffff;
+           fill:#9999ff;
+           stroke-width:1;
+        }
+.break {
+           stroke: none;
+           fill:#ffffff;
+        }
+
+.filllabel {
+           stroke: #ff0000;
+           fill:#ff0000;
+        }
+.usedlabel {
+           stroke: #0000ff;
+           fill:#0000ff;
+        }
+
+

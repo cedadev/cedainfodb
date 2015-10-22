@@ -652,6 +652,14 @@ class FileSet(models.Model):
             return None
     last_size.allow_tags = True
 
+    def last_vol(self):
+        # display most recent FileSetSizeMeasurement
+        try:
+            fssm = FileSetSizeMeasurement.objects.filter(fileset=self).order_by('-date')[0]
+            return fssm.size
+        except:
+            return 0
+
     def last_audit(self):
         # display most recent audit
         audit = Audit.objects.filter(fileset=self)

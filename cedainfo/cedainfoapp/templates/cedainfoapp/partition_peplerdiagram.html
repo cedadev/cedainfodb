@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="/static/peplerdiagram.css">
+  <script src="/static/jquery-1.11.1.min.js"></script>
+</head>
+<body>
+
+<h4>Pepler Diagram</h4>
+
+Partition: <a href="/admin/cedainfoapp/partition/{{part.pk}}">{{part}}</a>
+
+
+<script>
+data = {
+         'allocs': [{% for fs in filesets  %}
+         [{{ fs.overall_final_size }}, {{ fs.last_vol }}, '{{ fs.logical_path }}',
+          '/admin/cedainfoapp/fileset/{{ fs.pk }}'], {% endfor %}
+         ], 'cap': {{ part.capacity_bytes }}, 'filled': {{ part.used_bytes }}
+         };
+</script>
+
+<script>
+
+var makesvg = function (data) {
+
+  ploth = 500;
+  plotw = 300;
+  cap = data.cap;
+  hscale = ploth/cap;
+  filled = data.filled * hscale;
+
+  var  html = '<svg height="600" width="600" xmlns:xlink="http://www.w3.org/1999/xlink>';
+
+    html += '<svg x="20" y="20">';
+
+  cumalloc=0;
+  cumused = 0;
+  for (i = 0; i < data.allocs.length; i++){
+    alloc=data.allocs[i][0];
+    used=data.allocs[i][1]
+    usedw= used *plotw /alloc;
+    alloch = alloc *hscale
+    label=data.allocs[i][2];
+    url=data.allocs[i][3];
+    html += '<svg y="'+cumalloc+'" x="0">';
+    html += '  <rect class="alloc" x=0 y=0 height="'+alloch+'" width="'+plotw+'"/>';
+    html += '  <rect class="used" x=0 y=0 height="'+alloch+'" width="'+usedw+'" />';
+    if (usedw>580) {
+      html += '  <polygon class="break" points="500,0  510,0 520,'+alloch/2+' 510,'+alloch+' 500,'+alloch+' 510,'+alloch/2+'"/>';
+      }
+    html += '  <a xlink:href="' + url + '"> XX<text x="5"  y="'+alloch+'" dy="-5">('+Math.floor(used*100/alloc)+'%) '+label+'</text></a>';
+    html += '</svg>';
+    cumalloc += alloch;
+    cumused += used * hscale;
+  }
+
+    html += '<rect class="totalused"  height="'+cumused+'" width="'+plotw+'" />';
+    html += '<text y="'+cumused+'" x="'+plotw+'" dy="3" dx="3" class="usedlabel">Total used</text>>';
+    html += '<rect class="filled"  height="'+filled+'" width="'+plotw+'" />';
+    html += '<text y="'+filled+'" x="'+plotw+'" dy="3" dx="3" class="filllabel">df fill</text>>';
+    html += '<rect class="capacity" height="'+ploth+'" width="'+plotw+'" />';
+    html += 'Sorry, your browser does not support inline SVG. ';
+    html += '</svg>';
+    html += '</svg>';
+  $( "#show" ).html(html);
+
+};
+</script>
+
+
+
+<div id="show"></div>
+
+<script>makesvg(data)</script>
+</body>
+</html>

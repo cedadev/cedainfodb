@@ -417,6 +417,24 @@ def partition_vis(request, id):
     return render_to_response('cedainfoapp/partition_vis.html', 
                {'part': part, 'filesets': filesets, 'unalloc':unalloc})  
 
+@login_required()
+def partition_peplerdiagram(request, id):
+    part = Partition.objects.get(pk=id)
+    filesets = FileSet.objects.filter(partition=part).order_by('-overall_final_size')
+    unalloc = part.capacity_bytes
+    for f in filesets:
+        alloc = f.overall_final_size*100/part.capacity_bytes
+        #f.vis = '|' * alloc
+        f.vis = alloc
+        size = f.last_size().size
+        f.allocused = min(f.overall_final_size, size)
+        f.allocfree = max(f.overall_final_size-size, 0)
+        f.overalloc = max(size-f.overall_final_size, 0)
+        f.totalsize = max(f.overall_final_size, f.overall_final_size+f.overalloc)
+        unalloc -= f.totalsize
+    return render_to_response('cedainfoapp/partition_peplerdiagram.html',
+               {'part': part, 'filesets': filesets, 'unalloc':unalloc})
+
     
 # do df for a partition and redirect back to partitions list
 @login_required()
