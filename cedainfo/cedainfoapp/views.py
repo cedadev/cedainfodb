@@ -588,6 +588,10 @@ def make_fileset(request):
         return render_to_response('cedainfoapp/fileset_make.html', {'path':path, 'size':size_in, 'error':'no path specified'})   
     if not size_in: 
         return render_to_response('cedainfoapp/fileset_make.html', {'path':path, 'size':size_in, 'error':'no size specified'})  
+
+    # make sure filesets have no spaces or slashes at the end
+    path = path.strip()
+    path = path.rstrip('/')
         
     # Find size
     if size_in[-2:].upper() == 'KB': size = int(size_in[0:-2])*1024
@@ -611,6 +615,10 @@ def split_fileset(request):
     if size_in==None: 
         return render_to_response('cedainfoapp/fileset_split.html', {'path':path, 'size':size_in, 'error':'Need a size.'})  
 
+    # make sure filesets have no spaces or slashes at the end
+    path = path.strip()
+    path = path.rstrip('/')
+        
     # Find size
     if size_in[-2:].upper() == 'KB': size = int(size_in[0:-2])*1024
     elif size_in[-2:].upper() == 'MB': size = int(size_in[0:-2])*1024*1024

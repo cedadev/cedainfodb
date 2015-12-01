@@ -300,7 +300,7 @@ class FileSetAdmin(admin.ModelAdmin):
     list_editable=['sd_backup']  
   
     ordering = ('-id',)
-    readonly_fields = ('partition',
+    readonly_fields = ('logical_path', 'partition',
         'migrate_to', 
         'storage_pot', 'complete', 'complete_date', niceOverallFinalSize)
 	
