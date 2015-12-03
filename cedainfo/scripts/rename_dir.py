@@ -19,7 +19,7 @@ def run ():
     if "/" in change_to:
         raise Exception("Can't have slashes in change to argument.")
 
-    filesets_to_change = FilleSet.objects.filter(logical_path__startswith=archive_path)
+    filesets_to_change = FileSet.objects.filter(logical_path__startswith=archive_path)
     print filesets_to_change
 
     # new path
