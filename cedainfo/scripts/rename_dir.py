@@ -30,8 +30,9 @@ def run (*args):
 
     # rename dir
     print "rename %s -> %s" % (archive_path, new_path)
-    # os.rename(archive_path, new_path)
+    os.rename(archive_path, new_path)
 
     for fs in filesets_to_change:
-        print fs.logical_path
         print fs.logical_path, " -> ", fs.logical_path.replace(archive_path, new_path)
+        fs.logical_path = fs.logical_path.replace(archive_path, new_path)
+        fs.save()
