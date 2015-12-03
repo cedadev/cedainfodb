@@ -16,6 +16,9 @@ def run (*args):
 
     print archive_path, change_to
 
+    if not os.path.isdir(archive_path):
+        raise Exception("Need a existing directory in archive")
+
     if "/" in change_to:
         raise Exception("Can't have slashes in change to argument.")
 
