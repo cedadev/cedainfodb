@@ -8,11 +8,11 @@ import smtplib
 from cedainfoapp.models import *
 
 
-def run ():
-    archive_path = sys.argv[1]
+def run (*args):
+    archive_path = args[0]
     archive_path = archive_path.rstrip('/')
     archive_parent_dir = os.path.dirname(archive_path)
-    change_to = sys.argv[2]
+    change_to = args[1]
 
     print archive_path, change_to
 
