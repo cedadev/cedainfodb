@@ -108,7 +108,7 @@ class ServiceAdmin(admin.ModelAdmin):
     search_fields = ('description', 'name')
     ordering = ('-active', 'name')
     filter_horizontal= ('dependencies',)   
-admin.site.register(Service, ServiceAdmin)
+##admin.site.register(Service, ServiceAdmin)
 
 
 class ServiceHostFilter(SimpleListFilter):
