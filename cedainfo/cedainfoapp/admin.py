@@ -10,14 +10,16 @@ from forms import *
 
 
 def prettySize(size):
-   '''Returns file size in human readable format'''
+    '''Returns file size in human readable format'''
    
-   suffixes = [("B",2**10), ("K",2**20), ("M",2**30), ("G",2**40), ("T",2**50)]
-   for suf, lim in suffixes:
-      if size > lim:
-         continue
-      else:
-         return round(size/float(lim/2**10),2).__str__()+suf
+    suffixes = [("B", 1), ("K", 1000), ("M", 1000000), ("G", 1000000000), ("T", 1000000000000)]
+    level_up_factor = 2000.0
+    for suf, multipler in suffixes:
+        if float(size)/multipler > level_up_factor:
+            continue
+        else:
+            return round(size/float(multipler), 2).__str__()+suf
+    return round(size/float(multipler), 2).__str__()+suf
 
 
 class BigIntegerInput(forms.TextInput):
@@ -320,9 +322,9 @@ class FileSetAdmin(admin.ModelAdmin):
     )	
     
     # TODO : add size history graph
-    formfield_overrides = { ByteSizeField: {'widget': BigIntegerInput} }
+    formfield_overrides = {ByteSizeField: {'widget': BigIntegerInput}}
     search_fields = ['logical_path', 'notes']
-    actions=['bulk_du',]
+    actions = ['bulk_du', ]
     
     def bulk_du(self, request, queryset):
         for fs in queryset.all():
@@ -333,20 +335,20 @@ class FileSetAdmin(admin.ModelAdmin):
     def change_view(self, request, object_id, extra_context=None):
     
         fssms = FileSetSizeMeasurement.objects.filter(fileset=object_id).order_by('date')
-	#.objects.filter(fileset=self).order_by('date')
-	#fssms = fssms.get()
-#	for in
-#        size_values = fssms.values_list('size', flat=True)
-#        date_values = fssms.values_list('date', flat=True)    
+        # .objects.filter(fileset=self).order_by('date')
+        # fssms = fssms.get()
+        #	for in
+        # size_values = fssms.values_list('size', flat=True)
+        # date_values = fssms.values_list('date', flat=True)
+
         my_context = {'xx': 'MyContect', 'fssms':fssms}
-        return super(FileSetAdmin, self).change_view(request, object_id,
-            extra_context=my_context)
+        return super(FileSetAdmin, self).change_view(request, object_id, extra_context=my_context)
 
     def has_add_permission(self, request, obj=None):
         return False
 
 
-admin.site.register(FileSet,FileSetAdmin)
+admin.site.register(FileSet, FileSetAdmin)
 
 #class FileSetSizeMeasurementAdmin(admin.ModelAdmin):
 #    formfield_overrides = { ByteSizeField: {'widget': BigIntegerInput} }

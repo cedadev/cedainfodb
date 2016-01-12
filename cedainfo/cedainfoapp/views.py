@@ -594,10 +594,10 @@ def make_fileset(request):
     path = path.rstrip('/')
         
     # Find size
-    if size_in[-2:].upper() == 'KB': size = int(size_in[0:-2])*1024
-    elif size_in[-2:].upper() == 'MB': size = int(size_in[0:-2])*1024*1024
-    elif size_in[-2:].upper() == 'GB': size = int(size_in[0:-2])*1024*1024*1024
-    elif size_in[-2:].upper() == 'TB': size = int(size_in[0:-2])*1024*1024*1024*1024
+    if size_in[-2:].upper() == 'KB': size = int(size_in[0:-2])*1000
+    elif size_in[-2:].upper() == 'MB': size = int(size_in[0:-2])*1000000
+    elif size_in[-2:].upper() == 'GB': size = int(size_in[0:-2])*1000*1000000
+    elif size_in[-2:].upper() == 'TB': size = int(size_in[0:-2])*1000000*1000000
     else: size = int(size_in)    
  
     new_fs = FileSet(logical_path=path, overall_final_size=size)
@@ -620,10 +620,10 @@ def split_fileset(request):
     path = path.rstrip('/')
         
     # Find size
-    if size_in[-2:].upper() == 'KB': size = int(size_in[0:-2])*1024
-    elif size_in[-2:].upper() == 'MB': size = int(size_in[0:-2])*1024*1024
-    elif size_in[-2:].upper() == 'GB': size = int(size_in[0:-2])*1024*1024*1024
-    elif size_in[-2:].upper() == 'TB': size = int(size_in[0:-2])*1024*1024*1024*1024
+    if size_in[-2:].upper() == 'KB': size = int(size_in[0:-2])*1000
+    elif size_in[-2:].upper() == 'MB': size = int(size_in[0:-2])*1000000
+    elif size_in[-2:].upper() == 'GB': size = int(size_in[0:-2])*1000*1000000
+    elif size_in[-2:].upper() == 'TB': size = int(size_in[0:-2])*1000000*1000000
     else: size = int(size_in)    
      
     # find parent fileset 
