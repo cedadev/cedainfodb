@@ -135,7 +135,7 @@ class ServiceHostFilter(SimpleListFilter):
 class ManagerFilter(SimpleListFilter):
  
     title = 'Manager'
-    parameter_name = ''
+    parameter_name = 'manager'
 
     def lookups(self, request, model_admin):
         users = set([c.service_manager for c in model_admin.model.objects.all()])
@@ -160,6 +160,35 @@ class ManagerFilter(SimpleListFilter):
         else:
             return queryset
 
+
+class SystemManagerFilter(SimpleListFilter):
+ 
+    title = 'System Manager'
+    parameter_name = 'sysadmin'
+
+    def lookups(self, request, model_admin):
+        users = set([c.host.patch_responsible for c in model_admin.model.objects.all()])
+        if None in users: users.remove(None)
+#
+#       Sort results
+#	
+	users = list(users)	   
+	users.sort(key=lambda x: x.username)
+	
+	count = {}
+	for u in users:
+	    count[u.username] = len(model_admin.model.objects.filter(host__patch_responsible__username=u.username))
+	    
+        return [(c.id, c.username + ' (%s)' % count[c.username] ) for c in users]
+ 
+ 
+    def queryset(self, request, queryset):
+
+        if self.value():
+            return queryset.filter(host__patch_responsible__id__exact=self.value()) 
+        else:
+            return queryset
+
 class NewServiceAdmin(admin.ModelAdmin):
 
 #    def wikiLink(self):
@@ -178,11 +207,18 @@ class NewServiceAdmin(admin.ModelAdmin):
 	
 	return tolerance
 	    
+    def system_manager(self):
+        if self.host.name.startswith('legacy:'):
+	    return ''
+	else:    
+    	    return self.host.patch_responsible
 
+    system_manager.admin_order_field = "host__patch_responsible__username"
+        
 
-    list_display = ('name', 'visibility', 'status', 'summary', 'host', 'service_manager')
+    list_display = ('name',  'host', system_manager, 'visibility', 'status', 'summary','service_manager')
     
-    list_filter = ('visibility', 'status', 'keywords', ManagerFilter, ServiceHostFilter)
+    list_filter = ('visibility', 'status', 'keywords', ManagerFilter, ServiceHostFilter, SystemManagerFilter)
     search_fields = ('description', 'name')
     ordering = ('name',)
 
