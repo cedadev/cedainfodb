@@ -1824,6 +1824,9 @@ class NewService(models.Model):
 
     keywords = models.ManyToManyField(ServiceKeyword, blank=True, null=True, help_text="Select any keywords that apply to this service")
 
+    class Meta:
+        verbose_name = "Service"
+
     def __unicode__(self):
         theHost = ''
         if self.host is not None:
