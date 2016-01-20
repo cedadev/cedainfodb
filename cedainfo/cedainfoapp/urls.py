@@ -14,6 +14,8 @@ urlpatterns = patterns('',
     #   - list view of hosts subsetted (e.g. in_pool, not_retired)
     (r'^hosts/(?P<subset>\w+)$', host_list),
 
+    (r'^services/listbyvm/$', service_list_by_vm),
+
     (r'^txt/hosts/$', txt_host_list),
     (r'^txt/vms/(?P<vmname>.*)$', txt_vms_list),
     (r'^txt/vmrequests/$', txt_vm_request_list), 

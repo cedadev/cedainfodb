@@ -11,6 +11,8 @@ from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.core.context_processors import csrf
 
+from udbadmin.SortHeaders import SortHeaders
+
 import re
 
 import datetime
@@ -1075,3 +1077,36 @@ def txt_vm_request_list (request):
         output += '\n'
 
     return HttpResponse(output, content_type="text/plain")
+
+
+@login_required()    
+def service_list_by_vm(request):
+
+    HEADERS = (
+      ('Name', 'name'),
+      ('Sysadmin', 'patch_responsible__username'),
+	)
+
+    sort_headers = SortHeaders(request, HEADERS)
+    
+    headers = list(sort_headers.headers())
+
+    allvms = VM.objects.all()
+    allvms = allvms.order_by(sort_headers.get_order_by())   
+        
+    for vm in allvms:
+        if vm.patch_responsible.username == 'nobody':
+	   vm.patch_responsible.username = ''    
+    
+    vms = []
+    
+    for vm in allvms:
+        recs = NewService.objects.filter(host__name=vm.name).filter(status='production')
+	
+		
+        if (len(recs) > 0):
+	    vm.prodservices = recs
+            vms.append(vm) 
+
+     
+    return render_to_response('services/list_by_vm.html', locals())
