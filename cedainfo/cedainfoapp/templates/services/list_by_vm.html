@@ -47,9 +47,7 @@ Number of vms: {{vms|length}}
 
 {% for service in vm.prodservices %}
   
-   {% if service.visibility == 'restricted' %}
-       <li><b><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}} ({{service.service_manager}})</a></b><br>
-    {% elif service.visibility == 'internal' %}
+   {% if service.visibility != 'public' %}
        <li><b><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}} ({{service.service_manager}})</a></b><br>
     {% else %}
        <li><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}} ({{service.service_manager}})</a><br>
