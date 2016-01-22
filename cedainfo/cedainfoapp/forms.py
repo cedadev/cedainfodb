@@ -94,4 +94,9 @@ class GWSRequestDetailForm(ModelForm):
             'requested_volume': TextInput(attrs={'size': 80,}),
             'related_url': TextInput(attrs={'size': 80,}),
         }
-        
+
+class ServiceForm(ModelForm):
+    class Meta:
+        model = NewService
+
+         

@@ -1086,6 +1086,9 @@ def service_list_by_vm(request):
       ('Name', 'name'),
       ('Sysadmin', 'patch_responsible__username'),
 	)
+	
+    service_status = request.REQUEST.get('status', 'production')
+    myform = ServiceForm(initial={'status': service_status},)
 
     sort_headers = SortHeaders(request, HEADERS)
     
@@ -1101,7 +1104,7 @@ def service_list_by_vm(request):
     vms = []
     
     for vm in allvms:
-        recs = NewService.objects.filter(host__name=vm.name).filter(status='production')
+        recs = NewService.objects.filter(host__name=vm.name).filter(status=service_status)
 	
 		
         if (len(recs) > 0):

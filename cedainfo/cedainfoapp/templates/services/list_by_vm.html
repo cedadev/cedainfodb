@@ -2,13 +2,18 @@
 
 {% block content %}
 
-<h1>Services by VM</h1>
+<h1>Services listed by VM</h1>
 <p>
 
 </p>
-
-Lists all 'production' services by vm. <em>sysadmin</em> is taken from 'patch responsible' in the VM record.
+Lists all services by vm. <em>sysadmin</em> is taken from 'patch responsible' in the VM record.
 <p>
+
+<form method="get">
+Display services with status: {{myform.status }}
+<input type="Submit" value="Go">
+</form>
+
 </p>
 
 <a href="/admin/cedainfoapp/newservice/">List all services</a>
@@ -29,7 +34,7 @@ Number of vms: {{vms|length}}
      {% if header.sortable %}</a>{% endif %}
    </th>{% endfor %}
 
-<th>Production services</th>
+<th>Service (Service admin)</th>
 <th>All services</th>
 <th>Icinga</th>
 
@@ -41,8 +46,16 @@ Number of vms: {{vms|length}}
 <td>
 
 {% for service in vm.prodservices %}
-   <li><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}} ({{service.service_manager}})</a><br>
+  
+   {% if service.visibility == 'restricted' %}
+       <li><b><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}} ({{service.service_manager}})</a></b><br>
+    {% elif service.visibility == 'internal' %}
+       <li><b><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}} ({{service.service_manager}})</a></b><br>
+    {% else %}
+       <li><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}} ({{service.service_manager}})</a><br>
 
+    {% endif %}
+    
 {% endfor %}
 
 </td>
