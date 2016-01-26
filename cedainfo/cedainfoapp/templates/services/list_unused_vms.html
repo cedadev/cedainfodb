@@ -1,0 +1,67 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>List VMs without services</h1>
+<p>
+
+</p>
+Lists VMs that don't have any 'production' or 'pre-production' services associated with them. Excluded are any VMs that
+have an operation type of 'test' or 'development' 
+<em>sysadmin</em> is the 'patch responsible' field in the VM record.
+<p>
+
+</p>
+
+<a href="/admin/cedainfoapp/newservice/">List all services</a>
+|
+<a href="/admin/cedainfoapp/vm/">List all VMs</a>
+
+<p></p>
+
+Number of vms: {{vms|length}}
+<p>
+
+<table border="1">
+
+{% for header in headers %}
+   <th>
+     {% if header.sortable %}<a href="{{ header.url|escape }}" title="Click to sort by this column">{% endif %}
+     {{ header.text }}
+     {% if header.sortable %}</a>{% endif %}
+   </th>
+{% endfor %}
+
+
+<th>Icinga</th>
+
+{% for vm in vms %}
+
+<tr>
+<td><a href="/admin/cedainfoapp/vm/{{vm.id}}">{{vm.name}}</a></td>
+
+<td>{{vm.patch_responsible}}</td>
+
+<td>{{vm.type}}</td>
+
+<td>{{vm.operation_type}}</td>
+
+
+<td>
+{{ vm.created|date:'d/m/Y' }}
+</td>
+
+<td>
+{{vm.internal_requester}}
+<td>
+<a href="https://icinga2-master.esc.rl.ac.uk/icingaweb2/monitoring/host/show?host={{vm.name}}">Icinga</a>
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+{% endblock %}
+
