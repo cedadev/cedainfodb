@@ -1113,3 +1113,58 @@ def service_list_by_vm(request):
 
      
     return render_to_response('services/list_by_vm.html', locals())
+
+
+@login_required()    
+def service_unusedvms(request):
+
+    HEADERS = (
+      ('Name', 'name'),
+      ('Sysadmin', 'patch_responsible__username'),
+      ('Type', 'type'),
+      ('Operation type', 'operation_type'),
+      ('Created', 'created'),
+      ('Internal requester', 'internal_requester__username'),
+	)
+	
+    service_status = request.REQUEST.get('status', 'production')
+    myform = ServiceForm(initial={'status': service_status},)
+
+    sort_headers = SortHeaders(request, HEADERS)
+    
+    headers = list(sort_headers.headers())
+
+    allvms = VM.objects.all()
+    allvms = allvms.order_by(sort_headers.get_order_by())   
+        
+    for vm in allvms:
+        if vm.patch_responsible.username == 'nobody':
+	   vm.patch_responsible.username = ''    
+    
+    vms = []
+    
+    for vm in allvms:
+    
+#        if 'dev.' in vm.name or 'test.' in vm.name or 'dev1.' in vm.name or 'test1.' in vm.name:
+#	    continue
+
+	if vm.type == 'legacy':
+	    continue
+	
+	if vm.operation_type == 'development' or vm.operation_type == 'test':
+	    continue
+	            
+        services = NewService.objects.filter(host__name=vm.name)
+
+	recs = NewService.objects.filter(host__name=vm.name).filter(status="production")
+	nprod = len(recs)	
+     
+	recs = NewService.objects.filter(host__name=vm.name).filter(status="pre-production")
+	npreprod = len(recs)	
+	
+        if (nprod + npreprod == 0):
+	    vm.nservices = len(services)
+            vms.append(vm) 
+
+     
+    return render_to_response('services/list_unused_vms.html', locals())

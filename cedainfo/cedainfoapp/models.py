@@ -1694,10 +1694,12 @@ class VM(models.Model):
         # Custom save method : will only save an instance if there is no PK, i.e. if the model is a new instance
         # Logic : If you want to change a request, you can't, you need to make a new one & have that approved.
 
-        if self.pk is None:
-            super(VM, self).save(*args, **kwargs)
-        else:
-            raise Exception("Unable to save changes to existing VM : create an update request & get it approved")
+        super(VM, self).save(*args, **kwargs)
+
+#        if self.pk is None:
+#            super(VM, self).save(*args, **kwargs)
+#        else:
+#            raise Exception("Unable to save changes to existing VM : create an update request & get it approved")
             
     def forceSave(self, *args, **kwargs):
         # OK, sometimes we need to update individual fields (e.g. "approved")"

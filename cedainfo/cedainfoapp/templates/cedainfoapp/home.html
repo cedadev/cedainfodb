@@ -30,21 +30,17 @@ the <a href="/admin">Home</a> link on the bar above.
 		</li>
                 <p/>
 
-		<li><h4>Hosts</h4>
-			<ul>
-				<li><a href="/hosts/">List of all hosts</a></li>
-                                <li><a href="/admin/cedainfoapp/host">Searchable list of hosts</a></li>
-				<li><a href="/hosts/active">List of all active hosts</a></li>
-                                <li><a href="/admin/cedainfoapp/host/add">Add new host</a></li>
-			</ul>
-		</li>
-                <p/>
 
-		<li><h4>Racks / Servers / Services</h4>
+		<li><h4>Services and VMs</h4>
 			<ul>
-                                <li><a href="/admin/cedainfoapp/service">Searchable list of services</a></li>
-				<li><a href="/rack/services/1">List services by rack and server</a></li>
-                                <li><a href="/admin/cedainfoapp/service/add">Add new service</a></li>
+                                <li><a href="/admin/cedainfoapp/newservice">List of services</a></li>
+				<li><a href="/services/listbyvm">List of services by VM</a></li>
+				
+				
+                                <li><a href="/admin/cedainfoapp/vm">List of VMs</a></li>
+				<li><a href="/services/unusedvms">list VMs with no service associated</a></li>				
+				
+                                <li><a href="/admin/cedainfoapp/newservice/add">Add new service</a></li>
 			</ul>
 		</li>
                 <p/>
@@ -85,6 +81,19 @@ the <a href="/admin">Home</a> link on the bar above.
 				<li><a href="/dmp/projectsbyperson">Project summary</a></li>
 			</ul>
 		</li>
+		
+		
+				<li><h4>Hosts</h4>
+			<ul>
+				<li><a href="/hosts/">List of all hosts</a></li>
+                                <li><a href="/admin/cedainfoapp/host">Searchable list of hosts</a></li>
+				<li><a href="/hosts/active">List of all active hosts</a></li>
+                                <li><a href="/admin/cedainfoapp/host/add">Add new host</a></li>
+			</ul>
+		</li>
+                <p/>
+
+		
           </ul>
 
 {% endblock %}
