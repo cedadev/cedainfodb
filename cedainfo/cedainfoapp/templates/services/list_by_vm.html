@@ -38,12 +38,20 @@ Number of vms: {{vms|length}}
 <th>Service (Service admin)</th>
 <th>All services</th>
 <th>Icinga</th>
+<th>Galglia</th>
 
 {% for vm in vms %}
 
 <tr>
 <td><a href="/admin/cedainfoapp/vm/{{vm.id}}">{{vm.name}}</a></td>
-<td>{{vm.patch_responsible}}</td>
+
+{% if vm.type != 'legacy' %}
+    <td>{{vm.patch_responsible.email}}</td>
+{% else %}
+    <td></td>
+{% endif %}
+    
+
 <td>
 
 {% for service in vm.prodservices %}
@@ -66,6 +74,16 @@ Number of vms: {{vms|length}}
 <td>
 <a href="https://icinga2-master.esc.rl.ac.uk/icingaweb2/monitoring/host/show?host={{vm.name}}">Icinga</a>
 </td>
+
+
+{% if vm.type != 'legacy' %}
+<td>
+<a href="http://mgmt.jc.rl.ac.uk/ganglia/?r=day&cs=&ce=&c=JASMIN+Cluster&tab=m&vn=&mc=2&z=medium&metric_group=ALLGROUPS&h={{vm.name}}">Ganglia</a>
+</td>
+{% else %}
+<td></td>
+{% endif %}
+
 </tr>
 {% endfor %}
 
