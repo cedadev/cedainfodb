@@ -1151,7 +1151,7 @@ def service_unusedvms(request):
 	if vm.type == 'legacy':
 	    continue
 	
-	if vm.operation_type == 'development' or vm.operation_type == 'test':
+	if vm.operation_type == 'development' or vm.operation_type == 'test' or vm.operation_type == 'research':
 	    continue
 	            
         services = NewService.objects.filter(host__name=vm.name)
