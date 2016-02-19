@@ -45,11 +45,9 @@ Number of vms: {{vms|length}}
 <tr>
 <td><a href="/admin/cedainfoapp/vm/{{vm.id}}">{{vm.name}}</a></td>
 
-{% if vm.type != 'legacy' %}
-    <td>{{vm.patch_responsible.email}}</td>
-{% else %}
-    <td></td>
-{% endif %}
+
+<td>{{vm.patch_responsible.email}}</td>
+
     
 
 <td>
