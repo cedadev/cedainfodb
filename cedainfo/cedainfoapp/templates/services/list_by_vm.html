@@ -52,17 +52,41 @@ Number of vms: {{vms|length}}
 
 <td>
 
+<table border="0">
+
 {% for service in vm.prodservices %}
   
-   {% if service.visibility != 'public' %}
-       <li><b><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}} ({{service.service_manager}})</a></b><br>
+   <tr>
+ 
+   {% if service.documentation %}
+   
+      
+       <td><li><b><a href="{{service.documentation}}">{{service.name}}</b></a> 
+       <td>{{service.service_manager}}       
+       <td><a href="/admin/cedainfoapp/newservice/{{service.id}}">Service info</a>
+       
+       {% if service.ports %}
+           | <td><a href="{{service.documentation}}#ports">Ports:</a> {{service.ports}}
+       {% endif %}
+       </tr>
     {% else %}
-       <li><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}} ({{service.service_manager}})</a><br>
-
+      
+	<td><li>{{service.name}}
+	<td>{{service.service_manager}}     
+        <td><a href="/admin/cedainfoapp/newservice/{{service.id}}">Service info</a>
+	
+       {% if service.ports %}	
+            | <td>Ports: {{service.ports}} 
+       {% endif %}
+           
+       </tr>
+    
     {% endif %}
     
+    </tr>
 {% endfor %}
 
+</table>
 </td>
 
 <td>
