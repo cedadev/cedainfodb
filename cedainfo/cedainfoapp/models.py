@@ -1824,6 +1824,8 @@ class NewService(models.Model):
 
     keywords = models.ManyToManyField(ServiceKeyword, blank=True, null=True, help_text="Select any keywords that apply to this service")
 
+    ports = models.CharField(max_length=100, help_text='External open ports required by this service')
+    
     class Meta:
         verbose_name = "Service"
 
