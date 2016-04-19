@@ -38,6 +38,7 @@ DATASET_REGISTRATION_TYPES=(
    ("public","public"),
    ("signature", "signature"),
    ("badc", "badc"),
+   ("reguser", "reguser"),
    ("none", "none")
 )
 
