@@ -160,6 +160,33 @@ class ManagerFilter(SimpleListFilter):
         else:
             return queryset
 
+class OwnerFilter(SimpleListFilter):
+ 
+    title = 'Owner'
+    parameter_name = 'owner'
+
+    def lookups(self, request, model_admin):
+        users = set([c.owner for c in model_admin.model.objects.all()])
+        if None in users: users.remove(None)
+#
+#       Sort results
+#	
+	users = list(users)	   
+	users.sort(key=lambda x: x.username)
+	
+	count = {}
+	for u in users:
+	    count[u.username] = len(model_admin.model.objects.filter(owner__username=u.username))
+	    
+        return [(c.id, c.username + ' (%s)' % count[c.username] ) for c in users]
+ 
+ 
+    def queryset(self, request, queryset):
+
+        if self.value():
+            return queryset.filter(owner__id__exact=self.value())
+        else:
+            return queryset
 
 class SystemManagerFilter(SimpleListFilter):
  
@@ -218,7 +245,7 @@ class NewServiceAdmin(admin.ModelAdmin):
 
     list_display = ('name',  'host', system_manager, 'visibility', 'status', 'summary','service_manager')
     
-    list_filter = ('visibility', 'status', 'keywords', ManagerFilter, ServiceHostFilter, SystemManagerFilter)
+    list_filter = ('visibility', 'status', 'keywords', ManagerFilter, OwnerFilter, ServiceHostFilter, SystemManagerFilter)
     search_fields = ('description', 'name')
     ordering = ('name',)
 

@@ -295,7 +295,7 @@ class Person(models.Model):
         return u'%s' % self.name
 	
     class Meta:
-        ordering = ["username"]
+        ordering = ["name"]
 
         
 class FileSet(models.Model):
@@ -1807,7 +1807,9 @@ class NewService(models.Model):
 	help_text="Intended visibility when operational"
     )	
 
-    service_manager = models.ForeignKey(Person, null=True, blank=True, related_name='software_manager', help_text="CEDA person responsible for this service")
+    service_manager = models.ForeignKey(Person, null=True, blank=True, related_name='software_manager', help_text="CEDA person who looks after this service")
+
+    owner = models.ForeignKey(Person, null=True, blank=True, related_name='owner', help_text="Owner of this service")
 
     last_reviewed = models.DateField(null=True, blank=True, help_text="Date of last review")
     review_status = models.CharField(
@@ -1824,7 +1826,7 @@ class NewService(models.Model):
 
     keywords = models.ManyToManyField(ServiceKeyword, blank=True, null=True, help_text="Select any keywords that apply to this service")
 
-    ports = models.CharField(max_length=100, help_text='External open ports required by this service')
+    ports = models.CharField(max_length=100, blank=True, help_text='External open ports required by this service')
     
     class Meta:
         verbose_name = "Service"
