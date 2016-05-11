@@ -38,6 +38,7 @@ BYTE_UNIT_SUFFIXES = {
     'Eb':   1024*1024*1024*1024*1024,   # exabyte
 }
 
+
 class ByteSizeField(forms.CharField):
 
     def clean(self, value):
@@ -53,13 +54,12 @@ class ByteSizeField(forms.CharField):
         except:
             raise ValidationError(u"Enter a value either as an integer number of bytes, or as a number followed by the suffix 'b', 'Mb', 'Gb', 'Tb', 'Pb, 'Eb'")
 
-        
-        
+
 # don't need to edit curation cat
-#admin.site.register(CurationCategory)
+# admin.site.register(CurationCategory)
 
 # don't need to change in admin interface
-#admin.site.register(AccessStatus)
+# admin.site.register(AccessStatus)
 
 class PersonAdmin(admin.ModelAdmin):
    ordering = ('name',)
@@ -85,7 +85,7 @@ class HostAdmin(admin.ModelAdmin):
     # for the "hypervisor" field, restrict the list of available hosts to those with host_type="hypervisor_server"
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "hypervisor":
-	    #kwargs["queryset"] =#Host.objects.filter(host_type="hypervisor_server").order_by('hypervisor') # seems to have no effect
+	    # kwargs["queryset"] =#Host.objects.filter(host_type="hypervisor_server").order_by('hypervisor') # seems to have no effect
 	    kwargs["queryset"] = Host.objects.filter(host_type="hypervisor_server")
 	    return db_field.formfield(**kwargs)
 	return super(HostAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
@@ -231,17 +231,15 @@ class NewServiceAdmin(admin.ModelAdmin):
 
     def availability(self):
         tolerance = self.availability_tolerance
-	
-	return tolerance
-	    
+        return tolerance
+
     def system_manager(self):
         if self.host.name.startswith('legacy:'):
-	    return ''
-	else:    
-    	    return self.host.patch_responsible
+            return ''
+        else:
+            return self.host.patch_responsible
 
     system_manager.admin_order_field = "host__patch_responsible__username"
-        
 
     list_display = ('name',  'host', system_manager, 'visibility', 'status', 'summary','service_manager')
     
@@ -249,36 +247,35 @@ class NewServiceAdmin(admin.ModelAdmin):
     search_fields = ('description', 'name')
     ordering = ('name',)
 
-    filter_horizontal= ('keywords',)   
+    filter_horizontal = ('keywords',)
     
     formfield_overrides = {
-        models.URLField: {'widget': TextInput(attrs={'size':'120'})},
-        models.CharField: {'widget': TextInput(attrs={'size':'80'})},
-	
-    }
+        models.URLField: {'widget': TextInput(attrs={'size': '120'})},
+        models.CharField: {'widget': TextInput(attrs={'size': '80'})},
+            }
     
 admin.site.register(NewService, NewServiceAdmin)
 
 
 # customise the Rack admin interface
-class RackAdmin(admin.ModelAdmin):
-    list_display = ('name', 'room')
-    list_filter = ('room',)
-    ordering = ('name', 'room')
-admin.site.register(Rack, RackAdmin)
+# class RackAdmin(admin.ModelAdmin):
+#    list_display = ('name', 'room')
+#    list_filter = ('room',)
+#    ordering = ('name', 'room')
+#admin.site.register(Rack, RackAdmin)
 
 # customise the DataEntity admin interface
-class DataEntityAdmin(admin.ModelAdmin):
-    list_display = ('dataentity_id','symbolic_name','responsible_officer','last_reviewed','recipes_expression',)
-    list_filter = ('friendly_name', 'curation_category','responsible_officer','last_reviewed','access_status','availability_priority','availability_failover',)
-    ordering = ('dataentity_id','symbolic_name','responsible_officer','last_reviewed')
-    search_fields = ['dataentity_id','symbolic_name',]
+#class DataEntityAdmin(admin.ModelAdmin):
+#    list_display = ('dataentity_id','symbolic_name','responsible_officer','last_reviewed','recipes_expression',)
+#    list_filter = ('friendly_name', 'curation_category','responsible_officer','last_reviewed','access_status','availability_priority','availability_failover',)
+#    ordering = ('dataentity_id','symbolic_name','responsible_officer','last_reviewed')
+#    search_fields = ['dataentity_id','symbolic_name',]
+#
+#    formfield_overrides = {
+#	   models.CharField: {'widget': TextInput(attrs={'size':'80'})},
+#	}
 
-    formfield_overrides = {
-	   models.CharField: {'widget': TextInput(attrs={'size':'80'})},
-	}
-
-admin.site.register(DataEntity, DataEntityAdmin)
+#admin.site.register(DataEntity, DataEntityAdmin)
 
 class PartitionAdminForm(forms.ModelForm):
     used_bytes = ByteSizeField()
@@ -333,23 +330,19 @@ class FileSetAdminForm(forms.ModelForm):
     overall_final_size.help_text = "The allocation given to a fileset is an estimate of the final size on disk. If the dataset is going to grow indefinitely then estimate the size for 4 years ahead. Filesets can't be bigger than a single partition, but in order to aid disk managment they should not exceed 20% of the size of a partition."
 
     def clean_logical_path(self):
-#
-#              Make sure logical path does not have a '/' at the end as this causes problems later
-#    
+        """Make sure logical path does not have a '/' at the end as this causes problems later"""
         data = self.cleaned_data['logical_path']
-	data = data.strip()
-	data = data.rstrip('/')
-	
-	return data
+        data = data.strip()
+        data = data.rstrip('/')
+        return data
     
     class Meta:
         model = FileSet
-	
-	    
+
+
 class FileSetAdmin(admin.ModelAdmin):
     form = FileSetAdminForm
-    
-    
+
     def niceOverallFinalSize(self):
        return prettySize(self.overall_final_size)
 
@@ -357,11 +350,10 @@ class FileSetAdmin(admin.ModelAdmin):
     niceOverallFinalSize.short_description = 'Overall final size'     
      
     list_display = ('logical_path', niceOverallFinalSize, 
-        'partition', 
-#	'status',
-	'sd_backup','responsible',
-	'links',)
-    list_filter = ('partition','sd_backup')
+                    'partition',
+                    'sd_backup',
+                    'links',)
+    list_filter = ('partition', 'sd_backup')
     list_editable=['sd_backup']  
   
     ordering = ('-id',)
