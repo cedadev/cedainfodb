@@ -16,7 +16,8 @@ urlpatterns = patterns('',
 
     (r'^services/listbyvm/$', service_list_by_vm),
     (r'^services/unusedvms/$', service_unusedvms),
-
+    (r'^services/review/$', service_review_selection),
+    
     (r'^txt/hosts/$', txt_host_list),
     (r'^txt/vms/(?P<vmname>.*)$', txt_vms_list),
     (r'^txt/vmrequests/$', txt_vm_request_list), 
