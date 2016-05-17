@@ -1168,3 +1168,44 @@ def service_unusedvms(request):
 
      
     return render_to_response('services/list_unused_vms.html', locals())
+
+
+
+
+
+@login_required()    
+def service_review_selection(request):
+
+    HEADERS = (
+      ('Name', 'name'),
+      ('Review Status', 'review_status'),
+      ('Last reviewed', 'last_reviewed'),
+      ('Visibility', 'visibility'),
+      ('Manager', 'service_manager'),
+      ('Owner', 'owner'),
+      ('Status', 'status'),
+      
+	)
+	
+    review_status = request.REQUEST.get('review_status', '')
+    visibility = request.REQUEST.get('visibility', '')
+    status = request.REQUEST.get('status', '') 
+        
+    myform = ServiceForm(initial={'review_status': review_status, 'visibility': visibility, 'status': status})
+
+    sort_headers = SortHeaders(request, HEADERS)
+    
+    headers = list(sort_headers.headers())
+
+    services = NewService.objects.all()    
+    
+    if review_status:
+        services = services.filter(review_status=review_status)
+    if visibility:
+        services = services.filter(visibility=visibility)
+    if status:
+        services = services.filter(status=status)
+	          
+    services = services.order_by(sort_headers.get_order_by())
+         
+    return render_to_response('services/review_selection.html', locals())

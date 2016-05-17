@@ -96,6 +96,26 @@ class GWSRequestDetailForm(ModelForm):
         }
 
 class ServiceForm(ModelForm):
+    review_status = ChoiceField(choices=( 
+                                         ('', 'Any'), 
+                                         ('to be reviewed', 'To be reviewed'), 
+                                         ('reviewed but issues', 'Reviewed but issues'),      
+					 ('passed', 'Passed'),
+			         )) 
+    visibility = ChoiceField(choices=( 
+                                         ('', 'Any'),
+					 ('public', 'Public'),
+					 ('internal', 'Internal'),
+					 ('restricted', 'Restricted'),
+                                      ))
+				      
+    status = ChoiceField(choices=(
+                                  ('', 'Any'),
+				  ('pre-production', 'Pre-production'),
+				  ('production', 'Production'),
+				  ('decomissioned', 'Decomissioned'),
+				  ('other', 'Other'),
+                               ))				      
     class Meta:
         model = NewService
 
