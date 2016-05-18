@@ -1178,6 +1178,7 @@ def service_review_selection(request):
 
     HEADERS = (
       ('Name', 'name'),
+      ('Host', 'host'),
       ('Review Status', 'review_status'),
       ('Last reviewed', 'last_reviewed'),
       ('Visibility', 'visibility'),
