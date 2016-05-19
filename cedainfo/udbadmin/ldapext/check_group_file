@@ -11,7 +11,7 @@ import subprocess
 import tempfile
 
 MIN_SIZE     = 6000    #Minimum group file size, in bytes
-MAX_PER_SIZE_DIFF = 20.0
+MAX_PER_SIZE_DIFF = 40.0
 SWROOT       = "/etc/yp-excedar/scripts"
 FILESTORE    = SWROOT + "/files"
 FIXED_GROUPS = "/etc/yp-excedar/group.internal"
@@ -66,7 +66,7 @@ per_diff = (100.0 * abs(new_size - old_size))/old_size
 print 'Per diff: ', per_diff
 
 if per_diff > MAX_PER_SIZE_DIFF:
-    print 'Size of files  %s and %s differs by % percent' % (group_file, GROUP_FILE, per_diff)
+    print 'Abandoning update as size of files  %s and %s differs by %s percent.' % (group_file, GROUP_FILE, per_diff)
     sys.exit(2)
 #
 # Sort the live group file and the one generated from the userdb
