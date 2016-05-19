@@ -586,6 +586,13 @@ def display_free_gids (request):
         rec['gid'] = gid
         rec['free'] = True
 
+
+        udbdataset = Dataset.objects.filter(gid=gid)
+	
+	if len(udbdataset) > 0:
+	    rec['udb_group'] = udbdataset[0].datasetid
+	    rec['free'] = False
+	
         if ext_gids.has_key(gid):
             rec['ext_group']      = ext_gids[gid]
             rec['free']           = False
@@ -594,7 +601,7 @@ def display_free_gids (request):
             rec['int_group']     = int_gids[gid]     
             rec['free']          = False
 
-        if gid > 26076 and next_gid == 0:
+        if gid > 26170 and next_gid == 0:
             if rec['free']:
                 next_gid =  gid
 

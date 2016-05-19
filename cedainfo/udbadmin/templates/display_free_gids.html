@@ -22,7 +22,7 @@
 
 
 <table border="1">
-<th>gid</th><th>Internal NIS</th><th>External NIS</th>
+<th>gid</th><th>Userdb dataset</th><th>Internal NIS</th><th>External NIS</th>
 
 {% for rec in output %}
 
@@ -36,9 +36,13 @@
 
 <td>{{rec.gid}}</td>
 
+<td>{{rec.udb_group}}</td>
+
 <td>{{rec.int_group}}</td>
 
 <td>{{rec.ext_group}}</td>
+
+
 
 </tr>
 
