@@ -240,6 +240,11 @@ class User (models.Model):
     accountid = models.CharField('User Name', 
                                  max_length=20, blank=True, 
                                  help_text='This is your username on this system')
+
+    jasminaccountid = models.CharField('JASMIN accountid', 
+                                 max_length=20, blank=True, 
+                                 help_text='Username in JASMIN system')
+ 
     
     accounttype = models.CharField(max_length=10,
                choices=(
