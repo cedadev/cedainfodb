@@ -6,7 +6,7 @@ PROJECT_DIR= os.path.dirname(__file__)
 
 DATETIME_FORMAT = "d-M-Y H:i"
 
-DEBUG = True
+DEBUG = False 
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -320,3 +320,7 @@ LDAP_WRITE_DN     = 'cn=cedaadmin,ou=software,ou=People,o=hpc,dc=rl,dc=ac,dc=uk'
 
 ADDITIONAL_LDAP_GROUP_FILE = "/datacentre/opshome/etc/infrastructure/accounts/ldap/ldap_additional_groups.txt"
 ADDITIONAL_LDAP_USER_FILE  = "/datacentre/opshome/etc/infrastructure/accounts/ldap/ldap_additional_users.txt"
+
+SIZEFIELD_IS_BINARY = False
+SIZEFIELD_AMBIGUOUS_SUFFIX = False
+SIZEFIELD_ASSUME_BINARY = False
