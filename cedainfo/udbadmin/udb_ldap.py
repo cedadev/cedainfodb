@@ -65,7 +65,7 @@ DEFAULT_SHELL = "/bin/bash"
 #
 # The following users should be a member of all archive access groups
 #
-ARCHIVE_ACCESS_STANDARD_USERS = ["badc", "prototype", "cwps", "archread"]
+ARCHIVE_ACCESS_STANDARD_USERS = ["badc", "prototype", "cwps", "archread", "bodc"]
 
 def is_ldap_user (user):    
     ''' Checks if the user should be in the LDAP system'''
