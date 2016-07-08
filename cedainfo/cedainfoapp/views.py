@@ -889,7 +889,7 @@ def gwsdf(request, id):
 # needs to be public to interact with scripts.
 def gws_list_etexport(request):
 
-    gwss = GWS.objects.all()
+    gwss = GWS.objects.filter(status="active")
     return render_to_response('cedainfoapp/gws_list_etexport.html', {'items':gwss}, mimetype="text/plain")      
 
 #
