@@ -398,18 +398,19 @@ class User (models.Model):
             return False                 
 
     def pending_vm_request(self):
-	 """
-	 Checks if the given user has a pending request for a vm account
-	 """
+        
+	"""
+	Checks if the given user has a pending request for a vm account
+	"""
 
-	 requests = self.pendingDatasets()
+	requests = self.pendingDatasets()
+         
+	for request in requests:
+            if request.datasetid.datasetid == 'jasmin-login' or \
+        	request.datasetid.datasetid == 'cems-login' or \
+        	request.datasetid.datasetid == 'commercial-login':
 
-	 for request in requests:
-             if request.datasetid.datasetid == 'jasmin-login' or \
-        	 request.datasetid.datasetid == 'cems-login' or \
-        	 request.datasetid.datasetid == 'commercial-login':
-
-                     return True
+                    return True
 
 	return False
   
