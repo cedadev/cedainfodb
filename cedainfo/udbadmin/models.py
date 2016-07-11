@@ -95,6 +95,30 @@ class Dataset(models.Model):
         return "/%s/dataset/details/%s" \
             % (self._meta.app_label, self.datasetid)
 
+    def browse_url (self):
+        '''Returns url for browsing data directory (if appropriate)'''
+	
+	BROWSER = "http://badc.nerc.ac.uk/browse"
+
+        if self.datasetid.startswith('gws_'):
+	    return None
+
+        if self.datasetid.endswith('_ps'):
+	    return None
+
+        if self.datasetid == 'gosta_cd':
+	    return None
+	    	    
+	text = self.directory.strip()
+	
+	if text.startswith('http'):
+	    return text
+	
+	if not text.startswith('/'):    
+            return None
+	    	    
+	return BROWSER + self.directory
+	
     def manual_processing_required(self):
 #
 #            Temporary fudge to indicate that the dataset requires "manual processing". 
@@ -138,7 +162,7 @@ class Institute(models.Model):
    'Name of institute, universtity or other organisation for which you work', 
          max_length=80)
     country = models.CharField('Institute Country', 
-               help_text='Home country of institue', max_length=30,
+               help_text='Home country of your host institue', max_length=30,
                choices=country_list.COUNTRY_LIST)
     type = models.CharField('Institute type', max_length=30,
                help_text='Commercial, Government, University, etc',
@@ -154,7 +178,7 @@ class Institute(models.Model):
 class Addresses(models.Model):
     addresskey = models.IntegerField(primary_key=True)
     institutekey = models.ForeignKey(Institute, db_column='institutekey')
-    department = models.CharField(max_length=100, blank=True, help_text='Department within the institute')
+    department = models.CharField(max_length=100, blank=True, help_text='Your department within your host institute')
 
     def __unicode__ (self):
         return "%s" % self.addresskey
@@ -192,13 +216,13 @@ class User (models.Model):
     surname = models.CharField(max_length=50, help_text='Surname')
     othernames = models.CharField(max_length=50, verbose_name='Other names', help_text='Christian or Forenames')
     addresskey = models.OneToOneField(Addresses, db_column='addresskey')
-    telephoneno = models.CharField('Telephone number', max_length=50, blank=True, help_text='Your institute/work number')
-    emailaddress = models.EmailField('Email Address', max_length=100, unique=False, help_text='Your institute/work email address')
+    telephoneno = models.CharField('Telephone number', max_length=50, blank=True, help_text='Your contact telephone number in case we need to call you (e.g. helpdesk assistance)')
+    emailaddress = models.EmailField('Email Address', max_length=100, unique=False, help_text='Your institute/work email address. A personal email address may be used, but may cause delays in processing access applications.')
     comments = models.TextField(blank=True)
     endorsedby = models.CharField("Supervisor's name", 
                            max_length=50, 
                            blank=True, 
-                           help_text='Your academic supervisor. This is a required field for PhD students')
+                           help_text='Your academic supervisor. This is a required field for all students')
 #    degree = models.CharField('Degree you are studying for', max_length=20)
     
     degree = models.CharField('Degree you are studying for', max_length=20, blank=True, null=True, 
@@ -216,8 +240,8 @@ class User (models.Model):
         )
     ) 
         
-    field = models.CharField('Discipline', max_length=50, blank=True, null=True,  
-        help_text = 'field you are working in',
+    field = models.CharField('Discipline', max_length=50, blank=False, null=True,  
+        help_text = 'Select a subject discipline that closest matches the field you are working in',
         choices=(
             ("Atmospheric Physics","Atmospheric Physics"),
             ("Atmospheric Chemistry","Atmospheric Chemistry"),
@@ -239,7 +263,7 @@ class User (models.Model):
     
     accountid = models.CharField('User Name', 
                                  max_length=20, blank=True, 
-                                 help_text='This is your username on this system')
+                                 help_text='Your username for the CEDA site and services') 
 
     jasminaccountid = models.CharField('JASMIN accountid', 
                                  max_length=20, blank=True, 
@@ -258,15 +282,15 @@ class User (models.Model):
 #    webpasswd = models.CharField(max_length=13)  #Don't use this field.
     encpasswd = models.CharField(max_length=13) 
     md5passwd = models.CharField(max_length=32)
-    public_key = models.TextField('Public Key', blank=True, 
-                                  help_text='RSA public key required for access to JASMIN') 
+    public_key = models.TextField('Public Key', blank=True,  
+                                  help_text='RSA public key required for access to JASMIN or CEMS systems')  
     startdate = models.DateTimeField()
 #    sharedetails = models.IntegerField()
     datacenter = models.CharField(max_length=30)
     openid_username_component = models.CharField('OpenID Username Component',max_length=100, 
                                   help_text='The unique part of your OpenID address')
     openid = models.URLField(max_length=100, blank=True, 
-           help_text='You may log in using a "sign-on once" account by entering its address here')
+           help_text='This link address is your OpenID address for use where you see the "OpenID" log in option')
     uid     = models.IntegerField(default=0, blank=True)
     home_directory = models.CharField(max_length=150, blank=True)
     shell = models.CharField(max_length=50, blank=True)  
@@ -372,7 +396,24 @@ class User (models.Model):
             return True
         else:
             return False                 
-      
+
+   def pending_vm_request(self):
+	"""
+	Checks if the given user has a pending request for a vm account
+	"""
+
+	requests = self.pendingDatasets()
+
+	for request in requests:
+            if request.datasetid.datasetid == 'jasmin-login' or \
+        	request.datasetid.datasetid == 'cems-login' or \
+        	request.datasetid.datasetid == 'commercial-login':
+
+                    return True
+
+	return False
+  
+        
     def nextUserkey (self):        
         '''Returns the next userkey value'''
 
@@ -435,7 +476,21 @@ class Datasetjoin(models.Model):
     extrainfo = models.CharField(max_length=3000)
     expiredate = models.DateTimeField()
     agreement = Base64Field(null=True, blank=True)
-                
+
+    def days_until_expires(self):
+        '''
+	Returns the number of days until the registraion expires, or None if
+	this could not be calculated (e.g. there is no expiry date set).
+	'''
+        try:
+            a = self.expiredate 
+
+	    b = datetime.today()
+	    delta = a - b
+            return delta.days
+        except:
+	    return None
+	                    
     def removeDataset(self):
         self.removed = -1
         self.removeddate = datetime.now(timezone('Europe/London'))
@@ -457,7 +512,7 @@ class Datasetrequest(models.Model):
     JUNK     = 'junk'
     PENDING  = 'pending'
     
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     userkey = models.ForeignKey(User, db_column='userkey')
     datasetid = models.ForeignKey(Dataset, db_column='datasetid')
     requestdate = models.DateTimeField()
