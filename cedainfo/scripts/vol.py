@@ -10,7 +10,6 @@ def vol(from_date, search_period, path_filter):
     done = []
     last = []
     for fm in fms:
-        if fm.fileset.logical_path[:len(path_filter)] != path_filter: continue
         if fm.fileset in done: continue
         done.append(fm.fileset)
         last.append(fm)
