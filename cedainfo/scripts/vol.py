@@ -25,7 +25,7 @@ def vol(from_date, search_period, path_filter):
 
 def run(*args):
 
-    search_period = datetime.timedelta(days=100)
+    search_period = datetime.timedelta(days=60)
     if len(args) == 1:
         path_filter = args[0]
     else:
