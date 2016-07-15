@@ -2,11 +2,13 @@ from cedainfoapp.models import *
 
 import datetime
 
-def vol(from_date, search_period):
+def vol(from_date, search_period, path_filter):
+
     fms = FileSetSizeMeasurement.objects.filter(date__lt=from_date, date__gt=from_date - search_period).order_by('-date')
     done = []
-    last=[]
+    last = []
     for fm in fms:
+        if fm.fileset.logical_path[:len(path_filter)] != path_filter: continue
         if fm.fileset in done: continue
         done.append(fm.fileset)
         last.append(fm)
@@ -23,7 +25,10 @@ def vol(from_date, search_period):
 def run(*args):
 
     search_period = datetime.timedelta(days=100)
-    print args
+    if len(args) == 1:
+        path_filter = args[0]
+    else:
+        path_filter = ''
 
     for year in (2010, 2011, 2012, 2013, 2014, 2015, 2016):
         for month in range(1,13):
