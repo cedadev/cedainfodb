@@ -4,7 +4,9 @@ import datetime
 
 def vol(from_date, search_period, path_filter):
 
-    fms = FileSetSizeMeasurement.objects.filter(date__lt=from_date, date__gt=from_date - search_period).order_by('-date')
+    fms = FileSetSizeMeasurement.objects.filter(fileset__logical_path__startswith=path_filter,
+                                                date__lt=from_date,
+                                                date__gt=from_date - search_period).order_by('-date')
     done = []
     last = []
     for fm in fms:
