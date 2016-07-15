@@ -34,7 +34,7 @@ def run(*args):
         for month in range(1,13):
 
             d = datetime.datetime(year, month, 1)
-            total, totalf = vol(d, search_period)
+            total, totalf = vol(d, search_period, path_filter)
             print '%s, %s, %s' % (d, total, totalf)
 
 
