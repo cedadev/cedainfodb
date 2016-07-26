@@ -98,9 +98,12 @@ class GWSRequestDetailForm(ModelForm):
 class ServiceForm(ModelForm):
     review_status = ChoiceField(choices=( 
                                          ('', 'Any'), 
-                                         ('to be reviewed', 'To be reviewed'), 
-                                         ('reviewed but issues', 'Reviewed but issues'),      
-					 ('passed', 'Passed'),
+             ("to be reviewed","To be reviewed"),
+            ("passed", "Passed"),
+            ("passed with issues", "Passed with issues"),
+            ("failed", "Failed"),
+            ("failed with minor issues", "Failed with minor issues"),
+ 
 			         )) 
     visibility = ChoiceField(choices=( 
                                          ('', 'Any'),

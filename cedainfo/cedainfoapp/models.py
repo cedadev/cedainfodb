@@ -1816,8 +1816,11 @@ class NewService(models.Model):
         max_length=50,
         choices=(
             ("to be reviewed","To be reviewed"),
-            ("reviewed but issues", "Reviewed but issues"),
             ("passed", "Passed"),
+            ("passed with issues", "Passed with issues"),
+            ("failed", "Failed"),
+            ("failed with minor issues", "Failed with minor issues"),
+	    
         ),
         default="to be reviewed"
     )
