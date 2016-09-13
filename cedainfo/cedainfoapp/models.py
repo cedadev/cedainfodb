@@ -497,13 +497,8 @@ class FileSet(models.Model):
         assert os.path.isdir(os.path.dirname(path)), "Parent directory does not exist."
 
         # select partitions to search for space
-        if on_tape:
-            self.primary_on_tape = True
-            partitions = Partition.objects.filter(status='Allocating_tape')
-            fill_factor = 20.0
-        else:
-            partitions = Partition.objects.filter(status='Allocating')
-            fill_factor = 0.8
+        partitions = Partition.objects.filter(status='Allocating')
+        fill_factor = 0.8
 
         # find the fullest partition which can accomidate the file set
         allocated_partition = None
@@ -654,9 +649,8 @@ class FileSet(models.Model):
     #        self.save()
 
     def du(self):
-        '''Report disk usage of FileSet by creating as FileSetSizeMeasurement.'''
-        # switch off du if primary archive on tape.
-        if self.spot_exists() and not self.primary_on_tape:
+        """Report disk usage of FileSet by creating as FileSetSizeMeasurement."""
+        if self.spot_exists():
             # find volume using du
             output = subprocess.Popen(['/usr/bin/du', '-sk', '--apparent', self.storage_path()],
                                       stdout=subprocess.PIPE).communicate()[0]
