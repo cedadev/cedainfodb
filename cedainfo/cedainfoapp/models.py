@@ -382,10 +382,10 @@ class FileSet(models.Model):
         return os.path.normpath(self.migrate_to.mountpoint + '/' + self.storage_pot_type + '/' + self.storage_pot)
 
     def migrate_spot(self, do_audit=True):
-        assert self.storage_pot == '', "can't migrate a spot does not already exists in the db"
-        assert not self.partition, "can't migrate a spot if no partition"
-        assert not self.migrate_to, "can't migrate a spot if no migration partition"
-        assert not os.path.islink(self.logical_path), "can't migrate a spot if logical path is not a link"
+        assert self.storage_pot != '', "can't migrate a spot does not already exists in the db"
+        assert self.partition, "can't migrate a spot if no partition"
+        assert self.migrate_to, "can't migrate a spot if no migration partition"
+        assert os.path.islink(self.logical_path), "can't migrate a spot if logical path is not a link"
 
         # copy - exceptions raised if fail
         self._migration_copy()
@@ -492,11 +492,9 @@ class FileSet(models.Model):
     # if the path already exists then split the spot
     def make_fileset(self, path, size, on_tape=False):
         filesets = FileSet.objects.filter(logical_path=path)
-        if os.path.exists(path):
-            raise FilseSetCreationError("Logical path already exists.")
-        if len(filesets) != 0:
-            raise FilseSetCreationError("File set with same logical path already exists.")
-        if not os.path.isdir(os.path.dirname(path)): raise FilseSetCreationError("Parent directory does not exist.")
+        assert not os.path.exists(path), "Logical path already exists."
+        assert len(filesets) == 0, "File set with same logical path already exists."
+        assert os.path.isdir(os.path.dirname(path)), "Parent directory does not exist."
 
         # select partitions to search for space
         if on_tape:
