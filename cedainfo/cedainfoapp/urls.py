@@ -25,13 +25,13 @@ urlpatterns = patterns('',
     #   - detail view of 1 host, by id
     (r'^host/(?P<host_id>\d+)/$', host_detail),
     # Recreate the SDDCS "nodelist" file as a view
-    (r'^nodelist$', nodelist),
+    #(r'^nodelist$', nodelist),
 
     # detail view of data entity
-    (r'^dataentity/(?P<id>\d+)/$', dataentity_detail_form),
-    (r'^dataentity/search/$', dataentity_search),
-    (r'^dataentity/find/(?P<dataentity_id>.*)$', dataentity_find),
-    (r'^dataentity/add/(?P<dataentity_id>.*)$', dataentity_add),
+    #(r'^dataentity/(?P<id>\d+)/$', dataentity_detail_form),
+    #(r'^dataentity/search/$', dataentity_search),
+    #(r'^dataentity/find/(?P<dataentity_id>.*)$', dataentity_find),
+    #(r'^dataentity/add/(?P<dataentity_id>.*)$', dataentity_add),
     # generic index view of all hosts
     #(r'^dataentity/index/$', list_detail.object_list, dataentity_info),
     (r'^dataentity/index/$', dataentity_list),
