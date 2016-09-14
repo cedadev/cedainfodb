@@ -722,6 +722,16 @@ class FileSet(models.Model, ProblemsMixin):
                     if today - date > timedelta(days=10):
                         msgs.append(f.problem_html("Not backed up for over 10 days", 2))
 
+            if not f.partition:
+                msgs.append(f.problem_html("Fileset without partition", 4))
+
+            if not f.storage_pot:
+                msgs.append(f.problem_html("Fileset without storage pot", 4))
+            if not f.logical_path_right():
+                msgs.append(f.problem_html("Fileset with bad logical path", 4))
+            if f.migrate_to:
+                msgs.append(f.problem_html("Fileset marked for migration to %s" % f.migrate_to, 3))
+
         return msgs
 
     # migration allocation don by hand at the moment
