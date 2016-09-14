@@ -29,8 +29,10 @@ var makesvg = function (data) {
   cap = data.cap;
   hscale = ploth/cap;
   filled = data.filled * hscale;
+  svgw = 900;
+  svgh = 700;
 
-  var  html = '<svg height="700" width="900" xmlns:xlink="http://www.w3.org/1999/xlink>';
+  var  html = '<svg height="' + svgh + '" width="' + svgw + '" xmlns:xlink="http://www.w3.org/1999/xlink>';
 
     html += '<svg x="20" y="20">';
 
@@ -46,7 +48,9 @@ var makesvg = function (data) {
     html += '<svg y="'+cumalloc+'" x="0">';
     html += '  <rect class="alloc" x=0 y=0 height="'+alloch+'" width="'+plotw+'"/>';
     html += '  <rect class="used" x=0 y=0 height="'+alloch+'" width="'+usedw+'" />';
-    if (usedw>580) {
+    if (usedw>svgw-300) {
+
+      html += '  <rect class="xxx" x=' +plotw-50+' y=0 height="'+alloch+'" width="50" />';
       html += '  <polygon class="break" points="500,0  510,0 520,'+alloch/2+' 510,'+alloch+' 500,'+alloch+' 510,'+alloch/2+'"/>';
       }
     html += '  <a xlink:href="' + url + '"> XX<text x="5"  y="'+alloch+'" dy="-5">('+Math.floor(used*100/alloc)+'%) '+label+'</text></a>';
