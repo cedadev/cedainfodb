@@ -13,6 +13,7 @@ FileSet list
 
 <form name="input" method="get">
 Logical path search: <input type="text" name="search" />
+simple: <input type="checkbox" name="simple"{% if simple %} checked{% endif %}>
 <input type="submit" value="Go" />
 </form>
 
@@ -24,8 +25,8 @@ Logical path search: <input type="text" name="search" />
 			<th>Allocation</th>
 			<th>current size</th>
 			<th>Last measured number of files</th>
-			<th>Storage-D backup status</th>
-			<th>Storage-D last processed</th>
+			{%  if simple %}<th>Storage-D backup status</th>
+			<th>Storage-D last processed</th>{% endif %}
 			</tr>
 	    {% for fs in fileset_list %}
 		    <tr>
@@ -34,8 +35,8 @@ Logical path search: <input type="text" name="search" />
 	    	    <td>{{fs.overall_final_size|filesizeformat}}</td>
 	    	    <td>{{fs.last_size.size|filesizeformat}}</td>
 	    	    <td>{{fs.last_size.no_files}}</td>
-	    	    <td>{% if fs.sd_backup %}<a href="http://storaged-monitor.esc.rl.ac.uk/storaged_ceda/CEDA_Fileset_Summary.php?{{fs.storage_pot}}">{{fs.backup_summary2|safe}}</a>{% else %}Not marked for storage-d{% endif %}</td>
-	    	    <td>{% if fs.sd_backup %}{{fs.sd_backup_process_log|safe}}{% else %}Not marked for storage-d{% endif %}</td>
+	    	    {%  if simple %}<td>{% if fs.sd_backup %}<a href="http://storaged-monitor.esc.rl.ac.uk/storaged_ceda/CEDA_Fileset_Summary.php?{{fs.storage_pot}}">{{fs.backup_summary2|safe}}</a>{% else %}Not marked for storage-d{% endif %}</td>
+	    	    <td>{% if fs.sd_backup %}{{fs.sd_backup_process_log|safe}}{% else %}Not marked for storage-d{% endif %}</td>{% endif %}
 			</tr>
         {% endfor %}
   <tr>
@@ -44,8 +45,8 @@ Logical path search: <input type="text" name="search" />
      <th>{{totalalloc|filesizeformat}}</th>
      <th>{{totaldu|filesizeformat}}</th>
      <th>{{totalnum}}</th>
-     <th></th>
-     <th></th>
+     {%  if simple %}<th></th>
+     <th></th>{% endif %}
   </tr>
 	</table>
 {% endblock %}
