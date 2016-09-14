@@ -226,6 +226,18 @@ class Partition(models.Model):
         for a in allocs: total += a.overall_final_size
         return total
 
+    def disk_allocated(self):
+        # find total allocated space allowing for tape only filesets
+        total = 0
+        allocs = FileSet.objects.filter(partition=self)
+        for a in allocs:
+            if a.primary_on_tape:
+                alloc_size = max(a.last_vol(), 0.05 * a.overall_final_size)
+            else:
+                alloc_size = a.overall_final_size
+            total += alloc_size
+        return total
+
     def secondary_allocated(self):
         # find total allocated space to secondary copies
         total = 0
@@ -488,9 +500,8 @@ class FileSet(models.Model):
 
     status.allow_tags = True
 
-    # make a fileset including makeing spot directoies and seting allocations.
-    # if the path already exists then split the spot
     def make_fileset(self, path, size, on_tape=False):
+        """make a fileset including makeing spot directoies and seting allocations."""
         filesets = FileSet.objects.filter(logical_path=path)
         assert not os.path.exists(path), "Logical path already exists."
         assert len(filesets) == 0, "File set with same logical path already exists."
@@ -504,7 +515,7 @@ class FileSet(models.Model):
         allocated_partition = None
         fullest_space = 10e40
         for p in partitions:
-            partition_free_space = fill_factor * p.capacity_bytes - p.allocated()
+            partition_free_space = fill_factor * p.capacity_bytes - p.disk_allocated()
             # if this partition could accommidate file set...
             if partition_free_space > size:
                 # ... and its the fullest so far
