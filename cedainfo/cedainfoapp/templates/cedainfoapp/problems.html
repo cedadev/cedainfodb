@@ -13,7 +13,7 @@
  <h4>Fileset problems</h4>
 
 {% for p in fileset_problems %}
-    <li><a href="{% url admin:cedainfoapp_fileset_change 1 %}">{{ p|safe }}</a></li>
+    <li>{{ p|safe }}</li>
 {% endfor %}
 
 

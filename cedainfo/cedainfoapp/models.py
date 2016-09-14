@@ -27,6 +27,20 @@ from django.contrib.auth.models import *
 
 from django.core.validators import RegexValidator
 
+# https://timmyomahony.com/blog/reversing-admin-urls-and-creating-admin-links-you-models/
+from django.contrib.contenttypes.models import ContentType
+from django.core.urlresolvers import reverse
+
+class ProblemsMixin(object):
+
+    problem_levels = {0: "INFO", 1:"WARN", 2:"PROBLEM", 3:"URGENT", 4:"CRITICAL"}
+
+    def get_admin_url(self):
+        content_type = ContentType.objects.get_for_model(self.__class__)
+        return reverse("admin:%s_%s_change" % (content_type.app_label, content_type.model), args=(self.id,))
+
+    def problem_html(self, msg, level=0):
+        return '<a href="%s">%s</a>[%s] %s' % (self.get_admin_url(), self, self.problem_levels[level], msg)
 
 # Create your models here.
 
@@ -122,7 +136,7 @@ class Host(models.Model):
         ordering = ['hostname']
 
 
-class Partition(models.Model):
+class Partition(models.Model, ProblemsMixin):
     '''Filesystem equipped with standard directory structure for archive storage'''
     mountpoint = models.CharField(blank=True, max_length=1024, help_text="E.g. /disks/machineN", unique=True)
     host = models.ForeignKey(Host, blank=True, null=True, help_text="Host on which this partition resides")
@@ -299,12 +313,12 @@ class Partition(models.Model):
         # list overfilled partitions
         for p in partitions:
             if 100.0 * p.used_bytes/(p.capacity_bytes+1) > 99.0:
-                msgs.append("%s Partition over filled" % p)
+                msgs.append(p.problem_html("Partition over filled"))
         # list overallocated partitions
         for p in partitions:
             allocated = p.allocated() + p.secondary_allocated()
             if 100.0 * allocated/(p.capacity_bytes+1) > 87.0:
-                msgs.append("%s Partition overallocated" % p)
+                msgs.append(p.problem_html("Partition overallocated"))
         return msgs
 
     def __unicode__(self):
@@ -360,7 +374,7 @@ class Person(models.Model):
         ordering = ["name"]
 
 
-class FileSet(models.Model):
+class FileSet(models.Model, ProblemsMixin):
     ''' subtree of archive directory hierarchy.
     Collection of all filesets taken together should exactly represent 
     all files in the archive. Must never span multiple filesystems.'''
@@ -682,26 +696,26 @@ class FileSet(models.Model):
                     changing = True    # if we have one or less points in the 120 days then assume changing.
 
                 if len(fssms) < 10 and not f.sd_backup:
-                    msgs.append("%s Newish and not marked for backup." % f)
+                    msgs.append(f.problem_html("Newish and not marked for backup."))
             else:
-                msgs.append("%s Not measured yet" % f)
+                msgs.append(f.problem_html("Not measured yet"))
                 continue
 
             if too_many_files:
-                msgs.append("%s Too Many files" % f)
+                msgs.append(f.problem_html("Too Many files"))
             if too_big:
-                msgs.append("%s Too Big" % f)
+                msgs.append(f.problem_html("Too Big"))
             if over_alloc:
-                msgs.append("%s Over allocation" % f)
+                msgs.append(f.problem_html("Over allocation"))
 
             if f.sd_backup:
                 backup_processed = f.sd_backup_process_log()[-13:-5]
                 if backup_processed[:3] == "Not":
-                    msgs.append("%s Not processed for backup yet" % f)
+                    msgs.append(f.problem_html("Not processed for backup yet"))
                 else:
                     date = datetime(int(backup_processed[:4]), int(backup_processed[4:6]), int(backup_processed[6:8]))
                     if today - date > timedelta(days=10):
-                        msgs.append("%s Not backed up for over 10 days" % f)
+                        msgs.append(f.problem_html("Not backed up for over 10 days"))
 
         return msgs
 
