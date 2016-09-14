@@ -97,7 +97,7 @@
             data.addColumn('number', "Number of files");
 
             data.addRows([
-{% for fssm in fssms %}          [new Date({{fssm.date.year}},{{fssm.date.month|add:"-1"}},{{fssm.date.day}}), {{fssm.size}}, {{fssm.alloc|default:0}}, {{fssm.no_files|default:0}} ]
+{% for fssm in fssms %}          [new Date({{fssm.date.year}},{{fssm.date.month|add:"-1"}},{{fssm.date.day}}), {{fssm.size}}, {{fssm.alloc|default:0}}, {{fssm.no_files|default:0}}],
 {% endfor %}
                          ]);
 
