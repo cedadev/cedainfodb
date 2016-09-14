@@ -33,14 +33,17 @@ from django.core.urlresolvers import reverse
 
 class ProblemsMixin(object):
 
-    problem_levels = {0: "INFO", 1:"WARN", 2:"PROBLEM", 3:"URGENT", 4:"CRITICAL"}
+    problem_levels = {0: "INFO", 1: "WARN", 2: "PROBLEM", 3: "URGENT", 4: "CRITICAL"}
+    problem_colours = {0: "green", 1: "black", 2: "orange", 3: "pink", 4: "red"}
 
     def get_admin_url(self):
         content_type = ContentType.objects.get_for_model(self.__class__)
         return reverse("admin:%s_%s_change" % (content_type.app_label, content_type.model), args=(self.id,))
 
     def problem_html(self, msg, level=0):
-        return '<a href="%s">%s</a>[%s] %s' % (self.get_admin_url(), self, self.problem_levels[level], msg)
+        return '<a href="%s">%s</a><font color="%s">[%s] %s</font>' % (self.get_admin_url(), self,
+                                                                       self.problem_colours[level],
+                                                                       self.problem_levels[level], msg)
 
 # Create your models here.
 
