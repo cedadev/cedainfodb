@@ -96,7 +96,20 @@
 
         var options = {
           title: 'Fileset size history',
-          legend: { position: 'bottom' }
+          legend: { position: 'bottom' },
+            series: {
+          // Gives each series an axis name that matches the Y-axis below.
+          0: {axis: 'Vol'},
+          1: {axis: 'Vol'}
+          2: {axis: 'Number'}
+        },
+        axes: {
+          // Adds labels to each axis; they don't have to match the axis names.
+          y: {
+            Vol: {label: 'Data volume'},
+            Number: {label: 'Number of files'}
+          }
+
         };
 
         var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
