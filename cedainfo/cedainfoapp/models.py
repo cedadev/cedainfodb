@@ -1348,7 +1348,7 @@ class Audit(models.Model, ProblemsMixin):
         time_threshold = datetime.now() - timedelta(days=5)
         audits = Audit.objects.filter(auditstate='started', starttime__lt=time_threshold)
         for a in audits:
-            msgs.append(a.problem_html("Audit started but not finished"), 1)
+            msgs.append(a.problem_html("Audit started but not finished", 1))
         return msgs
 
 # class SpatioTemp(models.Model):
