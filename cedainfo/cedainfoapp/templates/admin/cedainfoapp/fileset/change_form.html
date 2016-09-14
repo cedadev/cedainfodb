@@ -84,14 +84,15 @@
       google.charts.load('current', {'packages':['corechart']});
       google.charts.setOnLoadCallback(drawChart);
 
+       data = [[ 'Date', 'Volume', 'Expected Volume', 'Number of files' ]]
+       {% for fssm in fssms %}  data.push([new Date({{fssm.date.year}},{{fssm.date.month|add:"-1"}},{{fssm.date.day}}),
+                   {{fssm.size}},
+                   {{fssm.fileset.overall_final_size}},
+                   {{fssm.no_files|default:0}} ]);
+{% endfor %}
+
       function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-          ['Year', 'Sales', 'Expenses'],
-          ['2004',  1000,      400],
-          ['2005',  1170,      460],
-          ['2006',  660,       1120],
-          ['2007',  1030,      540]
-        ]);
+        var data = google.visualization.arrayToDataTable(data);
 
         var options = {
           title: 'Company Performance',
