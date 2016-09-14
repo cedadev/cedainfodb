@@ -27,8 +27,8 @@ var makesvg = function (data) {
   ploth = 600;
   plotw = 700;
   cap = data.cap;
-  wscale = plotw/cap;
-  filled = data.filled * wscale;
+  hscale = ploth/cap;
+  filled = data.filled * hscale;
   svgw = 900;
   svgh = 700;
 
@@ -56,10 +56,10 @@ var makesvg = function (data) {
     html += '  <a xlink:href="' + url + '"> XX<text x="5"  y="'+alloch+'" dy="-5">('+Math.floor(used*100/alloc)+'%) '+label+'</text></a>';
     html += '</svg>';
     cumalloc += alloch;
-    cumused += used * wscale;
+    cumused += used * hscale;
   }
 
-    html += '<rect class="totalused"  height="'+ploth+'" width="'+cumused+'" />';
+    html += '<rect class="totalused"  height="'+cumused+'" width="'+plotw+'" />';
     html += '<text y="'+cumused+'" x="'+plotw+'" dy="3" dx="3" class="usedlabel">Total used</text>>';
     html += '<rect class="filled"  height="'+filled+'" width="'+plotw+'" />';
     html += '<text y="'+filled+'" x="'+plotw+'" dy="3" dx="3" class="filllabel">df fill</text>>';
