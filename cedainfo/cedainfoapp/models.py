@@ -305,6 +305,7 @@ class Partition(models.Model):
             allocated = p.allocated() + p.secondary_allocated()
             if 100.0 * allocated/(p.capacity_bytes+1) > 87.0:
                 msgs.append("%s Partition overallocated" % p)
+        return msgs
 
     def __unicode__(self):
         tb_remaining = (self.capacity_bytes - self.used_bytes) / (1024 ** 4)
