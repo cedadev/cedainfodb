@@ -515,6 +515,7 @@ class FileSet(models.Model):
         allocated_partition = None
         fullest_space = 10e40
         for p in partitions:
+            print p, p.allocated(), p.disk_allocated()
             partition_free_space = fill_factor * p.capacity_bytes - p.disk_allocated()
             # if this partition could accommidate file set...
             if partition_free_space > size:
