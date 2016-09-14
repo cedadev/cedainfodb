@@ -68,9 +68,11 @@ def problems(request):
     probs = ["massage1", "message2"]
     fs_probs = FileSet.problems()
     part_probs = Partition.problems()
+    audit_probs = Audit.problems()
 
     return render_to_response('cedainfoapp/problems.html', {'user': request.user, 'fileset_problems': fs_probs,
-                                                            'partition_problems': part_probs})
+                                                            'partition_problems': part_probs,
+                                                            "audit_problems": audit_probs})
 
 
 @login_required()

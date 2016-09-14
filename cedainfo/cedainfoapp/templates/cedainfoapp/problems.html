@@ -16,5 +16,16 @@
     <li>{{ p|safe }}</li>
 {% endfor %}
 
+ <h4>Partition problems</h4>
+
+{% for p in fileset_problems %}
+    <li>{{ p|safe }}</li>
+{% endfor %}
+ <h4>Audit problems</h4>
+
+{% for p in audit_problems %}
+    <li>{{ p|safe }}</li>
+{% endfor %}
+
 
 {% endblock %}

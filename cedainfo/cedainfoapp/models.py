@@ -312,13 +312,15 @@ class Partition(models.Model, ProblemsMixin):
         msgs = []
         # list overfilled partitions
         for p in partitions:
-            if 100.0 * p.used_bytes/(p.capacity_bytes+1) > 99.0:
-                msgs.append(p.problem_html("Partition over filled"))
+            if 100.0 * p.used_bytes/(p.capacity_bytes+1) > 99.99:
+                msgs.append(p.problem_html("Partition Full", 4))
+            elif 100.0 * p.used_bytes/(p.capacity_bytes+1) > 99.0:
+                msgs.append(p.problem_html("Partition over filled", 3))
         # list overallocated partitions
         for p in partitions:
             allocated = p.allocated() + p.secondary_allocated()
             if 100.0 * allocated/(p.capacity_bytes+1) > 87.0:
-                msgs.append(p.problem_html("Partition overallocated"))
+                msgs.append(p.problem_html("Partition overallocated", 2))
         return msgs
 
     def __unicode__(self):
@@ -696,26 +698,26 @@ class FileSet(models.Model, ProblemsMixin):
                     changing = True    # if we have one or less points in the 120 days then assume changing.
 
                 if len(fssms) < 10 and not f.sd_backup:
-                    msgs.append(f.problem_html("Newish and not marked for backup."))
+                    msgs.append(f.problem_html("Newish and not marked for backup.", 1))
             else:
-                msgs.append(f.problem_html("Not measured yet"))
+                msgs.append(f.problem_html("Not measured yet", 1))
                 continue
 
             if too_many_files:
-                msgs.append(f.problem_html("Too Many files"))
+                msgs.append(f.problem_html("Too Many files", 1))
             if too_big:
-                msgs.append(f.problem_html("Too Big"))
+                msgs.append(f.problem_html("Too Big", 1))
             if over_alloc:
-                msgs.append(f.problem_html("Over allocation"))
+                msgs.append(f.problem_html("Over allocation", 2))
 
             if f.sd_backup:
                 backup_processed = f.sd_backup_process_log()[-13:-5]
                 if backup_processed[:3] == "Not":
-                    msgs.append(f.problem_html("Not processed for backup yet"))
+                    msgs.append(f.problem_html("Not processed for backup yet", 1))
                 else:
                     date = datetime(int(backup_processed[:4]), int(backup_processed[4:6]), int(backup_processed[6:8]))
                     if today - date > timedelta(days=10):
-                        msgs.append(f.problem_html("Not backed up for over 10 days"))
+                        msgs.append(f.problem_html("Not backed up for over 10 days", 2))
 
         return msgs
 
@@ -1045,7 +1047,7 @@ class FileSetSizeMeasurement(models.Model):
         return u'%s %s; %s %s (%s)' % (size, unit, no_files, funit, self.date.strftime("%Y-%m-%d %H:%M"))
 
 
-class Audit(models.Model):
+class Audit(models.Model, ProblemsMixin):
     """A record of inspecting a fileset"""
     fileset = models.ForeignKey(FileSet, help_text="FileSet which this audit related to at time of creation",
                                 on_delete=models.SET_NULL, null=True, blank=True)
@@ -1332,7 +1334,21 @@ class Audit(models.Model):
         self.save()
         print "      ... Done"
 
+    @staticmethod
+    def audit_problems():
+        msgs = []
+        audits = Audit.objects.filter(auditstate='corruption')
+        for a in audits:
+            msgs.append(a.problem_html("Audit detected corruption", 3))
 
+        audits = Audit.objects.filter(auditstate='error')
+        for a in audits:
+            msgs.append(a.problem_html("Audit detected error", 2))
+
+        time_threshold = datetime.now() - timedelta(days=5)
+        audits = Audit.objects.filter(auditstate='started', starttime__lt=time_threshold)
+        for a in audits:
+            msgs.append(a.problem_html("Audit started but not finished"), 1)
 # class SpatioTemp(models.Model):
 #    '''spatiotemporal coverage of a file'''
 #    file = models.ForeignKey(File)
