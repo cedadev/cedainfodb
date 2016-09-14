@@ -33,9 +33,10 @@
            stroke-width:1;
         }
 .break {
-           stroke: none;
+           stroke: #3333ff;
            fill:#ffffff;
-           opacity:50;
+           stroke-width:1;
+           stroke-dasharray:10 5;
         }
 
 .filllabel {
