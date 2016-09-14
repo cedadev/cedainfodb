@@ -295,15 +295,16 @@ class Partition(models.Model):
     @staticmethod
     def problems():
         partitions = Partition.objects.exclude(status="Retired")
+        msgs = []
         # list overfilled partitions
         for p in partitions:
             if 100.0 * p.used_bytes/(p.capacity_bytes+1) > 99.0:
-                print_msg(p, "Partition over filled")
+                msgs.append("%s Partition over filled" % p)
         # list overallocated partitions
         for p in partitions:
             allocated = p.allocated() + p.secondary_allocated()
             if 100.0 * allocated/(p.capacity_bytes+1) > 87.0:
-                print_msg(p, "Partition overallocated")
+                msgs.append("%s Partition overallocated" % p)
 
     def __unicode__(self):
         tb_remaining = (self.capacity_bytes - self.used_bytes) / (1024 ** 4)
