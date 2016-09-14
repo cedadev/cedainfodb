@@ -626,13 +626,15 @@ class FileSet(models.Model):
             backupsize, backupfiles, nagg, firstfiletime, lastupdated = 0, 0, 0, '--', '--'
         return "%s files, %s bytes last stored %s" % (backupfiles, backupsize, lastupdated)
 
-    # find last time processed for storage-D... 
     def sd_backup_process_log(self):
+        """find last time processed for storage-D..."""
         SDLOG = open('/datacentre/stats/storaged/lastprocessing-latest-RT.txt')
         while 1:
             line = SDLOG.readline()
-            if line == '': break
-            if line.find(self.storage_pot) != -1: return line
+            if line == '':
+                break
+            if line.find(self.storage_pot) != -1:
+                return line
         return 'Not in log'
 
     @staticmethod
@@ -677,8 +679,8 @@ class FileSet(models.Model):
             if over_alloc:
                 msgs.append("%s Over allocation" % f)
 
-            #if f.sd_backup:
-            #    backup_processed = f.sd_backup_process_log()[-13:-5]
+            if f.sd_backup:
+                backup_processed = f.sd_backup_process_log()[-13:-5]
             #    if backup_processed[:3] == "Not":
             #        msgs.append("%s Not processed for backup yet" % f)
             #    else:
