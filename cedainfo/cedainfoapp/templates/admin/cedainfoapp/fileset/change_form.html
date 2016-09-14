@@ -104,18 +104,6 @@
         var options = {
           title: 'Fileset size history',
           legend: { position: 'bottom' },
-            series: {
-          // Gives each series an axis name that matches the Y-axis below.
-          0: {axis: 'Vol'},
-          1: {axis: 'Vol'}
-          2: {axis: 'Number'}
-        },
-          axes: {
-          // Adds labels to each axis; they don't have to match the axis names.
-          y: {
-            Vol: {label: 'Data volume'},
-            Number: {label: 'Number of files'}
-          }
 
         };
 
@@ -124,10 +112,8 @@
         chart.draw(data, options);
       }
     </script>
-  </head>
-  <body>
+
     <div id="curve_chart" style="width: 900px; height: 500px"></div>
-  </body>
 
 {% endblock %}
 
