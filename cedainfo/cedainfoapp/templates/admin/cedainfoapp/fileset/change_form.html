@@ -41,7 +41,6 @@
 
 
     <script type="text/javascript">
-
       google.charts.load('current', {'packages':['line', 'corechart']});
       google.charts.setOnLoadCallback(drawChart);
 
@@ -77,12 +76,9 @@
           }
         }
       };
-
-
-        var chart = new google.charts.Line(document.getElementById('size_history'));
-
+        var chart = new google.charts.Line(document.getElementById('chart_div'));
         chart.draw(data, options);
-      }
+    }
     </script>
 
     <div id="size_history" style="width: 900px; height: 500px"></div>
