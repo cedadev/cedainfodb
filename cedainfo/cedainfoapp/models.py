@@ -681,12 +681,12 @@ class FileSet(models.Model):
 
             if f.sd_backup:
                 backup_processed = f.sd_backup_process_log()[-13:-5]
-            #    if backup_processed[:3] == "Not":
-            #        msgs.append("%s Not processed for backup yet" % f)
-            #    else:
-            #        date = datetime(int(backup_processed[:4]), int(backup_processed[4:6]), int(backup_processed[6:8]))
-            #        if today - date > timedelta(days=10):
-            #            msgs.append("%s Not backed up for over 10 days" % f)
+                if backup_processed[:3] == "Not":
+                    msgs.append("%s Not processed for backup yet" % f)
+                else:
+                    date = datetime(int(backup_processed[:4]), int(backup_processed[4:6]), int(backup_processed[6:8]))
+                    if today - date > timedelta(days=10):
+                        msgs.append("%s Not backed up for over 10 days" % f)
         sys.stderr.write("%s" % msgs)
         return msgs
 
