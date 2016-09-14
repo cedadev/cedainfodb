@@ -686,6 +686,8 @@ class FileSet(models.Model):
                     if today - date > timedelta(days=10):
                         msgs.append("%s Not backed up for over 10 days" % f)
 
+        return msgs
+
     # migration allocation don by hand at the moment
 
     # def allocate_m(self):
