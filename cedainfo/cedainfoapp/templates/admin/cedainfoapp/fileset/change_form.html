@@ -84,7 +84,7 @@
       google.charts.load('current', {'packages':['corechart']});
       google.charts.setOnLoadCallback(drawChart);
 
-       data = [[ 'Date', 'Volume', 'Expected Volume', 'Number of files' ]]
+       datapoints = [[ 'Date', 'Volume', 'Expected Volume', 'Number of files' ]]
        {% for fssm in fssms %}  data.push([new Date({{fssm.date.year}},{{fssm.date.month|add:"-1"}},{{fssm.date.day}}),
                    {{fssm.size}},
                    {{fssm.fileset.overall_final_size}},
@@ -92,7 +92,7 @@
 {% endfor %}
 
       function drawChart() {
-        var data = google.visualization.arrayToDataTable(data);
+        var data = google.visualization.arrayToDataTable(datapoints);
 
         var options = {
           title: 'Company Performance',
