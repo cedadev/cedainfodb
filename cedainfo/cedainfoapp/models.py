@@ -1335,7 +1335,7 @@ class Audit(models.Model, ProblemsMixin):
         print "      ... Done"
 
     @staticmethod
-    def audit_problems():
+    def problems():
         msgs = []
         audits = Audit.objects.filter(auditstate='corruption')
         for a in audits:
@@ -1349,6 +1349,8 @@ class Audit(models.Model, ProblemsMixin):
         audits = Audit.objects.filter(auditstate='started', starttime__lt=time_threshold)
         for a in audits:
             msgs.append(a.problem_html("Audit started but not finished"), 1)
+        return msgs
+
 # class SpatioTemp(models.Model):
 #    '''spatiotemporal coverage of a file'''
 #    file = models.ForeignKey(File)
