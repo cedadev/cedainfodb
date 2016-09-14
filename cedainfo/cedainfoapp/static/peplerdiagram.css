@@ -36,6 +36,7 @@
            stroke: #3333ff;
            fill:#ffffff;
            stroke-width:1;
+           opacity:0.1;
            stroke-dasharray:10 5;
         }
 
