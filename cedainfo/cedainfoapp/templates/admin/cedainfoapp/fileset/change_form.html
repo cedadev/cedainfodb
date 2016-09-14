@@ -89,7 +89,17 @@
 {% endfor %}
 
       function drawChart() {
-        var data = google.visualization.arrayToDataTable(datapoints);
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('date', 'Date');
+            data.addColumn('number', "Size");
+            data.addColumn('number', "Allocation");
+            data.addColumn('number', "Number of files");
+
+            data.addRows([
+{% for fssm in fssms %}          [new Date({{fssm.date.year}},{{fssm.date.month|add:"-1"}},{{fssm.date.day}}), {{fssm.size}}, {{fssm.alloc|default:0}}, {{fssm.no_files|default:0}} ]
+{% endfor %}
+                         ]);
 
         var options = {
           title: 'Fileset size history',
