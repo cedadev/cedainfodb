@@ -24,8 +24,8 @@ data = {
 
 var makesvg = function (data) {
 
-  ploth = 500;
-  plotw = 500;
+  ploth = 600;
+  plotw = 800;
   cap = data.cap;
   hscale = ploth/cap;
   filled = data.filled * hscale;
@@ -73,5 +73,8 @@ var makesvg = function (data) {
 <div id="show"></div>
 
 <script>makesvg(data)</script>
+
+<div>{{ original.list_allocated|safe }}</div>
+
 </body>
 </html>
