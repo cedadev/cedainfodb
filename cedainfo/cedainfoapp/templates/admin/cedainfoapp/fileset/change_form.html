@@ -85,7 +85,7 @@
       google.charts.setOnLoadCallback(drawChart);
 
        datapoints = [[ 'Date', 'Volume', 'Expected Volume', 'Number of files' ]]
-       {% for fssm in fssms %}  data.push([new Date({{fssm.date.year}},{{fssm.date.month|add:"-1"}},{{fssm.date.day}}),
+       {% for fssm in fssms %}  datapoints.push([new Date({{fssm.date.year}},{{fssm.date.month|add:"-1"}},{{fssm.date.day}}),
                    {{fssm.size}},
                    {{fssm.fileset.overall_final_size}},
                    {{fssm.no_files|default:0}} ]);
