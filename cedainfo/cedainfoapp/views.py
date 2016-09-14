@@ -65,7 +65,8 @@ def home(request):
 @login_required()
 def problems(request):
     """Problems view"""
-    return render_to_response('cedainfoapp/problems.html', {'user': request.user})
+    probs = ["massage1", "message2"]
+    return render_to_response('cedainfoapp/problems.html', {'user': request.user, 'problems':probs})
 
 
 @login_required()
