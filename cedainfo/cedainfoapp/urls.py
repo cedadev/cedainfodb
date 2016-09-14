@@ -8,6 +8,7 @@ from django.conf import settings
 urlpatterns = patterns('',
     (r'^$', home),
     (r'^home/$', home),
+    (r'^problems/$', problems),
     #  - hosts
     #   - list view of all hosts
     (r'^hosts/$', host_list),
@@ -34,8 +35,8 @@ urlpatterns = patterns('',
     #(r'^dataentity/add/(?P<dataentity_id>.*)$', dataentity_add),
     # generic index view of all hosts
     #(r'^dataentity/index/$', list_detail.object_list, dataentity_info),
-    (r'^dataentity/index/$', dataentity_list),
-    (r'^dataentity/review/$', dataentities_for_review),
+    #(r'^dataentity/index/$', dataentity_list),
+    #(r'^dataentity/review/$', dataentities_for_review),
     (r'^fileset/index/$', fileset_list),
     (r'^fileset/second_copy_rsyncs/$', make_secondary_copies),
     (r'^fileset/primary_on_tape/$', primary_on_tape),

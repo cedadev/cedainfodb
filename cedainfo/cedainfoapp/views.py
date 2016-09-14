@@ -57,148 +57,15 @@ def host_detail(request, host_id):
         return render_to_response('error.html', {'message': message, 'url': url, 'user': request.user})
 
 
-# search by dataentity_id for DataEntity objects (their internal id field is distinct from the MOLES dataentity_id field which links them to the MOLES catalogue)
-@login_required()
-def dataentity_search(request):
-    query = request.GET.get('q', '')
-    if query:
-        qset = (
-            Q(dataentity_id__icontains=query) |
-            Q(symbolic_name__icontains=query) |
-            Q(friendly_name__icontains=query) |
-            Q(logical_path__icontains=query)
-        )
-        results = DataEntity.objects.filter(qset).distinct()
-    else:
-        results = []
-    return render_to_response('cedainfoapp/search_dataentity.html',
-                              {"results": results, "query": query, "user": request.user})
-
-
-# find a dataentity & go straight to it
-# TODO : handle things better when we can't find it
-@login_required()
-def dataentity_find(request, dataentity_id):
-    url = reverse('cedainfoapp.views.dataentity_search')
-    if dataentity_id:
-        try:
-            dataentity = DataEntity.objects.get(dataentity_id=dataentity_id)
-            form = DataEntityForm(instance=dataentity)
-            if form.is_valid():
-                form.save()
-        except:
-            message = "Unable to find dataentity '%s'" % (dataentity_id)
-            return render_to_response('error.html', {'message': message, 'url': url})
-    else:
-        dataentity = None
-        form = None
-        message = "Unable to find dataentity %s" % (dataentity_id)
-        return render_to_response('error.html', {'message': message, 'url': url})
-
-    return render_to_response('cedainfoapp/edit_dataentity.html',
-                              {'dataentity': dataentity, 'form': form, 'user': request.user})
-
-
-# Edit a dataentity
-@login_required()
-def dataentity_detail_form(request, id):
-    url = reverse('cedainfoapp.views.dataentity_search')
-    try:
-        dataentity = DataEntity.objects.get(pk=id)
-        if request.method == 'POST':
-            form = DataEntityForm(request.POST, instance=dataentity)
-            if form.is_valid():
-                form.save()
-        else:
-            form = DataEntityForm(instance=dataentity)
-        return render_to_response('cedainfoapp/edit_dataentity.html',
-                                  {'dataentity': dataentity, 'form': form, 'user': request.user})
-    except:
-        message = "Unable to find dataentity with id=%s" % (id)
-        return render_to_response('error.html', {'message': message, 'url': url, 'user': request.user})
-
-
-# Add a new dataentity
-@login_required()
-def dataentity_add(request, dataentity_id):
-    if (dataentity_id == ''):
-        # blank id ...can't make a new dataentity object
-        message = "Unable to create dataentity with blank dataentity_id. Add a string to the end of the URL representing the id, e.g. .../dataentity/add/newid"
-        return render_to_response('error.html', {'message': message, 'user': request.user})
-    else:
-        # make a new dataentity using this new id
-        dataentity = DataEntity(dataentity_id=dataentity_id,
-                                access_status=AccessStatus.objects.get(pk=2))  # TODO : add defaults / dummy values...
-        dataentity.save()
-        if request.method == 'POST':
-            form = DataEntityForm(request.POST, instance=dataentity)
-            if form.is_valid():
-                form.save()
-        else:
-            form = DataEntityForm(instance=dataentity)
-        return render_to_response('cedainfoapp/edit_dataentity.html',
-                                  {'dataentity': dataentity, 'form': form, 'user': request.user})
-
-
-@login_required()
-def dataentity_list(request):
-    o = request.GET.get('o', 'id')  # default order is ascending id
-    qs = DataEntity.objects.order_by(o)
-    # Use the object_list view.
-    return list_detail.object_list(
-            request,
-            queryset=qs,
-            template_name="cedainfoapp/dataentity_list.html",
-            template_object_name="dataentity",
-    )
-
-
-@login_required()
-def dataentities_for_review(request):
-    o = request.GET.get('o', 'next_review')  # default order is ascending next_review (date)
-    qs = DataEntity.objects.filter(review_status="to be reviewed").order_by(o)
-    # Use the object_list view.
-    return list_detail.object_list(
-            request,
-            queryset=qs,
-            template_name="cedainfoapp/dataentity_list.html",
-            template_object_name="dataentity",
-    )
-
-
-@login_required()
-def services_by_rack(request, rack_id):
-    # show a rack, show hosts within rack, show virtual hosts within hypervisor hosts, services within hosts ...sort of deployment diagram
-    # Create a data structure to hold hierarchical structure:
-    # rack
-    #   host
-    #     [virtualhost]
-    #        service
-    layout = {}
-    rack = Rack.objects.get(pk=rack_id)
-    all_racks = Rack.objects.all()
-    # Find list of physical hosts belonging to this rack
-    hosts = Host.objects.filter(rack=rack).filter(hypervisor=None)
-    services_by_host = {}
-    vms_by_hypervisor = {}
-    for host in hosts:
-        services_by_host[host] = Service.objects.filter(host=host)
-        # Make a list of any vms that are on this physical host
-        vms_by_hypervisor[host] = Host.objects.filter(hypervisor=host)
-        # Loop through child vms that we've found
-        for vm in vms_by_hypervisor[host]:
-            # look for services that belong to this vm
-            services_by_host[vm] = Service.objects.filter(host=vm)
-
-    return render_to_response('cedainfoapp/services_view.html',
-                              {'user': request.user, 'rack': rack, 'all_racks': all_racks, 'hosts': hosts,
-                               'services_by_host': services_by_host, 'vms_by_hypervisor': vms_by_hypervisor})
-
-
 @login_required()
 def home(request):
     # Home page view
     return render_to_response('cedainfoapp/home.html', {'user': request.user})
+
+@login_required()
+def problems(request):
+    """Problems view"""
+    return render_to_response('cedainfoapp/problems.html', {'user': request.user})
 
 
 @login_required()

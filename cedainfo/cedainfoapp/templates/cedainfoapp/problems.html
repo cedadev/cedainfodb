@@ -1,0 +1,100 @@
+{% extends "base_site.html" %}
+
+
+{% block title %}
+CEDA Information Database
+{% endblock %}
+
+
+
+{% block content %}
+
+<h2>CEDAinfoDB</h2>
+ 
+The CEDAinfoDB contains various internal data related to the administration of datasets and services. The interface uses both
+customised database views and the Django admin interface. The admin interface can be accessed using the link below, or using
+the <a href="/admin">Home</a> link on the bar above.
+
+<p>
+<p>
+
+<a href="/admin">View using Django admin interface</a>
+               
+    	        <ul>
+		<li><h4>Data Entities</h4>
+			<ul>
+				<li><a href="/dataentity/index">List of all data entities</a></li>
+				<li><a href="/dataentity/search">Search dataentities</a></li>
+				<li><a href="/dataentity/add">Add a new data entity</a></li>
+			</ul>
+		</li>
+                <p/>
+
+
+		<li><h4>Services and VMs</h4>
+			<ul>
+                                <li><a href="/admin/cedainfoapp/newservice">List of services</a></li>
+				<li><a href="/services/listbyvm">List of services by VM</a></li>
+				<li><a href="/services/review">Services review list</a></li>
+				
+				
+                                <li><a href="/admin/cedainfoapp/vm">List of VMs</a></li>
+				<li><a href="/services/unusedvms">list VMs with no service associated</a></li>				
+				
+                                <li><a href="/admin/cedainfoapp/newservice/add">Add new service</a></li>
+			</ul>
+		</li>
+                <p/>
+
+		<li><h4>Storage</h4>
+			<ul>
+				<li><a href="/fileset/index/?search=%2Fbadc%2Facsoe">list filesets</a></li>
+				<li><a href="/fileset/second_copy_rsyncs">rsync jobs for second copy</a></li>
+				<li><a href="/fileset/primary_on_tape">List of spots which have been selected for tape archive only</a>
+                    </li>
+				<li><a href="/fileset/download_conf">spots for download configuration</a></li>
+				<li><a href="/storage-d/spotlist">spots marked for storage-D</a> 
+				    (<a href="/storage-d/spotlist?withpath">with storage paths</a>)</li>
+				<li><a href="/partition">Partitions</a></li>
+				<li><a href="/storagesummary">Storage Summary</a></li>
+				<li><a href="/audit_totals">Audit Totals</a></li>
+			</ul>
+		</li>
+        
+        	<li><h4>VM & GWS Requests</h4>
+			<ul>
+				<li><a href="/vmrequest/index">list VM Requests</a></li>
+				<li><a href="/gwsrequest/index">list GWS Requests</a></li>
+			</ul>
+
+
+                <li><h4>Existing VMs & GWSs</h4>
+                     <ul>
+                        <li><a href="/gws/index">Summary of all GWSs</a></li>
+                     </ul>
+                </li>
+
+
+        	<li><h4>DMP</h4>
+			<ul>
+				<li><a href="/dmp/myprojects">My projects</a></li>
+				<li><a href="/dmp/datamad_update">DataMAD update list</a></li>
+				<li><a href="/dmp/projectsbyperson">Project summary</a></li>
+			</ul>
+		</li>
+		
+		
+				<li><h4>Hosts</h4>
+			<ul>
+				<li><a href="/hosts/">List of all hosts</a></li>
+                                <li><a href="/admin/cedainfoapp/host">Searchable list of hosts</a></li>
+				<li><a href="/hosts/active">List of all active hosts</a></li>
+                                <li><a href="/admin/cedainfoapp/host/add">Add new host</a></li>
+			</ul>
+		</li>
+                <p/>
+
+		
+          </ul>
+
+{% endblock %}
