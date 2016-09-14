@@ -50,7 +50,7 @@ var makesvg = function (data) {
     html += '  <rect class="used" x=0 y=0 height="'+alloch+'" width="'+usedw+'" />';
     if (usedw>500) {
 
-      html += '  <rect class="cc" x=' +(svgw-50)+' y=0 height="'+alloch+'" width="50" />';
+      html += '  <rect class="break" x=' +(svgw-50)+' y=0 height="'+alloch+'" width="50" />';
       html += '  <polygon class="break" points="500,0  510,0 520,'+alloch/2+' 510,'+alloch+' 500,'+alloch+' 510,'+alloch/2+'"/>';
       }
     html += '  <a xlink:href="' + url + '"> XX<text x="5"  y="'+alloch+'" dy="-5">('+Math.floor(used*100/alloc)+'%) '+label+'</text></a>';
