@@ -1,0 +1,47 @@
+{% extends "base_site.html" %}
+
+{% block title %}
+FileSet list
+{% endblock %}
+
+{% block header %}
+    <h2>FileSet list </h2>
+{% endblock %}
+
+{% block content %}
+<p>View list in <a href="/admin/cedainfoapp/fileset/">admin interface</a></p>
+
+<form name="input" method="get">
+Logical path search: <input type="text" name="search" />
+<input type="submit" value="Go" />
+</form>
+
+<br/>
+<table border="1">
+	    <tr>
+			<th><a href="?o=id">Id</a></th>
+			<th><a href="?o=logical_path">Logical Path</a></th>
+			<th>Allocation</th>
+			<th>current size</th>
+			<th>Last measured number of files</th>
+			</tr>
+	    {% for fs in fileset_list %}
+		    <tr>
+	    	    <td><a href="/admin/cedainfoapp/fileset/{{fs.id}}">{{fs.id}}</a></td>
+	    	    <td>{{fs.logical_path}}</td>
+	    	    <td>{{fs.overall_final_size|filesizeformat}}</td>
+	    	    <td>{{fs.last_size.size|filesizeformat}}</td>
+	    	    <td>{{fs.last_size.no_files}}</td>
+			</tr>
+        {% endfor %}
+  <tr>
+     <th>Total</th>
+     <th></th>
+     <th>{{totalalloc|filesizeformat}}</th>
+     <th>{{totaldu|filesizeformat}}</th>
+     <th>{{totalnum}}</th>
+     <th></th>
+     <th></th>
+  </tr>
+	</table>
+{% endblock %}

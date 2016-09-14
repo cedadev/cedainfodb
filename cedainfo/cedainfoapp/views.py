@@ -80,7 +80,13 @@ def fileset_list(request):
     '''Barebones list of filesets'''
     o = request.GET.get('o', 'id')  # default order is ascending id
     search = request.GET.get('search', '')  # default order is ascending id
+    style = request.GET.get('style', '')  # default order is ascending id
     qs = FileSet.objects.filter(logical_path__contains=search).order_by(o)
+    if style == "simple":
+        template = "cedainfoapp/fileset_list.html"
+    else:
+        template = "cedainfoapp/fileset_list_simple.html"
+
     # Use the object_list view.
     totalalloc = 0
     totaldu = 0
@@ -94,7 +100,7 @@ def fileset_list(request):
     return list_detail.object_list(
             request,
             queryset=qs,
-            template_name="cedainfoapp/fileset_list.html",
+            template_name=template,
             template_object_name="fileset",
             extra_context={"totaldu": totaldu, "totalalloc": totalalloc, "totalnum": totalnum}
     )
