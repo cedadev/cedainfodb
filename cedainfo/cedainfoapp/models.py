@@ -292,6 +292,19 @@ class Partition(models.Model):
 
     links.allow_tags = True
 
+    @staticmethod
+    def problems():
+        partitions = Partition.objects.exclude(status="Retired")
+        # list overfilled partitions
+        for p in partitions:
+            if 100.0 * p.used_bytes/(p.capacity_bytes+1) > 99.0:
+                print_msg(p, "Partition over filled")
+        # list overallocated partitions
+        for p in partitions:
+            allocated = p.allocated() + p.secondary_allocated()
+            if 100.0 * allocated/(p.capacity_bytes+1) > 87.0:
+                print_msg(p, "Partition overallocated")
+
     def __unicode__(self):
         tb_remaining = (self.capacity_bytes - self.used_bytes) / (1024 ** 4)
         return u'%s (%d %s)' % (self.mountpoint, tb_remaining, 'Tb free')
@@ -687,7 +700,7 @@ class FileSet(models.Model):
                     date = datetime(int(backup_processed[:4]), int(backup_processed[4:6]), int(backup_processed[6:8]))
                     if today - date > timedelta(days=10):
                         msgs.append("%s Not backed up for over 10 days" % f)
-        sys.stderr.write("%s" % msgs)
+
         return msgs
 
     # migration allocation don by hand at the moment

@@ -66,8 +66,10 @@ def home(request):
 def problems(request):
     """Problems view"""
     probs = ["massage1", "message2"]
-    probs = FileSet.problems()
-    return render_to_response('cedainfoapp/problems.html', {'user': request.user, 'problems':probs})
+    fs_probs = FileSet.problems()
+    part_probs =
+
+    return render_to_response('cedainfoapp/problems.html', {'user': request.user, 'fileset_problems': fs_probs})
 
 
 @login_required()

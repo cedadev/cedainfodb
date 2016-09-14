@@ -10,10 +10,10 @@
 
     <a href="/admin">View using Django admin interface</a>
 
- <h4>Data Entities</h4>
+ <h4>Fileset problems</h4>
 
-{% for p in problems %}
-    <li>{{ p|safe }}</li>
+{% for p in fileset_problems %}
+    <li><a href="{% url admin:cedainfoapp:fileset %}">{{ p|safe }}</a></li>
 {% endfor %}
 
 
