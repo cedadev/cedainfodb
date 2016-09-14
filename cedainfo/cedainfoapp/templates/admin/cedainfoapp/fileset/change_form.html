@@ -35,6 +35,8 @@
 
 {% block after_field_sets %}
 
+Current number of files: {{ original.last_size.no_files }}
+
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
     <div id="size_history" style="width: 900px; height: 500px"></div>
@@ -63,7 +65,6 @@
         },
         width: 900,
         height: 500,
-          explorer: {},
         series: {
           // Gives each series an axis name that matches the Y-axis below.
           0: {axis: 'Vol'},
