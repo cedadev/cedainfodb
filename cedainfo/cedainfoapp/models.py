@@ -687,7 +687,7 @@ class FileSet(models.Model):
             #        date = datetime(int(backup_processed[:4]), int(backup_processed[4:6]), int(backup_processed[6:8]))
             #        if today - date > timedelta(days=10):
             #            msgs.append("%s Not backed up for over 10 days" % f)
-        sys.stderr.write(msgs)
+        sys.stderr.write("%s" % msgs)
         return msgs
 
     # migration allocation don by hand at the moment
