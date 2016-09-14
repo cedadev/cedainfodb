@@ -35,6 +35,7 @@
 .break {
            stroke: none;
            fill:#ffffff;
+           opacity:50;
         }
 
 .filllabel {
