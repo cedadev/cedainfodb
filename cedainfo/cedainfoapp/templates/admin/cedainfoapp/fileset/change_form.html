@@ -85,10 +85,7 @@
       google.charts.setOnLoadCallback(drawChart);
 
        datapoints = [[ 'Date', 'Volume', 'Expected Volume', 'Number of files' ]]
-       {% for fssm in fssms %}  datapoints.push([new Date({{fssm.date.year}},{{fssm.date.month|add:"-1"}},{{fssm.date.day}}),
-                   {{fssm.size}},
-                   {{fssm.alloc|default:0}},
-                   {{fssm.no_files|default:0}} ]);
+       {% for fssm in fssms %}  datapoints.push([new Date({{fssm.date.year}},{{fssm.date.month|add:"-1"}},{{fssm.date.day}}), {{fssm.size}}, {{fssm.alloc|default:0}}, {{fssm.no_files|default:0}} ]);
 {% endfor %}
 
       function drawChart() {
@@ -103,7 +100,7 @@
           1: {axis: 'Vol'}
           2: {axis: 'Number'}
         },
-        axes: {
+          axes: {
           // Adds labels to each axis; they don't have to match the axis names.
           y: {
             Vol: {label: 'Data volume'},
