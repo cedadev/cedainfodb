@@ -12,7 +12,7 @@ FileSet list
 <p>View list in <a href="/admin/cedainfoapp/fileset/">admin interface</a></p>
 
 <form name="input" method="get">
-Logical path search: <input type="text" name="search" />
+Logical path search: <input type="text" name="search" value="{{ search }}"/>
 simple: <input type="checkbox" name="simple"{% if simple %} checked{% endif %}>
 <input type="submit" value="Go" />
 </form>
