@@ -635,6 +635,57 @@ class FileSet(models.Model):
             if line.find(self.storage_pot) != -1: return line
         return 'Not in log'
 
+    @staticmethod
+    def problems():
+        """find fileset problems"""
+        # Look at filesets for over allocation
+        filesets = FileSet.objects.all()
+        msgs = []
+        today = datetime.now()
+
+        for f in filesets:
+            fssms = FileSetSizeMeasurement.objects.filter(fileset=f).order_by('-date')
+            first_time = (len(fssms) == 0)
+
+            if not first_time:
+                last_fssm = fssms[0]
+                too_many_files = last_fssm.no_files > 5000000
+                too_big = f.overall_final_size > 40000000000000
+                over_alloc = last_fssm.size > f.overall_final_size
+
+                changing = False     # assume static and look for changes
+                npoints = 0
+                for fssm in fssms[1:]:                    # loop over fileset measurements from second to last...
+                    if datetime.now() - fssm.date > timedelta(days=120):
+                        break  # only look in past 120 days
+                    npoints += 1         # number of points within 120 days
+                    if fssm.size != last_fssm.size or fssm.no_files != last_fssm.no_files:
+                        changing = True
+                if npoints < 2:
+                    changing = True    # if we have one or less points in the 120 days then assume changing.
+
+                if len(fssms) < 10 and not f.sd_backup:
+                    msgs.append("%s Newish and not marked for backup." % f)
+            else:
+                msgs.append("%s Not measured yet" % f)
+                continue
+
+            if too_many_files:
+                msgs.append("%s Too Many files" % f)
+            if too_big:
+                msgs.append("%s Too Big" % f)
+            if over_alloc:
+                msgs.append("%s Over allocation" % f)
+
+            if f.sd_backup:
+                backup_processed = f.sd_backup_process_log()[-13:-5]
+                if backup_processed[:3] == "Not":
+                    msgs.append("%s Not processed for backup yet" % f)
+                else:
+                    date = datetime(int(backup_processed[:4]), int(backup_processed[4:6]), int(backup_processed[6:8]))
+                    if today - date > timedelta(days=10):
+                        msgs.append("%s Not backed up for over 10 days" % f)
+
     # migration allocation don by hand at the moment
 
     # def allocate_m(self):
