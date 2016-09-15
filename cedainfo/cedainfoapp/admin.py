@@ -365,11 +365,20 @@ class FileSetAdmin(admin.ModelAdmin):
     def niceOverallFinalSize(self):
         return prettySize(self.overall_final_size)
 
+    def partition_link(self, obj):
+        return '<a href="{}">{}</a>'.format(
+            reverse("admin:cedainfoapp_partition_change", args=(obj.partition.id,)),
+            obj.partition
+        )
+    user_link.short_description = 'partition'
+
+
+
     niceOverallFinalSize.admin_order_field = 'overall_final_size'
     niceOverallFinalSize.short_description = 'Overall final size'
 
     list_display = ('logical_path', niceOverallFinalSize,
-                    'partition',
+                    'partition_link',
                     'sd_backup',
                     'links',)
     list_filter = ('partition', 'sd_backup')
