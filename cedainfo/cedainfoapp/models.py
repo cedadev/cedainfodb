@@ -32,7 +32,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 
 class ProblemsMixin(object):
-
+    """Mixin class to add reporting of content problems."""
     problem_levels = {0: "INFO", 1: "WARN", 2: "PROBLEM", 3: "URGENT", 4: "CRITICAL"}
     problem_colours = {0: "green", 1: "black", 2: "orange", 3: "pink", 4: "red"}
 

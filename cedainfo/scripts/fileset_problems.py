@@ -101,12 +101,7 @@ def run():
     audit_msgs = Audit.problems()
     part_msgs = Partition.problems()
 
-    print "Fileset problems"
-    for m in fs_msgs:
-        print m
-    print "Partition problems"
-    for m in part_msgs:
-        print m
-    print "Audit problems"
-    for m in audit_msgs:
-        print m
+    print "%s Fileset problems" % len(fs_msgs)
+    print "%s Partition problems" % len(part_msgs)
+    print "%s Audit problems" % len(audit_msgs)
+
