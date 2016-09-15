@@ -370,7 +370,7 @@ class FileSetAdmin(admin.ModelAdmin):
             reverse("admin:cedainfoapp_partition_change", args=(obj.partition.id,)),
             obj.partition
         )
-    user_link.short_description = 'partition'
+    partition_link.short_description = 'partition'
 
 
 
