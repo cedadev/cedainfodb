@@ -263,7 +263,7 @@ class Partition(models.Model, ProblemsMixin):
             unit = "TB";  scale = 0.000000000001
         else:
             unit = "PB"; scale = 0.000000000000001
-        return "%5.2d%s used of %5.2d%s (%s%%)" % (used * scale, unit, cap * scale, unit, used/cap)
+        return "%5.2f%s used of %5.2f%s (%2.2f%%)" % (used * scale, unit, cap * scale, unit, float(used)/cap)
 
     text_meter.allow_tags = True
 
