@@ -298,7 +298,8 @@ class PartitionAdmin(admin.ModelAdmin):
                     #'mountpoint',
                     'status',
                     # 'list_allocated',
-                    #'links',)
+                    #'links',
+                    )
     list_filter = ('status',)
 
 
