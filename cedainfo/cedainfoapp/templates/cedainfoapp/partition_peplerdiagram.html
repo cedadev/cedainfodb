@@ -49,9 +49,7 @@ var makesvg = function (data) {
     html += '  <rect class="alloc" x=0 y=0 height="'+alloch+'" width="'+plotw+'"/>';
     html += '  <rect class="used" x=0 y=0 height="'+alloch+'" width="'+usedw+'" />';
     if (usedw>svgw) {
-
       html += '  <rect class="break" x=' +(svgw-50)+' y=1 height="'+(alloch-1)+'" width="100" />';
-      html += '  <polygon class="break" points="500,0  510,0 520,'+alloch/2+' 510,'+alloch+' 500,'+alloch+' 510,'+alloch/2+'"/>';
       }
     html += '  <a xlink:href="' + url + '"> XX<text x="5"  y="'+alloch+'" dy="-5">('+Math.floor(used*100/alloc)+'%) '+label+'</text></a>';
     html += '</svg>';
