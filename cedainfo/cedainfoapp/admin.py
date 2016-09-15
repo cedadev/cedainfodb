@@ -371,8 +371,7 @@ class FileSetAdmin(admin.ModelAdmin):
             obj.partition
         )
     partition_link.short_description = 'partition'
-
-
+    partition_link.allow_tags = True
 
     niceOverallFinalSize.admin_order_field = 'overall_final_size'
     niceOverallFinalSize.short_description = 'Overall final size'
