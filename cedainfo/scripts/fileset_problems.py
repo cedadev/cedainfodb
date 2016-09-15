@@ -97,6 +97,16 @@ def print_msg(obj, msg):
 
 
 def run():
-    fileset_problems()
-    audit_problems()
-    partition_problems()    
+    fs_msgs = FileSet.problems()
+    audit_msgs = Audit.problems()
+    part_msgs = Partition.problems()
+
+    print "Fileset problems"
+    for m in fs_msgs:
+        print m
+    print "Partition problems"
+    for m in part_msgs:
+        print m
+    print "Audit problems"
+    for m in audit_msgs:
+        print m
