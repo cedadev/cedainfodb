@@ -236,6 +236,37 @@ class Partition(models.Model, ProblemsMixin):
 
     meter.allow_tags = True
 
+    def text_meter(self):
+        # text meter for partition
+        if self.capacity_bytes == 0:
+            return "No capacity set"
+        used = self.used_bytes
+        cap = self.capacity_bytes
+        #current_allocated = self.allocated()
+        #current_secondary_allocated = self.secondary_allocated()
+        #alloc = current_allocated * 100 / self.capacity_bytes
+        # Find the set of most recent FileSetSizeMeasurements for FileSets on this Partition
+        #filesetsum = self.used_by_filesets()
+        #secondaryfilesetsum = self.secondary_used_by_filesets()
+        # Turn this into a percentage of capacity
+        #fssumpercent = filesetsum * 100 / self.capacity_bytes
+        # work out units for capacity for axis (full axis is 110%)
+        if self.capacity_bytes < 1000:
+            unit = "B"; scale = 1.0
+        elif self.capacity_bytes < 1000000:
+            unit = "kB"; scale = 0.001
+        elif self.capacity_bytes < 1000000000:
+            unit = "MB";  scale = 0.000001
+        elif self.capacity_bytes < 1000000000000:
+            unit = "GB"; scale = 0.000000001
+        elif self.capacity_bytes < 1000000000000000:
+            unit = "TB";  scale = 0.000000000001
+        else:
+            unit = "PB"; scale = 0.000000000000001
+        return "%5.2d%s used of %5.2d%s (%s%%)" % (used * scale, unit, cap * scale, unit, used/cap)
+
+    text_meter.allow_tags = True
+
     def allocated(self):
         # find total allocated space
         total = 0

@@ -24,8 +24,7 @@
   <ul class="object-tools">
     {% block object-tools-items %}
     <li><a href="/admin/cedainfoapp/host/{{ original.host.id }}" class="historylink">Veiw Host</a></li>
-    <li><a href="/partition/{{ original.id }}/peplerdiagram" class="historylink">vis2</a></li>
-    <li><a href="/partition/{{ original.id }}/vis" class="historylink">vis</a></li>
+    <li><a href="/partition/{{ original.id }}/peplerdiagram" class="historylink">visualise</a></li>
     <li><a href="/partition/{{ original.id }}/df" class="historylink">Update df</a></li>
     <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
     {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
