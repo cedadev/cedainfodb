@@ -568,9 +568,12 @@ class FileSet(models.Model, ProblemsMixin):
     def make_fileset(self, path, size, on_tape=False):
         """make a fileset including makeing spot directoies and seting allocations."""
         filesets = FileSet.objects.filter(logical_path=path)
-        assert not os.path.exists(path), "Logical path already exists."
-        assert len(filesets) == 0, "File set with same logical path already exists."
-        assert os.path.isdir(os.path.dirname(path)), "Parent directory does not exist."
+        if os.path.exists(path):
+            raise FilseSetCreationError("Logical path already exists.")
+        if len(filesets) != 0:
+            raise FilseSetCreationError("File set with same logical path already exists.")
+        if not os.path.isdir(os.path.dirname(path)):
+            raise FilseSetCreationError("Parent directory does not exist.")
 
         # select partitions to search for space
         partitions = Partition.objects.filter(status='Allocating')
