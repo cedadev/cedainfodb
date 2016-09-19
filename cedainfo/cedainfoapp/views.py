@@ -492,14 +492,21 @@ def make_fileset(request):
     path = request.GET.get('path', None)
     size_in = request.GET.get('size', None)
     on_tape = request.GET.get('on_tape', False)
-    if path == None:
-        return render_to_response('cedainfoapp/fileset_make.html',
-                                  {'path': path, 'size': size_in, 'error': 'no path specified'})
-    if not size_in:
-        return render_to_response('cedainfoapp/fileset_make.html',
-                                  {'path': path, 'size': size_in, 'error': 'no size specified'})
+    simple = request.GET.get('simple', False)
+    if simple:
+        template = 'cedainfoapp/fileset_make_simple.json'
+    else:
+        template = 'cedainfoapp/fileset_make.html'
 
-        # make sure filesets have no spaces or slashes at the end
+    # check parameters ok
+    if path is None:
+        return render_to_response(template, {'path': path, 'size': size_in, 'error': True,
+                                             'error_msg': 'no path specified'})
+    if not size_in:
+        return render_to_response(template, {'path': path, 'size': size_in, 'error': True,
+                                             'error_msg': 'no size specified'})
+
+    # make sure filesets have no spaces or slashes at the end
     path = path.strip()
     path = path.rstrip('/')
 
@@ -519,12 +526,11 @@ def make_fileset(request):
     try:
         new_fs.make_fileset(path, size, on_tape)
     except FilseSetCreationError:
-        return render_to_response('cedainfoapp/fileset_make.html', {'path': path, 'size': size_in,
-                                                                    'error': 'Fileset creation error: %s' %
-                                                                             sys.exc_info()[1]})
+        error_msg = 'Fileset creation error: %s' % sys.exc_info()[1]
+        return render_to_response(template, {'path': path, 'size': size_in, 'error': True, 'error': error_msg})
 
-    return render_to_response('cedainfoapp/fileset_make.html',
-                              {'path': '', 'size': '', 'error': 'Fileset created.', 'fs': new_fs})
+    return render_to_response(template, {'path': '', 'size': '', 'error': True,
+                                         'error_msg': 'Fileset created.', 'fs': new_fs})
 
 
 def split_fileset(request):
