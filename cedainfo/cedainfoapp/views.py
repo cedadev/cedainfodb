@@ -487,7 +487,6 @@ def spotlist(request):
 
 
 # make a fileset from simple web request.
-# if the path already exists then split the spot
 def make_fileset(request):
     path = request.GET.get('path', None)
     size_in = request.GET.get('size', None)
@@ -502,11 +501,11 @@ def make_fileset(request):
 
     # check parameters ok
     if path is None:
-        return render_to_response(template, {'path': path, 'size': size_in, 'error': True,
-                                             'error_msg': 'no path specified'}, mimetype=mimetype)
+        return render_to_response(template, {'path': path, 'size': size_in, 'fileset_created': False,
+                                             'message': 'no path specified'}, mimetype=mimetype)
     if not size_in:
-        return render_to_response(template, {'path': path, 'size': size_in, 'error': True,
-                                             'error_msg': 'no size specified'}, mimetype=mimetype)
+        return render_to_response(template, {'path': path, 'size': size_in, 'fileset_created': False,
+                                             'message': 'no size specified'}, mimetype=mimetype)
 
     # make sure filesets have no spaces or slashes at the end
     path = path.strip()
@@ -529,11 +528,11 @@ def make_fileset(request):
         new_fs.make_fileset(path, size, on_tape)
     except FilseSetCreationError:
         error_msg = 'Fileset creation error: %s' % sys.exc_info()[1]
-        return render_to_response(template, {'path': path, 'size': size_in, 'error': True,
-                                             'error_msg': error_msg}, mimetype=mimetype)
+        return render_to_response(template, {'path': path, 'size': size_in, 'fileset_created': False,
+                                             'message': error_msg}, mimetype=mimetype)
 
-    return render_to_response(template, {'path': '', 'size': '', 'error': True,
-                                         'error_msg': 'Fileset created.', 'fs': new_fs}, mimetype=mimetype)
+    return render_to_response(template, {'path': '', 'size': '', 'fileset_created': True,
+                                         'message': 'Fileset created.', 'fs': new_fs}, mimetype=mimetype)
 
 
 def split_fileset(request):
