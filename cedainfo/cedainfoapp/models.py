@@ -731,7 +731,7 @@ class FileSet(models.Model, ProblemsMixin):
                 if npoints < 2:
                     changing = True    # if we have one or less points in the 120 days then assume changing.
 
-                if len(fssms) < 10 and not f.sd_backup:
+                if datetime.now() - fssms[len(fssms)-1].date < timedelta(days=60) and not f.sd_backup:
                     msgs.append(f.problem_html("Newish and not marked for backup.", 1))
             else:
                 msgs.append(f.problem_html("Not measured yet", 1))
