@@ -2,8 +2,8 @@
   "logical_path": "{{path}}",
   "size": "{{size}}",
   "on_tape": "{{on_tape}}",
-  "error": {{fileset_created}},
-  "error_msg": "{{message}}",
+  "fileset_created": {% if fileset_created %}true{% else %}false{% endif %},
+  "message": "{{message}}",
   "new_fs_id": "{{fs.id}}",
   "fs_storage_path": "{{fs.storage_path}}"
 }
