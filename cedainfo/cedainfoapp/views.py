@@ -527,7 +527,7 @@ def make_fileset(request):
         new_fs.make_fileset(path, size, on_tape)
     except FilseSetCreationError:
         error_msg = 'Fileset creation error: %s' % sys.exc_info()[1]
-        return render_to_response(template, {'path': path, 'size': size_in, 'error': True, 'error': error_msg})
+        return render_to_response(template, {'path': path, 'size': size_in, 'error': True, 'error_msg': error_msg})
 
     return render_to_response(template, {'path': '', 'size': '', 'error': True,
                                          'error_msg': 'Fileset created.', 'fs': new_fs})
