@@ -22,7 +22,8 @@ urlpatterns = patterns('',
     (r'^txt/hosts/$', txt_host_list),
     (r'^txt/vms/(?P<vmname>.*)$', txt_vms_list),
     (r'^txt/vmrequests/$', txt_vm_request_list), 
-    (r'^txt/services/(?P<vmname>.*)$', txt_service_list),     
+    (r'^txt/services/(?P<vmname>.*)$', txt_service_list),
+    (r'^txt/services2/(?P<vmname>.*)$', txt_service_list2),          
     #   - detail view of 1 host, by id
     (r'^host/(?P<host_id>\d+)/$', host_detail),
     # Recreate the SDDCS "nodelist" file as a view

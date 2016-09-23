@@ -961,7 +961,6 @@ def txt_vms_list(request, vmname=''):
 
     return HttpResponse(output, content_type="text/plain")
 
-
 def txt_service_list(request, vmname=''):
     if vmname:
         fields = ("name", "documentation")
@@ -980,6 +979,35 @@ def txt_service_list(request, vmname=''):
         for field in fields:
             output += str(getattr(rec, field))
             output += '\t'
+
+        output += '\n'
+
+    return HttpResponse(output, content_type="text/plain")
+
+
+def txt_service_list2(request, vmname=''):
+
+    if vmname:
+        fields = ("name", "service_manager", "ports", "infolink", "documentation")
+        recs = NewService.objects.filter(host__name=vmname).exclude(status='decomissioned')
+    else:
+        fields = ("name", "service_manager", "ports", "infolink", "documentation", "host", "status")
+        recs = NewService.objects.all().exclude(status='decomissioned').order_by('host')
+
+    output = ''
+
+    for field in fields:
+        output += field + '\t'
+    output += '\n'
+
+    for rec in recs:
+        for field in fields:
+	    if field == 'infolink':
+	        output += "http://cedadb.ceda.ac.uk/admin/cedainfoapp/newservice/%s/" % str(rec.id)
+		output += '\t'
+            else:
+                output += str(getattr(rec, field))
+                output += '\t'
 
         output += '\n'
 
