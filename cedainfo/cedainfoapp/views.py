@@ -997,7 +997,7 @@ def txt_service_list2(request, vmname=''):
     output = ''
 
     for field in fields:
-        output += field + '\t'
+        output += field.capitalize() + '\t'
     output += '\n'
 
     for rec in recs:
