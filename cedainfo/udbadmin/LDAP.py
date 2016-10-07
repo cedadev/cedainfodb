@@ -305,7 +305,8 @@ def ldif_all_users (filter_root_users=False, server=settings.LDAP_URL):
         p2.wait()
 
         ccin = open(cc.name, 'r')
-        p3 = subprocess.Popen(["grep", "-v", "rootAccessGroup"], stdin=ccin, stdout=bb)
+#        p3 = subprocess.Popen(["grep", "-v", "rootAccessGroup"], stdin=ccin, stdout=bb)
+        p3 = subprocess.Popen(["egrep", "-v", "rootAccessGroup|userPassword"], stdin=ccin, stdout=bb)
         p3.wait() 
  
     else:
