@@ -7,6 +7,7 @@ from operator import attrgetter
 import os
 import tempfile
 import subprocess
+from unidecode import unidecode
 
 from django.conf import settings
 
@@ -87,7 +88,7 @@ def user_shell (user):
 def user_gecos (user):
     '''Returns gecos string for user'''
  
-    return '%s %s' % (user.othernames, user.surname)   
+    return '%s %s' % (unidecode(user.othernames), unidecode(user.surname))   
  
 def user_gid (user):
     ''' Returns initial group to be used for user. If no specific value has been set 
