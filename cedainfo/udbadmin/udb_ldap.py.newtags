@@ -447,23 +447,28 @@ def ldap_user_record(accountid, write_root_access=True):
 
     surname = user.surname.strip()
     
-    mail = ''
-    
-    try:
-        mail = user.emailaddress.strip()
-    except:
-        pass
-	
     if not surname:
         surname = 'Not specified'
     record = record + 'sn: %s\n' % surname
-    record = record + 'givenName: %s\n' % unidecode(user.othernames.strip())
-    record = record + 'mail: %s\n' % mail
+
+
+    if user.accountid == 'mpryor':
+	surname = user.surname.strip()    
+	mail    = ''
+
+	try:
+            mail = user.emailaddress.strip()
+	except:
+            pass
+
+    
+	record = record + 'givenName: %s\n' % unidecode(user.othernames.strip())
+	record = record + 'mail: %s\n' % mail
+	record = record + 'objectClass: organizationalPerson\n'
+	record = record + 'objectClass: inetOrgPerson\n'
 
     record = record + 'objectClass: top\n'
     record = record + 'objectClass: person\n'
-    record = record + 'objectClass: organizationalPerson\n'
-    record = record + 'objectClass: inetOrgPerson\n'
     
     record = record + 'objectClass: posixAccount\n'
     record = record + 'objectClass: ldapPublicKey\n'
