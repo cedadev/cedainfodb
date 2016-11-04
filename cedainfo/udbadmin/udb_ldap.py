@@ -15,6 +15,11 @@ from models import *
 import LDAP
 
 
+UPDATE_ACCOUNTS = [
+'mpryor', 
+'aharwood',
+]
+
 ARCHIVE_ACCESS_GROUPS = {"cmip5_research": {"gid": 26059, "datasets" : ["cmip5_research", "cmip3", "cmip3_ukmo"]},
                          "esacat1":        {"gid": 26017, "datasets" : ["aatsr_multimission", "atsrubt", "mipas", "sciamachy"]},                         
                          "ecmwf":          {"gid": 26018, "datasets" : ["era", "ecmwfop", "ecmwftrj", "era4t", "ecmwfera"]},
@@ -451,8 +456,7 @@ def ldap_user_record(accountid, write_root_access=True):
         surname = 'Not specified'
     record = record + 'sn: %s\n' % surname
 
-
-    if user.accountid == 'mpryor':
+    if user.accountid in UPDATE_ACCOUNTS:
 	surname = user.surname.strip()    
 	mail    = ''
 
