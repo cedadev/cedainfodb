@@ -456,7 +456,7 @@ def ldap_user_record(accountid, write_root_access=True):
         surname = 'Not specified'
     record = record + 'sn: %s\n' % surname
 
-    if user.accountid in UPDATE_ACCOUNTS:
+    if user.accountid in UPDATE_ACCOUNTS or user.uid < 0:
 	surname = user.surname.strip()    
 	mail    = ''
 
