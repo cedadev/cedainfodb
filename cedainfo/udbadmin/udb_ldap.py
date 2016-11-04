@@ -143,7 +143,7 @@ def all_users(order_by="userkey"):
 
     sql = "select distinct tbusers.* from tbusers where tbusers.uid > 0 " + \
           "order by %s" % order_by
-
+    
 #    sql = "select distinct tbusers.* from tbusers, tbdatasetjoin where (tbusers.userkey=tbdatasetjoin.userkey)" + \
 #          "and tbdatasetjoin.removed=0 and ((datasetid='jasmin-login') or " + \
 #          "(datasetid='vm_access_ceda_internal') or (datasetid='system-login') or (datasetid='cems-login')) " + \
@@ -277,7 +277,7 @@ def ldap_all_user_records (write_root_access=True, add_additional_users=True):
     record = ''
         
     users =  all_users(order_by="accountid")
-       
+    
     for user in users:
         record = record + ldap_user_record(user.accountid, 
                           write_root_access=write_root_access) + '\n'
@@ -441,7 +441,7 @@ def ldap_user_record(accountid, write_root_access=True):
     
 #    if not user.uid > 0:
 #        return 'uid not set for %s' % accountid
-
+    
     record = "dn: cn=%s,ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk\n" % user.accountid.strip()    
     record = record + 'loginShell: %s\n' % user_shell(user).strip()
 
@@ -451,8 +451,25 @@ def ldap_user_record(accountid, write_root_access=True):
         surname = 'Not specified'
     record = record + 'sn: %s\n' % surname
 
+
+    if user.accountid == 'mpryor':
+	surname = user.surname.strip()    
+	mail    = ''
+
+	try:
+            mail = user.emailaddress.strip()
+	except:
+            pass
+
+    
+	record = record + 'givenName: %s\n' % unidecode(user.othernames.strip())
+	record = record + 'mail: %s\n' % mail
+	record = record + 'objectClass: organizationalPerson\n'
+	record = record + 'objectClass: inetOrgPerson\n'
+
     record = record + 'objectClass: top\n'
     record = record + 'objectClass: person\n'
+    
     record = record + 'objectClass: posixAccount\n'
     record = record + 'objectClass: ldapPublicKey\n'
 
