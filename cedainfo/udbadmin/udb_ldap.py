@@ -550,10 +550,21 @@ def ldif_all_user_updates(server=settings.LDAP_URL):
     out = e.readlines()
     stringout = ""
 
-    for i in range(len(out)):
+    i = 0
+    
+    while i < len(out):
         if out[i].find('rootAccessGroup') == -1:
-            stringout += out[i]
-
+	
+	    if i< len(out)-1 and out[i+1].startswith('changetype: delete'):
+		if out[i].startswith('dn: cn=aharwood') or out[i].startswith('dn: cn=xxxx'):
+	            i = i + 1
+		else:
+		    stringout += out[i]
+            else:
+	        stringout += out[i]
+                
+        i = i + 1
+	    
     return stringout
     
 def ldif_all_users (write_root_access=True):
