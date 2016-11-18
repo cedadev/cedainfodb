@@ -15,11 +15,6 @@ from models import *
 import LDAP
 
 
-UPDATE_ACCOUNTS = [
-'mpryor', 
-'aharwood',
-]
-
 ARCHIVE_ACCESS_GROUPS = {"cmip5_research": {"gid": 26059, "datasets" : ["cmip5_research", "cmip3", "cmip3_ukmo"]},
                          "esacat1":        {"gid": 26017, "datasets" : ["aatsr_multimission", "atsrubt", "mipas", "sciamachy"]},                         
                          "ecmwf":          {"gid": 26018, "datasets" : ["era", "ecmwfop", "ecmwftrj", "era4t", "ecmwfera"]},
@@ -455,21 +450,6 @@ def ldap_user_record(accountid, write_root_access=True):
     if not surname:
         surname = 'Not specified'
     record = record + 'sn: %s\n' % surname
-
-    if user.accountid in UPDATE_ACCOUNTS or user.uid < 0:
-	surname = user.surname.strip()    
-	mail    = ''
-
-	try:
-            mail = user.emailaddress.strip()
-	except:
-            pass
-
-    
-	record = record + 'givenName: %s\n' % unidecode(user.othernames.strip())
-	record = record + 'mail: %s\n' % mail
-	record = record + 'objectClass: organizationalPerson\n'
-	record = record + 'objectClass: inetOrgPerson\n'
 
     record = record + 'objectClass: top\n'
     record = record + 'objectClass: person\n'
