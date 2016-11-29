@@ -39,6 +39,7 @@ DATASET_REGISTRATION_TYPES=(
    ("signature", "signature"),
    ("badc", "badc"),
    ("reguser", "reguser"),
+   ("jasmin-portal", "jasmin-portal"),
    ("none", "none")
 )
 
