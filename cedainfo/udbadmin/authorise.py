@@ -114,7 +114,10 @@ def authorise_datasets(request, userkey):
                     dataset.datasetid == "commercial-login":
 		    
                     uid_update = True
-                    
+		    
+                    datasetRequest.userkey.jasminaccountid = datasetRequest.userkey.accountid
+                    datasetRequest.userkey.save()
+ 
                     uid = _add_uid(datasetRequest.userkey)
                      
                     try:
