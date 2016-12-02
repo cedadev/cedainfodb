@@ -141,7 +141,7 @@ def all_users(order_by="userkey"):
     '''Returns user objects for all LDAP users. For efficiency this is done using an sql query.
        optionally the results can be ordered by the given field'''
 
-    sql = "select distinct tbusers.* from tbusers where tbusers.uid > 0 " + \
+    sql = "select distinct tbusers.* from tbusers where tbusers.jasminaccountid !=''" + \
           "order by %s" % order_by
     
 #    sql = "select distinct tbusers.* from tbusers, tbdatasetjoin where (tbusers.userkey=tbdatasetjoin.userkey)" + \
@@ -325,7 +325,7 @@ def ldap_group_record(datasetid):
     users.sort(key=attrgetter('accountid'))
         
     for user in users:
-       record = record + 'memberUid: ' + user.accountid + '\n'
+       record = record + 'memberUid: ' + user.jasminaccountid + '\n'
   
     return record
 
@@ -347,7 +347,7 @@ def ldap_open_group_record():
     accounts = []
     
     for user in all:
-       accounts.append(user.accountid)
+       accounts.append(user.jasminaccountid)
        
     accounts = accounts + ARCHIVE_ACCESS_STANDARD_USERS
 
@@ -378,7 +378,7 @@ def ldap_archive_access_group_record(datasetid):
     accounts = []
     
     for user in users:
-        accounts.append(user.accountid)
+        accounts.append(user.jasminaccountid)
         
     accounts = accounts  + ARCHIVE_ACCESS_STANDARD_USERS
 
@@ -525,9 +525,11 @@ def ldif_all_group_updates (server=settings.LDAP_URL):
 
     stringout = ""
 
-    for i in range(len(diffoutput)):
-        stringout += diffoutput[i]
-
+    i = 0
+    
+    while i < len(diffoutput):
+        stringout += diffoutput[i]        
+        i = i + 1
     return stringout
 
 def ldif_all_user_updates(server=settings.LDAP_URL):
