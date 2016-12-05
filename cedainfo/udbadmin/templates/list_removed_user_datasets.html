@@ -24,14 +24,21 @@
 <tbody>
   {% for dataset in datasets %}<tr class="{% cycle row1,row2 %}">
     <td><a href="/udbadmin/udj/{{dataset.id}}">Edit</a></td>
-    <td><a href="{{ dataset.datasetid.get_absolute_url|escape }}" title="Click to view dataset details">{{ dataset.datasetid|escape }}</a></td>
+
+    {% if dataset.datasetid.authtype == "jasmin-portal" %}
+        <td bgcolor="#D2A6C7"><a href="{{ dataset.datasetid.get_absolute_url|escape }}" title="Dataset now handled by Jasmin portal. Click for dataset details">{{ dataset.datasetid|escape }}</a></td>    
+    {% else %}   
+        <td><a href="{{ dataset.datasetid.get_absolute_url|escape }}" title="Click to view dataset details">{{ dataset.datasetid|escape }}</a></td>
+    {% endif %}
+    
     <td>{{ dataset.ver|escape }}</td>
     <td>{{ dataset.endorseddate|date:"d-M-Y" }}</td>
     <td>{{ dataset.expiredate|date:"d-M-Y" }}</td>
     <td>{{ dataset.removeddate|date:"d-M-Y" }}</td>
     <td>{{ dataset.endorsedby|escape }}</td>
     <td>{{ dataset.nercfunded|yesno:"Yes,No" }}</td>
-    <td>{{ dataset.research|escape }}</td>
+    
+        <td>{{ dataset.research|escape }}</td>    	
   </tr>
   {% endfor %}
 
