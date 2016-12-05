@@ -13,6 +13,8 @@ process.
 When you submit this form you will be given the opportunity of editing other fields, such as the research description, 
 expiry date etc.
 <p>
+Items in <font color="red">red</font> should now be controlled by the <a href="http://accounts.jasmin.ac.uk">JASMIN accounts portal</a>
+<p>
 Once you have finished adding any groups, remember to <a href="http://team.ceda.ac.uk/cgi-bin/userdb/update_group_file.cgi.pl">Update the group file</a> in order for the ftp
 server to pick up the new groups.
 <p/>
@@ -26,7 +28,12 @@ server to pick up the new groups.
 <select name="datasetid" size="1">
 <option value="" selected="y">
 {% for d in datasets %}
-   <option>{{d.datasetid}}
+
+   {% if d.authtype == 'jasmin-portal' %}
+       <option style="color:red">{{d.datasetid}}
+   {% else %}
+       <option>{{d.datasetid}}    
+   {% endif %}    
 {% endfor %}
 </select>
 </td>
