@@ -279,10 +279,10 @@ def ldap_all_user_records (write_root_access=True, add_additional_users=True):
     users =  all_users(order_by="accountid")
     
     for user in users:
-        record = record + ldap_user_record(user.accountid, 
-                          write_root_access=write_root_access) + '\n'
-
-    record = record + '\n'
+        if user.uid > 0:
+            record = record + ldap_user_record(user.accountid, 
+                              write_root_access=write_root_access) + '\n'
+            record = record + '\n'
 
     if add_additional_users:
         if os.path.exists(settings.ADDITIONAL_LDAP_USER_FILE):

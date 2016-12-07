@@ -186,7 +186,7 @@ class UserAdmin(admin.ModelAdmin):
     list_per_page = 200
     
 #    exclude = ('encpasswd', 'md5passwd', 'onlinereg')
-    readonly_fields = (showDatasets, 'datacenter', 'userkey', 'accountid', 'jasminaccountid', 'addresskey', 'startdate', 'encpasswd', 'md5passwd', 'institute', links, ldap_links, password)
+    readonly_fields = (showDatasets, 'datacenter', 'userkey', 'accountid', 'addresskey', 'startdate', 'encpasswd', 'md5passwd', 'institute', links, ldap_links, password)
 
     fieldsets = (
             (None, {
