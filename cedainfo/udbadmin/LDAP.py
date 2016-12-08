@@ -6,6 +6,9 @@ from operator import itemgetter
 
 from django.conf import settings
 
+EXCLUDE_USERS = ['aharwood', 'mpryor']
+#EXCLUDE_USERS = []
+
 GROUP_BASE  = "ou=ceda,ou=Groups,o=hpc,dc=rl,dc=ac,dc=uk"
 PEOPLE_BASE = "ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"
 
@@ -259,8 +262,11 @@ def ldif_all_groups (filter_scarf_users=False, server=settings.LDAP_URL):
     if filter_scarf_users is set then scarf users are removed from the output 
     using grep.
     """
+#    group_filter = "(|(cn=ukmo)(cn=ecmwf)(cn=cmip5_research)(cn=esacat1)(cn=eurosat)(cn=ukmo_wx)(cn=ukmo_clim)(cn=open))"
+#    group_filter='(cn=gws_nceo_generic)'
+    group_filter = '(cn=*)'
     b = tempfile.NamedTemporaryFile()
-    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", server, "-b", GROUP_BASE, "-s", "one"], stdout=b)
+    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", server, "-b", GROUP_BASE, "-s", "one", group_filter], stdout=b)
     p1.wait()
 
     bb = tempfile.NamedTemporaryFile()
@@ -271,8 +277,13 @@ def ldif_all_groups (filter_scarf_users=False, server=settings.LDAP_URL):
         p2 = subprocess.Popen([SORT_SCRIPT, "-a", "-k", "dn", b.name], stdout=cc)
         p2.wait()
 
+	grep_string = "memberUid: scarf"
+
+	for entry in EXCLUDE_USERS:
+	    grep_string = grep_string + "|memberUid: %s" % entry
+
 	ccin = open(cc.name, 'r')
-        p3 = subprocess.Popen(["grep", "-v", "memberUid: scarf"], stdin=ccin, stdout=bb)
+        p3 = subprocess.Popen(["egrep", "-v", grep_string], stdin=ccin, stdout=bb)
         p3.wait() 
 
     else:
@@ -292,8 +303,16 @@ def ldif_all_users (filter_root_users=False, server=settings.LDAP_URL):
 
     """
     b = tempfile.NamedTemporaryFile()
-   
-    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", server, "-b", PEOPLE_BASE, "-s", "one"], stdout=b)
+#
+#   Filter to exclude any users whose details we don't want
+#   
+    filter_string = "(!(|(uid=dummEntry)"  
+
+    for entry in EXCLUDE_USERS:
+	filter_string += "(uid=%s)" % entry
+    filter_string += "))"	
+
+    p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", server, "-b", PEOPLE_BASE, "-s", "one", filter_string], stdout=b)
     p1.wait()
 
     bb = tempfile.NamedTemporaryFile()

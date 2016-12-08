@@ -14,6 +14,7 @@ from django.conf import settings
 from models import *
 import LDAP
 
+EXCLUDE_USERS = ['aharwood', 'mpryor']
 
 ARCHIVE_ACCESS_GROUPS = {"cmip5_research": {"gid": 26059, "datasets" : ["cmip5_research", "cmip3", "cmip3_ukmo"]},
                          "esacat1":        {"gid": 26017, "datasets" : ["aatsr_multimission", "atsrubt", "mipas", "sciamachy"]},                         
@@ -244,7 +245,8 @@ def ldap_all_group_records ():
     Returns ldap record string for all ldap groups
     '''
 
-    datasets = Dataset.objects.all().filter(gid__gt=0).order_by('grp')
+##    datasets = Dataset.objects.all().filter(gid__gt=0).filter(datasetid='gws_nceo_generic').order_by('grp')
+    datasets = Dataset.objects.all().filter(gid__gt=0).exclude(authtype='jasmin-portal').order_by('grp')
 
     record = ''
         
@@ -279,7 +281,7 @@ def ldap_all_user_records (write_root_access=True, add_additional_users=True):
     users =  all_users(order_by="accountid")
     
     for user in users:
-        if user.uid > 0:
+        if user.accountid not in EXCLUDE_USERS and user.uid > 0:
             record = record + ldap_user_record(user.accountid, 
                               write_root_access=write_root_access) + '\n'
             record = record + '\n'
@@ -324,8 +326,9 @@ def ldap_group_record(datasetid):
     users = get_dataset_users(datasetid)
     users.sort(key=attrgetter('accountid'))
         
-    for user in users:
-       record = record + 'memberUid: ' + user.jasminaccountid + '\n'
+    for user in users:    
+       if not user.accountid in EXCLUDE_USERS:
+           record = record + 'memberUid: ' + user.jasminaccountid + '\n'
   
     return record
 
@@ -347,7 +350,8 @@ def ldap_open_group_record():
     accounts = []
     
     for user in all:
-       accounts.append(user.jasminaccountid)
+       if not user.accountid in EXCLUDE_USERS:
+           accounts.append(user.jasminaccountid)
        
     accounts = accounts + ARCHIVE_ACCESS_STANDARD_USERS
 
@@ -378,7 +382,8 @@ def ldap_archive_access_group_record(datasetid):
     accounts = []
     
     for user in users:
-        accounts.append(user.jasminaccountid)
+        if not user.accountid in EXCLUDE_USERS:
+            accounts.append(user.jasminaccountid)
         
     accounts = accounts  + ARCHIVE_ACCESS_STANDARD_USERS
 
