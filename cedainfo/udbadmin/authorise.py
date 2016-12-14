@@ -312,25 +312,22 @@ def _get_next_free_uid():
 
     external = NISaccounts.getExtPasswdFile()
  
-    if not external:
-        return 0    
- 
-    for account in external.keys():
-        try:
-            uids.remove(int(external[account].uid))
-        except ValueError:
-            pass
- 
+    if external:
+        for account in external.keys():
+            try:
+        	uids.remove(int(external[account].uid))
+            except ValueError:
+        	pass
+
     internal = NISaccounts.getIntPasswdFile()
  
-    if not internal:
-        return 0
+    if internal:
  
-    for account in internal.keys():
-        try:
-            uids.remove(int(internal[account].uid))
-        except ValueError:
-            pass
+	for account in internal.keys():
+            try:
+        	uids.remove(int(internal[account].uid))
+            except ValueError:
+        	pass
 	    
     if len(uids) > 0:
         return uids[0]
