@@ -6,7 +6,7 @@ from operator import itemgetter
 
 from django.conf import settings
 
-EXCLUDE_USERS = ['aharwood', 'mpryor', 'gparton', 'gpp02', 'mpritcha', 'wtucker', 'rsmith013']
+EXCLUDE_USERS = ['aharwood', 'mpryor', 'gparton', 'gpp02', 'mpritcha', 'wtucker', 'rsmith013', 'pjkersha', 'fchami', 'mattp']
 
 #EXCLUDE_USERS = []
 

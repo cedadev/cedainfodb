@@ -1,6 +1,7 @@
 from subprocess import *
 
 SERVER     = "ldap://homer.esc.rl.ac.uk"
+#SERVER     = 'ldap://ldap-rhel7.jc.rl.ac.uk'
 BASE       = "ou=People,o=hpc,dc=rl,dc=ac,dc=uk"
 CMD        = "/usr/bin/ldapsearch"
 TAG_PREFIX = "description: cluster:"
