@@ -6,7 +6,8 @@ from operator import itemgetter
 
 from django.conf import settings
 
-EXCLUDE_USERS = ['aharwood', 'mpryor', 'gparton', 'gpp02', 'mpritcha', 'wtucker', 'rsmith013', 'pjkersha', 'fchami', 'mattp']
+
+EXCLUDE_USERS = ['mpryor', 'gparton', 'gpp02', 'mpritcha', 'wtucker', 'rsmith013', 'pjkersha', 'fchami', 'mattp', 'dch1fc']
 
 #EXCLUDE_USERS = []
 
@@ -255,17 +256,23 @@ def rootAccessMembers():
     return memberAccounts
 
 
-def ldif_all_groups (filter_scarf_users=False, server=settings.LDAP_URL):
+def ldif_all_groups (filter_scarf_users=False, server=settings.LDAP_URL, select_groups=[]):
     """
     Returns all LDIF information from LDAP server for ceda groups, sorted by dn.
     Returns a filehandle for an open temporary file that can be read from.
+    
+    select_groups can be used to select only the specified groups
 
     if filter_scarf_users is set then scarf users are removed from the output 
     using grep.
     """
+    group_filter = _get_ldap_group_filter_string (select_groups)
+
+#    print group_filter
 #    group_filter = "(|(cn=ukmo)(cn=ecmwf)(cn=cmip5_research)(cn=esacat1)(cn=eurosat)(cn=ukmo_wx)(cn=ukmo_clim)(cn=open))"
 #    group_filter='(cn=gws_nceo_generic)'
-    group_filter = '(cn=*)'
+#    group_filter = '(cn=*)'
+
     b = tempfile.NamedTemporaryFile()
     p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", server, "-b", GROUP_BASE, "-s", "one", group_filter], stdout=b)
     p1.wait()
@@ -281,7 +288,7 @@ def ldif_all_groups (filter_scarf_users=False, server=settings.LDAP_URL):
 	grep_string = "memberUid: scarf"
 
 	for entry in EXCLUDE_USERS:
-	    grep_string = grep_string + "|memberUid: %s" % entry
+	    grep_string = grep_string + "|memberUid: %s$" % entry
 
 	ccin = open(cc.name, 'r')
         p3 = subprocess.Popen(["egrep", "-v", grep_string], stdin=ccin, stdout=bb)
@@ -292,6 +299,27 @@ def ldif_all_groups (filter_scarf_users=False, server=settings.LDAP_URL):
         p2.wait()
   
     return bb
+
+def _get_ldap_group_filter_string (groups=[]):
+    """
+    Returns the filter string that can be used with ldapsearch to select only the given groups from
+    the LDAP server. If no groups are specified then wildcard selection string is returned 
+    (to select all groups)
+    """
+
+    if len(groups) == 1:
+            group_filter = '(cn=%s)' % groups[0]
+    elif len(groups) > 1:
+    	    group_filter = '(|'
+
+            for group in groups:
+	        group_filter += '(cn=%s)' % group    
+            group_filter += ')'		
+
+    else:
+	group_filter = '(cn=*)'
+
+    return group_filter
 
 def ldif_all_users (filter_root_users=False, server=settings.LDAP_URL):
     """
