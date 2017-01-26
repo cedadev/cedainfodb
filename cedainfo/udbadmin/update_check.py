@@ -66,7 +66,7 @@ def group_updated (connection, reset=True, name='jasmin_group'):
     sql = "select hash from update_hash where name='%s' order by id desc" % name
     cursor.execute(sql)
     rec = cursor.fetchone()
-
+    
     if rec:
         stored_hash = str(rec[0])
     else:
@@ -74,8 +74,8 @@ def group_updated (connection, reset=True, name='jasmin_group'):
     
     sql = """
     select j.id,j.userkey,j.datasetid,j.removed from tbusers,tbdatasetjoin as j
-    where tbusers.userkey=j.userkey
-    and tbusers.uid > 0;
+    where tbusers.userkey=j.userkey and
+    tbusers.jasminaccountid !='';
     """
 
     datasetjoin_str = get_udb_str(sql, cursor)
