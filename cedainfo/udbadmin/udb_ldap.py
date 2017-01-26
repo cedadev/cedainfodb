@@ -16,6 +16,12 @@ import LDAP
 
 EXCLUDE_USERS = ['aharwood', 'mpryor', 'gparton', 'gpp02', 'mpritcha', 'wtucker', 'rsmith013', 'pjkersha', 'fchami']
 
+#
+# The following users should be a member of all archive access groups
+#
+ARCHIVE_ACCESS_STANDARD_USERS = ["badc", "prototype", "cwps", "archread"]
+
+
 ARCHIVE_ACCESS_GROUPS = {"cmip5_research": {"gid": 26059, "datasets" : ["cmip5_research", "cmip3", "cmip3_ukmo"]},
                          "esacat1":        {"gid": 26017, "datasets" : ["aatsr_multimission", "atsrubt", "mipas", "sciamachy"]},                         
                          "ecmwf":          {"gid": 26018, "datasets" : ["era", "ecmwfop", "ecmwftrj", "era4t", "ecmwfera"]},
@@ -64,10 +70,54 @@ DEFAULT_GID = 26030
 # Default shell for accont
 DEFAULT_SHELL = "/bin/bash" 
 
-#
-# The following users should be a member of all archive access groups
-#
-ARCHIVE_ACCESS_STANDARD_USERS = ["badc", "prototype", "cwps", "archread"]
+
+def userdb_managed_ldap_groups ():
+    """
+    Returns list of group names from ldap that are to be controlled via the userdb. This list is used to filter out the groups of interest from the
+    ldap server.
+    """ 
+    
+    groups = ["open"]
+       
+    for group in ARCHIVE_ACCESS_GROUPS.keys():
+        groups.append(group)
+
+    datasets = userdb_managed_ldap_datasets()
+    
+    for dataset in datasets:
+        groups.append(dataset.grp)
+		
+    return groups
+    
+def userdb_managed_ldap_datasets ():
+    """
+    Returns dataset objects for any datasets that are to control ldap groups. These are in addition to the archive access groups (which don't exist
+    as records in the userdb.
+    """
+    datasets = []   
+    
+#    datasets = Dataset.objects.all().filter(gid__gt=0).exclude(authtype='jasmin-portal').order_by('grp')
+#    datasets = Dataset.objects.all().filter(gid__gt=0).exclude(datasetid__startswith='gws_').order_by('grp')
+#    datasets = Dataset.objects.all().filter(gid__gt=0).order_by('grp')
+    datasets = Dataset.objects.all().filter(gid__gt=0).exclude(authtype='jasmin-portal').order_by('grp')
+
+    return datasets    
+
+def userdb_managed_datasetids ():
+    """
+    Returns a list of all datasetids for userdb datasets that map onto ldap groups
+    """
+    datasetids = []
+    
+    for item in ARCHIVE_ACCESS_GROUPS.keys():
+        datasetids.extend(ARCHIVE_ACCESS_GROUPS[item]["datasets"])
+
+    datasets = userdb_managed_ldap_datasets()
+
+    for dataset in datasets:
+        datasetids.append(dataset.datasetid)
+
+    return datasetids
 
 def is_ldap_user (user):    
     ''' Checks if the user should be in the LDAP system'''
@@ -240,14 +290,15 @@ def checkGroups():
                     badUsers.append(user)
     return badUsers
 
-def ldap_all_group_records ():
+def ldap_all_group_records (add_additions_file=True):
     '''
     Returns ldap record string for all ldap groups
     '''
 
 ##    datasets = Dataset.objects.all().filter(gid__gt=0).filter(datasetid='gws_nceo_generic').order_by('grp')
-    datasets = Dataset.objects.all().filter(gid__gt=0).exclude(authtype='jasmin-portal').order_by('grp')
-
+##    datasets = Dataset.objects.all().filter(gid__gt=0).exclude(authtype='jasmin-portal').order_by('grp')
+    datasets = userdb_managed_ldap_datasets ()
+    
     record = ''
         
     for dataset in datasets:
@@ -262,12 +313,13 @@ def ldap_all_group_records ():
     record = record + ldap_open_group_record()
     record = record + '\n'
 
-    if os.path.exists(settings.ADDITIONAL_LDAP_GROUP_FILE):
-        f = open(settings.ADDITIONAL_LDAP_GROUP_FILE, "r")
+    if add_additions_file:
+	if os.path.exists(settings.ADDITIONAL_LDAP_GROUP_FILE):
+            f = open(settings.ADDITIONAL_LDAP_GROUP_FILE, "r")
 
-        additional_groups = f.read()
-        f.close()
-        record = record + additional_groups    
+            additional_groups = f.read()
+            f.close()
+            record = record + additional_groups    
     
     return record
 
@@ -354,7 +406,11 @@ def ldap_open_group_record():
            accounts.append(user.jasminaccountid)
        
     accounts = accounts + ARCHIVE_ACCESS_STANDARD_USERS
-
+#
+#   Remove any duplicates
+#
+    accounts = list(set(accounts))
+    
     for account in sorted(accounts):
        record = record + 'memberUid: ' + account + '\n'
 
@@ -386,7 +442,11 @@ def ldap_archive_access_group_record(datasetid):
             accounts.append(user.jasminaccountid)
         
     accounts = accounts  + ARCHIVE_ACCESS_STANDARD_USERS
-
+#
+#   Remove any duplicates
+#
+    accounts = list(set(accounts))
+    
     for account in accounts:
         record = record + 'memberUid: ' + account + '\n'
          
@@ -495,13 +555,13 @@ def ldap_user_record(accountid, write_root_access=True):
 
     return record   
     
-def ldif_all_groups ():
+def ldif_all_groups (add_additions_file=True):
     """
     Returns all group information from the userdb as a sorted LDIF file
     Returns a filehandle for an open temporary file that can be read from.
     """
     a = tempfile.NamedTemporaryFile()
-    record = ldap_all_group_records()
+    record = ldap_all_group_records(add_additions_file=add_additions_file)
     a.write(record)
     a.flush()
      
@@ -511,13 +571,13 @@ def ldif_all_groups ():
             
     return bb
 
-def ldif_all_group_updates (server=settings.LDAP_URL):
+def ldif_all_group_updates (server=settings.LDAP_URL, select_groups=[], add_additions_file=True):
     """
     Returns ldiff commands to update LDAP group server as string array
     """
 
-    server_ldif = LDAP.ldif_all_groups(filter_scarf_users=True, server=server)                  
-    udb_ldif = ldif_all_groups()
+    server_ldif = LDAP.ldif_all_groups(filter_scarf_users=True, server=server, select_groups=select_groups)                  
+    udb_ldif = ldif_all_groups(add_additions_file=add_additions_file)
                 
     tmp_out = tempfile.NamedTemporaryFile()
     script = settings.PROJECT_DIR + "/udbadmin/ldifdiff.pl"
