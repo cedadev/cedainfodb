@@ -515,7 +515,7 @@ def display_free_uids (request):
     free_count = 0
 
     for uid in range (25000,25174+1) + range(26001, 26469+1) + range (29751,29899+1) + range(29900,29999+1) + range(35000,35099+1) \
-                     + range(7050000, 7060000):
+                     + range(7050000, 7051000):
 ##    for uid in range(26001, 26399+1) + range (29751,29899+1):
         
         rec = {}
