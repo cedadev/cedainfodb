@@ -340,7 +340,7 @@ def add_user_datasets(request, userkey):
    cedauser    = User.objects.get(userkey=userkey)
    
    authorisors = SiteUser.objects.exclude(last_name__exact="").order_by('first_name') 
-   datasets = Dataset.objects.exclude(datasetid__startswith='msf')
+   datasets = Dataset.objects.exclude(datasetid__startswith='msf').exclude(authtype='jasmin-portal')
       
    if request.method == 'POST':
      
