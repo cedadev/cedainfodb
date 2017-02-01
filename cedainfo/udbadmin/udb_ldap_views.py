@@ -106,7 +106,7 @@ def ldap_group_ldiff (request):
             output = LDAP.ldif_write(ldif, server=server)
 
     else:
-        stringout = udb_ldap.ldif_all_group_updates (server=server)
+        stringout = udb_ldap.ldif_all_group_updates (server=server,select_groups=udb_ldap.userdb_managed_ldap_groups(), add_additions_file=False)
 #       server_ldif = LDAP.ldif_all_groups(filter_scarf_users=True, server=server)                  
 #       udb_ldif = udb_ldap.ldif_all_groups()
 #                   
