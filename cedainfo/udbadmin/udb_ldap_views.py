@@ -136,8 +136,8 @@ def ldap_group_diff (request):
     the information generated from the userdb using the diff2html program
     """
     
-    ldif = LDAP.ldif_all_groups(filter_scarf_users=False)                  
-    udb_ldif = udb_ldap.ldif_all_groups()
+    ldif = LDAP.ldif_all_groups(filter_scarf_users=True, select_groups=udb_ldap.userdb_managed_ldap_groups())                  
+    udb_ldif = udb_ldap.ldif_all_groups(add_additions_file=False)
            
     tmp_out = tempfile.NamedTemporaryFile()
     script = settings.PROJECT_DIR + "/udbadmin/diff2html"
@@ -165,12 +165,26 @@ def ldap_groups (request):
     return HttpResponse(record, content_type="text/plain")
 
 @login_required()
+def ldap_groups_filtered (request):
+    """
+    Print out all group information from the LDAP server, filtered to show only groups controlled by ceda
+    """
+    fh = LDAP.ldif_all_groups(filter_scarf_users=True, select_groups=udb_ldap.userdb_managed_ldap_groups())            
+  
+    e = open(fh.name, 'r')
+    record = e.readlines()
+    header = 'LDIF group information from LDAP server %s filtered to show only groups controlled by CEDA \n\n' % settings.LDAP_URL
+    record = [header] + record
+    
+    return HttpResponse(record, content_type="text/plain")
+
+@login_required()
 def ldap_udb_groups (request):
     '''
     Writes ldap entries for all groups managed by the userdb
     '''
 
-    fh = udb_ldap.ldif_all_groups() 
+    fh = udb_ldap.ldif_all_groups(add_additions_file=False) 
     e = open(fh.name, 'r')
     record = e.readlines()
     record = ['Sorted LDIF group information from userdb\n\n'] + record

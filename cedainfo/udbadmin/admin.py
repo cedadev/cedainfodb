@@ -195,8 +195,12 @@ class UserAdmin(admin.ModelAdmin):
 	           'degree', 'endorsedby', 'field', 'startdate', showDatasets, 'datacenter', 'institute', 'comments')
 
             }),
+#
+# Remove following section once jap is in use
+#
             ('LDAP account info - only relevant if they have a JASMIN/CEMS/system-login account', 
                 {'fields': (ldap_links, 'uid', 'home_directory', 'shell', 'gid', 'public_key')}),
+
             )
        
 

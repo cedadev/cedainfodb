@@ -103,6 +103,26 @@ def userdb_managed_ldap_datasets ():
 
     return datasets    
 
+def udb_archive_access_datasets():
+    """
+    Returns dataset objects for all udb archive datasets that control ldap archive access groups
+    """
+    datasetids = []
+    datasets = []
+        
+    for item in ARCHIVE_ACCESS_GROUPS.keys():
+        datasetids.extend(ARCHIVE_ACCESS_GROUPS[item]["datasets"])
+
+    datasetids.sort()
+    
+    for datasetid in datasetids:
+        try:
+            datasets.append(Dataset.objects.get(datasetid=datasetid))
+	except:
+	    pass
+	    
+    return datasets	    
+	
 def userdb_managed_datasetids ():
     """
     Returns a list of all datasetids for userdb datasets that map onto ldap groups
