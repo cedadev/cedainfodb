@@ -6,8 +6,8 @@ from operator import itemgetter
 
 from django.conf import settings
 
-EXCLUDE_USERS = ['aharwood', 'mpryor', 'gparton', 'gpp02', 'mpritcha', 'wtucker', 'rsmith013', 'pjkersha', 'fchami', 'mattp', 'dch1fc']
-#EXCLUDE_USERS = []
+#EXCLUDE_USERS = ['aharwood', 'mpryor', 'gparton', 'gpp02', 'mpritcha', 'wtucker', 'rsmith013', 'pjkersha', 'fchami', 'mattp', 'dch1fc']
+EXCLUDE_USERS = []
 
 GROUP_BASE  = "ou=ceda,ou=Groups,o=hpc,dc=rl,dc=ac,dc=uk"
 PEOPLE_BASE = "ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"

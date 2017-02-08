@@ -14,8 +14,8 @@ from django.conf import settings
 from models import *
 import LDAP
 
-EXCLUDE_USERS = ['aharwood', 'mpryor', 'gparton', 'gpp02', 'mpritcha', 'wtucker', 'rsmith013', 'pjkersha', 'fchami']
-
+#EXCLUDE_USERS = ['aharwood', 'mpryor', 'gparton', 'gpp02', 'mpritcha', 'wtucker', 'rsmith013', 'pjkersha', 'fchami']
+EXCLUDE_USERS = []
 #
 # The following users should be a member of all archive access groups
 #
