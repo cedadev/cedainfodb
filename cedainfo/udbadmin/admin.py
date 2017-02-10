@@ -181,25 +181,25 @@ class UserAdmin(admin.ModelAdmin):
     startdate.admin_order_field = 'startdate' 
            	     	 
     list_display = ('userkey', 'title', 'othernames', 'surname', 'accountid', 'emailaddress', startdate, 'field', 'datasetCount')
-    list_filter = ('title', 'degree', 'accounttype', 'field','startdate','datacenter')
-    search_fields = ['surname', 'othernames', 'accountid', 'emailaddress']
+    list_filter = ('title', 'degree', 'accounttype', 'field','startdate')
+    search_fields = ['surname', 'othernames', 'accountid', 'jasminaccountid', 'emailaddress']
     list_per_page = 200
     
 #    exclude = ('encpasswd', 'md5passwd', 'onlinereg')
-    readonly_fields = (showDatasets, 'datacenter', 'userkey', 'accountid', 'jasminaccountid', 'addresskey', 'startdate', 'encpasswd', 'md5passwd', 'institute', links, ldap_links, password)
+    readonly_fields = (showDatasets, 'userkey', 'accountid', 'jasminaccountid', 'addresskey', 'startdate', 'encpasswd', 'md5passwd', 'institute', links, ldap_links, password)
 
     fieldsets = (
             (None, {
                 'fields': (links, 'userkey', 'title', 'surname', 'othernames', 'emailaddress',
                    'telephoneno', 'accountid', 'jasminaccountid', 'openid', 'accounttype',  password, 
-	           'degree', 'endorsedby', 'field', 'startdate', showDatasets, 'datacenter', 'institute', 'comments')
+	           'degree', 'endorsedby', 'field', 'startdate', showDatasets, 'institute', 'comments')
 
             }),
 #
 # Remove following section once jap is in use
 #
-            ('LDAP account info - only relevant if they have a JASMIN/CEMS/system-login account', 
-                {'fields': (ldap_links, 'uid', 'home_directory', 'shell', 'gid', 'public_key')}),
+#            ('LDAP account info - only relevant if they have a JASMIN/CEMS/system-login account', 
+#                {'fields': (ldap_links, 'uid', 'home_directory', 'shell', 'gid', 'public_key')}),
 
             )
        
