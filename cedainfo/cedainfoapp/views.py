@@ -1077,8 +1077,10 @@ def service_list_by_vm(request):
     vms = []
 
     for vm in allvms:
-        recs = NewService.objects.filter(host__name=vm.name).filter(status=service_status).order_by('name')
-
+        recs = NewService.objects.filter(host__name=vm.name).order_by('name')
+	
+        if service_status:
+	    recs = recs.filter(status=service_status)
         if (len(recs) > 0):
             vm.prodservices = recs
             vms.append(vm)
