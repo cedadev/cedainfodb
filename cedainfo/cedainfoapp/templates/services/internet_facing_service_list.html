@@ -2,18 +2,14 @@
 
 {% block content %}
 
-<h1>Services listed by VM</h1>
+<h1>Services on inetnet facing VMs</h1>
 <p>
 
 </p>
-Lists services with the selected status (default='production') by vm. <em>sysadmin</em> is taken from 'patch responsible' in the VM record.
-Services in bold are public.
+Lists all services on machines which are 'internet facing'. An internet facing machine runs one or more production services marked as either 'public' or
+'restricted visibility'.
 <p>
 
-<form method="get">
-Display services with status: {{myform.status }}
-<input type="Submit" value="Go">
-</form>
 
 </p>
 
@@ -60,9 +56,9 @@ Number of vms: {{vms|length}}
    {% if service.documentation %}
    
       
-       <td><li><b><a href="{{service.documentation}}" title="Documentation page">{{service.name}}</b></a> 
+       <td><li><a href="{{service.documentation}}" title="Documentation page">{{service.name}}</a> 
        <td>{{service.service_manager}}       
-       <td><a href="/admin/cedainfoapp/newservice/{{service.id}}" title="Service record">Service record</a>
+       <td><a href="/admin/cedainfoapp/newservice/{{service.id}}" title="Service information">Service info</a>
        
        {% if service.ports %}
            | <td>Ports: {{service.ports}}

@@ -1077,6 +1077,7 @@ def service_list_by_vm(request):
     vms = []
 
     for vm in allvms:
+	        
         recs = NewService.objects.filter(host__name=vm.name).order_by('name')
 	
         if service_status:
@@ -1086,6 +1087,42 @@ def service_list_by_vm(request):
             vms.append(vm)
 
     return render_to_response('services/list_by_vm.html', locals())
+
+@login_required()
+def service_internet_facing(request):
+    HEADERS = (
+        ('Name', 'name'),
+        ('Sysadmin', 'patch_responsible__username'),
+    )
+
+    sort_headers = SortHeaders(request, HEADERS)
+
+    headers = list(sort_headers.headers())
+
+    allvms = VM.objects.all()
+    allvms = allvms.order_by(sort_headers.get_order_by())
+
+    for vm in allvms:
+        if vm.patch_responsible.username == 'nobody':
+            vm.patch_responsible.username = ''
+
+    vms = []
+
+    for vm in allvms:
+#
+#       Only continue if this vm has at least one external facing service
+#
+        ext_services = NewService.objects.filter(host__name=vm.name).filter(status='production').filter(Q (visibility='restricted') | Q(visibility='public'))
+	if not ext_services:
+	    continue
+ 
+        recs = NewService.objects.filter(host__name=vm.name).order_by('name')
+	
+        if (len(recs) > 0):
+           vm.prodservices = recs
+           vms.append(vm)
+
+    return render_to_response('services/internet_facing_service_list.html', locals())
 
 
 @login_required()
