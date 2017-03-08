@@ -17,9 +17,8 @@ Display services with status: {{myform.status }}
 
 </p>
 
-<a href="/admin/cedainfoapp/newservice/">List all services</a>
-|
-<a href="/admin/cedainfoapp/vm/">List all VMs</a>
+<a href="http://ceda-internal.helpscoutdocs.com/article/4450-service-information-main-page">CEDA service information main page</a> 
+</p> 
 
 <p></p>
 
@@ -72,7 +71,7 @@ Number of vms: {{vms|length}}
       
 	<td><li>{{service.name}}
 	<td>{{service.service_manager}}     
-        <td><a href="/admin/cedainfoapp/newservice/{{service.id}}">Service info</a>
+        <td><a href="/admin/cedainfoapp/newservice/{{service.id}}" title="Service record">Service record</a>
 	
        {% if service.ports %}	
             | <td>Ports: {{service.ports}} 
