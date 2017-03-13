@@ -52,10 +52,10 @@ def find_nearest_ftpaccess_file (start_dirname):
     return ''
 
 
-connection = psycopg2.connect(dbname="cedainfo", 
+connection = psycopg2.connect(dbname="cedainfo_cedaarchiveapp", 
                                 host="db1.ceda.ac.uk",
                                 user="cedainfo", 
-                                password="xxxxx")
+                                password="xxxxxx")
 cursor = connection.cursor()
 
 sql = """
