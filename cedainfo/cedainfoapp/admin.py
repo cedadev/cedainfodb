@@ -315,7 +315,7 @@ def update_df(self, request, queryset):
 
 
 update_df.short_description = "Do a df on selected partitions"
-admin.site.register(Partition, PartitionAdmin)
+##admin.site.register(Partition, PartitionAdmin)
 
 
 class AuditAdmin(admin.ModelAdmin):
@@ -337,7 +337,7 @@ class AuditAdmin(admin.ModelAdmin):
     remove.short_description = "Delete audits"
 
 
-admin.site.register(Audit, AuditAdmin)
+##admin.site.register(Audit, AuditAdmin)
 
 
 class FileSetAdminForm(forms.ModelForm):
@@ -430,7 +430,7 @@ class FileSetAdmin(admin.ModelAdmin):
         return False
 
 
-admin.site.register(FileSet, FileSetAdmin)
+##admin.site.register(FileSet, FileSetAdmin)
 
 
 # class FileSetSizeMeasurementAdmin(admin.ModelAdmin):
