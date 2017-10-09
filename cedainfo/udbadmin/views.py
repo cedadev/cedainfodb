@@ -10,6 +10,7 @@ from udbadmin.models import *
 from udbadmin.forms import *
 from udbadmin.SortHeaders import SortHeaders
 import LDAP
+import json
 import public_keys
 
 import udb_ldap
@@ -95,10 +96,10 @@ surname: %s
 
     return HttpResponse(record, content_type="text/plain")
 
-def user_getemail(request, userkey):
+def user_getemail(request, accountid):
     """Function to return a users email address from accountid"""
     cedauser = User.objects.get(accountid=accountid)
-    record = {'accountid': cedauser.accountid, 'email': cedauser.emailaddress}\
+    record = {'accountid': cedauser.accountid, 'email': cedauser.emailaddress}
     return HttpResponse(json.dumps(record), content_type="application/json")
 
 @login_required()
