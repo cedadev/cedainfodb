@@ -11,6 +11,7 @@ from udbadmin.forms import *
 from udbadmin.SortHeaders import SortHeaders
 import LDAP
 import public_keys
+
 import udb_ldap
 #
 # sort table headers: djangosnippets.org/snippets/308
@@ -79,20 +80,26 @@ def user_edit_by_accountid(request, accountid):
     return redirect ('/admin/udbadmin/user/%s' % cedauser.userkey)
 
 
-def user_account_details(request, userkey):
- 
-    cedauser = User.objects.get(userkey=userkey)
-  
-    record = 'accountid: ' + cedauser.accountid + '\n'
+def user_account_details(request, accountid):
+
+    cedauser = User.objects.get(accountid=accountid)
+
+
+    record = 'accountid: %s' + cedauser.accountid + '\n'
     record += 'surname: ' + cedauser.surname + '\n'
-  
+
     record = \
 """accountid: %s
 surname: %s
     """ % (cedauser.accountid, cedauser.surname)
-      
+
     return HttpResponse(record, content_type="text/plain")
 
+def user_getemail(request, userkey):
+    """Function to return a users email address from accountid"""
+    cedauser = User.objects.get(accountid=accountid)
+    record = {'accountid': cedauser.accountid, 'email': cedauser.emailaddress}\
+    return HttpResponse(json.dumps(record), content_type="application/json")
 
 @login_required()
 def list_keys(request):

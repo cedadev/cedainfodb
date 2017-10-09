@@ -27,6 +27,7 @@ urlpatterns = patterns('',
 
     url(r'^user/keys/$', list_keys),        
     url(r'^external/user/account-details/(?P<userkey>\d{1,6})/$', user_account_details),
+    url(r'^user/getemail/(?P<accountid>[\d\w]+)$', user_getemail),
 
     url(r'^user/datasets/add/(?P<userkey>\d{1,6})/$', add_user_datasets),        
 
