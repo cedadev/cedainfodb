@@ -1873,6 +1873,7 @@ class VMRequest(models.Model):
                     patch_responsible=self.patch_responsible,
                     status='created',
                     end_of_life=self.end_of_life,
+		    other_info=self.other_info,
             )
             # root_users is a ManyToManyField, so need to copy outside of create()
             vm.root_users = self.root_users.all()
@@ -1907,6 +1908,7 @@ class VMRequest(models.Model):
                 vm.status = 'created'
                 vm.end_of_life = self.end_of_life
                 vm.root_users = self.root_users.all()
+		vm.other_info = self.other_info
                 vm.forceSave()
 
                 # update the request status
