@@ -258,6 +258,7 @@ VM_NETWORK_ACTIVITY_REQUIRED_CHOICES = (
 )
 
 VM_OS_REQUIRED_CHOICES = (
+    ('rhel7','rhel7'),
     ('rhel6','rhel6'),
     ('rhel5','rhel5'),
     ('sles11','sles11'),
