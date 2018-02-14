@@ -40,16 +40,11 @@ Entries: {{all_users|length}}
     {% endfor %}
 {% else %}
 <table border="1">
-<th>Username<th>Email<th>uid<th>Gecos<th>cn
+<th>Username<th>Email (from userdb)<th>uid<th>Gecos<th>cn
 {% for user in all_users %}
     <tr>
     <td>
-    {% if user.udb_user %}
-        <a href="/admin/udbadmin/user/{{user.udb_user.userkey}}">{{user.uid}}</a>
-    {% else %}
-        {{user.uid}}
-    {% endif %}
-    
+      <a href="https://accounts.jasmin.ac.uk/admin/jasmin_auth/jasminuser/?q={{user.uid}}">{{user.uid}}</a> 
     <td>{{user.email}}
     <td>{{user.uidnumber}}
     <td>{{user.gecos}}
