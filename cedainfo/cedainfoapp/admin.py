@@ -242,8 +242,15 @@ class NewServiceAdmin(admin.ModelAdmin):
             return self.host.patch_responsible
 
     system_manager.admin_order_field = "host__patch_responsible__username"
-
-    list_display = ('name', 'host', system_manager, 'visibility', 'status', 'summary', 'service_manager')
+    
+    def documentation(self):
+        if self.documentation:
+            return mark_safe('<a href="%s" title="View Helpscout documentation">Helpscout Doc</a>' % (self.documentation))
+        else:
+	    return ''
+    documentation.allow_tags = True
+    
+    list_display = ('name', documentation, 'host', system_manager, 'visibility', 'status', 'summary', 'service_manager')
 
     list_filter = (
     'visibility', 'status', 'keywords', ManagerFilter, OwnerFilter, ServiceHostFilter, SystemManagerFilter)
