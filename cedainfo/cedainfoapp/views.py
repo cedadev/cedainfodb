@@ -14,7 +14,7 @@ from django.core.context_processors import csrf
 from udbadmin.SortHeaders import SortHeaders
 
 import re
-
+import requests
 import datetime
 import time
 import random
@@ -1214,3 +1214,54 @@ def service_review_selection(request):
     services = services.order_by(sort_headers.get_order_by())
 
     return render_to_response('services/review_selection.html', locals())
+
+
+
+@login_required()
+def service_doc_check(request):
+
+    not_in_helpscout = []
+     
+    services = NewService.objects.all()
+
+    helpscout_urls = _download_helpscout_document_collection ('59b25ba1042863033a1caf8f')
+    
+    for service in services:
+        if service.documentation and service.documentation not in helpscout_urls:
+            not_in_helpscout.append(service)
+    
+    return render_to_response('services/doc_check.html', locals())
+
+
+def _download_helpscout_document_collection (collection_id):
+    urls = []
+
+    AUTH = ('47ff11d6d6207a05189271b8805a8b888533a49a', 'X')
+    
+    #
+    # Get number of pages of the articles index
+    #
+    list_url = 'https://docsapi.helpscout.net/v1/collections/%s/articles' % collection_id
+    r = requests.get(list_url, auth=AUTH)
+    pages =  r.json()["articles"]["pages"]
+
+##    pages = 1
+    #
+    # Now get each index page
+    #
+    for page in range(1, pages+1):
+	params = {"sort": "name", "page": page}
+	r = requests.get(list_url, auth=AUTH, params=params)
+
+	items =  r.json()["articles"]["items"]
+    #
+    #   Fetch and process each article on this index page
+    #
+	for i in items:
+	    try:
+		article_url = 'https://docsapi.helpscout.net/v1/articles/%s' % i["id"]
+		a = requests.get(article_url, auth=AUTH)
+                urls.append(a.json()["article"]["publicUrl"])		
+	    except Exception as e: print(e)	    
+
+    return urls

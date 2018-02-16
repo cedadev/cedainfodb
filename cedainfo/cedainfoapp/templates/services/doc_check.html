@@ -1,0 +1,25 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>Service documentation check</h1>
+<p>
+
+
+<h3>Services where document link not found in Helpscout services collection</h3>
+
+<table border>  
+
+{% for service in not_in_helpscout %}
+
+<tr>
+<td><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}}</a>
+
+<td>{{service.visibility}}
+<td>{{service.status}}
+<td><a href="{{service.documentation}}">{{service.documentation}}</a>
+</td>
+{% endfor %}
+</table>
+
+{% endblock %}

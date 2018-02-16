@@ -19,7 +19,8 @@ urlpatterns = patterns('',
     (r'^services/internetfacing/$', service_internet_facing),    
     (r'^services/unusedvms/$', service_unusedvms),
     (r'^services/review/$', service_review_selection),
-    
+    (r'^services/doc-check/$', service_doc_check),
+        
     (r'^txt/hosts/$', txt_host_list),
     (r'^txt/vms/(?P<vmname>.*)$', txt_vms_list),
     (r'^txt/vmrequests/$', txt_vm_request_list), 
