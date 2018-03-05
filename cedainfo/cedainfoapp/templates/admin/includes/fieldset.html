@@ -1,4 +1,12 @@
 <fieldset class="module aligned {{ fieldset.classes }}">
+
+<center>
+       | <a href="https://ceda-internal.helpscoutdocs.com/article/4450-service-information-main-page">Services Home page</a> |
+       <a href="http://cedadb.ceda.ac.uk/admin/cedainfoapp/newservice">List of services</a> |
+       <a href="http://cedadb.ceda.ac.uk/services/listbyvm">List of services by VM</a> |
+       <a href="http://cedadb.ceda.ac.uk/services/review">Services review list</a> |
+</center>
+<br/>	
     {% if fieldset.name %}<h2>{{ fieldset.name }}</h2>{% endif %}
     {% if fieldset.description %}
         <div class="description">{{ fieldset.description|safe }}</div>
