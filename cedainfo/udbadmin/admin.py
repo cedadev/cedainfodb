@@ -227,7 +227,7 @@ class DatasetrequestAdmin(admin.ModelAdmin):
                
    def authoriseLink(self):
       url = "/%s/authorise/%s" % (self._meta.app_label, self.userkey)
-      return mark_safe('<a href="%s"><img src="http://badc.nerc.ac.uk/graphics/misc/tick.gif"></a>' % url)
+      return mark_safe('<a href="%s"><img src="http://artefacts.ceda.ac.uk/graphics/misc/tick.gif"></a>' % url)
    authoriseLink.allow_tags = True
    authoriseLink.short_description = 'Authorise'
       	       
