@@ -1227,8 +1227,8 @@ def service_doc_check(request):
     helpscout_urls = _download_helpscout_document_collection ('59b25ba1042863033a1caf8f')
     
     for service in services:
-        if service.documentation and service.documentation not in helpscout_urls:
-            not_in_helpscout.append(service)
+        if service.documentation and service.documentation.replace('http://', 'https://') not in helpscout_urls:
+	    not_in_helpscout.append(service)
     
     return render_to_response('services/doc_check.html', locals())
 
