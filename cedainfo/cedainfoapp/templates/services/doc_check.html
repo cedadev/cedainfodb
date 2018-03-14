@@ -9,7 +9,7 @@
 <h3>Services where document link not found in Helpscout services collection</h3>
 
 <table border>  
-
+<th>Service name<th>Visibility<th>Status<th>Documentation page
 {% for service in not_in_helpscout %}
 
 <tr>
@@ -17,8 +17,14 @@
 
 <td>{{service.visibility}}
 <td>{{service.status}}
+
+{% if service.url_ok %}
 <td><a href="{{service.documentation}}">{{service.documentation}}</a>
-</td>
+{% else %}
+<td><a href="{{service.documentation}}"><span style="color:red;">{{service.documentation}}</span></a></font>
+{% endif %}
+
+</tr>
 {% endfor %}
 </table>
 
