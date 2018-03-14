@@ -17,6 +17,7 @@ import re
 import requests
 import datetime
 import time
+import httplib
 import random
 
 logging = settings.LOG
@@ -1228,7 +1229,8 @@ def service_doc_check(request):
     
     for service in services:
         if service.documentation and service.documentation.replace('http://', 'https://') not in helpscout_urls:
-	    not_in_helpscout.append(service)
+	    service.url_ok = _url_exists(service.documentation)
+            not_in_helpscout.append(service)
     
     return render_to_response('services/doc_check.html', locals())
 
@@ -1263,5 +1265,11 @@ def _download_helpscout_document_collection (collection_id):
 		a = requests.get(article_url, auth=AUTH)
                 urls.append(a.json()["article"]["publicUrl"])		
 	    except Exception as e: print(e)	    
-
+    
     return urls
+
+
+def _url_exists(url):
+    r = requests.get(url)
+    
+    return r.status_code == 200
