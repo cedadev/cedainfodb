@@ -249,6 +249,8 @@ class NewServiceAdmin(admin.ModelAdmin):
         else:
 	    return ''
     docs.allow_tags = True
+    docs.admin_order_field = "documentation"
+    
     
     list_display = ('name', docs, 'host', system_manager, 'visibility', 'status', 'summary', 'service_manager')
 
