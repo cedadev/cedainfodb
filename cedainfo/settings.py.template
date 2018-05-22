@@ -145,8 +145,8 @@ INSTALLED_APPS = (
     'sizefield',
     'cedainfo.cedainfoapp',
     'cedainfo.udbadmin',
-    'dmp',
-    'servicevis',
+#    'dmp',
+#    'servicevis',
 )
 
 ###ALLOWED_HOSTS=['*']
@@ -199,6 +199,7 @@ GWS_NAME_REGEX = re.compile(r'^[a-z][0-9_a-z]*$')
 GWS_PATH_CHOICES = (
     ('/group_workspaces/jasmin/', '/group_workspaces/jasmin/'),
     ('/group_workspaces/jasmin2/', '/group_workspaces/jasmin2/'),
+    ('/group_workspaces/jasmin4/', '/group_workspaces/jasmin4/'),
     ('/group_workspaces/cems/','/group_workspaces/cems/'),
     ('/group_workspaces/cems2/', '/group_workspaces/cems2/'),
 )
@@ -315,7 +316,7 @@ LDAP_URL       = 'ldap://homer.esc.rl.ac.uk'
 ##LDAP_WRITE_PASSWD = 'THUtu7Re'
 ##LDAP_WRITE_DN     = 'cn=cedaadmin,ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk'
 
-LDAP_WRITE_URL    = "ldap://homer.esc.rl.ac.uk"
+LDAP_WRITE_URL    =  LDAP_URL
 LDAP_WRITE_PASSWD = 'TUbr7kUj'
 LDAP_WRITE_DN     = 'cn=cedaadmin,ou=software,ou=People,o=hpc,dc=rl,dc=ac,dc=uk'
 
