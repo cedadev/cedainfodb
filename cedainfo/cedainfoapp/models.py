@@ -2151,3 +2151,19 @@ class NewService(models.Model):
     def documentationLink(self):
 
         return self.documentation
+
+    def coloured_vm_name(self):
+       '''Colour the vm name if no dns entry found. Remove legacy prefix before checking'''
+         
+       vm = self.host
+
+       try:
+            address = socket.gethostbyname(vm.name.replace('legacy:', ''))
+#	    address = socket.gethostbyname(vm.name)
+
+            return vm
+       except:
+            return ('<span style="color:red;">%s</span>' % vm)
+
+    coloured_vm_name.short_description = 'VM name'
+    coloured_vm_name.allow_tags = True

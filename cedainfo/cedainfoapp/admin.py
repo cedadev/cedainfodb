@@ -252,10 +252,9 @@ class NewServiceAdmin(admin.ModelAdmin):
     docs.admin_order_field = "documentation"
     
     
-    list_display = ('name', docs, 'host', system_manager, 'visibility', 'status', 'summary', 'service_manager')
+    list_display = ('name', docs, 'coloured_vm_name', 'review_status', 'visibility', 'status', 'summary', 'service_manager', 'owner')
 
-    list_filter = (
-    'visibility', 'status', 'keywords', ManagerFilter, OwnerFilter, ServiceHostFilter, SystemManagerFilter)
+    list_filter = ('visibility', 'status', 'review_status', 'keywords', ManagerFilter, OwnerFilter, ServiceHostFilter, SystemManagerFilter)
     search_fields = ('description', 'name')
     ordering = ('name',)
 
