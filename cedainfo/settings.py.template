@@ -202,7 +202,7 @@ GWS_PATH_CHOICES = (
     ('/group_workspaces/jasmin4/', '/group_workspaces/jasmin4/'),
     ('/group_workspaces/cems/','/group_workspaces/cems/'),
     ('/group_workspaces/cems2/', '/group_workspaces/cems2/'),
-    ('/gws/nopw/j04', '/gws/nopw/j04'),
+    ('/gws/nopw/j04/', '/gws/nopw/j04/'),
 )
 
 # Types of VM
