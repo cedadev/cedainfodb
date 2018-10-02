@@ -290,7 +290,7 @@ class NewServiceAdmin(admin.ModelAdmin):
     vm_name.admin_order_field = "host__name"
     
     
-    list_display = ('name', docs, vm_name, 'coloured_vm_name', 'review_status', 'visibility', 'status', 'summary', 'service_manager', 'owner')
+    list_display = ('name', docs, vm_name, 'review_status', 'visibility', 'status', 'summary', 'service_manager', 'owner')
 
     list_filter = ('visibility', 'status', 'review_status', 'keywords', ManagerFilter, OwnerFilter, ServiceHostFilter, SystemManagerFilter, VMStatusFilter)
     search_fields = ('description', 'name', 'host__name')
