@@ -218,6 +218,31 @@ class SystemManagerFilter(SimpleListFilter):
         else:
             return queryset
 
+class VMStatusFilter(SimpleListFilter):
+    title = 'VM status'
+    parameter_name = 'vmstatus'
+
+    def lookups(self, request, model_admin):
+        vms = set([c.host.status for c in model_admin.model.objects.all()])
+        if None in vms: vms.remove(None)
+        #
+        #       Sort results
+        #
+        vms = list(vms)
+        vms.sort()
+
+        count = {}
+        for u in vms:
+            count[u] = len(model_admin.model.objects.filter(host__status=u))
+
+        return [(c, c + ' (%s)' % count[c]) for c in vms]
+
+    def queryset(self, request, queryset):
+
+        if self.value():
+            return queryset.filter(host__status__exact=self.value())
+        else:
+            return queryset
 
 class NewServiceAdmin(admin.ModelAdmin):
     #    def wikiLink(self):
@@ -250,12 +275,25 @@ class NewServiceAdmin(admin.ModelAdmin):
 	    return ''
     docs.allow_tags = True
     docs.admin_order_field = "documentation"
-    
-    
-    list_display = ('name', docs, 'coloured_vm_name', 'review_status', 'visibility', 'status', 'summary', 'service_manager', 'owner')
 
-    list_filter = ('visibility', 'status', 'review_status', 'keywords', ManagerFilter, OwnerFilter, ServiceHostFilter, SystemManagerFilter)
-    search_fields = ('description', 'name')
+    def vm_name (self):
+    
+        if self.host.status == 'deprecated':
+	    color = 'DarkViolet'
+	elif self.host.status == 'retired':
+	    color = 'red'    
+	else:
+	    color = 'none'
+	        
+        return '<a href="/admin/cedainfoapp/vm/%s/" title="Status: %s"><span style="color: %s;">%s</span></a>' % (self.host.id, self.host.status, color, self.host.name)
+    vm_name.allow_tags = True
+    vm_name.admin_order_field = "host__name"
+    
+    
+    list_display = ('name', docs, vm_name, 'coloured_vm_name', 'review_status', 'visibility', 'status', 'summary', 'service_manager', 'owner')
+
+    list_filter = ('visibility', 'status', 'review_status', 'keywords', ManagerFilter, OwnerFilter, ServiceHostFilter, SystemManagerFilter, VMStatusFilter)
+    search_fields = ('description', 'name', 'host__name')
     ordering = ('name',)
 
     filter_horizontal = ('keywords',)
