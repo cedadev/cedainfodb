@@ -1798,7 +1798,7 @@ class VMRequest(models.Model):
     disk_activity_required = models.CharField(max_length=127, choices=settings.VM_DISK_ACTIVITY_REQUIRED_CHOICES)
     mountpoints_required = MultiSelectField(max_length=2048, choices=settings.MOUNT_CHOICES)
     network_required = models.CharField(max_length=127, choices=settings.VM_NETWORK_ACTIVITY_REQUIRED_CHOICES)
-    os_required = models.CharField(max_length=127, choices=settings.VM_OS_REQUIRED_CHOICES, default='rhel6')
+    os_required = models.CharField(max_length=127, choices=settings.VM_OS_REQUIRED_CHOICES, default='rhel7')
     other_info = models.TextField(blank=True)
     patch_responsible = models.ForeignKey(User, related_name='vmrequest_patch_responsible_user',
                                           limit_choices_to={'id__in': settings.ADMIN_USERS_PATCH_RESPONSIBLE},
@@ -1960,7 +1960,7 @@ class VM(models.Model):
     disk_activity_required = models.CharField(max_length=127, choices=settings.VM_DISK_ACTIVITY_REQUIRED_CHOICES)
     mountpoints_required = MultiSelectField(max_length=2048, choices=settings.MOUNT_CHOICES)
     network_required = models.CharField(max_length=127, choices=settings.VM_NETWORK_ACTIVITY_REQUIRED_CHOICES)
-    os_required = models.CharField(max_length=127, choices=settings.VM_OS_REQUIRED_CHOICES, default='rhel6')
+    os_required = models.CharField(max_length=127, choices=settings.VM_OS_REQUIRED_CHOICES, default='rhel7')
     other_info = models.TextField(blank=True)
     patch_responsible = models.ForeignKey(User, related_name='vm_patch_responsible_user',
                                           limit_choices_to={'id__in': settings.ADMIN_USERS_PATCH_RESPONSIBLE},
