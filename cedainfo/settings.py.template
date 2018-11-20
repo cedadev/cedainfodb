@@ -241,7 +241,7 @@ VM_MEM_REQUIRED_CHOICES = (
 )
 
 VM_DISK_SPACE_REQUIRED_CHOICES = (
-    ('light','light (10 Gb)'),
+    ('light','light (20 Gb)'),
     ('moderate','moderate (30 Gb)'),
     ('large', 'large (80 Gb)'),
     ('database', 'database (100 Gb)'),
