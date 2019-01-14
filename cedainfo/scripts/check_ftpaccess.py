@@ -15,6 +15,10 @@ import psycopg2
 
 
 FILE = '.ftpaccess'
+#
+# Directories where the .ftpaccess file should not be checked (because it needs to be different from the one above it)
+#
+IGNORE = ("/datacentre/archvol2/pan81/archive/spot-6430-v2.1")
 
 doit = False
 
@@ -55,7 +59,7 @@ def find_nearest_ftpaccess_file (start_dirname):
 connection = psycopg2.connect(dbname="cedainfo_cedaarchiveapp", 
                                 host="db1.ceda.ac.uk",
                                 user="cedainfo", 
-                                password="xxxxxx")
+                                password="xxxxxxx")
 cursor = connection.cursor()
 
 sql = """
@@ -72,9 +76,7 @@ for rec in recs:
    
    logical_path = rec[0]
    directory = rec[1] + '/archive/' + rec[2]
-   
-#   print logical_path, directory
-          
+             
    if logical_path.count('/') <= 2:
        continue
    
@@ -101,6 +103,11 @@ for rec in recs:
        print 'ERROR directory %s does not exist' % directory
        continue
    
+   if directory in IGNORE:
+      print "Skipping %s as it is in IGNORE" % directory
+      continue
+       
+      
    nearest = find_nearest_ftpaccess_file(logical_path)
    current = directory + '/.ftpaccess'
 
