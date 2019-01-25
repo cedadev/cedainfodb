@@ -6,7 +6,20 @@
 <p>
 
 
+<h3>Helpscout documents in services collection which are not linked to in cedainfodb</h3>
+
+
+<table border>  
+
+{% for url in not_in_cedainfodb %}
+<tr><td><a href="{{url}}">{{url}}</a></tr>
+{% endfor %}
+
+</table>
+
+
 <h3>Services where document link not found in Helpscout services collection</h3>
+
 
 <table border>  
 <th>Service name<th>Visibility<th>Status<th>Documentation page
@@ -27,5 +40,9 @@
 </tr>
 {% endfor %}
 </table>
+
+
+
+
 
 {% endblock %}
