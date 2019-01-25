@@ -1232,8 +1232,19 @@ def service_doc_check(request):
 	    service.url_ok = _url_exists(service.documentation)
             not_in_helpscout.append(service)
     
+    not_in_cedainfodb = []
+    
+    for url in helpscout_urls:
+        found = False
+	
+        for service in services:
+	    if service.documentation and service.documentation.replace('http://', 'https://')  == url:
+	        found = True
+	
+	if not found:
+	    not_in_cedainfodb.append(url)
+		       
     return render_to_response('services/doc_check.html', locals())
-
 
 def _download_helpscout_document_collection (collection_id):
     urls = []
@@ -1259,7 +1270,7 @@ def _download_helpscout_document_collection (collection_id):
     #
     #   Fetch and process each article on this index page
     #
-	for i in items:
+	for i in items:	    
 	    try:
 		article_url = 'https://docsapi.helpscout.net/v1/articles/%s' % i["id"]
 		a = requests.get(article_url, auth=AUTH)
