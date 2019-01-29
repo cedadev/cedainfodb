@@ -1225,7 +1225,16 @@ def service_doc_check(request):
      
     services = NewService.objects.all()
 
-    helpscout_urls = _download_helpscout_document_collection ('59b25ba1042863033a1caf8f')
+#    helpscout_urls = _download_helpscout_document_collection ('59b25ba1042863033a1caf8f')
+    
+    collection = _get_helpscout_collection('59b25ba1042863033a1caf8f')
+#
+#  Make a list of helpscout article urls from this collection
+#    
+    helpscout_urls = []
+
+    for article in collection:
+        helpscout_urls.append(article.json()["article"]["publicUrl"])	   
     
     for service in services:
         if service.documentation and service.documentation.replace('http://', 'https://') not in helpscout_urls:
@@ -1245,39 +1254,45 @@ def service_doc_check(request):
 	    not_in_cedainfodb.append(url)
 		       
     return render_to_response('services/doc_check.html', locals())
+    
 
-def _download_helpscout_document_collection (collection_id):
-    urls = []
+def _get_helpscout_collection (collection_id):
 
-    AUTH = ('47ff11d6d6207a05189271b8805a8b888533a49a', 'X')
+    """Returns the whole of the given collection as an array of json articles"""
+
+    HELPSCOUT_AUTH = ('47ff11d6d6207a05189271b8805a8b888533a49a', 'X')
+
+    collection = []
     
     #
     # Get number of pages of the articles index
     #
     list_url = 'https://docsapi.helpscout.net/v1/collections/%s/articles' % collection_id
-    r = requests.get(list_url, auth=AUTH)
+    r = requests.get(list_url, auth=HELPSCOUT_AUTH)
     pages =  r.json()["articles"]["pages"]
-
-##    pages = 1
+    
     #
     # Now get each index page
     #
     for page in range(1, pages+1):
 	params = {"sort": "name", "page": page}
-	r = requests.get(list_url, auth=AUTH, params=params)
+	r = requests.get(list_url, auth=HELPSCOUT_AUTH, params=params)
 
 	items =  r.json()["articles"]["items"]
     #
     #   Fetch and process each article on this index page
     #
-	for i in items:	    
+	for i in items:
+	
 	    try:
 		article_url = 'https://docsapi.helpscout.net/v1/articles/%s' % i["id"]
-		a = requests.get(article_url, auth=AUTH)
-                urls.append(a.json()["article"]["publicUrl"])		
+		a = requests.get(article_url, auth=HELPSCOUT_AUTH)
+		
+		collection.append(a)
+		 
 	    except Exception as e: print(e)	    
     
-    return urls
+    return collection
 
 
 def _url_exists(url):
