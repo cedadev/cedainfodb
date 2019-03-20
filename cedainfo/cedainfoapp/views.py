@@ -1237,7 +1237,7 @@ def service_doc_check(request):
         helpscout_urls.append(article.json()["article"]["publicUrl"])	   
     
     for service in services:
-        if service.documentation and service.documentation.replace('http://', 'https://') not in helpscout_urls:
+        if service.documentation and service.documentation not in helpscout_urls:
 	    service.url_ok = _url_exists(service.documentation)
             not_in_helpscout.append(service)
     
@@ -1247,7 +1247,7 @@ def service_doc_check(request):
         found = False
 	
         for service in services:
-	    if service.documentation and service.documentation.replace('http://', 'https://')  == url:
+	    if service.documentation and service.documentation  == url:
 	        found = True
 	
 	if not found:
