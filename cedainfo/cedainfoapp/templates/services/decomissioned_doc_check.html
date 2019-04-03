@@ -1,0 +1,34 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>Service documentation check</h1>
+<p>
+
+
+
+
+<h3>Decomissioned services where documents are still in current collection</h3>
+
+
+<table border>  
+<th>Service name<th>Visibility<th>Status<th>Documentation page
+{% for service in in_current %}
+
+<tr>
+<td><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}}</a>
+
+<td>{{service.visibility}}
+<td>{{service.status}}
+
+{% if service.url_ok %}
+<td><a href="{{service.documentation}}">{{service.documentation}}</a>
+{% else %}
+<td><a href="{{service.documentation}}"><span style="color:red;">{{service.documentation}}</span></a></font>
+{% endif %}
+
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}

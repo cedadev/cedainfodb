@@ -11,6 +11,8 @@ from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.core.context_processors import csrf
 
+import helpscoutdocs
+
 from udbadmin.SortHeaders import SortHeaders
 
 import re
@@ -1224,17 +1226,10 @@ def service_doc_check(request):
     not_in_helpscout = []
      
     services = NewService.objects.all()
-
-#    helpscout_urls = _download_helpscout_document_collection ('59b25ba1042863033a1caf8f')
     
-    collection = _get_helpscout_collection('59b25ba1042863033a1caf8f')
-#
-#  Make a list of helpscout article urls from this collection
-#    
-    helpscout_urls = []
+    collection = helpscoutdocs.get_collection('59b25ba1042863033a1caf8f')
 
-    for article in collection:
-        helpscout_urls.append(article.json()["article"]["publicUrl"])	   
+    helpscout_urls = helpscoutdocs.get_article_urls('59b25ba1042863033a1caf8f')
     
     for service in services:
         if service.documentation and service.documentation not in helpscout_urls:
@@ -1254,45 +1249,24 @@ def service_doc_check(request):
 	    not_in_cedainfodb.append(url)
 		       
     return render_to_response('services/doc_check.html', locals())
-    
 
-def _get_helpscout_collection (collection_id):
+@login_required()
+def decomissioned_service_doc_check(request):
 
-    """Returns the whole of the given collection as an array of json articles"""
+    in_current = []
+     
+    services = NewService.objects.filter(status='decomissioned')
 
-    HELPSCOUT_AUTH = ('47ff11d6d6207a05189271b8805a8b888533a49a', 'X')
+    helpscout_urls = helpscoutdocs.get_article_urls('59b25ba1042863033a1caf8f')
+               
+    for service in services:
+        if service.documentation and service.documentation in helpscout_urls:
+	    service.url_ok = _url_exists(service.documentation)
+            in_current.append(service)
 
-    collection = []
-    
-    #
-    # Get number of pages of the articles index
-    #
-    list_url = 'https://docsapi.helpscout.net/v1/collections/%s/articles' % collection_id
-    r = requests.get(list_url, auth=HELPSCOUT_AUTH)
-    pages =  r.json()["articles"]["pages"]
-    
-    #
-    # Now get each index page
-    #
-    for page in range(1, pages+1):
-	params = {"sort": "name", "page": page}
-	r = requests.get(list_url, auth=HELPSCOUT_AUTH, params=params)
+		       
+    return render_to_response('services/decomissioned_doc_check.html', locals())
 
-	items =  r.json()["articles"]["items"]
-    #
-    #   Fetch and process each article on this index page
-    #
-	for i in items:
-	
-	    try:
-		article_url = 'https://docsapi.helpscout.net/v1/articles/%s' % i["id"]
-		a = requests.get(article_url, auth=HELPSCOUT_AUTH)
-		
-		collection.append(a)
-		 
-	    except Exception as e: print(e)	    
-    
-    return collection
 
 
 def _url_exists(url):
