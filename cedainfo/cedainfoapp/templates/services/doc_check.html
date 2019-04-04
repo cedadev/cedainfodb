@@ -8,8 +8,10 @@
 
 
 
-<h3>Services where document link not found in Helpscout services collection</h3>
-
+<h3>Services where Helpscout document link not found in correct category</h3>
+All non-decommisioned services should have a link to a Helpscout document in the "Services documentation" category of the "Services - current" collection.
+The following is a list of services where the document link does not satisfy this requirement (either it is in a different collection, or it is in the correct collection but is not in the "Services documentation" category.
+<p>
 
 <table border>  
 <th>Service name<th>Visibility<th>Status<th>Documentation page
@@ -33,8 +35,9 @@
 
 
 <h3>Helpscout documents in services collection which are not linked to in cedainfodb</h3>
+The following Helpscout documents are in the "Services documentation" category of the "Services - current" collection, but are not linked to an active service record.
 
-
+<p>
 <table border>  
 
 {% for url in not_in_cedainfodb %}
@@ -43,6 +46,28 @@
 
 </table>
 
+
+<h3>Duplicate references to Helpscout documents</h3>
+The following services have the same documentation link:
+<p>
+
+<table border>  
+
+{% for d in duplicates %}
+<tr>
+
+<td>
+<ul>
+{% for s in d.services %}
+  <li><a href="/admin/cedainfoapp/newservice/{{s.id}}">{{s.name}}</a><p>
+{% endfor %}
+</ul>
+<td><a href="{{d.doc}}">{{d.doc}}</a>
+
+
+{% endfor %}
+
+</table>
 
 
 {% endblock %}

@@ -8,9 +8,12 @@ import re
 import time
 
 AUTH = ('47ff11d6d6207a05189271b8805a8b888533a49a', 'X')
+SERVICES_COLLECTION_ID = '59b25ba1042863033a1caf8f'
+SERVICES_DOCUMENTATION_CATEGORY_ID = '5ca5d2b82c7d3a154461c260'
 
 
-def get_collection (collection_id):
+
+def get_collection (collection_id=SERVICES_COLLECTION_ID):
 
     """Returns the whole of the given collection as an array of json articles"""
 
@@ -47,12 +50,12 @@ def get_collection (collection_id):
     return collection
 
 
-def get_article_urls (collection):
+def get_article_urls (collection_id=SERVICES_COLLECTION_ID):
 #
 #  Returns lists of urls of documents in given collection
 #
-
-    collection = get_collection('59b25ba1042863033a1caf8f')
+	
+    collection = get_collection(collection_id)
 #
 #   Make a list of helpscout article urls from this collection
 #    

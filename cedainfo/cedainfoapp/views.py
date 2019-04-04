@@ -1222,33 +1222,73 @@ def service_review_selection(request):
 
 @login_required()
 def service_doc_check(request):
+#
+#   Get duplicate docs links
+#
+    services = NewService.objects.all()
 
+    urls = []
+
+    for service in services:
+	if service.documentation:
+            urls.append(service.documentation)
+
+
+    duplicate_docs = _list_duplicates(urls)
+
+    duplicates = []
+
+
+    for d in duplicate_docs:
+	rec = {}
+	rec["doc"] = d
+	rec["services"] = []
+
+	res = NewService.objects.filter(documentation=d)
+
+	for r in res:
+            rec["services"].append(r)
+
+	duplicates.append(rec)
+#
+#   Get services where doc is not in correct collection and category
+#		
     not_in_helpscout = []
      
-    services = NewService.objects.all()
-    
-    collection = helpscoutdocs.get_collection('59b25ba1042863033a1caf8f')
+    services = NewService.objects.exclude(status='decomissioned')
+	
+    collection = helpscoutdocs.get_collection(helpscoutdocs.SERVICES_COLLECTION_ID)
 
-    helpscout_urls = helpscoutdocs.get_article_urls('59b25ba1042863033a1caf8f')
+    docs = helpscoutdocs.get_articles_in_category (collection,  helpscoutdocs.SERVICES_DOCUMENTATION_CATEGORY_ID)
     
+    helpscout_urls = []
+    
+    for doc in docs:
+	helpscout_urls.append(doc.json()["article"]["publicUrl"])
+	       
     for service in services:
-        if service.documentation and service.documentation not in helpscout_urls:
-	    service.url_ok = _url_exists(service.documentation)
-            not_in_helpscout.append(service)
-    
+	if service.documentation and service.documentation not in helpscout_urls:
+	   service.url_ok = _url_exists(service.documentation)
+	   not_in_helpscout.append(service)
+#
+#   Get docs which are not linked to an active service record
+#    
     not_in_cedainfodb = []
     
     for url in helpscout_urls:
-        found = False
-	
-        for service in services:
-	    if service.documentation and service.documentation  == url:
-	        found = True
-	
-	if not found:
-	    not_in_cedainfodb.append(url)
-		       
+	found = False
+       
+	for service in services:
+	   if service.documentation and service.documentation  == url:
+	       found = True
+       
+        if not found:
+	   not_in_cedainfodb.append(url)	  
+        	      
     return render_to_response('services/doc_check.html', locals())
+
+
+
 
 @login_required()
 def decomissioned_service_doc_check(request):
@@ -1257,7 +1297,7 @@ def decomissioned_service_doc_check(request):
      
     services = NewService.objects.filter(status='decomissioned')
 
-    helpscout_urls = helpscoutdocs.get_article_urls('59b25ba1042863033a1caf8f')
+    helpscout_urls = helpscoutdocs.get_article_urls(helpscoutdocs.SERVICES_COLLECTION_ID)
                
     for service in services:
         if service.documentation and service.documentation in helpscout_urls:
@@ -1273,3 +1313,12 @@ def _url_exists(url):
     r = requests.get(url)
     
     return r.status_code == 200
+
+def _list_duplicates(seq):
+#
+#  Returns duplicate values from array
+#
+    seen = set()
+    seen_add = seen.add
+    seen_twice = set( x for x in seq if x in seen or seen_add(x) )
+    return list( seen_twice )
