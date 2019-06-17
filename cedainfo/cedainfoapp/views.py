@@ -1325,8 +1325,8 @@ def vm_ping_check(request):
         if error:
             missing.append(vm)
       
-        if len(missing) > 2:
-            break
+#        if len(missing) > 2:
+#            break
             
                             
     return render_to_response('vm_ping_check.html', locals())
