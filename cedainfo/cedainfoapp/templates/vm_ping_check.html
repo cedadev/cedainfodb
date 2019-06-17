@@ -1,0 +1,25 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>VM ping check</h1>
+<p>
+
+
+The following VMs failed the ping check. That may mean that they no longer exist. VMs marked as 'retired' are not checked.
+
+
+<table border>  
+
+{% for vm in missing %}
+
+    <tr>
+    <td><a href="/admin/cedainfoapp/vm/{{vm.id}}">{{vm.name}}</a></td>
+    </tr>
+    
+{% endfor %}
+
+</table>
+
+
+{% endblock %}

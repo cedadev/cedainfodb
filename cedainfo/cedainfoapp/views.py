@@ -1308,6 +1308,30 @@ def decomissioned_service_doc_check(request):
     return render_to_response('services/decomissioned_doc_check.html', locals())
 
 
+@login_required()
+def vm_ping_check(request):
+    
+    vms = VM.objects.exclude(status='retired')
+
+    missing = []
+    
+    for vm in vms:
+        name = vm.name
+        name = name.replace('legacy:', '')
+        (output, error) = subprocess.Popen("ping -W1 -c 1 %s" % name,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE,
+                                   shell=True).communicate()		
+        if error:
+            missing.append(vm)
+      
+        if len(missing) > 2:
+            break
+            
+                            
+    return render_to_response('vm_ping_check.html', locals())
+
+
 
 def _url_exists(url):
     r = requests.get(url)
