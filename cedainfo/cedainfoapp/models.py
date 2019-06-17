@@ -1820,7 +1820,7 @@ class VMRequest(models.Model):
 
     def action_links(self):
         if self.request_status == 'ceda pending':
-            return u'<a href="/vmrequest/%i/approve">approve</a> <a href="/vmrequest/%i/reject">reject</a>' % (
+            return u'<a href="/vmrequest/%i/approve">approve</a>|<a href="/vmrequest/%i/reject">reject</a>' % (
             self.id, self.id)
         elif self.request_status == 'ceda approved':
             return u'<a href="/vmrequest/%i/convert">convert</a>' % self.id
@@ -1871,7 +1871,7 @@ class VMRequest(models.Model):
                     network_required=self.network_required,
                     os_required=self.os_required,
                     patch_responsible=self.patch_responsible,
-                    status='created',
+                    status='active',
                     end_of_life=self.end_of_life,
 		    other_info=self.other_info,
             )
@@ -1905,7 +1905,7 @@ class VMRequest(models.Model):
                 vm.network_required = self.network_required
                 vm.os_required = self.os_required
                 vm.patch_responsible = self.patch_responsible
-                vm.status = 'created'
+                vm.status = 'active'
                 vm.end_of_life = self.end_of_life
                 vm.root_users = self.root_users.all()
 		vm.other_info = self.other_info
@@ -1919,8 +1919,10 @@ class VMRequest(models.Model):
             if self.vm is None or self.vm == '':
                 raise Exception("Can't do update request : no VM associated")
             else:
-                self.vm.delete()
-                self.delete()
+                self.vm.status='retired'
+		self.vm.retired = datetime.now()
+		self.vm.forceSave()
+                self.save()
 
         else:
             raise Exception("Must set request status to update if updating an existing VM")

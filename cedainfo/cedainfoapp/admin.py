@@ -548,8 +548,8 @@ admin.site.register(VMRequest, VMRequestAdmin)
 
 class VMAdmin(admin.ModelAdmin):
     list_display = (
-    'coloured_vm_name', 'action_links', 'type', 'operation_type', 'internal_requester', 'patch_responsible',
-    'timestamp', 'status',)
+    'coloured_vm_name', 'type', 'operation_type', 'internal_requester', 'patch_responsible',
+    'timestamp', 'status', 'end_of_life')
     list_filter = ('type', 'operation_type', 'status', 'patch_responsible', MountpointFilter,)
     search_fields = ('name',)
 
