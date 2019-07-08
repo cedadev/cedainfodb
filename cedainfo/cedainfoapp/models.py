@@ -1921,6 +1921,8 @@ class VMRequest(models.Model):
             else:
                 self.vm.status='retired'
 		self.vm.retired = datetime.now()
+		self.request_status = 'completed'
+
 		self.vm.forceSave()
                 self.save()
 
