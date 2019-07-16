@@ -2077,6 +2077,7 @@ class VM(models.Model):
 
 	FNULL = open(os.devnull, 'w')
         status = subprocess.call (["ping", "-c 1", name], stdout=FNULL, stderr=FNULL)
+	FNULL.close()
 
 	if status == 0 :
 	    return True
