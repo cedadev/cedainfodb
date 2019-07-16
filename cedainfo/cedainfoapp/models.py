@@ -2075,14 +2075,13 @@ class VM(models.Model):
         name = self.name
         name = name.replace('legacy:', '')
 
-	(output, error) = subprocess.Popen("ping -W1 -c 1 %s" %  name,
-                        	   stdout=subprocess.PIPE,
-                        	   stderr=subprocess.PIPE,
-                        	   shell=True).communicate()		
-	if error:
-	    return False
-	else:
+	FNULL = open(os.devnull, 'w')
+        status = subprocess.call (["ping", "-c 1", name], stdout=FNULL, stderr=FNULL)
+
+	if status == 0 :
 	    return True
+	else:
+	    return False
 #
 
     def coloured_vm_name(self):
