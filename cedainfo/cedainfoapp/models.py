@@ -1975,6 +1975,7 @@ class VM(models.Model):
     end_of_life = models.DateField(default=datetime.now() + timedelta(days=3 * 365))  # 3 years from now
     retired = models.DateField(null=True, blank=True)
     timestamp = models.DateTimeField(auto_now=True, auto_now_add=False, help_text='time last modified')
+    ping_last_ok = models.DateField()
 
     # Set default ordering
     class Meta:
@@ -2048,6 +2049,41 @@ class VM(models.Model):
 
     action_links.allow_tags = True
     action_links.short_description = 'actions'
+
+    def dns_ok (self):
+        '''Returns True if dns entry found for vm'''
+        try:
+            address = socket.gethostbyname(self.name.replace('legacy:', ''))
+            return True
+        except:
+            return False
+
+
+    def ping_check(self):
+        '''Performs ping check on host. If successful records the time in the 'ping_last_ok' attribute and returns True'''
+	
+        if self.ping_ok():
+	    self.ping_last_ok = datetime.now() 
+            self.forceSave()
+	    return True
+        else:
+	    return False
+
+    def ping_ok (self):
+        '''Returns True if VM can be pinged'''
+
+        name = self.name
+        name = name.replace('legacy:', '')
+
+	(output, error) = subprocess.Popen("ping -W1 -c 1 %s" %  name,
+                        	   stdout=subprocess.PIPE,
+                        	   stderr=subprocess.PIPE,
+                        	   shell=True).communicate()		
+	if error:
+	    return False
+	else:
+	    return True
+#
 
     def coloured_vm_name(self):
         '''Colour the vm name if no dns entry found. Remove legacy prefix before checking'''
