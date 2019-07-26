@@ -2063,8 +2063,11 @@ class VM(models.Model):
         '''Performs ping check on host. If successful records the time in the 'ping_last_ok' attribute and returns True'''
 	
         if self.ping_ok():
-	    self.ping_last_ok = datetime.now() 
-            self.forceSave()
+#
+#         Save the update using a queryset so that the timestamp of the VM object is not updated as well
+#	
+	    VM.objects.filter(name = self.name).update(ping_last_ok=datetime.now())
+
 	    return True
         else:
 	    return False
