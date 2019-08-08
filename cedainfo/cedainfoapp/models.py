@@ -74,6 +74,17 @@ class ProblemsMixin(object):
 class FilseSetCreationError(Exception): pass
 
 
+class Tenancy(models.Model):
+    name = models.CharField(max_length=80)
+    summary = models.CharField(max_length=80)
+
+    def __unicode__(self):
+        return self.name
+	
+    class Meta:
+        ordering = ["name"]	
+ 
+
 class Rack(models.Model):
     '''Physical rack in which physical servers are installed'''
     name = models.CharField(max_length=126, help_text="Name of Rack")
@@ -1811,6 +1822,8 @@ class VMRequest(models.Model):
     end_of_life = models.DateField(default=datetime.now() + timedelta(days=3 * 365))  # approx 3 years from now
     timestamp = models.DateTimeField(auto_now=True, auto_now_add=False, help_text='time last modified')
 
+    tenancy = models.ForeignKey(Tenancy, on_delete=models.PROTECT, null=True, blank=True) 
+
     # Set default ordering
     class Meta:
         ordering = ['vm_name']
@@ -1874,6 +1887,7 @@ class VMRequest(models.Model):
                     status='active',
                     end_of_life=self.end_of_life,
 		    other_info=self.other_info,
+		    tenancy = self.tenancy,
             )
             # root_users is a ManyToManyField, so need to copy outside of create()
             vm.root_users = self.root_users.all()
@@ -1909,6 +1923,7 @@ class VMRequest(models.Model):
                 vm.end_of_life = self.end_of_life
                 vm.root_users = self.root_users.all()
 		vm.other_info = self.other_info
+		vm.tenancy = self.tenancy
                 vm.forceSave()
 
                 # update the request status
@@ -1975,7 +1990,9 @@ class VM(models.Model):
     end_of_life = models.DateField(default=datetime.now() + timedelta(days=3 * 365))  # 3 years from now
     retired = models.DateField(null=True, blank=True)
     timestamp = models.DateTimeField(auto_now=True, auto_now_add=False, help_text='time last modified')
-    ping_last_ok = models.DateField()
+    tenancy = models.ForeignKey(Tenancy, on_delete=models.PROTECT, null=True, blank=True) 
+
+    ping_last_ok = models.DateField(blank=True)
 
     # Set default ordering
     class Meta:
@@ -2017,6 +2034,7 @@ class VM(models.Model):
                 request_status='ceda pending',
                 request_type='update',
                 end_of_life=self.end_of_life,
+		tenancy = self.tenancy,
                 vm=self,
         )
         req.root_users = self.root_users.all()
@@ -2096,9 +2114,20 @@ class VM(models.Model):
         except:
             return ('<span style="color:red;">%s</span>' % self.name)
 
+
+    def service_count(self):
+        production_count = len(NewService.objects.filter(host_id=self.id, status='production'))
+        decomissioned_count = len(NewService.objects.filter(host_id=self.id, status='decomissioned'))
+
+	return '<a href="/admin/cedainfoapp/newservice/?Host=%s">%s (%s)</a>' % (self.id, production_count, decomissioned_count)
+
+    service_count.allow_tags = True
+##    service_count.admin_order_field='service_count'
+   
     coloured_vm_name.short_description = 'VM name'
     coloured_vm_name.allow_tags = True
 
+    
 
 class ServiceKeyword(models.Model):
     keyword = models.CharField(max_length=30)

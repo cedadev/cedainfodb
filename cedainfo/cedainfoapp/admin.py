@@ -495,6 +495,11 @@ class FileSetAdmin(admin.ModelAdmin):
 #    pass
 # admin.site.register(SpatioTemp, SpatioTempAdmin)
 
+class TenancyAdmin(admin.ModelAdmin):
+    list_display = ('name', 'summary')
+    
+admin.site.register(Tenancy, TenancyAdmin)
+
 
 class GWSRequestAdmin(admin.ModelAdmin):
     list_display = (
