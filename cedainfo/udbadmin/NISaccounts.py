@@ -100,5 +100,5 @@ def isIntNISUser (user):
         return False     
 
 
-EXT_PASSWD = getExtPasswdFile()
-INT_PASSWD = getIntPasswdFile()
+#EXT_PASSWD = getExtPasswdFile()
+#INT_PASSWD = getIntPasswdFile()

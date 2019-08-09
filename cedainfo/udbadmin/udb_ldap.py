@@ -19,13 +19,13 @@ EXCLUDE_USERS = []
 #
 # The following users should be a member of all archive access groups
 #
-ARCHIVE_ACCESS_STANDARD_USERS = ["badc", "prototype", "cwps", "archread"]
+ARCHIVE_ACCESS_STANDARD_USERS = ["badc", "prototype", "cwps", "archread", "archive"]
 
 
 ARCHIVE_ACCESS_GROUPS = {"cmip5_research": {"gid": 26059, "datasets" : ["cmip5_research", "cmip3", "cmip3_ukmo"]},
                          "esacat1":        {"gid": 26017, "datasets" : ["aatsr_multimission", "atsrubt", "mipas", "sciamachy"]},                         
                          "ecmwf":          {"gid": 26018, "datasets" : ["era", "ecmwfop", "ecmwftrj", "era4t", "ecmwfera"]},
-                         "ukmo" :          {"gid": 26019, "datasets" : ["surface"]},
+#                         "ukmo" :          {"gid": 26019, "datasets" : ["surface"]},
                          "eurosat":        {"gid": 26021, "datasets" : ["metop_iasi", "avhrr-3", "gome-2"]},
                          
                          "ukmo_wx":        {"gid": 26078, "datasets" : ["africa_lam",
@@ -435,6 +435,13 @@ def ldap_open_group_record():
        record = record + 'memberUid: ' + account + '\n'
 
     record = record + 'memberUid: bodc\n'
+#    record = record + 'memberUid: train001\n'
+#
+#   Temporary modification only - add training accounts to open group
+#
+    for x in range (1,51):
+        record = record + 'memberUid: train%03d\n' % x
+    
 
     return record   
 
