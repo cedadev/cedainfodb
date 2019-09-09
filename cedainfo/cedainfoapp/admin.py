@@ -535,7 +535,7 @@ class VMRequestAdmin(admin.ModelAdmin):
     list_display = (
     'coloured_vm_name', 'action_links', 'type', 'operation_type', 'internal_requester', 'patch_responsible',
     'date_required', 'timestamp', 'request_type', 'request_status', 'vm_link',)
-    list_filter = ('type', 'operation_type', 'request_status', 'patch_responsible', MountpointFilter,)
+    list_filter = ('type', 'operation_type', 'request_status', 'patch_responsible', MountpointFilter)
     search_fields = ('vm_name',)
 
     # readonly_fields = ('request_status',)
@@ -554,8 +554,8 @@ admin.site.register(VMRequest, VMRequestAdmin)
 class VMAdmin(admin.ModelAdmin):
     list_display = (
     'coloured_vm_name', 'type', 'operation_type', 'internal_requester', 'patch_responsible',
-    'timestamp', 'status', 'end_of_life', 'ping_last_ok')
-    list_filter = ('type', 'operation_type', 'status', 'patch_responsible', MountpointFilter,)
+    'timestamp', 'status', 'end_of_life', 'os_required', 'ping_last_ok')
+    list_filter = ('type', 'operation_type', 'status', 'patch_responsible', MountpointFilter, 'os_required')
     search_fields = ('name',)
 
     def has_add_permission(self, request):
