@@ -218,6 +218,7 @@ class SystemManagerFilter(SimpleListFilter):
         else:
             return queryset
 
+
 class VMStatusFilter(SimpleListFilter):
     title = 'VM status'
     parameter_name = 'vmstatus'
@@ -290,7 +291,15 @@ class NewServiceAdmin(admin.ModelAdmin):
     vm_name.admin_order_field = "host__name"
     
     
-    list_display = ('name', docs, vm_name, 'review_status', 'last_reviewed', 'visibility', 'status', 'summary', 'service_manager', 'owner')
+    def vm_os (self):
+
+	return self.host.os_required
+        
+	        
+    vm_os.admin_order_field = "host__os_required"
+    vm_os. short_description = "OS"
+    
+    list_display = ('name', docs, vm_name, vm_os, 'review_status', 'last_reviewed', 'visibility', 'status', 'summary', 'service_manager', 'owner')
 
     list_filter = ('visibility', 'status', 'review_status', 'keywords', ManagerFilter, OwnerFilter, ServiceHostFilter, SystemManagerFilter, VMStatusFilter)
     search_fields = ('description', 'name', 'host__name')
@@ -552,11 +561,20 @@ admin.site.register(VMRequest, VMRequestAdmin)
 
 
 class VMAdmin(admin.ModelAdmin):
+
+    def os (self):
+        return self.os_required
+    os. short_description = "OS"
+    os.admin_order_field = "os_required"
+
+    
+    
     list_display = (
     'coloured_vm_name', 'type', 'operation_type', 'internal_requester', 'patch_responsible',
-    'timestamp', 'status', 'end_of_life', 'os_required', 'ping_last_ok')
+    'timestamp', 'status', 'end_of_life',  os, 'ping_last_ok')
     list_filter = ('type', 'operation_type', 'status', 'patch_responsible', MountpointFilter, 'os_required')
     search_fields = ('name',)
+    
 
     def has_add_permission(self, request):
         return False
