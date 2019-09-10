@@ -209,6 +209,7 @@ class User (models.Model):
               ("Dr","Dr"),
               ("Miss","Miss"),
               ("Ms","Ms"),
+	      ("Mx", "Mx"),
               ("Prof","Prof")
           )
         ) 
