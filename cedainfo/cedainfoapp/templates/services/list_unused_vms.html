@@ -31,7 +31,6 @@ Number of vms: {{vms|length}}
    </th>
 {% endfor %}
 
-
 <th>Icinga</th>
 
 {% for vm in vms %}
@@ -50,8 +49,9 @@ Number of vms: {{vms|length}}
 {{ vm.created|date:'d/m/Y' }}
 </td>
 
-<td>
-{{vm.internal_requester}}
+<td>{{vm.internal_requester}}</td>
+
+<td>{{vm.ping_last_ok}}</td>
 <td>
 <a href="https://icinga2-master.esc.rl.ac.uk/icingaweb2/monitoring/host/show?host={{vm.name}}">Icinga</a>
 </td>
