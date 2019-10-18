@@ -160,7 +160,7 @@ or on:
    </thead>
 
    <tbody>
-     {% for dataset in datasets %}<tr class="{% cycle odd,even %}">
+     {% for dataset in datasets %}<tr class="{% cycle "row1" "row2" %}">
        <td><a href="/udbadmin/udj/{{dataset.id}}">Edit</a></td>
        <td><a href="{{ dataset.datasetid.get_absolute_url|escape }}" 
        title="{{authstring|lookup:dataset.datasetid}}
@@ -211,7 +211,7 @@ Click to view dataset details
    </thead>
 
    <tbody>
-     {% for dataset in removed_datasets %}<tr class="{% cycle odd,even %}">
+     {% for dataset in removed_datasets %}<tr class="{% cycle "row1" "row2" %}">
        <td><a href="/udbadmin/udj/{{dataset.id}}">Edit</a></td>
        
        <td><a href="{{ dataset.datasetid.get_absolute_url|escape }}" 
@@ -259,7 +259,7 @@ Click to view dataset details
    </thead>
 
    <tbody>
-     {% for request in request_history %}<tr class="{% cycle odd,even %}">
+     {% for request in request_history %}<tr class="{% cycle "row1" "row2" %}">
        <td><a href="/udbadmin/request/{{ request.id|escape }}" title="Click to view or edit request details">{{ request.id }}</a></td>
 
        <td><a href="{{ request.datasetid.get_absolute_url|escape }}" 

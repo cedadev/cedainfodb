@@ -24,7 +24,7 @@ class MultiSelectFormField(forms.MultipleChoiceField):
 
  
 class MultiSelectField(models.Field):
-    __metaclass__ = models.SubfieldBase
+##    __metaclass__ = models.SubfieldBase
  
     def get_internal_type(self):
         return "CharField"

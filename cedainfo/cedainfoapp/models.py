@@ -99,7 +99,7 @@ class Rack(models.Model):
 class Host(models.Model):
     '''An identifiable machine having a distinct IP address'''
     hostname = models.CharField(max_length=512, help_text="Full hostname e.g. machine.badc.rl.ac.uk")
-    ip_addr = models.IPAddressField(blank=True,
+    ip_addr = models.GenericIPAddressField(blank=True, null=True,
                                     help_text="IP Address")  # TODO check if admin allows no ip_addr field (otherwise default='0.0.0.0')
     serial_no = models.CharField(max_length=126, blank=True, help_text="Serial no (if physical machine)")
     po_no = models.CharField(max_length=126, blank=True, help_text="Purchase order no (if physical machine)")
@@ -987,7 +987,7 @@ class Service(models.Model):
     name = models.CharField(max_length=512, help_text="Name of service")
     active = models.BooleanField(default=False, help_text="Is this service active or has it been decomissioned?")
     description = models.TextField(blank=True, help_text="Longer description if needed")
-    documentation = models.URLField(verify_exists=False, blank=True,
+    documentation = models.URLField(blank=True,
                                     help_text="URL to documentation for service in opman")
     externally_visible = models.BooleanField(default=False,
                                              help_text="Whether or not this service is visible outside the RAL firewall")
@@ -1454,7 +1454,7 @@ class GWSRequest(models.Model):
     et_quota = FileSizeField(help_text="Elastic Tape quota. In bytes, but can be entered using suffix e.g. '200TB'",
                              default='0')
     backup_requirement = models.CharField(max_length=127, choices=settings.GWS_BACKUP_CHOICES, default='no backup')
-    related_url = models.URLField(verify_exists=False, blank=True,
+    related_url = models.URLField(blank=True,
                                   help_text='Link to further info relevant to this GWS')
     expiry_date = models.DateField(default=datetime.now() + timedelta(days=2 * 365),
                                    help_text="date after which GWS will be deleted")  # approx 2 years from now
@@ -1572,7 +1572,8 @@ class GWSRequest(models.Model):
     action_links.short_description = 'actions'
 
     def gws_link(self):
-        return u'<a href="/admin/cedainfoapp/gws/%i">%s%s</a>' % (self.gws.id, self.gws.path, self.gws.name)
+        if self.gws_id is not None:
+            return u'<a href="/admin/cedainfoapp/gws/%i">%s%s</a>' % (self.gws.id, self.gws.path, self.gws.name)
 
     gws_link.allow_tags = True
     gws_link.short_description = 'GWS'
@@ -1620,7 +1621,7 @@ class GWS(models.Model):
     description = models.TextField(null=True, blank=True, help_text='Text description of GWS')
     requested_volume = FileSizeField(help_text="In bytes, but can be entered using suffix e.g. '200TB'", default='0')
     backup_requirement = models.CharField(max_length=127, choices=settings.GWS_BACKUP_CHOICES, default='no backup')
-    related_url = models.URLField(verify_exists=False, blank=True,
+    related_url = models.URLField(blank=True,
                                   help_text='Link to further info relevant to this GWS')
     expiry_date = models.DateField(help_text='Date after which GWS will be deleted')
     timestamp = models.DateTimeField(auto_now=True, auto_now_add=False, help_text='time last modified')
@@ -1703,7 +1704,8 @@ class GWS(models.Model):
             return 0
 
     def used_volume_filesize(self):
-        return filesize(self.last_size().size)
+        if self.last_size() is not None:
+            return filesize(self.last_size().size)
         # return filesize(self.used_volume)
 
     used_volume_filesize.short_description = 'used'
@@ -1945,7 +1947,8 @@ class VMRequest(models.Model):
             raise Exception("Must set request status to update if updating an existing VM")
 
     def vm_link(self):
-        return u'<a href="/admin/cedainfoapp/vm/%i">%s</a>' % (self.vm.id, self.vm.name)
+        if self.vm is not None:
+            return u'<a href="/admin/cedainfoapp/vm/%i">%s</a>' % (self.vm.id, self.vm.name)
 
     vm_link.allow_tags = True
     vm_link.short_description = 'VM'
@@ -2157,7 +2160,7 @@ class NewService(models.Model):
     )
 
     description = models.TextField(blank=True, help_text="Longer description if needed")
-    documentation = models.URLField(verify_exists=False, blank=True,
+    documentation = models.URLField(blank=True,
                                     help_text="URL to documentation for service in opman")
     ##    externally_visible = models.BooleanField(default=False, help_text="Whether or not this service is visible outside the RAL firewall")
 

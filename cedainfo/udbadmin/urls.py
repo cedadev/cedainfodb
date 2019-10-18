@@ -1,25 +1,16 @@
-from django.conf.urls.defaults import patterns, include, url
+from django.conf.urls import include, url
 
 from views import *
 from authorise import *
 from jasmin import *
 from udb_ldap_views import *
-from django.views.generic import list_detail
-from django.views.generic.simple import direct_to_template
+from django.views.generic import TemplateView
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
 
-urlpatterns = patterns('',
-    # Examples:
-
-    # url(r'^userdbadmin/', include('userdbadmin.foo.urls')),
-    # Uncomment the admin/doc line below to enable admin documentation:
-#    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-    # Uncomment the next line to enable the admin:
-#     url(r'^admin/', include(admin.site.urls)),
-
+urlpatterns = [
     url(r'^$', home), 
     url(r'^user/accountid/(?P<accountid>.+)/$', user_edit_by_accountid),    
     url(r'^user/datasets/current/(?P<userkey>-?\d{1,6})/$', list_current_user_datasets),   
@@ -97,8 +88,6 @@ urlpatterns = patterns('',
     url(r'^authorise/(?P<userkey>-?\d{1,6})/$', authorise_datasets),
     url(r'^udj/(?P<id>\d{1,6})/$', edit_user_dataset_join),
     url(r'^request/(?P<id>\d{1,6})/$', edit_dataset_request),
+    url(r'^ldap/accessdenied/$',  TemplateView.as_view(template_name='accessdenied.html')),
 
-    url(r'^ldap/accessdenied/$', direct_to_template, {'template':'accessdenied.html'}),
-
-#     url(r'^pending/$', list_pending_datasets),
-)
+]

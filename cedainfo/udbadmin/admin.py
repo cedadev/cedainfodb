@@ -176,8 +176,11 @@ class UserAdmin(admin.ModelAdmin):
     showDatasets.short_description = 'Datasets'
     	 
     def startdate (self):
-       return self.startdate.strftime('%d-%b-%Y')
-
+       try:
+           return self.startdate.strftime('%d-%b-%Y')
+       except:
+           return ''	   
+ 
     startdate.admin_order_field = 'startdate' 
            	     	 
     list_display = ('userkey', 'title', 'othernames', 'surname', 'accountid', 'emailaddress', startdate, 'field', 'datasetCount')
@@ -214,7 +217,10 @@ class DatasetrequestAdmin(admin.ModelAdmin):
        return False
 
    def requestdate (self):
-       return self.requestdate.strftime('%d-%b-%Y')
+       try:
+           return self.requestdate.strftime('%d-%b-%Y')
+       except:
+           return ''	   
        	 
    requestdate.admin_order_field = 'requestdate' 
       

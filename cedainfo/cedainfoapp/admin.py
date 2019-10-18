@@ -342,7 +342,7 @@ class PartitionAdminForm(forms.ModelForm):
 
     class Meta:
         model = Partition
-
+        exclude = ('',)
 
 class PartitionAdmin(admin.ModelAdmin):
     form = PartitionAdminForm
@@ -371,133 +371,6 @@ def update_df(self, request, queryset):
 
 update_df.short_description = "Do a df on selected partitions"
 ##admin.site.register(Partition, PartitionAdmin)
-
-
-class AuditAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'fileset_link',
-                    'auditstate', 'starttime', 'total_files', 'corrupted_files', 'new_files',
-                    'deleted_files', 'modified_files', 'unchanges_files')
-    actions = ['remove']
-    search_fields = ['fileset__logical_path']
-    list_filter = ('auditstate',)
-    readonly_fields = ('fileset', 'auditstate', 'total_files', 'total_volume', 'corrupted_files', 'new_files',
-                       'deleted_files', 'modified_files', 'unchanges_files', 'starttime', 'endtime', 'logfile')
-
-    def has_add_permission(self, request):
-        return False
-
-    def remove(self, request, queryset):
-        queryset.delete()
-
-    remove.short_description = "Delete audits"
-
-
-##admin.site.register(Audit, AuditAdmin)
-
-
-class FileSetAdminForm(forms.ModelForm):
-    #    overall_final_size = ByteSizeField()
-    overall_final_size = forms.CharField(widget=forms.TextInput(attrs={'size': '25'}))
-    #
-    #      This is a copy of the help text in the models.py file. Must be a better way of doing this...
-    #
-    overall_final_size.help_text = "The allocation given to a fileset is an estimate of the final size on disk. If the dataset is going to grow indefinitely then estimate the size for 4 years ahead. Filesets can't be bigger than a single partition, but in order to aid disk managment they should not exceed 20% of the size of a partition."
-
-    def clean_logical_path(self):
-        """Make sure logical path does not have a '/' at the end as this causes problems later"""
-        data = self.cleaned_data['logical_path']
-        data = data.strip()
-        data = data.rstrip('/')
-        return data
-
-    class Meta:
-        model = FileSet
-
-
-class FileSetAdmin(admin.ModelAdmin):
-    form = FileSetAdminForm
-
-    def niceOverallFinalSize(self):
-        return prettySize(self.overall_final_size)
-
-    def partition_link(self, obj):
-        return '<a href="{}">{}</a>'.format(
-            reverse("admin:cedainfoapp_partition_change", args=(obj.partition.id,)),
-            obj.partition
-        )
-    partition_link.short_description = 'partition'
-    partition_link.allow_tags = True
-
-    niceOverallFinalSize.admin_order_field = 'overall_final_size'
-    niceOverallFinalSize.short_description = 'Overall final size'
-
-    list_display = ('logical_path', niceOverallFinalSize,
-                    'partition_link',
-                    'sd_backup',
-                    'links',)
-    list_filter = ('partition', 'sd_backup')
-    list_editable = ['sd_backup']
-
-    ordering = ('-id',)
-    readonly_fields = ('logical_path', 'partition',
-                       'migrate_to',
-                       'storage_pot', 'complete', 'complete_date', niceOverallFinalSize)
-
-    fields = (
-        'logical_path',
-        'overall_final_size',
-        niceOverallFinalSize,
-        'notes',
-        'partition',
-        'storage_pot',
-        'migrate_to',
-        'secondary_partition',
-        'sd_backup',
-        'primary_on_tape',
-        'complete',
-        'complete_date',
-    )
-
-    # TODO : add size history graph
-    formfield_overrides = {ByteSizeField: {'widget': BigIntegerInput}}
-    search_fields = ['logical_path', 'notes']
-    actions = ['bulk_du', ]
-
-    def bulk_du(self, request, queryset):
-        for fs in queryset.all():
-            fs.du()
-
-    bulk_du.short_description = "Measure size of selected FileSet(s)"
-
-    # extra context for admin view TODO!!!!
-    def change_view(self, request, object_id, extra_context=None):
-        fssms = FileSetSizeMeasurement.objects.filter(fileset=object_id).order_by('date')
-        # .objects.filter(fileset=self).order_by('date')
-        # fssms = fssms.get()
-        #	for in
-        # size_values = fssms.values_list('size', flat=True)
-        # date_values = fssms.values_list('date', flat=True)
-
-        my_context = {'xx': 'MyContect', 'fssms': fssms}
-        return super(FileSetAdmin, self).change_view(request, object_id, extra_context=my_context)
-
-    def has_add_permission(self, request, obj=None):
-        return False
-
-
-##admin.site.register(FileSet, FileSetAdmin)
-
-
-# class FileSetSizeMeasurementAdmin(admin.ModelAdmin):
-#    formfield_overrides = { ByteSizeField: {'widget': BigIntegerInput} }
-#    list_display = ('fileset','date', 'size')
-#    list_filter = ('fileset',)
-# admin.site.register(FileSetSizeMeasurement,FileSetSizeMeasurementAdmin)
-
-# admin.site.register(NodeList)
-# admin.site.register(HostList)
-# admin.site.register(RackList)
-
 
 
 # class SpatioTempAdmin(admin.OSMGeoAdmin):

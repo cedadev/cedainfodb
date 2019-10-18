@@ -6,7 +6,7 @@ import choices
 import LDAP
 
 class JasminUsersForm(forms.Form):
-    show_ceda_users  = BooleanField(required=False)
+    show_ceda_users  =  BooleanField(required=False)
     show_jasmin_users = BooleanField(required=False)
     show_jasmin2_users  = BooleanField(required=False)
     
@@ -28,12 +28,12 @@ class DatasetRequestForm(forms.Form):
 
 class DatasetForm(ModelForm):
     # customise the form a bit
-    comments = CharField(required=False, widget=forms.Textarea(attrs={'rows':'4', 'cols': '50'}))
-    defaultreglength = CharField(initial=36, required=False, label='Default Registration length (months)', max_length=4, widget=forms.TextInput(attrs={'size': '4'}))
-    conditions = CharField(required=False, widget=forms.TextInput(attrs={'size': '80'}))
-    description = CharField(required=False, widget=forms.TextInput(attrs={'size': '80'}))  
-    directory = CharField(required=False, widget=forms.TextInput(attrs={'size': '80'}))  
-    infourl = CharField(required=False, widget=forms.TextInput(attrs={'size': '80'}))  
+    comments = CharField(required=False, widget=Textarea(attrs={'rows':'4', 'cols': '50'}))
+    defaultreglength = CharField(initial=36, required=False, label='Default Registration length (months)', max_length=4, widget=TextInput(attrs={'size': '4'}))
+    conditions = CharField(required=False, widget=TextInput(attrs={'size': '80'}))
+    description = CharField(required=False, widget=TextInput(attrs={'size': '80'}))  
+    directory = CharField(required=False, widget=TextInput(attrs={'size': '80'}))  
+    infourl = CharField(required=False, widget=TextInput(attrs={'size': '80'}))  
     
     label = 'Associated Linux Group ID (0 if not used) <a target="_blank" href="/udbadmin/ldap/freegids">Find free gid</a>'
     gid = IntegerField(initial=0, required=False, label=mark_safe(label), max_value=90000, min_value=0)
@@ -48,25 +48,26 @@ class DatasetForm(ModelForm):
 
     class Meta:
         model = Dataset
-#	fields = ('datasetid', 'authtype', 'grp', 'description', 'directory', 'conditions', 'defaultreglength', 'datacentre', 'infourl', 'comments')
+	fields = ('datasetid', 'authtype', 'grp', 'description', 'directory', 'conditions', 'defaultreglength', 'datacentre', 'infourl', 'comments')
 
 class PrivilegeForm(ModelForm):
 
-    comment = CharField(required=False, widget=forms.Textarea(attrs={'rows':'4', 'cols': '50'}))
+    comment = CharField(required=False, widget=Textarea(attrs={'rows':'4', 'cols': '50'}))
 
     class Meta:
        model = Privilege
+       exclude=('',)
 
 
 class UserForm(ModelForm):
 
-    surname      = CharField(required=False, widget=forms.TextInput(attrs={'size': '60'}))  
-    othernames   = CharField(required=False, widget=forms.TextInput(attrs={'size': '60'}))  
-    emailaddress = CharField(required=False, widget=forms.TextInput(attrs={'size': '60'}))  
-    telephoneno = CharField(required=False, widget=forms.TextInput(attrs={'size': '60'}))  
-    openid = CharField(required=False, widget=forms.TextInput(attrs={'size': '60'}))  
+    surname      = CharField(required=False, widget=TextInput(attrs={'size': '60'}))  
+    othernames   = CharField(required=False, widget=TextInput(attrs={'size': '60'}))  
+    emailaddress = CharField(required=False, widget=TextInput(attrs={'size': '60'}))  
+    telephoneno = CharField(required=False, widget=TextInput(attrs={'size': '60'}))  
+    openid = CharField(required=False, widget=TextInput(attrs={'size': '60'}))  
     
-    public_key = CharField(required=False, widget=forms.Textarea(attrs={'rows':'5', 'cols': '100'}))
+    public_key = CharField(required=False, widget=Textarea(attrs={'rows':'5', 'cols': '100'}))
     label = 'Associated Linux user ID (0 if not used) <a target="_blank" href="/udbadmin/ldap/freeuids">Find free uid</a>'
     uid = IntegerField(initial=0, required=False, label=mark_safe(label), max_value=7059999, min_value=0)
     gid = IntegerField(initial=0, required=False, label='Primary group id (0= use default)', max_value=90000, min_value=0)
@@ -97,3 +98,4 @@ class UserForm(ModelForm):
 
     class Meta:
        model = User
+       exclude=('',)

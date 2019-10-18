@@ -2,14 +2,14 @@
 
 from django.db.models import Q
 from django.http import HttpResponse
-from cedainfo.cedainfoapp.models import *
-from cedainfo.cedainfoapp.forms import *
+from cedainfoapp.models import *
+from cedainfoapp.forms import *
 from django.shortcuts import redirect, render_to_response, get_object_or_404
-from django.views.generic import list_detail
+from django.views.generic.list import ListView
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 
 import helpscoutdocs
 
@@ -25,26 +25,16 @@ import random
 logging = settings.LOG
 
 
-# use generic view list_detail.object_list for Hosts (see urls.py)
 
-# host_list view: optionally includes subsetting (e.g. in_pool or not yet retired)
-@login_required()
-def host_list(request, subset=None):
-    o = request.GET.get('o', 'id')  # default order is ascending id
-    # define the queryset, using the subset if available
-    if (subset == 'active'):
-        qs = Host.objects.filter(retired_on=None).order_by(o)
-    else:
-        qs = Host.objects.all().order_by(o)
-    # Use the object_list view.
-    return list_detail.object_list(
-            request,
-            queryset=qs,
-            template_name="cedainfoapp/host_list.html",
-            template_object_name="host",
-    )
-
-
+class HostList(ListView):
+    model = Host
+    
+    def get_ordering(self):
+            ordering = self.request.GET.get('o', '-hostname')
+            # validate ordering here
+            return ordering    
+	    
+	    
 # host_detail view: includes details of host, plus services and history entries for that host
 @login_required()
 def host_detail(request, host_id):
