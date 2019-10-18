@@ -37,6 +37,6 @@ SECRET_KEY = ')p*zn!&dkeiji48jkdjkkljd880rutxe%av0_oa*4kc(57_rkda8!c&o7w$#^'
 LDAP_URL          = 'ldap://homer.esc.rl.ac.uk'
 
 LDAP_WRITE_URL    = "ldap://homer.esc.rl.ac.uk"
-LDAP_WRITE_PASSWD = 'TUbr7kUj'
+LDAP_WRITE_PASSWD = 'xxx' 
 LDAP_WRITE_DN     =  "cn=cedaadmin,ou=software,ou=People,o=hpc,dc=rl,dc=ac,dc=uk"
 
