@@ -398,7 +398,7 @@ def primary_on_tape(request):
     filesets = FileSet.objects.filter(sd_backup=True, storage_pot__isnull=False,
                                       primary_on_tape=True).exclude(storage_pot='')
     return render_to_response('cedainfoapp/primary_on_tape.txt', {'filesets': filesets, 'user': request.user},
-                              mimetype="text/plain")
+                              content_type="text/plain")
 
 
 # needs to be public to interact with scripts.
@@ -408,10 +408,10 @@ def storaged_spotlist(request):
     filesets = FileSet.objects.filter(sd_backup=True, storage_pot__isnull=False).exclude(storage_pot='')
     if withpath != None:
         return render_to_response('cedainfoapp/storage-d_spotlist_withpath.html',
-                                  {'filesets': filesets, 'user': request.user}, mimetype="text/plain")
+                                  {'filesets': filesets, 'user': request.user}, content_type="text/plain")
     else:
         return render_to_response('cedainfoapp/storage-d_spotlist.html', {'filesets': filesets, 'user': request.user},
-                                  mimetype="text/plain")
+                                  content_type="text/plain")
 
 
 #
@@ -440,7 +440,7 @@ def detailed_spotlist(request):
         else:
             fs.latest_suze = 0
     return render_to_response('cedainfoapp/detailed_spotlist.html', {'filesets': filesets, 'user': request.user},
-                              mimetype="text/plain")
+                              content_type="text/plain")
 
 
 # make list of rsync commands for makeing a secondary copies
@@ -449,7 +449,7 @@ def detailed_spotlist(request):
 def make_secondary_copies(request):
     filesets = FileSet.objects.filter(secondary_partition__isnull=False).exclude(storage_pot='')
     return render_to_response('cedainfoapp/make_secondary_copies.txt', {'filesets': filesets, 'user': request.user},
-                              mimetype="text/plain")
+                              content_type="text/plain")
 
 
 # make list of download stats configuration
@@ -458,7 +458,7 @@ def make_secondary_copies(request):
 def download_conf(request):
     filesets = FileSet.objects.all().exclude(storage_pot='')
     return render_to_response('cedainfoapp/download_conf.txt', {'filesets': filesets, 'user': request.user},
-                              mimetype="text/plain")
+                              content_type="text/plain")
 
 
 # make list filesets for depositserver
@@ -467,7 +467,7 @@ def download_conf(request):
 def complete_filesets(request):
     filesets = FileSet.objects.all()
     return render_to_response('cedainfoapp/complete.txt', {'filesets': filesets, 'user': request.user},
-                              mimetype="text/plain")
+                              content_type="text/plain")
 
 
 # make list filesets for access stats
@@ -476,7 +476,7 @@ def complete_filesets(request):
 def spotlist(request):
     filesets = FileSet.objects.all()
     return render_to_response('cedainfoapp/spotlist.txt', {'filesets': filesets, 'user': request.user},
-                              mimetype="text/plain")
+                              content_type="text/plain")
 
 
 # make a fileset from simple web request.
@@ -495,10 +495,10 @@ def make_fileset(request):
     # check parameters ok
     if path is None:
         return render_to_response(template, {'path': path, 'size': size_in, 'fileset_created': False,
-                                             'message': 'no path specified'}, mimetype=mimetype)
+                                             'message': 'no path specified'}, content_type=mimetype)
     if not size_in:
         return render_to_response(template, {'path': path, 'size': size_in, 'fileset_created': False,
-                                             'message': 'no size specified'}, mimetype=mimetype)
+                                             'message': 'no size specified'}, content_type=mimetype)
 
     # make sure filesets have no spaces or slashes at the end
     path = path.strip()
@@ -522,10 +522,10 @@ def make_fileset(request):
     except FilseSetCreationError:
         error_msg = 'Fileset creation error: %s' % sys.exc_info()[1]
         return render_to_response(template, {'path': path, 'size': size_in, 'fileset_created': False,
-                                             'message': error_msg}, mimetype=mimetype)
+                                             'message': error_msg}, content_type=mimetype)
 
     return render_to_response(template, {'path': '', 'size': '', 'fileset_created': True,
-                                         'message': 'Fileset created.', 'fs': new_fs}, mimetype=mimetype)
+                                         'message': 'Fileset created.', 'fs': new_fs}, content_type=mimetype)
 
 
 def split_fileset(request):
@@ -832,7 +832,7 @@ def gwsdf(request, id):
 # needs to be public to interact with scripts.
 def gws_list_etexport(request):
     gwss = GWS.objects.filter(status="active")
-    return render_to_response('cedainfoapp/gws_list_etexport.html', {'items': gwss}, mimetype="text/plain")
+    return render_to_response('cedainfoapp/gws_list_etexport.html', {'items': gwss}, content_type="text/plain")
 
 
 #
