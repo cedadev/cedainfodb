@@ -20,7 +20,7 @@ from django.contrib.auth.views import login, logout_then_login
 from cedainfoapp.urls import urlpatterns as cedainfoapp_urlpatterns
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^accounts/login/$', login),
+    url(r'^accounts/login/$', login, name='login'),
     url(r'^accounts/logout/$', logout_then_login),
     url(r'^udbadmin/', include('udbadmin.urls')),
 #    url(r'^cedainfoapp/', include('cedainfoapp.urls')),    

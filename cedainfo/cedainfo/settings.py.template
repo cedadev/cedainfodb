@@ -25,7 +25,7 @@ SECRET_KEY = 'd^g(yt46tlqs@yo8tkmb6oj^z!5g#!00bhg&2#pgxe*ag6la6k'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['archman1-test.ceda.ac.uk', '127.0.0.1']
+ALLOWED_HOSTS = ['cedadb.ceda.ac.uk', 'archman1-test.ceda.ac.uk', '127.0.0.1', '130.246.129.107']
 
 DATETIME_FORMAT = "d-M-Y H:i"
 SITE_ID = 1
@@ -59,7 +59,7 @@ ROOT_URLCONF = 'cedainfo.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['/usr/local/cedainfodb/releases/current/cedainfo/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -307,10 +307,6 @@ LDAP_URL       = 'ldap://homer.esc.rl.ac.uk'
 #
 # Details for writable LDAP server
 #
-##LDAP_WRITE_URL    = 'ldap://ldap03.esc.rl.ac.uk'
-##LDAP_WRITE_PASSWD = 'xxx'
-##LDAP_WRITE_DN     = 'cn=cedaadmin,ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk'
-
 LDAP_WRITE_URL    = "ldap://homer.esc.rl.ac.uk"
 LDAP_WRITE_PASSWD = 'xxx'
 LDAP_WRITE_DN     = 'cn=cedaadmin,ou=software,ou=People,o=hpc,dc=rl,dc=ac,dc=uk'
