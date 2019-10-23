@@ -25,7 +25,7 @@ SECRET_KEY = 'd^g(yt46tlqs@yo8tkmb6oj^z!5g#!00bhg&2#pgxe*ag6la6k'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['cedadb.ceda.ac.uk', 'archman1-test.ceda.ac.uk', '127.0.0.1', '130.246.129.107']
+ALLOWED_HOSTS = ['archman1-test.ceda.ac.uk', '127.0.0.1', '130.246.129.107']
 
 DATETIME_FORMAT = "d-M-Y H:i"
 SITE_ID = 1
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'udbadmin',
+    'sizefield',
     'cedainfoapp',
 ]
 
@@ -48,7 +49,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+##    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -81,7 +82,7 @@ DATABASES = {
         'NAME': 'cedainfo',                      # Or path to database file if using sqlite3.
         'USER': 'cedainfo',                      # Not used with sqlite3.
         'PASSWORD': 'xxx',                  # Not used with sqlite3.
-        'HOST': 'db-test1.ceda.ac.uk',                      # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': 'db1.ceda.ac.uk',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     },
 
@@ -90,7 +91,7 @@ DATABASES = {
         'NAME': 'userdb',                      # Or path to database file if using sqlite3.
         'USER': 'badc',                      # Not used with sqlite3.
         'PASSWORD': 'xxx',                  # Not used with sqlite3.
-        'HOST': 'db-test1.ceda.ac.uk',                      # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': 'db1.ceda.ac.uk',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '5432',                      # Set to empty string for default. Not used with sqlite3.
     }
 
@@ -307,6 +308,10 @@ LDAP_URL       = 'ldap://homer.esc.rl.ac.uk'
 #
 # Details for writable LDAP server
 #
+##LDAP_WRITE_URL    = 'ldap://ldap03.esc.rl.ac.uk'
+##LDAP_WRITE_PASSWD = 'THUtu7Re'
+##LDAP_WRITE_DN     = 'cn=cedaadmin,ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk'
+
 LDAP_WRITE_URL    = "ldap://homer.esc.rl.ac.uk"
 LDAP_WRITE_PASSWD = 'xxx'
 LDAP_WRITE_DN     = 'cn=cedaadmin,ou=software,ou=People,o=hpc,dc=rl,dc=ac,dc=uk'

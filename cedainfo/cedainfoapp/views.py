@@ -684,11 +684,11 @@ def gwsrequest_list(request):
         form = GWSRequestListFilterForm(initial={'request_status': 'ceda approved'}, )
         items = GWSRequest.objects.order_by(o)
 
-    c = RequestContext(request, {
+    c = {
         'form': form,
         'items': items,
-    })
-    c.update(csrf(request))
+    }
+
     return render_to_response('cedainfoapp/gwsrequest_list.html', c)
 
 
@@ -696,10 +696,10 @@ def gwsrequest_list(request):
 def gwsrequest_detail(request, id):
     item = get_object_or_404(GWSRequest, pk=id)
     form = GWSRequestDetailForm(instance=item)
-    c = RequestContext(request, {
+    c = {
         'item': item,
         'form': form,
-    })
+    }
     return render_to_response('cedainfoapp/gwsrequest_detail.html', c)
 
 
@@ -729,12 +729,17 @@ def vmrequest_list(request):
         except:
             item.vm_found = False
 
-    c = RequestContext(request, {
-        'form': form,
+    ctx = {        
+         'form': form,
         'items': items,
-    })
-    c.update(csrf(request))
-    return render_to_response('cedainfoapp/vmrequest_list.html', c)
+    }
+    
+#    ctx = RequestContext(request, {
+#        'form': form,
+#        'items': items,
+#    })
+#    c.update(csrf(request))
+    return render_to_response('cedainfoapp/vmrequest_list.html', ctx)
 
 
 def check_dns_entry(hostname):
@@ -754,10 +759,10 @@ def check_dns_entry(hostname):
 def vmrequest_detail(request, id):
     item = get_object_or_404(VMRequest, pk=id)
     form = VMRequestDetailForm(instance=item)
-    c = RequestContext(request, {
+    c = {
         'item': item,
         'form': form,
-    })
+    }
     return render_to_response('cedainfoapp/vmrequest_detail.html', c)
 
 
@@ -792,12 +797,12 @@ def gws_list(request):
     for i in items:
         total_volume += i.requested_volume
 
-    c = RequestContext(request, {
+    c = {
         'form': form,
         'items': items,
         'total_volume': total_volume,
-    })
-    c.update(csrf(request))
+    }
+
     return render_to_response('cedainfoapp/gws_list.html', c)
 
 
