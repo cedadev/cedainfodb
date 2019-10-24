@@ -30,6 +30,8 @@ ALLOWED_HOSTS = ['archman1-test.ceda.ac.uk', '127.0.0.1', '130.246.129.107']
 DATETIME_FORMAT = "d-M-Y H:i"
 SITE_ID = 1
 
+LOGIN_REDIRECT_URL = "/admin"
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -40,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     'udbadmin',
     'sizefield',
     'cedainfoapp',
@@ -190,8 +193,10 @@ GWS_NAME_REGEX = re.compile(r'^[a-z][0-9_a-z]*$')
 GWS_PATH_CHOICES = (
     ('/group_workspaces/jasmin/', '/group_workspaces/jasmin/'),
     ('/group_workspaces/jasmin2/', '/group_workspaces/jasmin2/'),
+    ('/group_workspaces/jasmin4/', '/group_workspaces/jasmin4/'),
     ('/group_workspaces/cems/','/group_workspaces/cems/'),
     ('/group_workspaces/cems2/', '/group_workspaces/cems2/'),
+    ('/gws/nopw/j04/', '/gws/nopw/j04/'),
 )
 
 # Types of VM
@@ -272,13 +277,6 @@ VM_STATUS_CHOICES = (
     ('retired', 'retired'),
 )
 
-VM_TENANCY_CHOICES = (
-    ('aaa','aaa'),
-    ('bbb', 'bbb'),
-)
-
-
-
 MOUNT_CHOICES = (
     ('no panasas mounts', 'no panasas mounts'),
     ('/datacentre/archvol ro', '/datacentre/archvol ro : Archive filesystem access'),
@@ -305,19 +303,12 @@ ADMIN_USERS_PATCH_RESPONSIBLE = [
 # Url for LDAP server
 #
 LDAP_URL       = 'ldap://homer.esc.rl.ac.uk'
-#
-# Details for writable LDAP server
-#
-##LDAP_WRITE_URL    = 'ldap://ldap03.esc.rl.ac.uk'
-##LDAP_WRITE_PASSWD = 'THUtu7Re'
-##LDAP_WRITE_DN     = 'cn=cedaadmin,ou=jasmin,ou=People,o=hpc,dc=rl,dc=ac,dc=uk'
-
-LDAP_WRITE_URL    = "ldap://homer.esc.rl.ac.uk"
+LDAP_WRITE_URL    = LDAP_URL
 LDAP_WRITE_PASSWD = 'xxx'
 LDAP_WRITE_DN     = 'cn=cedaadmin,ou=software,ou=People,o=hpc,dc=rl,dc=ac,dc=uk'
 
-ADDITIONAL_LDAP_GROUP_FILE = "/usr/local/cedainfodb/additional_ldap_files/ldap_additional_groups.txt"
-ADDITIONAL_LDAP_USER_FILE  = "/usr/local/cedainfodb/additional_ldap_files/ldap_additional_users.txt"
+ADDITIONAL_LDAP_GROUP_FILE = "/datacentre/opshome/etc/infrastructure/accounts/ldap/ldap_additional_groups.txt"
+ADDITIONAL_LDAP_USER_FILE  = "/datacentre/opshome/etc/infrastructure/accounts/ldap/ldap_additional_users.txt"
 
 SIZEFIELD_IS_BINARY = False
 SIZEFIELD_AMBIGUOUS_SUFFIX = False
