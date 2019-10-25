@@ -1,4 +1,4 @@
-#!/usr/local/cedainfodb/venv/bin/python
+#!/usr/local/cedainfodb/releases/current/venv/bin/python
 #
 # Checks if any updates are required to the LDAP server for groups. If so it
 # sends the updates to the LDAP server. Sends a notification email and writes
@@ -12,25 +12,24 @@
 #
 import subprocess
 import sys
-import os
 import tempfile
 import psycopg2
 import smtplib
 import time
 
-
-from django.core.management import setup_environ
+import os
+import django
 
 sys.path.append('/usr/local/cedainfodb/releases/current/cedainfo')
-
-import cron_settings as dbsettings
-setup_environ(dbsettings)
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cedainfo.settings")
+django.setup()
 
 import udbadmin.LDAP as LDAP
 import udbadmin.update_check as update_check
 import udbadmin.udb_ldap as udb_ldap
 
 from django.db import connections
+from django.conf import settings
 
 LOG_DIR = '/var/log/ldap/'
 RUN_LOG = LOG_DIR + 'update_run.log'
@@ -97,7 +96,7 @@ try:
 
     runlog = open(RUN_LOG, 'a')
 
-    dbconf     = dbsettings.DATABASES['userdb']
+    dbconf     = settings.DATABASES['userdb']
     connection = psycopg2.connect(dbname=dbconf['NAME'], 
                                     host=dbconf['HOST'],
                                     user=dbconf['USER'], 
@@ -133,4 +132,5 @@ try:
             mail_info_msg (cmds, output, subject='group', \
 	                   group_updated=group_updated, update_anyway=update_anyway)
 except:
+#    raise
     mail_error()    
