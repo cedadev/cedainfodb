@@ -33,7 +33,7 @@ Number of users: {{ recs|length}}
 <tbody>
 
   {% for rec in recs %}
-   <tr class="{% cycle row1,row2 %}">
+   <tr class="{% cycle "row1" "row2" %}">
    <td><a href="/admin/udbadmin/user/{{rec.userkey}}">{{ rec.userkey }}</a>
    <td>{{ rec.userkey.accountid }}
    <td>{{ rec.userkey.othernames }}

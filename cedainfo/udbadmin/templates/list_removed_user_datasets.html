@@ -22,7 +22,7 @@
 </thead>
 
 <tbody>
-  {% for dataset in datasets %}<tr class="{% cycle row1,row2 %}">
+  {% for dataset in datasets %}<tr class="{% cycle "row1" "row2" %}">
     <td><a href="/udbadmin/udj/{{dataset.id}}">Edit</a></td>
 
     {% if dataset.datasetid.authtype == "jasmin-portal" %}
