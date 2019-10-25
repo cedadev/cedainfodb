@@ -1,5 +1,5 @@
-#!/usr/local/cedainfodb/venv/bin/python
-#
+#!/usr/local/cedainfodb/releases/current/venv/bin/python
+
 # Prints any updates required to the group ldap. This is for use once the Jasmin Accounts Portal is in operation
 #
 import subprocess

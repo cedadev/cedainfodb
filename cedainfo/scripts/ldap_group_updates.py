@@ -1,4 +1,4 @@
-#!/usr/local/cedainfodb/venv/bin/python
+#!/usr/local/cedainfodb/releases/current/venv/bin/python
 #
 # Prints all ldap commands needed to syncronise the userdb with the current
 # ldap system

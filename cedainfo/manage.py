@@ -1,4 +1,4 @@
-#!/usr/local/cedainfodb/venv/bin/python
+#!/usr/local/cedainfodb/releases/current/venv/bin/python
 
 import os
 import sys

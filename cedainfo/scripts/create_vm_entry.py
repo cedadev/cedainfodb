@@ -1,4 +1,4 @@
-#!/usr/local/cedainfodb/venv/bin/python
+#!/usr/local/cedainfodb/releases/current/venv/bin/python
 #
 #
 # Template for adding a new legacy VM to the cedainfodb. 

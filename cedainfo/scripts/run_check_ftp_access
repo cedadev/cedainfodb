@@ -7,4 +7,4 @@ TODAY=$(date +"%Y-%m-%d:%H:%M:%S")
 
 LOGFILE="/var/log/ceda_ftpaccess_check/$TODAY-ftpaccess_check.log"
 
-/usr/local/cedainfodb/venv/bin/python  /usr/local/cedainfodb/releases/current/cedainfo/scripts/check_ftpaccess.py update > $LOGFILE 2>&1
+/usr/local/cedainfodb/releases/current/venv/bin/python   /usr/local/cedainfodb/releases/current/cedainfo/scripts/check_ftpaccess.py update > $LOGFILE 2>&1

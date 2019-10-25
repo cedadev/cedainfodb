@@ -1,4 +1,4 @@
-#!/usr/local/cedainfodb/venv/bin/python
+#!/usr/local/cedainfodb/releases/current/venv/bin/python
 #
 # Search for users who have 'gws' (group workspace datasets, but no cems/jasmin
 # vm account or other login account. Optionally remove these datasets if called 

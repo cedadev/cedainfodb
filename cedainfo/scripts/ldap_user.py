@@ -1,4 +1,4 @@
-#!/usr/local/cedainfodb/venv/bin/python
+#!/usr/local/cedainfodb/releases/current/venv/bin/python
 #
 # Prints all ldap user information generated from userdb for a single user. User is specified
 # by the accountid on the commandline
