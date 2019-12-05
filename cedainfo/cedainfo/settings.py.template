@@ -222,6 +222,7 @@ VM_CPU_REQUIRED_CHOICES = (
     ('moderate','moderate/multiuser (4)'),
 	('intermediate','intermediate (6)'),
     ('heavy','heavy/multi-threaded processing (8)'),
+    ('heavy16','heavy/multi-threaded processing (16)'),
 )
 
 VM_MEM_REQUIRED_CHOICES = (
@@ -229,9 +230,12 @@ VM_MEM_REQUIRED_CHOICES = (
     ('moderate','moderate (2 Gb)'),
     ('multiuser','multiuser (4 Gb)'),
     ('multithreaded', 'multi-threaded processing (8 Gb)'),
-    ('max16','max science workload (16 Gb)'),
-	('max24','max science workload (24 Gb)'),
-	('max32','max science workload (32 Gb)'),
+    ('max12','max-12 science workload (12 Gb)'),
+    ('max16','max-16 science workload (16 Gb)'),
+	('max24','max-24 science workload (24 Gb)'),
+	('max32','max-32 science workload (32 Gb)'),
+	('max48','max-48 science workload (48 Gb)'),
+	('max64','max-64 science workload (64 Gb)'),
 )
 
 VM_DISK_SPACE_REQUIRED_CHOICES = (
