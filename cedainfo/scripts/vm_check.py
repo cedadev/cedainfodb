@@ -31,7 +31,7 @@ def run():
            continue
 
            
-       print 'Procesing VM: %s' % vm.name
+       print 'Processing VM: %s' % vm.name
        fact_file = source_dir + '/' + vm.name
        
        if os.path.isfile(fact_file):
