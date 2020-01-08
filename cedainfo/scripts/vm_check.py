@@ -1,12 +1,14 @@
 #
 # Compare vm information in cedainfodb against ansible 'fact' information
 #
+# Intended to be run via run_script
+#
 import json
 import os
   
 from cedainfoapp.models import *
 
-source_dir = "/home/aharwood/ansible_vm_checker/vmfacts"
+source_dir = "/home/aharwood/ansible_vm_checker/tmp"
 
 memory_key = {'light': 1,
               'moderate': 2,
