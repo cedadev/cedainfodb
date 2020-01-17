@@ -12,6 +12,29 @@ from cedainfoapp.models import *
 from django.contrib.auth.models import *
 from django.conf import settings
 
+
+def get_cpu_string (cpu):
+
+    cpu = cpu.strip()
+    cpu_string = ''
+
+    if cpu == "1":
+        cpu_string = 'minimal'
+    elif cpu == "2":
+        cpu_string = 'light'
+    elif cpu == "4":
+        cpu_string = 'moderate'
+    elif cpu == "6":
+        cpu_string = 'intermediate'
+    elif cpu == "8":
+        cpu_string = 'heavy'
+    elif cpu == "16":
+        cpu_string = 'heavy16'
+    else:
+        sys.exit('Unexpected value (%s) for cpu' % cpu)
+
+    return cpu_string
+
 def run():
 
 
@@ -30,23 +53,7 @@ def run():
             vm_ip    = row[6]
             vm_other = row[7]
 
-            vm_cpu = vm_cpu.strip()
-
-            if vm_cpu == "1":
-                cpu_string = 'minimal'
-            elif vm_cpu == "2":
-                cpu_string = 'light'
-            elif vm_cpu == "4":
-                cpu_string = 'moderate'
-            elif vm_cpu == "6":
-                cpu_string = 'intermediate'
-            elif vm_cpu == "8":
-                cpu_string = 'heavy'
-            elif vm_cpu == "16":
-                cpu_string = 'heavy16'
-            else:
-                sys.exit('Unexpected value (%s) for cpu' % vm_cpu )
-
+            cpu_string = get_cpu_string(vm_cpu)
             print vm_name,  vm_cpu, cpu_string
             line_count = line_count + 1
 
