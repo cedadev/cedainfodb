@@ -13,6 +13,8 @@ from django.contrib.auth.models import *
 from django.conf import settings
 
 
+
+
 def get_cpu_string (cpu):
 
     cpu = cpu.strip()
@@ -35,6 +37,56 @@ def get_cpu_string (cpu):
 
     return cpu_string
 
+def get_ram_string (ram):
+
+    ram = ram.strip()
+    ram_string = ''
+
+    if ram == "1":
+        ram_string = "light"
+    elif ram == "2":
+        ram_string = "moderate"
+    elif ram == "4":
+        ram_string = "multiuser"
+    elif ram == "8":
+        ram_string = "multithreaded"
+    elif ram == "12":
+        ram_string = "max12"
+    elif ram == "16":
+        ram_string = "max16"
+    elif ram == "24":
+        ram_string = "max24"
+    elif ram == "32":
+        ram_string = "max32"
+    elif ram == "48":
+        ram_string = "max48"
+    elif ram == "64":
+        ram_string = "max64"
+    else:
+        sys.exit('Unexpected value (%s) for ram' % ram)
+
+    return ram_string
+
+def get_disk_string (disk):
+
+    disk = disk.strip()
+    disk_string = ''
+
+    disk = int(disk)
+
+    if disk <= 25:
+        disk_string = "light"
+    elif disk <= 35:
+        disk_string = "moderate"
+    elif disk <=85:
+        disk_string = "large"
+    elif disk  <=100:
+        disk_string = "database"
+    else:
+        sys.exit('Unexpected value (%s) for disk' % disk)
+
+    return disk_string
+
 def run():
 
 
@@ -54,7 +106,15 @@ def run():
             vm_other = row[7]
 
             cpu_string = get_cpu_string(vm_cpu)
-            print vm_name,  vm_cpu, cpu_string
+            ram_string = get_ram_string(vm_ram)
+            disk_string = get_disk_string(vm_disk)
+
+            vm_description = 'Added automatically'
+            if vm_tag: vm_description  +=  "\nTags: %s" % vm_tag
+            if vm_ip: vm_description  +=  "\nIP: %s" % vm_ip
+            if vm_other: vm_description  +=  "\nOther information: %s" % vm_other
+
+            print vm_name,  vm_description
             line_count = line_count + 1
 
             try:
@@ -63,11 +123,11 @@ def run():
                 sys.exit()
             except:
 
-                print "Creating: %s" % vm_name
+#                print "Creating: %s" % vm_name
 
                 vm_type = 'legacy'
+                vm_operation_type = 'production'
                 vm_status = 'deprecated'
-                vm_description = 'Added automatically'
                 vm_internal_requester  ='aharwood'
                 vm_date_required = '1999-01-01'
                 vm_patch_responsible = 'aharwood'
@@ -75,6 +135,10 @@ def run():
                 a= VM(
                     name=vm_name,
                     type= vm_type,
+                    operation_type = vm_operation_type,
+                    cpu_required = cpu_string,
+                    memory_required = ram_string,
+                    disk_space_required = disk_string,
                     status= vm_status,
                     description= vm_description,
                     internal_requester=User.objects.get(username=vm_patch_responsible),
@@ -82,7 +146,7 @@ def run():
                     patch_responsible_id=User.objects.get(username=vm_patch_responsible).id,
                 )
 
-                a.save()
+  ##              a.save()
 
     # vm_name = '00-ashtest'
     # vm_type = 'legacy'
