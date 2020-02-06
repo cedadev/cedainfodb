@@ -18,6 +18,10 @@ from django.conf import settings
 def get_cpu_string (cpu):
 
     cpu = cpu.strip()
+
+    if not cpu:
+        return ''
+
     cpu_string = ''
 
     if cpu == "1":
@@ -40,6 +44,10 @@ def get_cpu_string (cpu):
 def get_ram_string (ram):
 
     ram = ram.strip()
+
+    if not ram:
+        return ''
+
     ram_string = ''
 
     if ram == "1":
@@ -70,6 +78,8 @@ def get_ram_string (ram):
 def get_disk_string (disk):
 
     disk = disk.strip()
+    if not disk:
+        return ''
     disk_string = ''
 
     disk = int(disk)
@@ -80,30 +90,35 @@ def get_disk_string (disk):
         disk_string = "moderate"
     elif disk <=85:
         disk_string = "large"
-    elif disk  <=100:
+    elif disk  <=110:
         disk_string = "database"
     else:
         sys.exit('Unexpected value (%s) for disk' % disk)
 
     return disk_string
 
-def run():
+def run(*script_args):
 
+    vm_file = script_args[0]
 
-    with open('vms.txt') as csv_file:
+    if not vm_file:
+        os.exit("No file given")
+
+    with open(vm_file) as csv_file:
 
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0
 
         for row in csv_reader:
-            vm_name = row[0]
-            vm_cpu  = row[1]
-            vm_ram  = row[2]
-            vm_disk = row[3]
-            vm_root_users = row[4]
-            vm_tag   = row[5]
-            vm_ip    = row[6]
-            vm_other = row[7]
+            old_vm = row[0]
+            vm_name = row[1]
+            vm_cpu  = row[2]
+            vm_ram  = row[3]
+            vm_disk = row[4]
+            vm_root_users = row[5]
+            vm_tag   = row[6]
+            vm_ip    = row[7]
+            vm_other = row[8]
 
             cpu_string = get_cpu_string(vm_cpu)
             ram_string = get_ram_string(vm_ram)
@@ -120,14 +135,14 @@ def run():
             try:
                 a = VM.objects.get(name=vm_name)
                 print "vm name already exists"
-                sys.exit()
+                sys.exit(0)
             except:
 
 #                print "Creating: %s" % vm_name
 
-                vm_type = 'legacy'
+                vm_type = 'servicehost'
                 vm_operation_type = 'production'
-                vm_status = 'deprecated'
+                vm_status = 'active'
                 vm_internal_requester  ='aharwood'
                 vm_date_required = '1999-01-01'
                 vm_patch_responsible = 'aharwood'
@@ -139,14 +154,17 @@ def run():
                     cpu_required = cpu_string,
                     memory_required = ram_string,
                     disk_space_required = disk_string,
+                    disk_activity_required='moderate',
+
+                    os_required='centos7',
                     status= vm_status,
                     description= vm_description,
                     internal_requester=User.objects.get(username=vm_patch_responsible),
-                    date_required='1999-01-01',
+                    date_required='2020-02-01',
                     patch_responsible_id=User.objects.get(username=vm_patch_responsible).id,
                 )
 
-  ##              a.save()
+                a.save()
 
     # vm_name = '00-ashtest'
     # vm_type = 'legacy'
