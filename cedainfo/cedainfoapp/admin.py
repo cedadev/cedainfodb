@@ -299,9 +299,9 @@ class NewServiceAdmin(admin.ModelAdmin):
     vm_os.admin_order_field = "host__os_required"
     vm_os. short_description = "OS"
     
-    list_display = ('name', docs, vm_name, vm_os, 'review_status', 'last_reviewed', 'visibility', 'status', 'summary', 'service_manager', 'owner')
-
-    list_filter = ('visibility', 'status', 'review_status', 'keywords', ManagerFilter, OwnerFilter, ServiceHostFilter, SystemManagerFilter, VMStatusFilter)
+    list_display = ('name', docs, vm_name, vm_os, 'review_status', 'last_reviewed', 'visibility', 'status', 'priority', 'summary', 'service_manager', 'owner')
+    list_editable = ('priority',)
+    list_filter = ('visibility', 'priority', 'status', 'review_status', 'keywords', ManagerFilter, OwnerFilter, ServiceHostFilter, SystemManagerFilter, VMStatusFilter)
     search_fields = ('description', 'name', 'host__name')
     ordering = ('name',)
 
