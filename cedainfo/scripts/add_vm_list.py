@@ -20,7 +20,7 @@ def get_cpu_string (cpu):
     cpu = cpu.strip()
 
     if not cpu:
-        return ''
+        return 'minimal'
 
     cpu_string = ''
 
@@ -46,7 +46,7 @@ def get_ram_string (ram):
     ram = ram.strip()
 
     if not ram:
-        return ''
+        return 'light'
 
     ram_string = ''
 
@@ -79,7 +79,7 @@ def get_disk_string (disk):
 
     disk = disk.strip()
     if not disk:
-        return ''
+        return 'light'
     disk_string = ''
 
     disk = int(disk)
@@ -130,12 +130,13 @@ def run(*script_args):
             if vm_other: vm_description  +=  "\nOther information: %s" % vm_other
 
             print vm_name,  vm_description
+            print 'ROOT: vm_name %s' % vm_root_users
             line_count = line_count + 1
 
             try:
                 a = VM.objects.get(name=vm_name)
                 print "vm name already exists"
-                sys.exit(0)
+                continue
             except:
 
 #                print "Creating: %s" % vm_name
@@ -143,9 +144,9 @@ def run(*script_args):
                 vm_type = 'servicehost'
                 vm_operation_type = 'production'
                 vm_status = 'active'
-                vm_internal_requester  ='aharwood'
+                vm_internal_requester  ='mpritcha'
                 vm_date_required = '1999-01-01'
-                vm_patch_responsible = 'aharwood'
+                vm_patch_responsible = 'pcmc'
 
                 a= VM(
                     name=vm_name,
@@ -155,13 +156,15 @@ def run(*script_args):
                     memory_required = ram_string,
                     disk_space_required = disk_string,
                     disk_activity_required='moderate',
-
+                    mountpoints_required='no panasas mounts',
+                    network_required = 'moderate',
                     os_required='centos7',
                     status= vm_status,
                     description= vm_description,
-                    internal_requester=User.objects.get(username=vm_patch_responsible),
-                    date_required='2020-02-01',
+                    internal_requester=User.objects.get(username=vm_internal_requester),
+                    date_required='2020-01-01',
                     patch_responsible_id=User.objects.get(username=vm_patch_responsible).id,
+                    other_info = 'This record was generated automatically for centos7 update.\n\n'
                 )
 
                 a.save()

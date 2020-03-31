@@ -1,7 +1,9 @@
 #
-#  Create new VM entries using information from a csv file
+#  Copies information from original vm to new vm
 #
 # Intended to be run via run_script
+#
+# python ../manage.py runscript copy_vm_info --script-args ~/cedainfodb/vms/batch1.txt
 #
 import json
 import os
@@ -41,8 +43,14 @@ def run(*script_args):
             print old_vm, vm_name
             line_count = line_count + 1
 
+            print row
 
-            old = VM.objects.get(name=old_vm)
+            try:
+                old = VM.objects.get(name=old_vm)
+            except:
+                print "Old machine %s does not exist for new machine %s, skipping" % (old_vm, vm_name)
+                continue
+
             new = VM.objects.get(name=vm_name)
 
             print old.type, new.type
@@ -67,7 +75,7 @@ def run(*script_args):
             print old.network_required
             new.network_required = old.network_required
 
-            other = ''
+            other = 'This record was generated automatically for centos7 update.\n\n'
 
             extra = ''
             if vm_tag: extra  +=  "Tags: %s\n" % vm_tag
@@ -75,41 +83,18 @@ def run(*script_args):
             if vm_other: extra  +=  "Other information: %s\n" % vm_other
 
             if extra:
-                other = 'Information from VM request:\n\n'
+                other += 'Information from VM request:\n\n'
                 other += extra
 
-            other += '\nOther information from %s record: \n\n' % old.name
-            other += old.other_info
+            if old.other_info:
+                other += '\nOther information from %s record: \n\n' % old.name
+                other += old.other_info
+
             new.other_info = other
 
             new.patch_responsible = old.patch_responsible
+            new.tenancy = old.tenancy
+
+            new.root_users = old.root_users.all()
 
             new.save()
-
-    # vm_name = '00-ashtest'
-    # vm_type = 'legacy'
-    # vm_status = 'deprecated'
-    # vm_description = 'Added automatically'
-    # vm_internal_requester  ='aharwood'
-    # vm_date_required = '1999-01-01'
-    # vm_patch_responsible = 'aharwood'
-    #
-    # try:
-    #     a = VM.objects.get(name=vm_name)
-    #     print "vm name already exists"
-    #     sys.exit()
-    # except:
-    #
-    #     print "Creating: %s" % vm_name
-    #
-    #     a= VM(
-    #         name=vm_name,
-    #         type= vm_type,
-    #         status= vm_status,
-    #         description= vm_description,
-    #         internal_requester=User.objects.get(username=vm_patch_responsible),
-    #         date_required='1999-01-01',
-    #         patch_responsible_id=User.objects.get(username=vm_patch_responsible).id,
-    #     )
-    #
-    #     a.save()

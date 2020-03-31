@@ -27,11 +27,14 @@ cpu_key = {'minimal': 1, 'light': 2, 'moderate': 4, 'intermediate': 6, 'heavy': 
 def run():
    
    vms = VM.objects.filter(status = 'active').order_by('name')
-   
+
+
    for vm in vms:
        if vm.name.startswith('legacy:') or vm.name.startswith('00 unspecified'):
            continue
 
+       if not vm.description.startswith('Added automatically'):
+           continue
            
        print 'Processing VM: %s' % vm.name
        fact_file = source_dir + '/' + vm.name
