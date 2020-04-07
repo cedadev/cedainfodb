@@ -1431,7 +1431,7 @@ class GWSRequest(models.Model):
 
     gws_name = models.CharField(
             # name doesn't need to be unique here : there might be several requests but it's the one that's approved that gets copied.
-            max_length=16,
+            max_length=50,
             validators=[
                 RegexValidator(
                         regex=settings.GWS_NAME_REGEX,
@@ -1595,7 +1595,7 @@ class GWS(models.Model):
         ordering = ['name']
 
     name = models.CharField(
-            max_length=16,
+            max_length=50,
             unique=True,
             validators=[
                 RegexValidator(
