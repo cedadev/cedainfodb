@@ -1341,3 +1341,15 @@ def _list_duplicates(seq):
     seen_add = seen.add
     seen_twice = set( x for x in seq if x in seen or seen_add(x) )
     return list( seen_twice )
+
+
+@login_required()
+def service_list_for_team_members (request):
+
+
+    username = request.GET.get('username', 'spepler')
+
+    manager_services  = NewService.objects.filter(service_manager__username=username).order_by('name')
+
+    owner_services = NewService.objects.filter(owner__username=username).order_by('name')
+    return render_to_response('services/list_services_for_team_members.html', locals())

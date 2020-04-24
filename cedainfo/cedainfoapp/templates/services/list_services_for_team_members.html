@@ -1,0 +1,52 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>My services list</h1>
+
+
+
+
+<h2>Services that I am owner of:</h2>
+Production or pre-production status only.
+
+    <table>
+
+    {% for service in owner_services %}
+
+       <tr>
+           <td><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}}</a></td>
+           <td><a href="/admin/cedainfoapp/vm/{{service.host.id}}">{{service.host}}</a></td>
+
+           {% if service.documentation %}
+
+               <td><a href="{{service.documentation}}">Helpscout</a></td>
+
+           {% else %}
+               <td></td>
+           {% endif %}
+
+       <td>{{service.status}}</td>
+       </tr>
+{% endfor %}
+
+</table>
+
+
+
+<h2>Services that I am a manager for</h2>
+
+    <table>
+
+    {% for service in manager_services %}
+
+       <tr>
+       <td>{{service.name}}</td>
+
+        </tr>
+{% endfor %}
+
+</table>
+
+{% endblock %}
+
