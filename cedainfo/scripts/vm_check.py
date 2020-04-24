@@ -8,7 +8,7 @@ import os
   
 from cedainfoapp.models import *
 
-source_dir = "/home/aharwood/ansible_vm_checker/tmp"
+source_dir = "/home/aharwood/ansible_vm_checker/vmfacts"
 
 memory_key = {'light': 1,
               'moderate': 2,
