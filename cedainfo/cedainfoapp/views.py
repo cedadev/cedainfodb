@@ -1058,7 +1058,7 @@ def service_list_by_vm(request):
         ('Sysadmin', 'patch_responsible__username'),
     )
 
-    service_status = request.REQUEST.get('status', 'production')
+    service_status = request.GET.get('status', 'production')
     myform = ServiceForm(initial={'status': service_status}, )
 
     sort_headers = SortHeaders(request, HEADERS)
@@ -1134,7 +1134,7 @@ def service_unusedvms(request):
         ('Internal requester', 'internal_requester__username'),
     )
 
-    service_status = request.REQUEST.get('status', 'production')
+    service_status = request.GET.get('status', 'production')
     myform = ServiceForm(initial={'status': service_status}, )
 
     sort_headers = SortHeaders(request, HEADERS)
@@ -1190,9 +1190,9 @@ def service_review_selection(request):
 
     )
 
-    review_status = request.REQUEST.get('review_status', '')
-    visibility = request.REQUEST.get('visibility', '')
-    status = request.REQUEST.get('status', '')
+    review_status = request.GET.get('review_status', '')
+    visibility = request.GET.get('visibility', '')
+    status = request.GET.get('status', '')
 
     myform = ServiceForm(initial={'review_status': review_status, 'visibility': visibility, 'status': status})
 

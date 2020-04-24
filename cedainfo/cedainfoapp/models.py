@@ -1431,7 +1431,7 @@ class GWSRequest(models.Model):
 
     gws_name = models.CharField(
             # name doesn't need to be unique here : there might be several requests but it's the one that's approved that gets copied.
-            max_length=16,
+            max_length=50,
             validators=[
                 RegexValidator(
                         regex=settings.GWS_NAME_REGEX,
@@ -1595,7 +1595,7 @@ class GWS(models.Model):
         ordering = ['name']
 
     name = models.CharField(
-            max_length=16,
+            max_length=50,
             unique=True,
             validators=[
                 RegexValidator(
@@ -2007,11 +2007,11 @@ class VM(models.Model):
     def save(self, *args, **kwargs):
         # Custom save method : will only save an instance if there is no PK, i.e. if the model is a new instance
         # Logic : If you want to change a request, you can't, you need to make a new one & have that approved.
-
-        if self.pk is None:
-            super(VM, self).save(*args, **kwargs)
-        else:
-            raise Exception("Unable to save changes to existing VM : create an update request & get it approved")
+        super(VM, self).save(*args, **kwargs)
+#       if self.pk is None:
+#           super(VM, self).save(*args, **kwargs)
+#       else:
+#           raise Exception("Unable to save changes to existing VM : create an update request & get it approved")
 
     def forceSave(self, *args, **kwargs):
         # OK, sometimes we need to update individual fields (e.g. "approved")"
@@ -2159,6 +2159,16 @@ class NewService(models.Model):
             default="to be reviewed"
     )
 
+    priority = models.CharField(
+        max_length=50,
+        choices=(
+            ("low", "Low"),
+            ("medium", "Medium"),
+            ("high", "High")
+        ),
+        default="Low"
+    )
+
     description = models.TextField(blank=True, help_text="Longer description if needed")
     documentation = models.URLField(blank=True,
                                     help_text="URL to documentation for service in opman")
@@ -2177,6 +2187,9 @@ class NewService(models.Model):
 
     service_manager = models.ForeignKey(Person, null=True, blank=True, related_name='software_manager',
                                         help_text="CEDA person who looks after this service")
+
+    deputy_service_manager = models.ForeignKey(Person, null=True, blank=True, related_name='deputy_service_manager',
+                                        help_text="Deputy for service manager")
 
     owner = models.ForeignKey(Person, null=True, blank=True, related_name='owner', help_text="Owner of this service")
 
