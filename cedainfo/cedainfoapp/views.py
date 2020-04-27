@@ -1347,9 +1347,13 @@ def _list_duplicates(seq):
 def service_list_for_team_members (request):
 
 
-    username = request.GET.get('username', 'spepler')
+    username = request.GET.get('username', None)
+    person = Person.objects.get(username=username)
 
     manager_services  = NewService.objects.filter(service_manager__username=username).order_by('name')
+    manager_services = manager_services.filter(status='production') | manager_services.filter(status='pre-production')
 
     owner_services = NewService.objects.filter(owner__username=username).order_by('name')
+    owner_services = owner_services.filter(status='production') | owner_services.filter(status='pre-production')
+
     return render_to_response('services/list_services_for_team_members.html', locals())

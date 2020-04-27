@@ -2,22 +2,25 @@
 
 {% block content %}
 
-<h1>My services list</h1>
+<h1>Services list for {{person.name}}</h1>
 
+See <a href="https://ceda-internal.helpscoutdocs.com/article/4652-service-manager-and-service-owner-definitions">Definitions of service manager and owner</a>
 
-
-
-<h2>Services that I am owner of:</h2>
-Production or pre-production status only.
-
-    <table>
-
+<h2>Services that I own</h2>
+Only services with the status 'production' or 'pre-production' are listed here.  You can also
+<a href="/admin/cedainfoapp/newservice/?owner={{person.id}}"> list all services which
+    you own</a> (regardless of status) or <a href="/admin/cedainfoapp/newservice/">list all services<a>
+    (regardless of owner or status)
+<p></p>
+    <table border="1">
+    <th>Service</th>
+        <th>Host</th>
     {% for service in owner_services %}
 
        <tr>
-           <td><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}}</a></td>
-           <td><a href="/admin/cedainfoapp/vm/{{service.host.id}}">{{service.host}}</a></td>
-
+           <td><a title="Show service record" href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}}</a></td>
+           <td><a title="Show host details" href="/admin/cedainfoapp/vm/{{service.host.id}}">{{service.host}}</a></td>
+          <td>{{service.host.os_required}}</td>
            {% if service.documentation %}
 
                <td><a href="{{service.documentation}}">Helpscout</a></td>
@@ -27,6 +30,8 @@ Production or pre-production status only.
            {% endif %}
 
        <td>{{service.status}}</td>
+           <td><a href="{{request.path}}?username={{service.service_manager.username}}"
+                  title="Show services list for this user">{{service.service_manager}}</a></td>
        </tr>
 {% endfor %}
 
@@ -36,17 +41,7 @@ Production or pre-production status only.
 
 <h2>Services that I am a manager for</h2>
 
-    <table>
 
-    {% for service in manager_services %}
-
-       <tr>
-       <td>{{service.name}}</td>
-
-        </tr>
-{% endfor %}
-
-</table>
 
 {% endblock %}
 
