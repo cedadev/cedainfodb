@@ -13,13 +13,15 @@ Only services with the status 'production' or 'pre-production' are listed here. 
     (regardless of owner or status)
 <p></p>
     <table border="1">
-    <th>Service</th>
-        <th>Doc</th>
-        <th>Host</th>
-        <th>OS</th>
-        <th>Visibility</th>
-        <th>Status</th>
-        <th>Service manager</th>
+{% for header in owner_headers %}
+   <th>
+     {% if header.sortable %}<a href="{{ header.url|escape }}&username={{person.username}}" title="Click to sort by this column">{% endif %}
+     {{ header.text }}
+     {% if header.sortable %}</a>{% endif %}
+   </th>
+
+        {% endfor %}
+
     {% for service in owner_services %}
 
        <tr>
@@ -46,10 +48,4 @@ Only services with the status 'production' or 'pre-production' are listed here. 
 </table>
 
 
-
-<h2>Services that I am a manager for</h2>
-
-
-
 {% endblock %}
-
