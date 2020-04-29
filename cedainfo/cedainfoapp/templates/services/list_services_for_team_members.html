@@ -6,20 +6,22 @@
 
 See <a href="https://ceda-internal.helpscoutdocs.com/article/4652-service-manager-and-service-owner-definitions">Definitions of service manager and owner</a>
 
-<h2>Services that I own</h2>
+<h2>Services that I own (<a href="https://ceda-internal.helpscoutdocs.com/article/4652-service-manager-and-service-owner-definitions"">See definition of owner</a>)</h2>
 Only services with the status 'production' or 'pre-production' are listed here.  You can also
 <a href="/admin/cedainfoapp/newservice/?owner={{person.id}}"> list all services which
     you own</a> (regardless of status) or <a href="/admin/cedainfoapp/newservice/">list all services<a>
     (regardless of owner or status)
 <p></p>
     <table border="1">
-    <th>Service</th>
-        <th>Doc</th>
-        <th>Host</th>
-        <th>OS</th>
-        <th>Visibility</th>
-        <th>Status</th>
-        <th>Service manager</th>
+{% for header in owner_headers %}
+   <th>
+     {% if header.sortable %}<a href="{{ header.url|escape }}&username={{person.username}}" title="Click to sort by this column">{% endif %}
+     {{ header.text }}
+     {% if header.sortable %}</a>{% endif %}
+   </th>
+
+        {% endfor %}
+
     {% for service in owner_services %}
 
        <tr>
@@ -38,18 +40,17 @@ Only services with the status 'production' or 'pre-production' are listed here. 
           <td>{{service.host.os_required}}</td>
            <td>{{service.visibility}}</td>
        <td>{{service.status}}</td>
+           <td>{{service.priority}}</td>
            <td><a href="{{request.path}}?username={{service.service_manager.username}}"
                   title="Show services list for this user">{{service.service_manager}}</a></td>
+
+           <td><a href="{{request.path}}?username={{service.deputy_service_manager.username}}"
+                  title="Show services list for this user">{{service.deputy_service_manager}}</a></td>
+
        </tr>
 {% endfor %}
 
 </table>
 
 
-
-<h2>Services that I am a manager for</h2>
-
-
-
 {% endblock %}
-
