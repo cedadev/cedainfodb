@@ -1368,8 +1368,25 @@ def service_list_for_team_members (request):
    owner_services = owner_services.filter(status='production') | owner_services.filter(status='pre-production')
    owner_services = owner_services.order_by(owner_sort_headers.get_order_by())
 
-   manager_services  = NewService.objects.filter(service_manager__username=username).order_by('name')
+
+   MANAGER_HEADERS = (
+        ('Name', 'name'),
+        ('Docs', 'documentation'),
+        ('Host', 'host'),
+        ('OS', 'host__os_required'),
+        ('Visibility', 'visibility'),
+        ('Status', 'status'),
+        ('Priority', 'priority'),
+        ('Owner', 'owner'),
+        ('Deputy manager', 'deputy_service_manager')
+   )
+
+   manager_sort_headers = SortHeaders(request, MANAGER_HEADERS)
+   manager_headers = list(manager_sort_headers.headers())
+
+   manager_services = NewService.objects.filter(service_manager__username=username).order_by('name')
    manager_services = manager_services.filter(status='production') | manager_services.filter(status='pre-production')
+   manager_services = manager_services.order_by(manager_sort_headers.get_order_by())
 
    return render_to_response('services/list_services_for_team_members.html', locals())
 

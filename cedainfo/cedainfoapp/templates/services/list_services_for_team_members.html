@@ -6,12 +6,18 @@
 
 See <a href="https://ceda-internal.helpscoutdocs.com/article/4652-service-manager-and-service-owner-definitions">Definitions of service manager and owner</a>
 
-<h2>Services that I own (<a href="https://ceda-internal.helpscoutdocs.com/article/4652-service-manager-and-service-owner-definitions"">See definition of owner</a>)</h2>
+<h2>Services that I own (<a href="https://ceda-internal.helpscoutdocs.com/article/4652-service-manager-and-service-owner-definitions"">see definitions</a>)</h2>
 Only services with the status 'production' or 'pre-production' are listed here.  You can also
 <a href="/admin/cedainfoapp/newservice/?owner={{person.id}}"> list all services which
     you own</a> (regardless of status) or <a href="/admin/cedainfoapp/newservice/">list all services<a>
     (regardless of owner or status)
+
 <p></p>
+
+{% if owner_services|length_is:"0" %}
+    <em> - No records to display.</em>
+{% else %}
+
     <table border="1">
 {% for header in owner_headers %}
    <th>
@@ -32,7 +38,7 @@ Only services with the status 'production' or 'pre-production' are listed here. 
                <td><a href="{{service.documentation}}">Helpscout</a></td>
 
            {% else %}
-               <td></td>
+               <td style="background-color:red;">None</td>
            {% endif %}
 
 
@@ -51,6 +57,63 @@ Only services with the status 'production' or 'pre-production' are listed here. 
 {% endfor %}
 
 </table>
+
+{% endif %}
+
+
+
+<h2>Services that I manage (<a href="https://ceda-internal.helpscoutdocs.com/article/4652-service-manager-and-service-owner-definitions"">see definitions</a>)</h2>
+Only services with the status 'production' or 'pre-production' are listed here.  You can also
+<a href="/admin/cedainfoapp/newservice/?manager={{person.id}}"> list all services which
+    you manage</a> (regardless of status) or <a href="/admin/cedainfoapp/newservice/">list all services<a>
+    (regardless of owner or status)
+<p></p>
+
+{% if manager_services|length_is:"0" %}
+    <em> - No records to display.</em>
+{% else %}
+
+    <table border="1">
+{% for header in manager_headers %}
+   <th>
+     {% if header.sortable %}<a href="{{ header.url|escape }}&username={{person.username}}" title="Click to sort by this column">{% endif %}
+     {{ header.text }}
+     {% if header.sortable %}</a>{% endif %}
+   </th>
+
+        {% endfor %}
+
+    {% for service in manager_services %}
+
+       <tr>
+           <td><a title="Show service record" href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}}</a></td>
+
+           {% if service.documentation %}
+
+               <td><a href="{{service.documentation}}">Helpscout</a></td>
+
+           {% else %}
+               <td style="background-color:red;">None</td>
+           {% endif %}
+
+
+           <td><a title="Show host details" href="/admin/cedainfoapp/vm/{{service.host.id}}">{{service.host}}</a></td>
+          <td>{{service.host.os_required}}</td>
+           <td>{{service.visibility}}</td>
+       <td>{{service.status}}</td>
+           <td>{{service.priority}}</td>
+           <td><a href="{{request.path}}?username={{service.owner.username}}"
+                  title="Show services list for this user">{{service.owner}}</a></td>
+
+           <td><a href="{{request.path}}?username={{service.deputy_service_manager.username}}"
+                  title="Show services list for this user">{{service.deputy_service_manager}}</a></td>
+
+       </tr>
+{% endfor %}
+
+</table>
+
+{% endif %}
 
 
 {% endblock %}
