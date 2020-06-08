@@ -1344,6 +1344,40 @@ def _list_duplicates(seq):
 
 
 @login_required()
+def service_owner_manager_list (request):
+
+    persons = Person.objects.order_by('name')
+
+    counts = []
+
+    services = NewService.objects.filter(status='production')
+
+    for person in persons:
+
+        owner_count = NewService.objects.filter(owner__username=person.username).filter(status='production').count()
+
+        manager_count = NewService.objects.filter(service_manager__username=person.username).filter(status='production').count()
+        deputy_manager_count = NewService.objects.filter(deputy_service_manager__username=person.username).filter(status='production').count()
+        vm_count = VM.objects.filter(internal_requester__username=person.username).filter(status='active').count()
+
+        rec = {}
+        rec['name']  = person.name
+        rec['username'] = person.username
+        rec['owner_count'] = owner_count
+        rec['manager_count'] = manager_count
+        rec['deputy_manager_count'] = deputy_manager_count
+        rec['vm_count'] = vm_count
+        total = owner_count + manager_count + deputy_manager_count
+
+        counts.append(rec)
+
+#        if total > 0:
+#           counts.append(rec)
+
+    return render_to_response('services/service_owner_manager_list.html', locals())
+
+
+@login_required()
 def service_list_for_team_members (request):
 
    username = request.GET.get('username', None)

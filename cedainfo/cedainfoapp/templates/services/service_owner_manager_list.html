@@ -1,0 +1,27 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+
+<h1>List of all service owners and managers</h1>
+
+
+<table>
+    <th>Name</th>
+    <th>Owner</th>
+    <th>Manager</th>
+    <th>Deputy manager</th>
+    <th>VMs requested</th>
+{% for rec in counts %}
+<tr>
+    <td><a href="/services/list4team?username={{rec.username}}"</a>{{rec.name}}</td>
+    <td>{{rec.owner_count}}</td>
+    <td>{{rec.manager_count}}</td>
+    <td>{{rec.deputy_manager_count}}</td>
+    <td>{{rec.vm_count}}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+{% endblock %}

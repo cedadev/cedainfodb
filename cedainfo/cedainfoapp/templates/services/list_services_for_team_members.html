@@ -4,7 +4,6 @@
 
 <h1>Services list for {{person.name}}</h1>
 
-See <a href="https://ceda-internal.helpscoutdocs.com/article/4652-service-manager-and-service-owner-definitions">Definitions of service manager and owner</a>
 
 <h2>Services that I own (<a href="https://ceda-internal.helpscoutdocs.com/article/4652-service-manager-and-service-owner-definitions"">see definitions</a>)</h2>
 Only services with the status 'production' or 'pre-production' are listed here.  You can also
@@ -50,9 +49,16 @@ Only services with the status 'production' or 'pre-production' are listed here. 
            <td><a href="{{request.path}}?username={{service.service_manager.username}}"
                   title="Show services list for this user">{{service.service_manager}}</a></td>
 
+         {% if service.deputy_service_manager.username == None  and service.priority == "high" %}
+            <td style="background-color:red;"><a href="{{request.path}}?username={{service.deputy_service_manager.username}}"
+                  title="Show services list for this user">{{service.deputy_service_manager}}</a></td>
+
+           {% else %}
+
            <td><a href="{{request.path}}?username={{service.deputy_service_manager.username}}"
                   title="Show services list for this user">{{service.deputy_service_manager}}</a></td>
 
+           {% endif %}
        </tr>
 {% endfor %}
 
@@ -105,8 +111,18 @@ Only services with the status 'production' or 'pre-production' are listed here. 
            <td><a href="{{request.path}}?username={{service.owner.username}}"
                   title="Show services list for this user">{{service.owner}}</a></td>
 
+         {% if service.deputy_service_manager.username == None  and service.priority == "high" %}
+            <td style="background-color:red;"><a href="{{request.path}}?username={{service.deputy_service_manager.username}}"
+                  title="Show services list for this user">{{service.deputy_service_manager}}</a></td>
+
+           {% else %}
+
            <td><a href="{{request.path}}?username={{service.deputy_service_manager.username}}"
                   title="Show services list for this user">{{service.deputy_service_manager}}</a></td>
+         {% endif %}
+
+
+
 
        </tr>
 {% endfor %}
