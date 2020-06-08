@@ -3,10 +3,13 @@ from django.contrib.admin import SimpleListFilter
 # from django.contrib.gis import admin
 from models import *
 from filters import MountpointFilter
-from django import forms
+
 from django.utils.safestring import mark_safe
 
 from forms import *
+
+from django import forms
+from django.db import models
 
 
 def prettySize(size):
