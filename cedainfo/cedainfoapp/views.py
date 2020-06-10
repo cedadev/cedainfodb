@@ -1341,3 +1341,101 @@ def _list_duplicates(seq):
     seen_add = seen.add
     seen_twice = set( x for x in seq if x in seen or seen_add(x) )
     return list( seen_twice )
+
+
+@login_required()
+def service_owner_manager_list (request):
+
+    persons = Person.objects.order_by('name')
+
+    counts = []
+
+    services = NewService.objects.filter(status='production')
+
+    for person in persons:
+
+        owner_count = NewService.objects.filter(owner__username=person.username).filter(status='production').count()
+        manager_count = NewService.objects.filter(service_manager__username=person.username).filter(status='production').count()
+        deputy_manager_count = NewService.objects.filter(deputy_service_manager__username=person.username).filter(status='production').count()
+        vm_count = VM.objects.filter(internal_requester__username=person.username).filter(status='active').count()
+
+        rec = {}
+        rec['name']  = person.name
+        rec['username'] = person.username
+        rec['owner_count'] = owner_count
+        rec['manager_count'] = manager_count
+        rec['deputy_manager_count'] = deputy_manager_count
+        rec['vm_count'] = vm_count
+        total = owner_count + manager_count + deputy_manager_count + vm_count
+
+#        counts.append(rec)
+
+        if total > 0:
+           counts.append(rec)
+
+    return render_to_response('services/service_owner_manager_list.html', locals())
+
+
+@login_required()
+def service_list_for_team_members (request):
+
+   username = request.GET.get('username', None)
+   person = Person.objects.get(username=username)
+
+   OWNER_HEADERS = (
+        ('Name', 'name'),
+        ('Docs', 'documentation'),
+        ('Host', 'host'),
+        ('OS', 'host__os_required'),
+        ('Visibility', 'visibility'),
+        ('Status', 'status'),
+        ('Priority', 'priority'),
+        ('Manager', 'service_manager'),
+        ('Deputy manager', 'deputy_service_manager')
+   )
+
+   owner_sort_headers = SortHeaders(request, OWNER_HEADERS)
+   owner_headers = list(owner_sort_headers.headers())
+
+   owner_services = NewService.objects.filter(owner__username=username).order_by('name')
+   owner_services = owner_services.filter(status='production') | owner_services.filter(status='pre-production')
+   owner_services = owner_services.order_by(owner_sort_headers.get_order_by())
+
+
+   MANAGER_HEADERS = (
+        ('Name', 'name'),
+        ('Docs', 'documentation'),
+        ('Host', 'host'),
+        ('OS', 'host__os_required'),
+        ('Visibility', 'visibility'),
+        ('Status', 'status'),
+        ('Priority', 'priority'),
+        ('Owner', 'owner'),
+        ('Deputy manager', 'deputy_service_manager')
+   )
+
+   manager_sort_headers = SortHeaders(request, MANAGER_HEADERS)
+   manager_headers = list(manager_sort_headers.headers())
+
+   manager_services = NewService.objects.filter(service_manager__username=username).order_by('name')
+   manager_services = manager_services.filter(status='production') | manager_services.filter(status='pre-production')
+   manager_services = manager_services.order_by(manager_sort_headers.get_order_by())
+
+   active_vms = VM.objects.filter(internal_requester__username=person.username).filter(status='active')
+
+   return render_to_response('services/list_services_for_team_members.html', locals())
+
+#@login_required()
+#def service_list_for_team_members (request):
+#
+#
+#   username = request.GET.get('username', None)
+#    person = Person.objects.get(username=username)
+#
+#    manager_services  = NewService.objects.filter(service_manager__username=username).order_by('name')
+#    manager_services = manager_services.filter(status='production') | manager_services.filter(status='pre-production')
+#
+#    owner_services = NewService.objects.filter(owner__username=username).order_by('name')
+#    owner_services = owner_services.filter(status='production') | owner_services.filter(status='pre-production')
+#
+#    return render_to_response('services/list_services_for_team_members.html', locals())

@@ -11,7 +11,8 @@ import re
 import pwd, grp
 
 from storageDXMLClient import SpotXMLReader
-from fields import *  # custom MultiSelectField, MultiSelectFormField from http://djangosnippets.org/snippets/2753/
+##from fields import *  # custom MultiSelectField, MultiSelectFormField from http://djangosnippets.org/snippets/2753/
+from multiselectfield import MultiSelectField
 
 from sizefield.models import FileSizeField
 from sizefield.templatetags.sizefieldtags import filesize

@@ -18,6 +18,9 @@ urlpatterns = [
 #    url(r'^hosts/(?P<subset>\w+)$', host_list),
  
     url(r'^services/listbyvm/$', service_list_by_vm),
+    url(r'^services/list4team/$', service_list_for_team_members),
+    url(r'^services/owner_managers/$', service_owner_manager_list),
+
     url(r'^services/internetfacing/$', service_internet_facing),    
     url(r'^services/unusedvms/$', service_unusedvms),
     url(r'^services/review/$', service_review_selection),
