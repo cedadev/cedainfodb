@@ -30,11 +30,12 @@ def run():
 
 
    for vm in vms:
+
        if vm.name.startswith('legacy:') or vm.name.startswith('00 unspecified'):
            continue
 
-       if not vm.description.startswith('Added automatically'):
-           continue
+#       if not vm.description.startswith('Added automatically'):
+#           continue
            
        print 'Processing VM: %s' % vm.name
        fact_file = source_dir + '/' + vm.name
