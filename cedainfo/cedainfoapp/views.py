@@ -1355,7 +1355,6 @@ def service_owner_manager_list (request):
     for person in persons:
 
         owner_count = NewService.objects.filter(owner__username=person.username).filter(status='production').count()
-
         manager_count = NewService.objects.filter(service_manager__username=person.username).filter(status='production').count()
         deputy_manager_count = NewService.objects.filter(deputy_service_manager__username=person.username).filter(status='production').count()
         vm_count = VM.objects.filter(internal_requester__username=person.username).filter(status='active').count()
@@ -1367,12 +1366,12 @@ def service_owner_manager_list (request):
         rec['manager_count'] = manager_count
         rec['deputy_manager_count'] = deputy_manager_count
         rec['vm_count'] = vm_count
-        total = owner_count + manager_count + deputy_manager_count
+        total = owner_count + manager_count + deputy_manager_count + vm_count
 
-        counts.append(rec)
+#        counts.append(rec)
 
-#        if total > 0:
-#           counts.append(rec)
+        if total > 0:
+           counts.append(rec)
 
     return render_to_response('services/service_owner_manager_list.html', locals())
 
@@ -1421,6 +1420,8 @@ def service_list_for_team_members (request):
    manager_services = NewService.objects.filter(service_manager__username=username).order_by('name')
    manager_services = manager_services.filter(status='production') | manager_services.filter(status='pre-production')
    manager_services = manager_services.order_by(manager_sort_headers.get_order_by())
+
+   active_vms = VM.objects.filter(internal_requester__username=person.username).filter(status='active')
 
    return render_to_response('services/list_services_for_team_members.html', locals())
 

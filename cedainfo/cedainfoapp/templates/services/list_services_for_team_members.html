@@ -4,6 +4,7 @@
 
 <h1>Services list for {{person.name}}</h1>
 
+<a href="/services/owner_managers">List all users</a>
 
 <h2>Services that I own (<a href="https://ceda-internal.helpscoutdocs.com/article/4652-service-manager-and-service-owner-definitions"">see definitions</a>)</h2>
 Only services with the status 'production' or 'pre-production' are listed here.  You can also
@@ -130,6 +131,41 @@ Only services with the status 'production' or 'pre-production' are listed here. 
 </table>
 
 {% endif %}
+
+<h2>Virtual machines</h2>
+
+Active VMs that you requested.
+        <p></p>
+{% if active_vms|length_is:"0" %}
+    <em> - No records to display.</em>
+{% else %}
+
+
+    <table border="1">
+<th>Name</th>
+        <th>Type</th>
+        <th>Operation type</th>
+        <th>Request date</th>
+        <th>Requestor</th>
+<th>Status</th>
+    {% for vm  in active_vms %}
+
+       <tr>
+
+           <td><a href="/admin/cedainfoapp/vm/{{vm.id}}">{{vm.name}}</a></td>
+           <td>{{vm.type}}</td>
+           <td>{{vm.operation_type}}</td>
+           <td>{{vm.date_required}}</td>
+           <td>{{vm.internal_requester}}</td>
+           <td>{{vm.status}}</td>
+
+       </tr>
+{% endfor %}
+
+</table>
+
+{% endif %}
+
 
 
 {% endblock %}
