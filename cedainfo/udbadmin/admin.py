@@ -156,33 +156,33 @@ class UserAdmin(admin.ModelAdmin):
 
     def showDatasets (self):
          
-	 datasets = self.datasets(removed=False)
-	 datasets = datasets.order_by("datasetid")
+        datasets = self.datasets(removed=False)
+        datasets = datasets.order_by("datasetid")
 
-         a = 'Details: '
-         a += ' <a href="/%s/user/datasets/current/%s">Current datasets</a> |' % (self._meta.app_label, self.userkey)
-         a += ' <a href="/%s/user/datasets/removed/%s">Removed datasets</a> |' % (self._meta.app_label, self.userkey)
-         a += ' <a href="/%s/authorise/%s">Pending datasets</a> |' % (self._meta.app_label, self.userkey)	 
-	 a += ' <a href="/admin/udbadmin/datasetrequest/?userkey=%s">Request history</a>' % (self.userkey)
-         a += '<p/>'
-	 
-	 a+= '<ul>'
-	 for dataset in datasets:
-            a +=  '<li>' + str(dataset.datasetid)
-	 a+='</ul>'
-	    
-	 return mark_safe(a)
-	 
+        a = 'Details: '
+        a += ' <a href="/%s/user/datasets/current/%s">Current datasets</a> |' % (self._meta.app_label, self.userkey)
+        a += ' <a href="/%s/user/datasets/removed/%s">Removed datasets</a> |' % (self._meta.app_label, self.userkey)
+        a += ' <a href="/%s/authorise/%s">Pending datasets</a> |' % (self._meta.app_label, self.userkey)     
+        a += ' <a href="/admin/udbadmin/datasetrequest/?userkey=%s">Request history</a>' % (self.userkey)
+        a += '<p/>'
+
+        a+= '<ul>'
+        for dataset in datasets:
+               a +=  '<li>' + str(dataset.datasetid)
+        a+='</ul>'
+
+        return mark_safe(a)
+     
     showDatasets.short_description = 'Datasets'
-    	 
+         
     def startdate (self):
        try:
            return self.startdate.strftime('%d-%b-%Y')
        except:
-           return ''	   
+           return ''       
  
     startdate.admin_order_field = 'startdate' 
-           	     	 
+                         
     list_display = ('userkey', 'title', 'othernames', 'surname', 'accountid', 'emailaddress', startdate, 'field', 'datasetCount')
     list_filter = ('title', 'degree', 'accounttype', 'field','startdate')
     search_fields = ['surname', 'othernames', 'accountid', 'jasminaccountid', 'emailaddress']
@@ -195,7 +195,7 @@ class UserAdmin(admin.ModelAdmin):
             (None, {
                 'fields': (links, 'userkey', 'title', 'surname', 'othernames', 'emailaddress',
                    'telephoneno', 'accountid', 'jasminaccountid', 'openid', 'accounttype',  password, 
-	           'degree', 'endorsedby', 'field', 'startdate', showDatasets, 'institute', 'comments')
+               'degree', 'endorsedby', 'field', 'startdate', showDatasets, 'institute', 'comments')
 
             }),
 #
@@ -220,8 +220,8 @@ class DatasetrequestAdmin(admin.ModelAdmin):
        try:
            return self.requestdate.strftime('%d-%b-%Y')
        except:
-           return ''	   
-       	 
+           return ''       
+            
    requestdate.admin_order_field = 'requestdate' 
       
    def accountidLink(self):
@@ -236,21 +236,21 @@ class DatasetrequestAdmin(admin.ModelAdmin):
       return mark_safe('<a href="%s"><img src="http://artefacts.ceda.ac.uk/graphics/misc/tick.gif"></a>' % url)
    authoriseLink.allow_tags = True
    authoriseLink.short_description = 'Authorise'
-      	       
+                 
    def nerc(self):
       if self.nercfunded:
          return "Yes"
       else:
          return "No"
    nerc.admin_order_field = 'nercfunded'
-	 
+     
    def editLink(self):
       url = "/%s/request/%s" % (self._meta.app_label, self.id)
       return mark_safe('<a href="%s">Edit</a>' % url)
    editLink.allow_tags = True
    editLink.short_description = 'Edit'
 
-   	 	 	       
+                        
    list_display = (editLink, accountidLink, authoriseLink, 'datasetid', requestdate, 'research', nerc, 'status')
    list_filter = ('status', 'nercfunded', 'requestdate', 'datasetid',)
 
@@ -258,7 +258,7 @@ class DatasetrequestAdmin(admin.ModelAdmin):
 
    fields = ('id', 'userkey', 'datasetid', 'requestdate', 'research', 'nercfunded', 'fundingtype', 
                      'grantref', 'openpub', 'extrainfo', 'fromhost', 'status')
-   		      
+                 
    search_fields =['research']
 
 admin.site.register(Datasetrequest, DatasetrequestAdmin)
@@ -293,7 +293,7 @@ class DatasetexpirenotificationAdmin(admin.ModelAdmin):
        return False
    def has_delete_permission(self, request, obj=None):
        return False
-       	 
+            
       
    list_display = ('userkey', 'datasetid', 'ver', 'date', 'emailaddress')
    list_filter = ('date', 'datasetid')
