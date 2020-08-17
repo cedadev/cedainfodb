@@ -14,9 +14,9 @@ def getExtGroupFile():
     p1 = subprocess.Popen(["ssh", 
                            "-oBatchMode=yes", 
                            "ypinfo@storm.badc.rl.ac.uk",  
-			   "ypcat", 
-			   "group"], 
-			   stdout=a)
+                           "ypcat", 
+                           "group"], 
+                           stdout=a)
     p1.wait()
     group = passwd.loadgrp(a.name)
     a.close()
@@ -32,9 +32,9 @@ def getIntGroupFile():
     p1 = subprocess.Popen(["ssh", 
                            "-oBatchMode=yes", 
                            "ypinfo@twister.badc.rl.ac.uk",  
-			   "ypcat", 
-			   "group"], 
-			   stdout=a)
+                           "ypcat", 
+                           "group"], 
+                           stdout=a)
     p1.wait()
     group = passwd.loadgrp(a.name)
     a.close()
@@ -49,10 +49,10 @@ def getExtPasswdFile():
     p1 = subprocess.Popen(["ssh",
                            "-oBatchMode=yes", 
                            "-oStrictHostKeyChecking=no",
-			   "ypinfo@storm.badc.rl.ac.uk",  
-			   "ypcat", 
-			   "passwd"], 
-			   stdout=a)
+                           "ypinfo@storm.badc.rl.ac.uk",  
+                           "ypcat", 
+                           "passwd"], 
+                           stdout=a)
     p1.wait()
     pw = passwd.loadpw(a.name)
     a.close()
@@ -68,10 +68,10 @@ def getIntPasswdFile():
     p1 = subprocess.Popen(["ssh",
                            "-oBatchMode=yes",
                            "-oStrictHostKeyChecking=no", 
-			   "ypinfo@twister.badc.rl.ac.uk",  
-			   "ypcat", 
-			   "passwd"], 
-			   stdout=a)
+                           "ypinfo@twister.badc.rl.ac.uk",  
+                           "ypcat", 
+                           "passwd"], 
+                           stdout=a)
     p1.wait()
     pw = passwd.loadpw(a.name)
     a.close()

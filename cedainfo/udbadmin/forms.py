@@ -48,7 +48,7 @@ class DatasetForm(ModelForm):
 
     class Meta:
         model = Dataset
-	fields = ('datasetid', 'authtype', 'grp', 'description', 'directory', 'conditions', 'defaultreglength', 'datacentre', 'infourl', 'comments')
+        fields = ('datasetid', 'authtype', 'grp', 'description', 'directory', 'conditions', 'defaultreglength', 'datacentre', 'infourl', 'comments')
 
 class PrivilegeForm(ModelForm):
 

@@ -87,7 +87,7 @@ def authorise_datasets(request, userkey):
                  dataset = Dataset.objects.get(datasetid=datasetRequest.datasetid)
 
                  if expireMonths == -1:
-		     expireDate = datetime.strptime('01/01/2099', '%d/%m/%Y')   
+                     expireDate = datetime.strptime('01/01/2099', '%d/%m/%Y')   
 
                  elif expireMonths == 0:
                     userExpireDate = request.POST.get('userexpiredate', '')
@@ -112,9 +112,9 @@ def authorise_datasets(request, userkey):
                  if dataset.datasetid == "jasmin-login" or \
                     dataset.datasetid == "cems-login" or \
                     dataset.datasetid == "commercial-login":
-		    
+    
                     uid_update = True
-		    
+    
                     datasetRequest.userkey.jasminaccountid = datasetRequest.userkey.accountid
                     datasetRequest.userkey.save()
  
@@ -133,26 +133,26 @@ def authorise_datasets(request, userkey):
                     dataset.datasetid == "cems-login":
 
                     if emailuser.lower() == "yes":  
-			userkey = datasetRequest.userkey
-			msg_sent = True
-			cmd = "/usr/local/userdb/releases/current/new_datasets_notification/service_msg.py"
-			m = Popen([cmd, "%s" % userkey, dataset.datasetid, "--send"])
-			m.wait()
-			msg_status = m.returncode
+                        userkey = datasetRequest.userkey
+                        msg_sent = True
+                        cmd = "/usr/local/userdb/releases/current/new_datasets_notification/service_msg.py"
+                        m = Popen([cmd, "%s" % userkey, dataset.datasetid, "--send"])
+                        m.wait()
+                        msg_status = m.returncode
 
-			mailmsg = Popen([cmd, "%s" % userkey, dataset.datasetid], stdout=PIPE).communicate()[0] 
+                        mailmsg = Popen([cmd, "%s" % userkey, dataset.datasetid], stdout=PIPE).communicate()[0] 
 
                  if dataset.datasetid.startswith("gws_"):
 
                     if emailuser.lower() == "yes":  
-			userkey = datasetRequest.userkey
-			msg_sent = True
-			cmd = "/usr/local/userdb/releases/current/new_datasets_notification/service_msg.py"
-			m = Popen([cmd, "%s" % userkey, dataset.datasetid, "--send"])
-			m.wait()
-			msg_status = m.returncode
+                        userkey = datasetRequest.userkey
+                        msg_sent = True
+                        cmd = "/usr/local/userdb/releases/current/new_datasets_notification/service_msg.py"
+                        m = Popen([cmd, "%s" % userkey, dataset.datasetid, "--send"])
+                        m.wait()
+                        msg_status = m.returncode
 
-			mailmsg = Popen([cmd, "%s" % userkey, dataset.datasetid], stdout=PIPE).communicate()[0] 
+                        mailmsg = Popen([cmd, "%s" % userkey, dataset.datasetid], stdout=PIPE).communicate()[0] 
 
                          
                  if dataset.manual_processing_required():
@@ -235,24 +235,24 @@ def get_dataset_authoriser_string (datasetid):
     authoriser_string = ''
     
     try:
-    	
-	priv = Privilege.objects.filter(datasetid=datasetid, type='authorise')
-	
-	
-	if len(priv)==1:
-	    authoriser_string = 'Authoriser: '
-	else:
-	    authoriser_string = '%s Authorisers: ' % len(priv)
-	        
-	for p in priv:
+    
+        priv = Privilege.objects.filter(datasetid=datasetid, type='authorise')
+
+
+        if len(priv)==1:
+            authoriser_string = 'Authoriser: '
+        else:
+            authoriser_string = '%s Authorisers: ' % len(priv)
+        
+        for p in priv:
             authoriser_string = authoriser_string + p.userkey.displayName() + ', '
 
         authoriser_string = authoriser_string.rstrip(', ')
-	
+
     except:
         pass
-			
-			
+
+
     return authoriser_string
 
       
@@ -281,8 +281,8 @@ def _get_next_free_uid():
     
     REMOVE = [25001,25008,25010,25012,25013,25028,25041,25042,25046,25059,25060,25062,25065,25072,25073,25080,
               25091,25101,25102,25110,25111,25112,25115,25116,25117,25118,25120,25121,25122,25123,25124,25125,
-	      25126,25128,25129,25130,25131,25134,25135,25136,25139,25140,25142,25143,25144,25151,25152,25157,
-	      25160,25162,25165,25166,25168,25171]
+              25126,25128,25129,25130,25131,25134,25135,25136,25139,25140,25142,25143,25144,25151,25152,25157,
+              25160,25162,25165,25166,25168,25171]
     #
     # Get available range of uids
     #
@@ -315,20 +315,20 @@ def _get_next_free_uid():
     if external:
         for account in external.keys():
             try:
-        	uids.remove(int(external[account].uid))
+                uids.remove(int(external[account].uid))
             except ValueError:
-        	pass
+                pass
 
     internal = NISaccounts.getIntPasswdFile()
  
     if internal:
  
-	for account in internal.keys():
+        for account in internal.keys():
             try:
-        	uids.remove(int(internal[account].uid))
+                uids.remove(int(internal[account].uid))
             except ValueError:
-        	pass
-	    
+                pass
+    
     if len(uids) > 0:
         return uids[0]
     else:

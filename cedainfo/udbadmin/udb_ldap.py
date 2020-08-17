@@ -35,7 +35,7 @@ ARCHIVE_ACCESS_GROUPS = {"cmip5_research": {"gid": 26059, "datasets" : ["cmip5_r
                                                                         "surface",
                                                                         "synop",
                                                                         "ukmo-metdb",
-									"um",
+                                                                        "um",
                                                                         "nimrod"]},
                          
                          "ukmo_clim":      {"gid": 26079, "datasets" : ["cet",
@@ -86,7 +86,7 @@ def userdb_managed_ldap_groups ():
     
     for dataset in datasets:
         groups.append(dataset.grp)
-		
+
     return groups
     
 def userdb_managed_ldap_datasets ():
@@ -118,11 +118,11 @@ def udb_archive_access_datasets():
     for datasetid in datasetids:
         try:
             datasets.append(Dataset.objects.get(datasetid=datasetid))
-	except:
-	    pass
-	    
-    return datasets	    
-	
+        except:
+            pass
+    
+    return datasets    
+
 def userdb_managed_datasetids ():
     """
     Returns a list of all datasetids for userdb datasets that map onto ldap groups
@@ -262,8 +262,8 @@ def get_dataset_users(datasetids):
 #           Skip if no user for this record (it can happen!)
 #
             if not hasattr(udj, 'userkey'):
-	        continue
- 	
+                continue
+ 
             user = udj.userkey
 
             if user.userkey not in all_valid_userkeys:
@@ -334,7 +334,7 @@ def ldap_all_group_records (add_additions_file=True):
     record = record + '\n'
 
     if add_additions_file:
-	if os.path.exists(settings.ADDITIONAL_LDAP_GROUP_FILE):
+        if os.path.exists(settings.ADDITIONAL_LDAP_GROUP_FILE):
             f = open(settings.ADDITIONAL_LDAP_GROUP_FILE, "r")
 
             additional_groups = f.read()
@@ -648,17 +648,17 @@ def ldif_all_user_updates(server=settings.LDAP_URL):
     
     while i < len(out):
         if out[i].find('rootAccessGroup') == -1:
-	
-	    if i< len(out)-1 and out[i+1].startswith('changetype: delete'):
-		if out[i].startswith('dn: cn=aharwood') or out[i].startswith('dn: cn=xxxx'):
-	            i = i + 1
-		else:
-		    stringout += out[i]
+
+            if i< len(out)-1 and out[i+1].startswith('changetype: delete'):
+                if out[i].startswith('dn: cn=aharwood') or out[i].startswith('dn: cn=xxxx'):
+                    i = i + 1
+                else:
+                     stringout += out[i]
             else:
-	        stringout += out[i]
+                stringout += out[i]
                 
         i = i + 1
-	    
+    
     return stringout
     
 def ldif_all_users (write_root_access=True):

@@ -125,8 +125,7 @@ def ldap_group_ldiff (request):
 #            stringout += diffoutput[i]
         
  
-
- 	 
+ 
     return render_to_response('ldap_update_groups.html', locals())   
  
 @login_required()     
@@ -602,11 +601,11 @@ def display_free_gids (request):
 
 
         udbdataset = Dataset.objects.filter(gid=gid)
-	
-	if len(udbdataset) > 0:
-	    rec['udb_group'] = udbdataset[0].datasetid
-	    rec['free'] = False
-	
+
+        if len(udbdataset) > 0:
+            rec['udb_group'] = udbdataset[0].datasetid
+            rec['free'] = False
+
         if ext_gids.has_key(gid):
             rec['ext_group']      = ext_gids[gid]
             rec['free']           = False
@@ -655,5 +654,5 @@ def write_to_ldap_server(request):
         if ldif:
             output = LDAP.ldif_write(ldif)
 #           return HttpResponse(out, content_type="text/html")
-	 
+ 
     return render_to_response('write_to_ldap_server.html', locals())

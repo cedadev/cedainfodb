@@ -113,7 +113,7 @@ def list_keys(request):
     if sort_headers.get_order_by() != 'length':       
         users = User.objects.exclude(public_key__exact=' ').exclude(public_key__exact='').order_by(sort_headers.get_order_by())
     else:
-    	users = User.objects.exclude(public_key__exact=' ').exclude(public_key__exact='')
+        users = User.objects.exclude(public_key__exact=' ').exclude(public_key__exact='')
 
 ##    users = udb_ldap.all_users()
 #
@@ -146,16 +146,16 @@ def list_keys(request):
                 public_key_differs = True
 
         length = public_keys.check_public_key(user.public_key)
-	
+
         userhash = {'cedauser': user, 
                     'ldap_public_key': ldap_public_key, 
-		    'key_length': length, 
+                    'key_length': length, 
                     'public_key_differs': public_key_differs, 
                     'diag_udb_key': public_keys.prepare_key_for_diff(user.public_key), 
                     'diag_ldap_key': public_keys.prepare_key_for_diff(ldap_public_key)}
                      
         cedausers.append(userhash)
-	
+
     if sort_headers.get_order_by() == 'length':          
         cedausers = sorted(cedausers, key=itemgetter('key_length'))
      
@@ -172,8 +172,8 @@ def list_current_user_datasets(request, userkey):
     if request.method == 'POST':
        for removeID in request.POST.getlist('remove'):
           udj = Datasetjoin.objects.get(id=removeID)
-	  udj.removeDataset()
-	  
+          udj.removeDataset()
+  
     cedauser = User.objects.get(userkey=userkey)
 
     sort_headers = SortHeaders(request, DATASET_HEADERS)
@@ -222,17 +222,17 @@ def get_dataset_authorisers (datasetid):
     authorisers = []
 
     try:
-    	
-	priv = Privilege.objects.filter(datasetid=datasetid, type='authorise')
+    
+        priv = Privilege.objects.filter(datasetid=datasetid, type='authorise')
 
-	for p in priv:
+        for p in priv:
             authorisers.append(p.userkey)
 
-	if not authorisers:
+        if not authorisers:
             authorisers.append(User.objects.get(userkey=-1))
     except:
         pass
-			
+
     return authorisers
 
 def get_dataset_viewers (datasetid):
@@ -243,14 +243,14 @@ def get_dataset_viewers (datasetid):
     viewers = []
 
     try:
-    	
-	priv = Privilege.objects.filter(datasetid=datasetid, type='viewusers')
+  
+        priv = Privilege.objects.filter(datasetid=datasetid, type='viewusers')
 
-	for p in priv:
+        for p in priv:
             viewers.append(p.userkey)
     except:
         pass
-			
+
     return viewers
 
 
@@ -287,8 +287,8 @@ def edit_user_dataset_join (request, id):
          udj.removeDataset()
       if udj.removed == -1 and request.POST.get('removed') == '0':
          udj.removed = 0
-	 udj.removeddate = None
-	             
+         udj.removeddate = None
+             
       udj.save()
 #
 #          For some reason I need to re-read the values in order for the expiredate and endorseddate to show the correct values
@@ -327,7 +327,7 @@ def edit_dataset_request (request, id):
       changeendorsedby = request.POST.get('changeendorsedby', '')
       if changeendorsedby:
          datasetRequest.endorsedby = changeendorsedby
-	             
+             
       datasetRequest.save()
 #
 #          For some reason I need to re-read the values in order for the expiredate and endorseddate to show the correct values
@@ -355,17 +355,17 @@ def add_user_datasets(request, userkey):
       datasetid = request.POST.get('datasetid', '') 
       
       if datasetid:
-	 dataset   = Dataset.objects.get(datasetid=datasetid)
-	 expireDate = datetime.now() + relativedelta(months=dataset.defaultreglength)
+         dataset   = Dataset.objects.get(datasetid=datasetid)
+         expireDate = datetime.now() + relativedelta(months=dataset.defaultreglength)
 
-	 endorsedby = request.POST.get('endorsedby', '')  
+         endorsedby = request.POST.get('endorsedby', '')  
 
-	 version = Datasetjoin.objects.getDatasetVersion(userkey, datasetid) 
-	 udj = Datasetjoin(userkey=cedauser, datasetid=dataset, ver=version, endorsedby=endorsedby, expiredate=expireDate, endorseddate=datetime.now(timezone('Europe/London')))
-	 udj.save()
+         version = Datasetjoin.objects.getDatasetVersion(userkey, datasetid) 
+         udj = Datasetjoin(userkey=cedauser, datasetid=dataset, ver=version, endorsedby=endorsedby, expiredate=expireDate, endorseddate=datetime.now(timezone('Europe/London')))
+         udj.save()
 
          return redirect ('/udbadmin/udj/%s' % udj.id)
-	 
+ 
    return render_to_response('add_user_dataset.html', locals())
 
 
@@ -389,9 +389,9 @@ def list_users_for_dataset(request, datasetid):
 #          print u['userkey']
 #          print userKey
 #          cedaUser = User.objects.get(userkey=userKey)
-#	  mydict = {'user': cedaUser}
-#	  recs.append(userKey)
-	  
+#          mydict = {'user': cedaUser}
+#         recs.append(userKey)
+  
     except:
        return HttpResponse('dataset not found')
 
@@ -403,7 +403,7 @@ def list_accounts_for_dataset(request, datasetid):
 
     try:
        dataset = Dataset.objects.get(datasetid=datasetid)   
-       recs  = Datasetjoin.objects.filter(datasetid=datasetid).filter(userkey__gt=0).filter(removed=0)      	  
+       recs  = Datasetjoin.objects.filter(datasetid=datasetid).filter(userkey__gt=0).filter(removed=0)        
     except:
        return HttpResponse('dataset not found')
 

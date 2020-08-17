@@ -97,28 +97,28 @@ class Dataset(models.Model):
 
     def browse_url (self):
         '''Returns url for browsing data directory (if appropriate)'''
-	
-	BROWSER = "http://badc.nerc.ac.uk/browse"
+
+        BROWSER = "http://badc.nerc.ac.uk/browse"
 
         if self.datasetid.startswith('gws_'):
-	    return None
+            return None
 
         if self.datasetid.endswith('_ps'):
-	    return None
+            return None
 
         if self.datasetid == 'gosta_cd':
-	    return None
-	    	    
-	text = self.directory.strip()
-	
-	if text.startswith('http'):
-	    return text
-	
-	if not text.startswith('/'):    
             return None
-	    	    
-	return BROWSER + self.directory
-	
+    
+        text = self.directory.strip()
+
+        if text.startswith('http'):
+            return text
+
+        if not text.startswith('/'):    
+            return None
+      
+        return BROWSER + self.directory
+
     def manual_processing_required(self):
 #
 #            Temporary fudge to indicate that the dataset requires "manual processing". 
@@ -143,12 +143,12 @@ class Dataset(models.Model):
 #        
         priv = Privilege.objects.filter(datasetid=self.datasetid, type='authorise')
          
-	for p in priv:
-	    if p.userkey.userkey > 0:
-	        return True	 
+        for p in priv:
+            if p.userkey.userkey > 0:
+                return True 
 
         return False
-	      
+      
     class Meta:
         in_db = USERDB
         db_table = u'tbdatasets'
@@ -209,7 +209,7 @@ class User (models.Model):
               ("Dr","Dr"),
               ("Miss","Miss"),
               ("Ms","Ms"),
-	      ("Mx", "Mx"),
+              ("Mx", "Mx"),
               ("Prof","Prof")
           )
         ) 
@@ -392,28 +392,28 @@ class User (models.Model):
         '''Returns True if this is not a real person but a system account.'''
         
         if self.hasDataset("ldap_system_user") or \
-	   self.accountid == 'et_jasmin' or \
-	   self.othernames.startswith('system_user'):
+           self.accountid == 'et_jasmin' or \
+           self.othernames.startswith('system_user'):
             return True
         else:
             return False                 
 
     def pending_vm_request(self):
         
-	"""
-	Checks if the given user has a pending request for a vm account
-	"""
+        """
+        Checks if the given user has a pending request for a vm account
+        """
 
-	requests = self.pendingDatasets()
+        requests = self.pendingDatasets()
          
-	for request in requests:
+        for request in requests:
             if request.datasetid.datasetid == 'jasmin-login' or \
-        	request.datasetid.datasetid == 'cems-login' or \
-        	request.datasetid.datasetid == 'commercial-login':
+                request.datasetid.datasetid == 'cems-login' or \
+                request.datasetid.datasetid == 'commercial-login':
 
                     return True
 
-	return False
+        return False
   
         
     def nextUserkey (self):        
@@ -481,18 +481,18 @@ class Datasetjoin(models.Model):
 
     def days_until_expires(self):
         '''
-	Returns the number of days until the registraion expires, or None if
-	this could not be calculated (e.g. there is no expiry date set).
-	'''
+        Returns the number of days until the registraion expires, or None if
+        this could not be calculated (e.g. there is no expiry date set).
+        '''
         try:
             a = self.expiredate 
 
-	    b = datetime.today()
-	    delta = a - b
+            b = datetime.today()
+            delta = a - b
             return delta.days
         except:
-	    return None
-	                    
+            return None
+                    
     def removeDataset(self):
         self.removed = -1
         self.removeddate = datetime.now(timezone('Europe/London'))

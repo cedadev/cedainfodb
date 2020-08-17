@@ -278,17 +278,17 @@ def ldif_all_groups (filter_scarf_users=False, server=settings.LDAP_URL, select_
     bb = tempfile.NamedTemporaryFile()
 
     if filter_scarf_users:
-	cc = tempfile.NamedTemporaryFile()
-	
+        cc = tempfile.NamedTemporaryFile()
+
         p2 = subprocess.Popen([SORT_SCRIPT, "-a", "-k", "dn", b.name], stdout=cc)
         p2.wait()
 
-	grep_string = "memberUid: scarf"
+        grep_string = "memberUid: scarf"
 
-	for entry in EXCLUDE_USERS:
-	    grep_string = grep_string + "|memberUid: %s$" % entry
+        for entry in EXCLUDE_USERS:
+            grep_string = grep_string + "|memberUid: %s$" % entry
 
-	ccin = open(cc.name, 'r')
+        ccin = open(cc.name, 'r')
         p3 = subprocess.Popen(["egrep", "-v", grep_string], stdin=ccin, stdout=bb)
         p3.wait() 
 
@@ -308,14 +308,14 @@ def _get_ldap_group_filter_string (groups=[]):
     if len(groups) == 1:
             group_filter = '(cn=%s)' % groups[0]
     elif len(groups) > 1:
-    	    group_filter = '(|'
+            group_filter = '(|'
 
             for group in groups:
-	        group_filter += '(cn=%s)' % group    
-            group_filter += ')'		
+                group_filter += '(cn=%s)' % group    
+            group_filter += ')'
 
     else:
-	group_filter = '(cn=*)'
+        group_filter = '(cn=*)'
 
     return group_filter
 
@@ -336,8 +336,8 @@ def ldif_all_users (filter_root_users=False, server=settings.LDAP_URL):
     filter_string = "(!(|(uid=dummEntry)"  
 
     for entry in EXCLUDE_USERS:
-	filter_string += "(uid=%s)" % entry
-    filter_string += "))"	
+        filter_string += "(uid=%s)" % entry
+    filter_string += "))"
 
     p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", server, "-b", PEOPLE_BASE, "-s", "one", filter_string], stdout=b)
     p1.wait()
