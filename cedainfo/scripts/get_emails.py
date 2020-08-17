@@ -16,12 +16,12 @@ def run():
 
     for line in sys.stdin:
         username = line.strip()
-	
-	if not username:
-	    continue
+
+        if not username:
+            continue
         try: 
             user = User.objects.get(accountid=username)
-	    print user.accountid, user.emailaddress.lower()
+            print user.accountid, user.emailaddress.lower()
         except:
             print 'ERROR: %s not found' % username
 

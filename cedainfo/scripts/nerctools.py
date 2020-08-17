@@ -36,26 +36,26 @@ def run():
     for udj in udjs:
     
         print udj.userkey.userkey
-	
+
         if udj.userkey.userkey == 1:
             print 'AAAAAAA'
             continue
-	    	    
+        
         nerctools = Datasetjoin.objects.filter(userkey=udj.userkey).filter(datasetid='nerctools')
-	
-	if udj.userkey == 1:
+
+        if udj.userkey == 1:
             print 'ZZZ', udj.userkey
-	    
-	if len(nerctools) <= 0:
-	    print 'Add nerctools to ', udj.userkey
+    
+        if len(nerctools) <= 0:
+            print 'Add nerctools to ', udj.userkey
 
         else:
-	     print 'already got nerctools'    
-	
-	    
-	      
-	    
-	    
+            print 'already got nerctools'    
+
+    
+      
+    
+    
 #    accountids = []
 #    
 #    for udj in udjs:
