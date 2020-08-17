@@ -33,8 +33,8 @@ class HostList(ListView):
             ordering = self.request.GET.get('o', '-hostname')
             # validate ordering here
             return ordering    
-	    
-	    
+    
+    
 # host_detail view: includes details of host, plus services and history entries for that host
 @login_required()
 def host_detail(request, host_id):
@@ -1000,9 +1000,9 @@ def txt_service_list2(request, vmname=''):
 
     for rec in recs:
         for field in fields:
-	    if field == 'infolink':
-	        output += "http://cedadb.ceda.ac.uk/admin/cedainfoapp/newservice/%s/" % str(rec.id)
-		output += '\t'
+            if field == 'infolink':
+                output += "http://cedadb.ceda.ac.uk/admin/cedainfoapp/newservice/%s/" % str(rec.id)
+                output += '\t'
             else:
                 output += str(getattr(rec, field))
                 output += '\t'
@@ -1075,11 +1075,11 @@ def service_list_by_vm(request):
     vms = []
 
     for vm in allvms:
-	        
+        
         recs = NewService.objects.filter(host__name=vm.name).order_by('name')
-	
+
         if service_status:
-	    recs = recs.filter(status=service_status)
+            recs = recs.filter(status=service_status)
         if (len(recs) > 0):
             vm.prodservices = recs
             vms.append(vm)
@@ -1111,11 +1111,11 @@ def service_internet_facing(request):
 #       Only continue if this vm has at least one external facing service
 #
         ext_services = NewService.objects.filter(host__name=vm.name).filter(status='production').filter(Q (visibility='restricted') | Q(visibility='public'))
-	if not ext_services:
-	    continue
+        if not ext_services:
+            continue
  
         recs = NewService.objects.filter(host__name=vm.name).order_by('name')
-	
+
         if (len(recs) > 0):
            vm.prodservices = recs
            vms.append(vm)
@@ -1153,7 +1153,7 @@ def service_unusedvms(request):
     for vm in allvms:
 
         #        if 'dev.' in vm.name or 'test.' in vm.name or 'dev1.' in vm.name or 'test1.' in vm.name:
-        #	    continue
+        #    continue
 
         if vm.type == 'legacy':
             continue
@@ -1225,7 +1225,7 @@ def service_doc_check(request):
     urls = []
 
     for service in services:
-	if service.documentation:
+        if service.documentation:
             urls.append(service.documentation)
 
 
@@ -1235,23 +1235,23 @@ def service_doc_check(request):
 
 
     for d in duplicate_docs:
-	rec = {}
-	rec["doc"] = d
-	rec["services"] = []
+        rec = {}
+        rec["doc"] = d
+        rec["services"] = []
 
-	res = NewService.objects.filter(documentation=d)
+        res = NewService.objects.filter(documentation=d)
 
-	for r in res:
+        for r in res:
             rec["services"].append(r)
 
-	duplicates.append(rec)
+        duplicates.append(rec)
 #
 #   Get services where doc is not in correct collection and category
-#		
+#
     not_in_helpscout = []
      
     services = NewService.objects.exclude(status='decomissioned')
-	
+
     collection = helpscoutdocs.get_collection(helpscoutdocs.SERVICES_COLLECTION_ID)
 
     docs = helpscoutdocs.get_articles_in_category (collection,  helpscoutdocs.SERVICES_DOCUMENTATION_CATEGORY_ID)
@@ -1259,27 +1259,27 @@ def service_doc_check(request):
     helpscout_urls = []
     
     for doc in docs:
-	helpscout_urls.append(doc.json()["article"]["publicUrl"])
-	       
+        helpscout_urls.append(doc.json()["article"]["publicUrl"])
+       
     for service in services:
-	if service.documentation and service.documentation not in helpscout_urls:
-	   service.url_ok = _url_exists(service.documentation)
-	   not_in_helpscout.append(service)
+        if service.documentation and service.documentation not in helpscout_urls:
+           service.url_ok = _url_exists(service.documentation)
+           not_in_helpscout.append(service)
 #
 #   Get docs which are not linked to an active service record
 #    
     not_in_cedainfodb = []
     
     for url in helpscout_urls:
-	found = False
+        found = False
        
-	for service in services:
-	   if service.documentation and service.documentation  == url:
-	       found = True
+        for service in services:
+           if service.documentation and service.documentation  == url:
+               found = True
        
         if not found:
-	   not_in_cedainfodb.append(url)	  
-        	      
+           not_in_cedainfodb.append(url)  
+              
     return render_to_response('services/doc_check.html', locals())
 
 
@@ -1296,10 +1296,10 @@ def decomissioned_service_doc_check(request):
                
     for service in services:
         if service.documentation and service.documentation in helpscout_urls:
-	    service.url_ok = _url_exists(service.documentation)
+            service.url_ok = _url_exists(service.documentation)
             in_current.append(service)
 
-		       
+       
     return render_to_response('services/decomissioned_doc_check.html', locals())
 
 
@@ -1316,7 +1316,7 @@ def vm_ping_check(request):
         (output, error) = subprocess.Popen("ping -W1 -c 1 %s" % name,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE,
-                                   shell=True).communicate()		
+                                   shell=True).communicate()
         if error:
             missing.append(vm)
       

@@ -82,7 +82,7 @@ class VMRequestDetailForm(ModelForm):
         widgets = {
             'name': TextInput(attrs={'size': 80,}),
         }
-	exclude = ('',)
+        exclude = ('',)
 
 # Form for displaying (not editing) a single GWSRequest
 class GWSRequestDetailForm(ModelForm):
@@ -95,7 +95,7 @@ class GWSRequestDetailForm(ModelForm):
             'requested_volume': TextInput(attrs={'size': 80,}),
             'related_url': TextInput(attrs={'size': 80,}),
         }
-	exclude=('',)
+        exclude=('',)
 
 class ServiceForm(ModelForm):
     review_status = ChoiceField(choices=( 
@@ -106,21 +106,21 @@ class ServiceForm(ModelForm):
             ("failed", "Failed"),
             ("failed with minor issues", "Failed with minor issues"),
  
-			         )) 
+         )) 
     visibility = ChoiceField(choices=( 
                                          ('', 'Any'),
-					 ('public', 'Public'),
-					 ('internal', 'Internal'),
-					 ('restricted', 'Restricted'),
+                                         ('public', 'Public'),
+                                         ('internal', 'Internal'),
+                                         ('restricted', 'Restricted'),
                                       ))
-				      
+      
     status = ChoiceField(choices=(
                                   ('', 'Any'),
-				  ('pre-production', 'Pre-production'),
-				  ('production', 'Production'),
-				  ('decomissioned', 'Decomissioned'),
-				  ('other', 'Other'),
-                               ))				      
+                                  ('pre-production', 'Pre-production'),
+                                  ('production', 'Production'),
+                                  ('decomissioned', 'Decomissioned'),
+                                  ('other', 'Other'),
+                               ))      
     class Meta:
         model = NewService
         exclude =('',)

@@ -81,9 +81,9 @@ class Tenancy(models.Model):
 
     def __unicode__(self):
         return self.name
-	
+
     class Meta:
-        ordering = ["name"]	
+        ordering = ["name"]
  
 
 class Rack(models.Model):
@@ -497,10 +497,10 @@ class FileSet(models.Model, ProblemsMixin):
             # showing the migration is complete with regard to the CEDA info tool
             DOC = open(os.path.join(self.storage_path(), 'MIGRATED.txt'), 'w')
             DOC.write("""This storage directory has been migrated and can be deleted.
-	
-	            Migrated %s -> %s (%s)
-	            Storage pot: %s/%s
-	            Logical path: %s""" % (self.partition, self.migrate_to,
+
+                    Migrated %s -> %s (%s)
+                    Storage pot: %s/%s
+                    Logical path: %s""" % (self.partition, self.migrate_to,
                                        datetime.utcnow(), self.storage_pot_type,
                                        self.storage_pot, self.logical_path))
 
@@ -788,21 +788,21 @@ class FileSet(models.Model, ProblemsMixin):
     #    if not self.partition: return #can't migrate a spot if no partition 
     #    if self.migrate_to: return #already got a migration partition 
 
-    #	partitions = Partition.objects.filter(status='Allocating')
+    #   partitions = Partition.objects.filter(status='Allocating')
     #        # find the fullest partition which can accomidate the file set
-    #	allocated_partition = None
-    #	fullest_space = 10e40
-    #	for p in partitions:
-    #	    partition_free_space = 0.95 * p.capacity_bytes - p.allocated()
+    #   allocated_partition = None
+    #   fullest_space = 10e40
+    #   for p in partitions:
+    #       partition_free_space = 0.95 * p.capacity_bytes - p.allocated()
     #            # if this partition could accommidate file set...
-    #	    if partition_free_space > self.overall_final_size:
-    #		# ... and its the fullest so far
-    #		if partition_free_space < fullest_space:
-    #		    allocated_partition = p
-    #		    fullest_space = partition_free_space
+    #       if partition_free_space > self.overall_final_size:
+    #   # ... and its the fullest so far
+    #if partition_free_space < fullest_space:
+    #    allocated_partition = p
+    #    fullest_space = partition_free_space
     #
     #        self.migrate_to = allocated_partition
-    #	self.notes += '\nAllocated migration partition %s (%s)' % (self.migrate_to, datetime.now())
+    #  self.notes += '\nAllocated migration partition %s (%s)' % (self.migrate_to, datetime.now())
     #        self.save()
 
     def du(self):
@@ -1889,8 +1889,8 @@ class VMRequest(models.Model):
                     patch_responsible=self.patch_responsible,
                     status='active',
                     end_of_life=self.end_of_life,
-		    other_info=self.other_info,
-		    tenancy = self.tenancy,
+                    other_info=self.other_info,
+                    tenancy = self.tenancy,
             )
             # root_users is a ManyToManyField, so need to copy outside of create()
             vm.root_users = self.root_users.all()
@@ -1925,8 +1925,8 @@ class VMRequest(models.Model):
                 vm.status = 'active'
                 vm.end_of_life = self.end_of_life
                 vm.root_users = self.root_users.all()
-		vm.other_info = self.other_info
-		vm.tenancy = self.tenancy
+                vm.other_info = self.other_info
+                vm.tenancy = self.tenancy
                 vm.forceSave()
 
                 # update the request status
@@ -1938,10 +1938,10 @@ class VMRequest(models.Model):
                 raise Exception("Can't do update request : no VM associated")
             else:
                 self.vm.status='retired'
-		self.vm.retired = datetime.now()
-		self.request_status = 'completed'
+                self.vm.retired = datetime.now()
+                self.request_status = 'completed'
 
-		self.vm.forceSave()
+                self.vm.forceSave()
                 self.save()
 
         else:
@@ -2038,7 +2038,7 @@ class VM(models.Model):
                 request_status='ceda pending',
                 request_type='update',
                 end_of_life=self.end_of_life,
-		tenancy = self.tenancy,
+                tenancy = self.tenancy,
                 vm=self,
         )
         req.root_users = self.root_users.all()
@@ -2083,16 +2083,16 @@ class VM(models.Model):
 
     def ping_check(self):
         '''Performs ping check on host. If successful records the time in the 'ping_last_ok' attribute and returns True'''
-	
+
         if self.ping_ok():
 #
 #         Save the update using a queryset so that the timestamp of the VM object is not updated as well
-#	
-	    VM.objects.filter(name = self.name).update(ping_last_ok=datetime.now())
+#
+            VM.objects.filter(name = self.name).update(ping_last_ok=datetime.now())
 
-	    return True
+            return True
         else:
-	    return False
+            return False
 
     def ping_ok (self):
         '''Returns True if VM can be pinged'''
@@ -2100,14 +2100,14 @@ class VM(models.Model):
         name = self.name
         name = name.replace('legacy:', '')
 
-	FNULL = open(os.devnull, 'w')
+        FNULL = open(os.devnull, 'w')
         status = subprocess.call (["ping", "-c 1", name], stdout=FNULL, stderr=FNULL)
-	FNULL.close()
+        FNULL.close()
 
-	if status == 0 :
-	    return True
-	else:
-	    return False
+        if status == 0 :
+            return True
+        else:
+            return False
 #
 
     def coloured_vm_name(self):
@@ -2123,7 +2123,7 @@ class VM(models.Model):
         production_count = len(NewService.objects.filter(host_id=self.id, status='production'))
         decomissioned_count = len(NewService.objects.filter(host_id=self.id, status='decomissioned'))
 
-	return '<a href="/admin/cedainfoapp/newservice/?Host=%s">%s (%s)</a>' % (self.id, production_count, decomissioned_count)
+        return '<a href="/admin/cedainfoapp/newservice/?Host=%s">%s (%s)</a>' % (self.id, production_count, decomissioned_count)
 
     service_count.allow_tags = True
 ##    service_count.admin_order_field='service_count'
@@ -2248,7 +2248,7 @@ class NewService(models.Model):
 
        try:
             address = socket.gethostbyname(vm.name.replace('legacy:', ''))
-#	    address = socket.gethostbyname(vm.name)
+#         address = socket.gethostbyname(vm.name)
 
             return vm
        except:
