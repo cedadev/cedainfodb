@@ -44,10 +44,10 @@ def find_nearest_ftpaccess_file (start_dirname):
     while True:
     
         ftpaccess = dirname + '/' + FILE
-		
+
         if os.path.exists(ftpaccess):
-	    return ftpaccess
-	       
+            return ftpaccess
+       
         dirname = os.path.dirname(dirname)
 
         if dirname.count('/') == 1:
@@ -90,15 +90,15 @@ for rec in recs:
            continue
        else:
            link_destination = os.readlink(logical_path)
-	   
-	   link_destination = link_destination.rstrip('/')
-	   directory = directory.rstrip('/')
-	   
+   
+           link_destination = link_destination.rstrip('/')
+           directory = directory.rstrip('/')
+   
            if link_destination != directory:
-	       print 'ERROR: link mismatch: %s %s' % \
-	          (link_destination, directory)
-	       continue
-	       
+               print 'ERROR: link mismatch: %s %s' % \
+                  (link_destination, directory)
+               continue
+              
    if not os.path.exists(directory):
        print 'ERROR directory %s does not exist' % directory
        continue

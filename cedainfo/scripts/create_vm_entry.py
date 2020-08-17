@@ -35,13 +35,13 @@ except:
     """
 
     a= VM(
-	name=vm_name,
-	type='legacy',
-	status='deprecated',
-	description=description,
-	internal_requester=User.objects.get(username='nobody'),
-	date_required='1999-01-01',
-	patch_responsible_id=User.objects.get(username='nobody').id
+        name=vm_name,
+        type='legacy',
+        status='deprecated',
+        description=description,
+        internal_requester=User.objects.get(username='nobody'),
+        date_required='1999-01-01',
+        patch_responsible_id=User.objects.get(username='nobody').id
     )
     a.save()
-	
+
