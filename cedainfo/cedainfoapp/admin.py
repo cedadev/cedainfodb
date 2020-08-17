@@ -252,10 +252,10 @@ class NewServiceAdmin(admin.ModelAdmin):
     #    def wikiLink(self):
     #        url = self.documentation
     #
-    #	if url:
+    #    if url:
     #            return mark_safe('<a href="%s">Wiki</a>' % (url))
     #        else:
-    #	    return ''
+    #        return ''
     #
     #    wikiLink.allow_tags = True
     #    wikiLink.short_description = 'Wiki'
@@ -276,19 +276,19 @@ class NewServiceAdmin(admin.ModelAdmin):
         if self.documentation:
             return mark_safe('<a href="%s" title="View Helpscout documentation">Helpscout</a>' % (self.documentation))
         else:
-	    return ''
+            return ''
     docs.allow_tags = True
     docs.admin_order_field = "documentation"
 
     def vm_name (self):
     
         if self.host.status == 'deprecated':
-	    color = 'DarkViolet'
-	elif self.host.status == 'retired':
-	    color = 'red'    
-	else:
-	    color = 'none'
-	        
+            color = 'DarkViolet'
+        elif self.host.status == 'retired':
+            color = 'red'    
+        else:
+            color = 'none'
+        
         return '<a href="/admin/cedainfoapp/vm/%s/" title="Status: %s"><span style="color: %s;">%s</span></a>' % (self.host.id, self.host.status, color, self.host.name)
     vm_name.allow_tags = True
     vm_name.admin_order_field = "host__name"
@@ -296,9 +296,9 @@ class NewServiceAdmin(admin.ModelAdmin):
     
     def vm_os (self):
 
-	return self.host.os_required
+        return self.host.os_required
         
-	        
+        
     vm_os.admin_order_field = "host__os_required"
     vm_os. short_description = "OS"
     
@@ -334,8 +334,8 @@ admin.site.register(NewService, NewServiceAdmin)
 #    search_fields = ['dataentity_id','symbolic_name',]
 #
 #    formfield_overrides = {
-#	   models.CharField: {'widget': TextInput(attrs={'size':'80'})},
-#	}
+#           models.CharField: {'widget': TextInput(attrs={'size':'80'})},
+#        }
 
 # admin.site.register(DataEntity, DataEntityAdmin)
 
