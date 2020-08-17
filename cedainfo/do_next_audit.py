@@ -24,19 +24,19 @@ def pick_audit():
     for f in filesets:
         last_audit = f.last_audit()
         # if no audit done before then use this one
-	if last_audit == None:
-	    return f    
+        if last_audit == None:
+             return f    
         # skip if last audit not an analysed state then skip
         if last_audit.auditstate != 'analysed':    
             print "Ignore - audit got an error" 
             continue
         # see if this is the oldest audit
         print  last_audit.starttime , oldest_audit, last_audit.starttime < oldest_audit
-	if last_audit.starttime < oldest_audit:
-	    oldest_audit = last_audit.starttime
-	    fileset_to_audit = f
-    return fileset_to_audit	        
-            	  	
+        if last_audit.starttime < oldest_audit:
+            oldest_audit = last_audit.starttime
+            fileset_to_audit = f
+    return fileset_to_audit        
+              
 def do_audit(f):
     print "Doing audit of fileset: %s ... " % f 
     audit=Audit(fileset=f)

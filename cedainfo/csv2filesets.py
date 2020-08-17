@@ -43,7 +43,7 @@ if __name__=="__main__":
             usage()
             sys.exit()
         elif o in ("-u", "--unit"):
-	    if a not in units.keys(): raise "unknown units"
+            if a not in units.keys(): raise "unknown units"
             factor = units[a] 
         elif o in ("-p", "--prefix"):
             prefix = a
@@ -57,15 +57,15 @@ if __name__=="__main__":
     
     for row in csvReader:
         path, size = row
-	size = long(size)
-	existing_filesets = FileSet.objects.filter(logical_path=path)
-	if len(existing_filesets) != 0:
-	    print "Skip: File set with same logical path already exists"
-	    continue
-	
-	if not test: 
-	    fs = FileSet(logical_path=prefix+path, overall_final_size=size*factor)
-	    fs.save()
+        size = long(size)
+        existing_filesets = FileSet.objects.filter(logical_path=path)
+        if len(existing_filesets) != 0:
+            print "Skip: File set with same logical path already exists"
+            continue
+
+        if not test: 
+            fs = FileSet(logical_path=prefix+path, overall_final_size=size*factor)
+            fs.save()
         print "makeing Fileset: %s (%s)" % (prefix+path,size*factor)
  
 

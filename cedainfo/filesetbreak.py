@@ -21,12 +21,12 @@ if __name__=="__main__":
     #find fileset to break
     for f in filesets:
          if f.logical_path == breakpath[0:len(f.logical_path)]:
-	     if fs_to_break == None:
-	         fs_to_break = f
-	     elif len(fs_to_break.logical_path) < len(f.logical_path):
-	         fs_to_break = f	      
-	     print f, fs_to_break
-	 
+             if fs_to_break == None:
+                 fs_to_break = f
+             elif len(fs_to_break.logical_path) < len(f.logical_path):
+                 fs_to_break = f      
+             print f, fs_to_break
+ 
  
     # if no break found exit
     if fs_to_break == None: 

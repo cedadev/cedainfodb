@@ -19,7 +19,7 @@ def start(self):
         return
 
     # time of audit
-    mtime = datetime.datetime.utcfromtimestamp(os.path.getmtime(checksumsfile))	    
+    mtime = datetime.datetime.utcfromtimestamp(os.path.getmtime(checksumsfile))    
     self.starttime = mtime
     self.auditstate = 'started'
     self.save()
@@ -30,9 +30,9 @@ def start(self):
         self.auditstate = 'error'
         self.save()
         raise e  
-	    
+    
     self.endtime = self.starttime
-	
+
     self.auditstate = 'analysed'
     self.save()
 
@@ -71,7 +71,7 @@ def _checkm_log(self, directory, storage_path, LOG):
                       time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime(float(mtime)))))
 
 Audit._checkm_log = _checkm_log
-	
+
 
 
 if __name__=="__main__":
@@ -103,7 +103,7 @@ if __name__=="__main__":
             continue
         
         # check that .checksums Audit does not exist
-        mtime = datetime.datetime.utcfromtimestamp(os.path.getmtime(checksumsfile))	    
+        mtime = datetime.datetime.utcfromtimestamp(os.path.getmtime(checksumsfile))    
         audits = Audit.objects.filter(fileset=fs, starttime=mtime)
         if len(audits) >0:
             print "audit already done or already started. %s." % fs.logical_path
