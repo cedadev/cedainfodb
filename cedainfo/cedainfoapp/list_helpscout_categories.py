@@ -29,7 +29,7 @@ ncategories = len(r.json()["categories"]["items"])
 
 for n in range(0, ncategories):
 
-    print r.json()["categories"]["items"][n]["name"], r.json()["categories"]["items"][n]["id"]
+    print(r.json()["categories"]["items"][n]["name"], r.json()["categories"]["items"][n]["id"])
 
 sys.exit()
 

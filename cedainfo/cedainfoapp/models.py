@@ -10,7 +10,7 @@ import socket
 import re
 import pwd, grp
 
-from storageDXMLClient import SpotXMLReader
+from .storageDXMLClient import SpotXMLReader
 ##from fields import *  # custom MultiSelectField, MultiSelectFormField from http://djangosnippets.org/snippets/2753/
 from multiselectfield import MultiSelectField
 
@@ -94,7 +94,7 @@ class Rack(models.Model):
     # tag = models.ManyToManyField(NodeListTag, null=True, blank=True, help_text="tag for nodelist")
     #    racklist = models.ForeignKey(RackList, null=True, blank=True, help_text="list this rack belongs to (only one)")
     def __unicode__(self):
-        return u'%s' % self.name
+        return '%s' % self.name
 
 
 class Host(models.Model):
@@ -142,7 +142,7 @@ class Host(models.Model):
     # hostlist = models.ManyToManyField(HostList, null=True, blank=True, help_text="list(s) this host belongs to")
 
     def __unicode__(self):
-        return u'%s' % self.hostname
+        return '%s' % self.hostname
 
     def partitions(self):
         return Partition.objects.filter(host=self)
@@ -371,7 +371,7 @@ class Partition(models.Model, ProblemsMixin):
 
     def __unicode__(self):
         tb_remaining = (self.capacity_bytes - self.used_bytes) / (1024 ** 4)
-        return u'%s (%d %s)' % (self.mountpoint, tb_remaining, 'Tb free')
+        return '%s (%d %s)' % (self.mountpoint, tb_remaining, 'Tb free')
 
     __unicode__.allow_tags = True    # seem to need this in order to use __unicode__ as one of the fields
                                      # in list_display in the admin view (see
@@ -384,7 +384,7 @@ class CurationCategory(models.Model):
     description = models.CharField(max_length=1024, help_text="Longer description")
 
     def __unicode__(self):
-        return u"%s : %s" % (self.category, self.description)
+        return "%s : %s" % (self.category, self.description)
 
 
 class BackupPolicy(models.Model):
@@ -397,7 +397,7 @@ class BackupPolicy(models.Model):
     policy_version = models.IntegerField(help_text="Policy version number")
 
     def __unicode__(self):
-        return u"%s %s %s %s" % (self.tool, self.frequency, self.type, self.policy_version)
+        return "%s %s %s %s" % (self.tool, self.frequency, self.type, self.policy_version)
 
 
 class AccessStatus(models.Model):
@@ -406,7 +406,7 @@ class AccessStatus(models.Model):
     comment = models.CharField(max_length=1024, help_text="Comment describing this status")
 
     def __unicode__(self):
-        return u"%s : %s" % (self.status, self.comment)
+        return "%s : %s" % (self.status, self.comment)
 
 
 class Person(models.Model):
@@ -416,7 +416,7 @@ class Person(models.Model):
     username = models.CharField(max_length=45, help_text="System username")
 
     def __unicode__(self):
-        return u'%s' % self.name
+        return '%s' % self.name
 
     class Meta:
         ordering = ["name"]
@@ -453,7 +453,7 @@ class FileSet(models.Model, ProblemsMixin):
     primary_on_tape = models.BooleanField(default=False, help_text="Primary media storage on tape.")
 
     def __unicode__(self):
-        return u'%s' % (self.logical_path,)
+        return '%s' % (self.logical_path,)
 
     # TODO custom save method (for when assigning a partition) : check that FileSet size
 
@@ -514,7 +514,7 @@ class FileSet(models.Model, ProblemsMixin):
     def _migration_copy(self):
         # copy - exception  copy is ok
         rsynccmd = 'rsync -av %s/ %s' % (self.storage_path(), self.migrate_path())
-        print ">>> %s" % rsynccmd
+        print((">>> %s" % rsynccmd))
         subprocess.check_call(rsynccmd.split())
 
     def secondary_copy_command(self):
@@ -595,7 +595,7 @@ class FileSet(models.Model, ProblemsMixin):
         allocated_partition = None
         fullest_space = 10e40
         for p in partitions:
-            print p, p.allocated(), p.disk_allocated()
+            print((p, p.allocated(), p.disk_allocated()))
             partition_free_space = fill_factor * p.capacity_bytes - p.disk_allocated()
             # if this partition could accommidate file set...
             if partition_free_space > size:
@@ -603,7 +603,7 @@ class FileSet(models.Model, ProblemsMixin):
                 if partition_free_space < fullest_space:
                     allocated_partition = p
                     fullest_space = partition_free_space
-                    print ">>>>>>> ", p, allocated_partition, fullest_space, partition_free_space
+                    print((">>>>>>> ", p, allocated_partition, fullest_space, partition_free_space))
 
         if allocated_partition is None:
             raise FilseSetCreationError("Can't find a partition to allocate this to.")
@@ -692,8 +692,8 @@ class FileSet(models.Model, ProblemsMixin):
     # crude storage-d size finder via screen scrape...
     def backup_summary2(self):
         url = 'http://storaged-monitor.esc.rl.ac.uk/storaged_ceda/CEDA_Fileset_Summary_XML.php?fileset=%s;level=top' % self.storage_pot
-        import urllib2
-        f = urllib2.urlopen(url)
+        import urllib.request, urllib.error, urllib.parse
+        f = urllib.request.urlopen(url)
         backup = f.read()
         m = re.search(
             '<total_volume>(.+)</total_volume><total_file_count>(.*)</total_file_count><aggregation_count>(.*)</aggregation_count><first_file>(.*)</first_file><last_updated>(.*)</last_updated>',
@@ -912,7 +912,7 @@ class VolFeed(Feed):
             if size:
                 vol = vol + size.size
                 nfiles = nfiles + size.no_files
-        lines = table.items()
+        lines = list(table.items())
 
         d += "Top 10 largest datasets\n"
         lines.sort(key=lambda a: a[1][0], reverse=True)
@@ -978,7 +978,7 @@ class DataEntity(models.Model):
     friendly_name.alphabetic_filter = True
 
     def __unicode__(self):
-        return u'%s (%s)' % (self.dataentity_id, self.symbolic_name)
+        return '%s (%s)' % (self.dataentity_id, self.symbolic_name)
 
 
 class Service(models.Model):
@@ -1029,7 +1029,7 @@ class Service(models.Model):
         the_host = ''
         if self.host is not None:
             the_host = self.host
-        return u'%s (%s)' % (self.name, the_host)
+        return '%s (%s)' % (self.name, the_host)
 
     def summary(self):
         '''Returns a summary string extracted from the start of the full description text'''
@@ -1056,7 +1056,7 @@ class HostHistory(models.Model):
     admin_contact = models.ForeignKey(Person, help_text="CEDA Person reporting this event")
 
     def __unicode__(self):
-        return u'%s|%s' % (self.host, self.date)
+        return '%s|%s' % (self.host, self.date)
 
 
 class ServiceBackupLog(models.Model):
@@ -1068,7 +1068,7 @@ class ServiceBackupLog(models.Model):
     comment = models.TextField(blank=True, help_text="Additional comment(s)")
 
     def __unicode__(self):
-        return u'%s|%s' % (self.service, self.date)
+        return '%s|%s' % (self.service, self.date)
 
 
 class FileSetSizeMeasurement(models.Model):
@@ -1103,7 +1103,7 @@ class FileSetSizeMeasurement(models.Model):
             no_files = self.no_files
             funit = "files"
 
-        return u'%s %s; %s %s (%s)' % (size, unit, no_files, funit, self.date.strftime("%Y-%m-%d %H:%M"))
+        return '%s %s; %s %s (%s)' % (size, unit, no_files, funit, self.date.strftime("%Y-%m-%d %H:%M"))
 
 
 class Audit(models.Model, ProblemsMixin):
@@ -1149,7 +1149,7 @@ class Audit(models.Model, ProblemsMixin):
         self.save()
         try:
             self.checkm_log()
-        except Exception, e:
+        except Exception as e:
             self.endtime = datetime.utcnow()
             self.auditstate = 'error'
             self.save()
@@ -1316,7 +1316,7 @@ class Audit(models.Model, ProblemsMixin):
         return {'corrupt': corrupt, 'modified': modified, 'new': new, 'deleted': deleted, 'unchanged': unchanged}
 
     def checkm_log(self):
-        print "Writing checkm log for this audit..."
+        print("Writing checkm log for this audit...")
         fileset = self.fileset
         if fileset is None:
             raise Exception("Can't make log for audit with no fileset")
@@ -1335,7 +1335,7 @@ class Audit(models.Model, ProblemsMixin):
         LOG.write('# Filename|Algorithm|Digest|Length | ModTime\n')
         self._checkm_log(fileset.storage_path(), fileset.storage_path(), LOG)
         LOG.close()
-        print "      ... Done"
+        print("      ... Done")
 
     def _checkm_log(self, directory, storage_path, LOG):
         # recursive function to make checkm log file
@@ -1366,7 +1366,7 @@ class Audit(models.Model, ProblemsMixin):
     def verify_copy(self):
         # verify that a migrated copy has the same files as this audit.
         # Added files are OK.
-        print "Verifying checkm log against migrated files ..."
+        print("Verifying checkm log against migrated files ...")
         LOG = open(self.logfile)
         while 1:
             line = LOG.readline()
@@ -1391,7 +1391,7 @@ class Audit(models.Model, ProblemsMixin):
             if m.hexdigest() != checksum: raise "checksums do not match %s" % newpath
         self.auditstate = 'copy verified'
         self.save()
-        print "      ... Done"
+        print("      ... Done")
 
     @staticmethod
     def problems():
@@ -1436,7 +1436,7 @@ class GWSRequest(models.Model):
             validators=[
                 RegexValidator(
                         regex=settings.GWS_NAME_REGEX,
-                        message=u"Invalid name : this string will be used as a unix group name so must match the pattern %s" % settings.GWS_NAME_REGEX.pattern,
+                        message="Invalid name : this string will be used as a unix group name so must match the pattern %s" % settings.GWS_NAME_REGEX.pattern,
                 )
             ]
             ,
@@ -1468,7 +1468,7 @@ class GWSRequest(models.Model):
     timestamp = models.DateTimeField(auto_now=True, auto_now_add=False, help_text='time last modified')
 
     def __unicode__(self):
-        return u'%s' % self.gws_name
+        return '%s' % self.gws_name
 
     # Actions : 
     # reject
@@ -1562,19 +1562,19 @@ class GWSRequest(models.Model):
 
     def action_links(self):
         if self.request_status == 'ceda pending':
-            return u'<a href="/gwsrequest/%i/approve">approve</a> <a href="/gwsrequest/%i/reject">reject</a>' % (
+            return '<a href="/gwsrequest/%i/approve">approve</a> <a href="/gwsrequest/%i/reject">reject</a>' % (
             self.id, self.id)
         elif self.request_status == 'ceda approved':
-            return u'<a href="/gwsrequest/%i/convert">convert</a>' % self.id
+            return '<a href="/gwsrequest/%i/convert">convert</a>' % self.id
         else:
-            return u'n/a'
+            return 'n/a'
 
     action_links.allow_tags = True
     action_links.short_description = 'actions'
 
     def gws_link(self):
         if self.gws_id is not None:
-            return u'<a href="/admin/cedainfoapp/gws/%i">%s%s</a>' % (self.gws.id, self.gws.path, self.gws.name)
+            return '<a href="/admin/cedainfoapp/gws/%i">%s%s</a>' % (self.gws.id, self.gws.path, self.gws.name)
 
     gws_link.allow_tags = True
     gws_link.short_description = 'GWS'
@@ -1601,7 +1601,7 @@ class GWS(models.Model):
             validators=[
                 RegexValidator(
                         regex=settings.GWS_NAME_REGEX,
-                        message=u"Invalid name : this string will be used as a unix group name so must match the pattern %s" % settings.GWS_NAME_REGEX.pattern,
+                        message="Invalid name : this string will be used as a unix group name so must match the pattern %s" % settings.GWS_NAME_REGEX.pattern,
                 )
             ]
             ,
@@ -1653,7 +1653,7 @@ class GWS(models.Model):
             path = self.path
         else:
             path = ''
-        return u'%s(%s)' % (self.name, path)
+        return '%s(%s)' % (self.name, path)
 
     def create_update_request(self):
         '''Create a new gwsrequest based on this gws pre-populated with values ready for editing & approval'''
@@ -1677,7 +1677,7 @@ class GWS(models.Model):
         return req.id
 
     def update_link(self):
-        return u'<a href="/gws/%i/update">update</a>' % self.id
+        return '<a href="/gws/%i/update">update</a>' % self.id
 
     update_link.allow_tags = True
 
@@ -1731,7 +1731,7 @@ class GWS(models.Model):
             if len(lines) == 3:
                 (fs, blocks, used, available, use, mounted) = lines[1].split()
             size = int(used) * 1024
-            print "used %s, size %s" % (used, size)
+            print(("used %s, size %s" % (used, size)))
 
             # find number of files
             p1 = subprocess.Popen(["find", gws_dir, "-type", "f"], stdout=subprocess.PIPE)
@@ -1773,7 +1773,7 @@ class GWS(models.Model):
     last_size.allow_tags = True
 
     def action_links(self):
-        return u'<a href="/gws/%i/df">df</a>' % self.id
+        return '<a href="/gws/%i/df">df</a>' % self.id
 
     action_links.allow_tags = True
     action_links.short_description = 'actions'
@@ -1793,7 +1793,7 @@ class GWSSizeMeasurement(models.Model):
         else:
             no_files = self.no_files
             funit = "files"
-        return u'%s %s %s %s' % (filesize(self.size), self.no_files, funit, self.date.strftime("%Y-%m-%d %H:%M"))
+        return '%s %s %s %s' % (filesize(self.size), self.no_files, funit, self.date.strftime("%Y-%m-%d %H:%M"))
 
 
 class VMRequest(models.Model):
@@ -1832,16 +1832,16 @@ class VMRequest(models.Model):
         ordering = ['vm_name']
 
     def __unicode__(self):
-        return u'%s' % self.vm_name
+        return '%s' % self.vm_name
 
     def action_links(self):
         if self.request_status == 'ceda pending':
-            return u'<a href="/vmrequest/%i/approve">approve</a>|<a href="/vmrequest/%i/reject">reject</a>' % (
+            return '<a href="/vmrequest/%i/approve">approve</a>|<a href="/vmrequest/%i/reject">reject</a>' % (
             self.id, self.id)
         elif self.request_status == 'ceda approved':
-            return u'<a href="/vmrequest/%i/convert">convert</a>' % self.id
+            return '<a href="/vmrequest/%i/convert">convert</a>' % self.id
         else:
-            return u'n/a'
+            return 'n/a'
 
     action_links.allow_tags = True
     action_links.short_description = 'actions'
@@ -1906,7 +1906,7 @@ class VMRequest(models.Model):
                 raise Exception("Can't do update request : no VM associated")
             else:
                 vm = self.vm
-                print self.vm
+                print((self.vm))
                 # update the existing associated vm
                 vm.name = self.vm_name
                 vm.internal_requester = self.internal_requester
@@ -1949,7 +1949,7 @@ class VMRequest(models.Model):
 
     def vm_link(self):
         if self.vm is not None:
-            return u'<a href="/admin/cedainfoapp/vm/%i">%s</a>' % (self.vm.id, self.vm.name)
+            return '<a href="/admin/cedainfoapp/vm/%i">%s</a>' % (self.vm.id, self.vm.name)
 
     vm_link.allow_tags = True
     vm_link.short_description = 'VM'
@@ -2003,7 +2003,7 @@ class VM(models.Model):
         ordering = ['name']
 
     def __unicode__(self):
-        return u'%s' % self.name
+        return '%s' % self.name
 
     def save(self, *args, **kwargs):
         # Custom save method : will only save an instance if there is no PK, i.e. if the model is a new instance
@@ -2046,7 +2046,7 @@ class VM(models.Model):
         return req.id
 
     def update_link(self):
-        return u'<a href="/vm/%i/update">update</a>' % self.id
+        return '<a href="/vm/%i/update">update</a>' % self.id
 
     update_link.allow_tags = True
 
@@ -2067,7 +2067,7 @@ class VM(models.Model):
         self.forceSave()
 
     def action_links(self):
-        return u'<a href="/vm/%i/changestatus">change status</a>' % (self.id,)
+        return '<a href="/vm/%i/changestatus">change status</a>' % (self.id,)
 
     action_links.allow_tags = True
     action_links.short_description = 'actions'
@@ -2223,7 +2223,7 @@ class NewService(models.Model):
         theHost = ''
         if self.host is not None:
             theHost = self.host
-        return u'%s (%s)' % (self.name, theHost)
+        return '%s (%s)' % (self.name, theHost)
 
     def summary(self):
         '''Returns a summary string extracted from the start of the full description text'''

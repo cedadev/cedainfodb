@@ -1,9 +1,9 @@
 from django.conf.urls import include, url
 
-from views import *
-from authorise import *
-from jasmin import *
-from udb_ldap_views import *
+from .views import *
+from .authorise import *
+from .jasmin import *
+from .udb_ldap_views import *
 from django.views.generic import TemplateView
 
 # Uncomment the next two lines to enable the admin:
@@ -28,9 +28,6 @@ urlpatterns = [
         
     url(r'^dataset/email/(?P<datasetid>.+)/$', list_users_email_for_dataset),     
 
-    url(r'^jasmin/check_linux_groups/$', check_linux_groups),     
-    url(r'^jasmin/nis_group_entries/$', nis_group_entries),     
-
     url(r'^jasmin/list_users/(?P<tag>.+)/$', list_jasmin_users), 
     url(r'^jasmin/list_users/$', list_jasmin_users), 
 
@@ -48,8 +45,6 @@ urlpatterns = [
 
     url(r'^ldap/nis/external/passwd$', display_nis_external_passwd), 
     url(r'^ldap/nis/internal/passwd$', display_nis_internal_passwd), 
-    url(r'^ldap/freeuids$', display_free_uids), 
-    url(r'^ldap/freegids$', display_free_gids),
 
     url(r'^ldapext/group/$', ldap_udb_groups),   
 

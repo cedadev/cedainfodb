@@ -128,7 +128,7 @@ class GrpEnt:
         self.passwd = lst[0]
         self.gid = int(lst[1])
         self.users = string.split(lst[2], ",")
-        self.users = map(string.strip, self.users)
+        self.users = list(map(string.strip, self.users))
     def seq(self):
         return [ self.passwd, self.gid, string.join(self.users, ",") ]
 
@@ -138,12 +138,12 @@ class OrdDict(UserDict.UserDict):
         UserDict.UserDict.__init__(self)
         self.ordkeys = []
     def __setitem__(self, key, value):
-        if not self.data.has_key(key):
+        if key not in self.data:
             self.ordkeys.append(key)
         UserDict.UserDict.__setitem__(self, key, value)
     def __delitem__(self, key):
-        if self.data.has_key(key):
-            self.ordkeys = filter(lambda x, k = key: x != k, self.ordkeys)
+        if key in self.data:
+            self.ordkeys = list(filter(lambda x, k = key: x != k, self.ordkeys))
         UserDict.UserDict.__delitem__(self, key)
     def keys(self):
         return self.ordkeys[:]
@@ -174,8 +174,8 @@ def loadgrp(fname = "/etc/group"):
 def save(fname, d):
     "save(), saves any kind of entry dictionary"
     fp = open(fname, "w")
-    for k in d.keys():
-        lst = map(str, [ k ] + d[k].seq())
+    for k in list(d.keys()):
+        lst = list(map(str, [ k ] + d[k].seq()))
         fp.write(string.join(lst, ":") + "\n")
     fp.close()
 
@@ -215,8 +215,8 @@ if __name__ == "__main__":
     # testrig
 
     crpwd = genpw('george')
-    print "genpw('george') =", crpwd
-    print "ckpw('george', '%s') =" % crpwd, ckpw('george', crpwd)
+    print("genpw('george') =", crpwd)
+    print("ckpw('george', '%s') =" % crpwd, ckpw('george', crpwd))
 
     p = loadpw()
     save("pwtest", p)

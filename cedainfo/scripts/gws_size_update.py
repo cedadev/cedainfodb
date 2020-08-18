@@ -9,7 +9,7 @@ def update(filename):
 
         for line in data:
             [name, vol] = line.split()
-            print name
+            print(name)
             g = GWS.objects.get(name=name)
             g.requested_volume = vol
             g.forceSave()

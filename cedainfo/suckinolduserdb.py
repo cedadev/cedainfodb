@@ -3,11 +3,11 @@ import psycopg2.psycopg1 as psycopg  #Updated by ASH
 import string
 
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import re
 
 
-from ConfigParser import *
+from configparser import *
 
 configdict = ConfigParser()
 configdict.read('userdb.conf')
@@ -38,7 +38,7 @@ def jsonescape(s):
     s = s.replace("\xa0", " ")
     s = s.replace("\x0e", " ")
     s = s.translate(ttable)
-    s = unicode(s)
+    s = str(s)
     s = str(s)
     return s
 
@@ -239,9 +239,9 @@ for rec in records:
     conditionsurl = string.replace(conditionsurl,'$HTROOT', 'http://badc.nerc.ac.uk')
 
     # extract conditions of use from web
-    if conditionsurl not in conditions.keys(): 
-        print "conditions url: %s" % (conditionsurl, )
-        try: f = urllib2.urlopen(conditionsurl)
+    if conditionsurl not in list(conditions.keys()): 
+        print("conditions url: %s" % (conditionsurl, ))
+        try: f = urllib.request.urlopen(conditionsurl)
         except:
             conditions[conditionsurl] = 1
 	    groupcond[rec[0]] = 1            
@@ -291,7 +291,7 @@ for rec in records:
   """ % (i,i, conditions[conditionsurl], rec[12],  rec[1] ) )
 
 
-    print rec[0], conditionsurl, conditions[conditionsurl]
+    print(rec[0], conditionsurl, conditions[conditionsurl])
 
 
     groups[rec[0]] = i
@@ -308,9 +308,9 @@ JSONc.write('{"model": "userdb.country", "pk":10000, "fields": { "name": "DELETE
 JSONc.close()
 iap = i
 
-print groupcond
-print
-print groups
+print(groupcond)
+print()
+print(groups)
 
 #===================
 # Licences
@@ -395,7 +395,7 @@ for rec in records:
     else: raise "Unknown role type"
 
     # licence
-    if rec[2] not in groups.keys(): continue
+    if rec[2] not in list(groups.keys()): continue
     JSON.write("""
   {
      "model": "userdb.licence",
@@ -447,7 +447,7 @@ for rec in records:
     # licence request
     if rec[3]: reqdate = rec[3] 
     else: reqdate = "2000-01-01"
-    if rec[2] not in groups.keys(): continue
+    if rec[2] not in list(groups.keys()): continue
     JSON.write("""
   {
      "model": "userdb.licence",

@@ -8,7 +8,7 @@ from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
-from cedainfoapp.models import *
+from .cedainfoapp.models import *
 
 
 if __name__=="__main__":
@@ -21,6 +21,6 @@ if __name__=="__main__":
     prev_audit = Audit.objects.filter(fileset=audit.fileset, auditstate='analysed').order_by('-starttime')[0]
 
     result = audit.compare(prev_audit)
-    print "Audit of %s\n============\nReported corruption of the following files\n" % audit.fileset
+    print("Audit of %s\n============\nReported corruption of the following files\n" % audit.fileset)
     for line in result['corrupt']:
-        print line,
+        print(line, end=' ')

@@ -36,6 +36,6 @@ def run(*args):
 
             d = datetime.datetime(year, month, 1)
             total, totalf = vol(d, search_period, path_filter)
-            print '%s, %s, %s' % (d, total, totalf)
+            print('%s, %s, %s' % (d, total, totalf))
 
 

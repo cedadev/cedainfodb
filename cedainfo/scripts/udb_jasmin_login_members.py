@@ -22,6 +22,6 @@ def run():
     accountids.sort()
     
     for accountid in accountids:
-        print accountid   
+        print(accountid)   
 
 

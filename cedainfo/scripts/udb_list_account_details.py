@@ -6,15 +6,15 @@ from udbadmin.models import User
 
 def run():
 
-    print 'hello'
+    print('hello')
     
     for line in sys.stdin:
-        print 'bbb'
+        print('bbb')
         username = line.strip()
-        print username
+        print(username)
         try: 
             user = User.objects.get(accountid=username)
         except:
-            print 'ERROR: %s not found' % username
+            print('ERROR: %s not found' % username)
 
-        print user.accountid, user.emailaddress.lower()
+        print(user.accountid, user.emailaddress.lower())

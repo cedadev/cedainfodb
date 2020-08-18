@@ -3,7 +3,7 @@ import settings
 setup_environ(settings)
 
 from django.core import serializers
-from cedainfoapp import models
+from .cedainfoapp import models
 import sys
 import socket
 import re
@@ -59,11 +59,11 @@ class nodelistparser:
                 # (See Python Cookbook section 4.15 p174)
                 for value in values:
                     if value == '':
-                        print 'Error line: %s' % line
+                        print('Error line: %s' % line)
                     self.host_lists.setdefault(key, {})[value] = 1
                                     
             except Exception:
-                print "Couldn't parse following line:\n%s" % line
+                print("Couldn't parse following line:\n%s" % line)
                 
     def get_list(self, name, resolve=False):
         '''if a single value e.g. $value2 starts with $ it is a variable and needs resolving :
@@ -71,7 +71,7 @@ class nodelistparser:
         # find a list
         # iterate through its keys
         # if any keys are variables (have $ or are in lookup) then substitute with values of that list & append to list, returning the new list
-        tmp_list = self.host_lists[name].keys()
+        tmp_list = list(self.host_lists[name].keys())
         if resolve:
             # iterate through tmp_list, replace members with lists of same name
             count=0
@@ -80,7 +80,7 @@ class nodelistparser:
                     # this may itself be a dictionary key to another list of items
                     itemname = itemkey.replace('$', '')
                     # remove the offending item
-                    tmp_list[count:count+1] = self.host_lists[itemname].keys()
+                    tmp_list[count:count+1] = list(self.host_lists[itemname].keys())
                 count = count + 1
         # return the list, uniuqe-ifying it on the fly
         return list(set(tmp_list))
@@ -90,7 +90,7 @@ class nodelistparser:
         # For each entry in XENServerList, there is a corresponding list XENServer_servername which lists the clients to that XENServer.
         # first print list of XENServers (hypervisors)
         for host in sorted(self.get_list('XENServerList', True)):
-            print "XENServer:\t%s" % host
+            print("XENServer:\t%s" % host)
 
     def showXenClients(self):
         '''Show the VMs (XENClients) running on each XENServer'''
@@ -102,7 +102,7 @@ class nodelistparser:
             xenserver_name = xenserver_name.replace('-','_')
             client_list_name = 'XENServer_%s' % xenserver_name
             for xenclient in sorted(self.get_list(client_list_name, True)):
-                print "XENClient:\t%s\t\t(%s)" % (xenclient, xenserver_name)
+                print("XENClient:\t%s\t\t(%s)" % (xenclient, xenserver_name))
 
     def hackLists(self):
         '''Hack the dictionary of lists to create our own groupings'''
@@ -130,21 +130,21 @@ class nodelistparser:
                 fullhostname = '%s%s' % (host, default_host_suffix)
             search_host = models.Host.objects.filter(hostname=fullhostname)
             if len(search_host) > 0:
-                print "Found host %s" % fullhostname
+                print("Found host %s" % fullhostname)
             else:
-                print "Need new entry for %s" % fullhostname
+                print("Need new entry for %s" % fullhostname)
                 try:
                     ipaddr = socket.gethostbyaddr( fullhostname )[2][0]
                     new_host = models.Host(hostname=fullhostname, ip_addr=ipaddr)
-                    print "Made new host object with ip for %s ...not saved yet" % fullhostname
+                    print("Made new host object with ip for %s ...not saved yet" % fullhostname)
                     new_host.save()
-                    print "Saved %s" % new_host
+                    print("Saved %s" % new_host)
                 except:
-                    print "Can't resolve %s to an ip address" % fullhostname
+                    print("Can't resolve %s to an ip address" % fullhostname)
                     new_host = models.Host(hostname=fullhostname, ip_addr='')
-                    print "Made new host object (no ip) for %s ...not saved yet" % fullhostname
+                    print("Made new host object (no ip) for %s ...not saved yet" % fullhostname)
                     new_host.save()
-                    print "Saved %s" % new_host
+                    print("Saved %s" % new_host)
 
     def checkHosts(self):
         '''Reverse check by fetching hosts from DB & seeing if there in one of the lists'''
@@ -154,7 +154,7 @@ class nodelistparser:
         for host in db_hosts:
             hostname = host.hostname.split('.')[0]
             if (hostname not in self.get_list('CEDAList', True)) and (hostname not in self.get_list('MISCNEODCList', True)) and (hostname not in self.get_list('MISCBADCList', True)):
-                print "Not OK:\t%s\t(retired_on = %s)" % (hostname, host.retired_on)
+                print("Not OK:\t%s\t(retired_on = %s)" % (hostname, host.retired_on))
 
     def assignRacks(self):
         '''Assign hosts to racks based on rack contents lists'''
@@ -182,12 +182,12 @@ class nodelistparser:
                 try:
                     target_host = models.Host.objects.get(hostname=fullhostname)
                 except:
-                    print 'problem assigning rack for host %s (%s?)' % (host, fullhostname)
+                    print('problem assigning rack for host %s (%s?)' % (host, fullhostname))
                     target_host = None
 
                 if target_host != None:
                     target_host.rack = target_rack
-                    print "Set rack to %s for host %s" % (target_host.rack, target_host)
+                    print("Set rack to %s for host %s" % (target_host.rack, target_host))
                     target_host.save()
 
 

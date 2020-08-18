@@ -22,4 +22,4 @@ def run():
          else:
             degree = user.degree
                
-         print "%s:%s" % (degree, user.title)
+         print("%s:%s" % (degree, user.title))

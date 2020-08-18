@@ -13,5 +13,5 @@ def run():
    vms = VM.objects.all().order_by('name')
    
    for vm in vms:
-       print 'Checking VM: %s' % vm.name, 
-       print ' ', vm.ping_check()
+       print('Checking VM: %s' % vm.name, end=' ') 
+       print(' ', vm.ping_check())

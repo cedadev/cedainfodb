@@ -49,7 +49,7 @@ class MultiSelectField(models.Field):
         return value
 
     def get_db_prep_value(self, value, connection=None, prepared=False):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             return value
         elif isinstance(value, list):
             return ",".join(value)

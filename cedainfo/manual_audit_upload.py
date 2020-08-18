@@ -8,7 +8,7 @@ from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
-from cedainfoapp.models import *
+from .cedainfoapp.models import *
 
 
 if __name__=="__main__":
@@ -17,7 +17,7 @@ if __name__=="__main__":
     checkmfilename = sys.argv[2]
     
     audit = Audit.objects.get(pk=auditid)
-    print audit
+    print(audit)
 
     if not os.path.exists('%s/%s' %(settings.CHECKM_DIR, audit.fileset.storage_pot)): 
         os.mkdir('%s/%s' %(settings.CHECKM_DIR, fileset.storage_pot))

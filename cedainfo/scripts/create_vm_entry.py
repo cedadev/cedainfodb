@@ -24,11 +24,11 @@ vm_name = 'legacy:triton.badc.rl.ac.uk'
 
 try:
     a = VM.objects.get(name=vm_name)
-    print "vm name already exists"
+    print("vm name already exists")
     sys.exit()
 except:
 
-    print "Creating: %s" % vm_name
+    print("Creating: %s" % vm_name)
     
     description = """
     This VM entry was added automatically. It is a skeleton entry based on the orginal entry in the 'host' table.

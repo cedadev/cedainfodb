@@ -7,14 +7,14 @@ from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
-from cedainfoapp.models import FileSet, Partition, Audit
+from .cedainfoapp.models import FileSet, Partition, Audit
 
 
 def usage():
-    print "Script to do audit next fileset"
-    print "Usage: %s <file_set_path>" % sys.argv[0]
-    print " file_set_path = logical path of fileset to audit"
-    print
+    print("Script to do audit next fileset")
+    print("Usage: %s <file_set_path>" % sys.argv[0])
+    print(" file_set_path = logical path of fileset to audit")
+    print()
 
 def pick_audit():
     # pick an audit to do: 
@@ -28,20 +28,20 @@ def pick_audit():
              return f    
         # skip if last audit not an analysed state then skip
         if last_audit.auditstate != 'analysed':    
-            print "Ignore - audit got an error" 
+            print("Ignore - audit got an error") 
             continue
         # see if this is the oldest audit
-        print  last_audit.starttime , oldest_audit, last_audit.starttime < oldest_audit
+        print(last_audit.starttime , oldest_audit, last_audit.starttime < oldest_audit)
         if last_audit.starttime < oldest_audit:
             oldest_audit = last_audit.starttime
             fileset_to_audit = f
     return fileset_to_audit        
               
 def do_audit(f):
-    print "Doing audit of fileset: %s ... " % f 
+    print("Doing audit of fileset: %s ... " % f) 
     audit=Audit(fileset=f)
     audit.start()
-    print "            ... Done"
+    print("            ... Done")
 
 
 if __name__=="__main__":
@@ -66,7 +66,7 @@ if __name__=="__main__":
     else:
         fileset = pick_audit()
 
-    print fileset 
+    print(fileset) 
     # do audit
     if fileset != None: do_audit(fileset)
 

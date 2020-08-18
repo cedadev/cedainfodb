@@ -128,7 +128,7 @@ def run(*script_args):
 
             vm_other = row[16]
 
-            print 'AAA: ', vm_other
+            print('AAA: ', vm_other)
 
             cpu_string = get_cpu_string(vm_cpu)
             ram_string = get_ram_string(vm_ram)
@@ -141,7 +141,7 @@ def run(*script_args):
 
             try:
                 a = VM.objects.get(name=vm_name)
-                print "vm name already exists"
+                print("vm name already exists")
                 continue
             except:
 

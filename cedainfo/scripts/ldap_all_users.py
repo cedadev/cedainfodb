@@ -42,5 +42,5 @@ a.seek(0)
 lines = a.readlines()
 
 for line in lines:
-    print line,
+    print(line, end=' ')
 

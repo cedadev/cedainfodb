@@ -57,7 +57,7 @@ class SortHeaders:
         self.order_field, self.order_type = default_order_field, default_order_type
 
         # Determine order field and order type for the current request
-        params = dict(request.GET.items())
+        params = dict(list(request.GET.items()))
         if ORDER_VAR in params:
             try:
                 new_order_field = int(params[ORDER_VAR])
@@ -94,7 +94,7 @@ class SortHeaders:
         """
         params.update(self.additional_params)
         return '?%s' % '&amp;'.join(['%s=%s' % (param, value) \
-                                     for param, value in params.items()])
+                                     for param, value in list(params.items())])
 
     def get_order_by(self):
         """

@@ -37,14 +37,14 @@ from django.db.models import Max, Min
 
 from datetime import datetime
 from pytz import timezone
-import choices
-import country_list
+import udbadmin.choices as choices
+import udbadmin.country_list  as country_list
 import django.db.models.options as options
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
 import base64
 
-USERDB = u'userdb'
+USERDB = 'userdb'
 
 class Base64Field(models.TextField):
 
@@ -151,7 +151,7 @@ class Dataset(models.Model):
       
     class Meta:
         in_db = USERDB
-        db_table = u'tbdatasets'
+        db_table = 'tbdatasets'
         ordering = ['datasetid']
         managed  = False
 
@@ -172,7 +172,7 @@ class Institute(models.Model):
                 max_length=100)
     class Meta:
         in_db = USERDB
-        db_table = u'tbinstitutes'
+        db_table = 'tbinstitutes'
         managed  = False
 
 class Addresses(models.Model):
@@ -185,7 +185,7 @@ class Addresses(models.Model):
        
     class Meta:
         in_db = USERDB
-        db_table = u'addresses'
+        db_table = 'addresses'
         managed  = False
 
 class UserManager(models.Manager):
@@ -441,7 +441,7 @@ class User (models.Model):
     class Meta:
         in_db = USERDB
         ordering = ['-userkey']
-        db_table = u'tbusers'
+        db_table = 'tbusers'
         managed  = False
         get_latest_by = 'startdate'
 
@@ -500,7 +500,7 @@ class Datasetjoin(models.Model):
        
     class Meta:
         in_db = USERDB
-        db_table = u'tbdatasetjoin'
+        db_table = 'tbdatasetjoin'
         managed  = False
 
     objects = DatasetJoinManager() 
@@ -578,7 +578,7 @@ class Datasetrequest(models.Model):
            
     class Meta:
         in_db = USERDB
-        db_table = u'datasetrequest'
+        db_table = 'datasetrequest'
         managed  = False
         ordering = ['-requestdate']
 
@@ -602,7 +602,7 @@ class Privilege(models.Model):
 
     class Meta:
         in_db = USERDB
-        db_table = u'privilege'
+        db_table = 'privilege'
         managed  = False
 
 
@@ -616,7 +616,7 @@ class Datasetexpirenotification(models.Model):
     extrainfo = models.CharField(max_length=1500)
     class Meta:
         in_db = USERDB
-        db_table = u'datasetexpirenotification'
+        db_table = 'datasetexpirenotification'
         managed = False
 
 class Fundingtypes(models.Model):
@@ -625,6 +625,6 @@ class Fundingtypes(models.Model):
     name = models.CharField(max_length=40)
     class Meta:
         in_db = USERDB
-        db_table = u'fundingtypes'
+        db_table = 'fundingtypes'
         managed = False
 

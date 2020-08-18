@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.forms import *
-from models import *
+from .models import *
 from django.utils.safestring import mark_safe
-from forms import *
+from .forms import *
 
 from django.contrib.auth.models import User as SiteUser
 from django.contrib.sites.models import Site

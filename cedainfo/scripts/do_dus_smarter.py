@@ -35,7 +35,7 @@ def do_dus():
             last_fssm = None
             not50, not20, small, changing = True, True, True, True
 
-        print "%s    " % f,
+        print("%s    " % f, end=' ')
 
         doflag = False
         if first_time:
@@ -52,22 +52,22 @@ def do_dus():
                 doflag = True
 
         if doflag:
-            print "Last done: %s    " % last_fssm,                   
+            print("Last done: %s    " % last_fssm, end=' ')                   
             if not50:
-                print "not50 ",
+                print("not50 ", end=' ')
             if not20:
-                print "not20 ",
+                print("not20 ", end=' ')
             if not5:
-                print "not5 ",
+                print("not5 ", end=' ')
             if small:
-                print "small ",
+                print("small ", end=' ')
             if changing:
-                print "changing",
-            print ''
+                print("changing", end=' ')
+            print('')
 
             f.du()
         else:
-            print "SKIP"
+            print("SKIP")
 
 
 def run():

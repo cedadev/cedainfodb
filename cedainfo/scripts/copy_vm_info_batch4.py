@@ -40,39 +40,39 @@ def run(*script_args):
             vm_other = row[9]
 
 
-            print old_vm, vm_name
+            print(old_vm, vm_name)
             line_count = line_count + 1
 
-            print row
+            print(row)
 
             try:
                 old = VM.objects.get(name=old_vm)
             except:
-                print "Old machine %s does not exist for new machine %s, skipping" % (old_vm, vm_name)
+                print("Old machine %s does not exist for new machine %s, skipping" % (old_vm, vm_name))
                 continue
 
             new = VM.objects.get(name=vm_name)
 
-            print old.type, new.type
+            print(old.type, new.type)
             new.type = old.type
 
-            print old.operation_type, new.operation_type
+            print(old.operation_type, new.operation_type)
             new.operation_type = old.operation_type
 
-            print old.internal_requester, new.internal_requester
+            print(old.internal_requester, new.internal_requester)
             new.internal_requester = old.internal_requester
 
             description = "centos7 machine to replace %s\n\nDescription copied from %s:\n\n" % (old.name, old.name)
             description = description + old.description
             new.description = description
 
-            print old.disk_activity_required, new.disk_activity_required
+            print(old.disk_activity_required, new.disk_activity_required)
             new.disk_activity_required = old.disk_activity_required
 
-            print old.mountpoints_required, new.mountpoints_required
+            print(old.mountpoints_required, new.mountpoints_required)
             new.mountpoints_required = old.mountpoints_required
 
-            print old.network_required
+            print(old.network_required)
             new.network_required = old.network_required
 
             other = 'This record was generated automatically for centos7 update.\n\n'

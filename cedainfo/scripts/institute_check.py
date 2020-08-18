@@ -13,7 +13,7 @@ def run():
    
    
    for i in institutes:
-       print i.name
+       print(i.name)
    
 
        

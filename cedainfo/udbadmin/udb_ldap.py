@@ -11,8 +11,8 @@ from unidecode import unidecode
 
 from django.conf import settings
 
-from models import *
-import LDAP
+from .models import *
+from . import LDAP
 
 #EXCLUDE_USERS = ['aharwood', 'mpryor', 'gparton', 'gpp02', 'mpritcha', 'wtucker', 'rsmith013', 'pjkersha', 'fchami']
 EXCLUDE_USERS = []
@@ -79,7 +79,7 @@ def userdb_managed_ldap_groups ():
     
     groups = ["open"]
        
-    for group in ARCHIVE_ACCESS_GROUPS.keys():
+    for group in list(ARCHIVE_ACCESS_GROUPS.keys()):
         groups.append(group)
 
     datasets = userdb_managed_ldap_datasets()
@@ -110,7 +110,7 @@ def udb_archive_access_datasets():
     datasetids = []
     datasets = []
         
-    for item in ARCHIVE_ACCESS_GROUPS.keys():
+    for item in list(ARCHIVE_ACCESS_GROUPS.keys()):
         datasetids.extend(ARCHIVE_ACCESS_GROUPS[item]["datasets"])
 
     datasetids.sort()
@@ -129,7 +129,7 @@ def userdb_managed_datasetids ():
     """
     datasetids = []
     
-    for item in ARCHIVE_ACCESS_GROUPS.keys():
+    for item in list(ARCHIVE_ACCESS_GROUPS.keys()):
         datasetids.extend(ARCHIVE_ACCESS_GROUPS[item]["datasets"])
 
     datasets = userdb_managed_ldap_datasets()
@@ -243,7 +243,7 @@ def get_dataset_users(datasetids):
     given then this routine returns the list of users who can access any of the datasets. Duplicate users
     are removed from the list.''' 
  
-    if isinstance(datasetids, basestring):
+    if isinstance(datasetids, str):
         datasetids = [datasetids]
 #
 #      Get usekeys of all users who have an ldap account
@@ -298,11 +298,11 @@ def checkGroups():
     for dataset in datasets:
     
         if dataset.datasetid.startswith('gws_'):
-            print dataset.datasetid
+            print(dataset.datasetid)
             users = get_dataset_users(dataset.datasetid)
             
             for user in users:
-                print '   ', user.accountid
+                print('   ', user.accountid)
                 if not (user.hasDataset("system-login") or \
                         user.hasDataset("jasmin-login") or \
                         user.hasDataset("cems-login") or \
@@ -326,7 +326,7 @@ def ldap_all_group_records (add_additions_file=True):
         record = record + '\n'
     
 
-    for datasetid in ARCHIVE_ACCESS_GROUPS.keys():
+    for datasetid in list(ARCHIVE_ACCESS_GROUPS.keys()):
         record = record + ldap_archive_access_group_record(datasetid)
         record = record + '\n'
         
@@ -449,7 +449,7 @@ def ldap_archive_access_group_record(datasetid):
 
     record = ''
     
-    if not datasetid in ARCHIVE_ACCESS_GROUPS.keys():
+    if not datasetid in list(ARCHIVE_ACCESS_GROUPS.keys()):
         return
 
     record = "dn: cn=%s,ou=ceda,ou=Groups,o=hpc,dc=rl,dc=ac,dc=uk\n" % datasetid
@@ -748,7 +748,7 @@ def generate_all_nis_groups ():
 #       Generate archive access groups
 #
 
-    for accessGroup in ARCHIVE_ACCESS_GROUPS.keys():            
+    for accessGroup in list(ARCHIVE_ACCESS_GROUPS.keys()):            
         users = get_dataset_users(ARCHIVE_ACCESS_GROUPS[accessGroup]["datasets"])
         accountsString = userAccountsString(users, extraAccounts=ARCHIVE_ACCESS_STANDARD_USERS)
         record = record + accessGroup + ':*:' + str(ARCHIVE_ACCESS_GROUPS[accessGroup]["gid"]) + ':' + accountsString + "\n";

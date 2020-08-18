@@ -1,5 +1,5 @@
 from django.forms import *
-from models import *
+from .models import *
 from django.contrib.admin import widgets
 from django.forms.extras.widgets import SelectDateWidget
 from django.conf import settings

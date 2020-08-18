@@ -7,12 +7,12 @@ from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
-from cedainfoapp.models import *
+from .cedainfoapp.models import *
 
 def usage():
-    print "Migration script for filesets"
-    print "Usage: %s" % sys.argv[0]
-    print
+    print("Migration script for filesets")
+    print("Usage: %s" % sys.argv[0])
+    print()
 
 
 
@@ -47,11 +47,11 @@ if __name__=="__main__":
     if fileset: filesets = filesets.filter(logical_path=fileset)
     
     
-    print "filessets to migrate: %s" % filesets
+    print("filessets to migrate: %s" % filesets)
 
     for fs in filesets:
-        print "MIGRATING %s" % (fs.logical_path) 
-        print "     %s -> %s" % (fs.partition, fs.migrate_to) 
+        print("MIGRATING %s" % (fs.logical_path)) 
+        print("     %s -> %s" % (fs.partition, fs.migrate_to)) 
         fs.migrate_spot(do_audit=do_audit)
  
 

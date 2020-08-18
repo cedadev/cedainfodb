@@ -34,6 +34,6 @@ connection = psycopg2.connect(dbname=dbconf['NAME'],
 
 accountid = sys.argv[1]
 
-print udb_ldap.ldap_user_record(accountid)
+print(udb_ldap.ldap_user_record(accountid))
 
 

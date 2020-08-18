@@ -11,9 +11,7 @@ import smtplib
 
 from subprocess import *
 
-from models import *
-import NISaccounts
-
+from .models import *
 
 def _add_user_to_jasmin_mailinglist (email, name):
 #
@@ -69,7 +67,7 @@ def authorise_datasets(request, userkey):
         
         infoString = []
 
-        for name in request.POST.keys():
+        for name in list(request.POST.keys()):
    #
    #             Process any form parameters associated with requests
    #     
@@ -271,65 +269,3 @@ def _add_uid(user):
     else:
         return user.uid
     
-def _get_next_free_uid():
-    '''
-        Return the next free uid number. From the allowed range remove
-        any that are already allocated in the userdb and any which are
-        used in the internal or external NIS files. Returns 0 if unable
-        to safely determine the number (if unable to check NIS files for example)
-    '''    
-    
-    REMOVE = [25001,25008,25010,25012,25013,25028,25041,25042,25046,25059,25060,25062,25065,25072,25073,25080,
-              25091,25101,25102,25110,25111,25112,25115,25116,25117,25118,25120,25121,25122,25123,25124,25125,
-              25126,25128,25129,25130,25131,25134,25135,25136,25139,25140,25142,25143,25144,25151,25152,25157,
-              25160,25162,25165,25166,25168,25171]
-    #
-    # Get available range of uids
-    #
-    uids = range(7050000, 7051000)
-    #
-    # Remove any uids that we already know are allocated to NIS accounts
-    #
-
-    for remove in REMOVE:
-        try:
-            uids.remove(remove)
-        except ValueError:
-            pass
-    #
-    # Remove any uids that are already allocated in the userdb
-    #
-    userdb_uids = User.objects.values_list('uid', flat=True).filter(uid__gt=0).order_by('uid')
-
-    for userdb_uid in userdb_uids:
-        try:
-            uids.remove(userdb_uid)
-        except ValueError:
-            pass
-    #
-    # Remove any uids in the external or internal NIS files
-    #
-
-    external = NISaccounts.getExtPasswdFile()
- 
-    if external:
-        for account in external.keys():
-            try:
-                uids.remove(int(external[account].uid))
-            except ValueError:
-                pass
-
-    internal = NISaccounts.getIntPasswdFile()
- 
-    if internal:
- 
-        for account in internal.keys():
-            try:
-                uids.remove(int(internal[account].uid))
-            except ValueError:
-                pass
-    
-    if len(uids) > 0:
-        return uids[0]
-    else:
-        return 0

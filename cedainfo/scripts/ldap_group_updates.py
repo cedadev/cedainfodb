@@ -27,4 +27,4 @@ from django.db import connections
 
 cmds = udb_ldap.ldif_all_group_updates(select_groups=udb_ldap.userdb_managed_ldap_groups(), add_additions_file=False)
 
-print cmds
+print(cmds)

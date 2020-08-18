@@ -8,14 +8,14 @@ from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
-from cedainfoapp.models import FileSet, Partition, Audit
+from .cedainfoapp.models import FileSet, Partition, Audit
 
 
 def start(self):
         
     checksumsfile = os.path.join(self.fileset.storage_path(), '.checksums') 
     if not os.path.exists(checksumsfile):
-        print "no checksums file."
+        print("no checksums file.")
         return
 
     # time of audit
@@ -25,7 +25,7 @@ def start(self):
     self.save()
     try: 
         self.checkm_log()
-    except Exception, e:
+    except Exception as e:
         self.endtime = datetime.datetime.utcnow()
         self.auditstate = 'error'
         self.save()
@@ -96,21 +96,21 @@ if __name__=="__main__":
 
     filesets  =   FileSet.objects.filter(storage_pot__isnull=False).exclude(storage_pot='')
     for fs in filesets:
-        print "===== %s ====" % fs
+        print("===== %s ====" % fs)
         checksumsfile = os.path.join(fs.storage_path(), '.checksums') 
         if not os.path.exists(checksumsfile):
-            print "no checksums file for %s." % fs.logical_path
+            print("no checksums file for %s." % fs.logical_path)
             continue
         
         # check that .checksums Audit does not exist
         mtime = datetime.datetime.utcfromtimestamp(os.path.getmtime(checksumsfile))    
         audits = Audit.objects.filter(fileset=fs, starttime=mtime)
         if len(audits) >0:
-            print "audit already done or already started. %s." % fs.logical_path
+            print("audit already done or already started. %s." % fs.logical_path)
             continue
              
         # scan for checksums   
-        print "Do audit for %s" %  fs.logical_path
+        print("Do audit for %s" %  fs.logical_path)
         audit=Audit(fileset=fs)
         audit.start() 
         audit.save()  

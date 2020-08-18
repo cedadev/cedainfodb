@@ -21,8 +21,8 @@ def run():
             continue
         try: 
             user = User.objects.get(accountid=username)
-            print user.accountid, user.emailaddress.lower()
+            print(user.accountid, user.emailaddress.lower())
         except:
-            print 'ERROR: %s not found' % username
+            print('ERROR: %s not found' % username)
 
         

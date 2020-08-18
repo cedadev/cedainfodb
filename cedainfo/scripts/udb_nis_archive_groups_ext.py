@@ -49,7 +49,7 @@ def run():
 
     ext_nis_groups = []
     
-    for accessGroup in ARCHIVE_ACCESS_GROUPS.keys():
+    for accessGroup in list(ARCHIVE_ACCESS_GROUPS.keys()):
         group_info = {}
         group_info['uid'] = 999
         group_info['name'] = accessGroup
@@ -72,8 +72,8 @@ def run():
    
   
     for info in ext_nis_groups:
-       print info['name'], info['uid']
+       print(info['name'], info['uid'])
        
        for member in info['accounts']:
-          print '   ', member
+          print('   ', member)
 

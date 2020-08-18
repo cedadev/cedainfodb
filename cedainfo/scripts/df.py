@@ -7,7 +7,7 @@ def do_dfs():
     # do df for all partitions
     partitions = Partition.objects.all()
     for p in partitions:
-        print "Doing df of partition: %s " % p
+        print("Doing df of partition: %s " % p)
         p.df()  
 
 

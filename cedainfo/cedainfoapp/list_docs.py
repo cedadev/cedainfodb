@@ -14,7 +14,7 @@ setup_environ(dbsettings)
 
 from cedainfoapp.models import *
 
-import helpscoutdocs
+from . import helpscoutdocs
 
 def list_duplicates(seq):
   seen = set()
@@ -51,7 +51,7 @@ for d in duplicate_docs:
     
 
 for d in duplicates:
-    print d["doc"]
+    print(d["doc"])
     
     for s in d["services"]:
-        print s.name
+        print(s.name)

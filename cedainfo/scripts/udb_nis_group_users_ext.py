@@ -39,10 +39,10 @@ def run():
 
           
     for accountid in accountids:
-        if accountid in extPasswd.keys():
+        if accountid in list(extPasswd.keys()):
            sys.stdout.write( "%s," % accountid)
    
-    print 
+    print() 
     
     
 #    print 'Users in NIS group, but not set in userdb: '

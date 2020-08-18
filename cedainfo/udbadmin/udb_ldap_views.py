@@ -14,13 +14,12 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import *
 
-from models import Dataset
-from models import User
+from .models import Dataset
+from .models import User
 
-import udb_ldap
-import update_check
-import LDAP
-import NISaccounts
+from . import udb_ldap
+from . import update_check
+from . import LDAP
 
 def user_has_ldap_write_access(user):
     '''Indicates if logged in user is allowed to write to ldap server'''
@@ -62,7 +61,7 @@ def write_ldap_group (request, datasetid=''):
     
     if datasetid == 'open':
         record = udb_ldap.ldap_open_group_record()
-    elif datasetid in udb_ldap.ARCHIVE_ACCESS_GROUPS.keys():
+    elif datasetid in list(udb_ldap.ARCHIVE_ACCESS_GROUPS.keys()):
         record = udb_ldap.ldap_archive_access_group_record(datasetid)
     else:
         dataset = Dataset.objects.get(datasetid=datasetid)
@@ -505,125 +504,6 @@ def display_nis_internal_passwd (request):
 
     return HttpResponse(output,content_type="text/plain")
 
-@login_required()
-def display_free_uids (request):
-    '''Display uid numbers to allow selection of a new one'''
-
-    ext_users = NISaccounts.getExtPasswdFile()
-
-    ext_uids = {}
-
-    for account in ext_users.keys():
-        ext_uids[ext_users[account].uid] = account 
-
-    int_users = NISaccounts.getIntPasswdFile()
-
-    int_uids = {}
-
-    for account in int_users.keys():
-        int_uids[int_users[account].uid] = account 
-   
-    output = []
-    next_uid = 0
-    free_count = 0
-
-    for uid in range (25000,25174+1) + range(26001, 26469+1) + range (29751,29899+1) + range(29900,29999+1) + range(35000,35099+1) \
-                     + range(7050000, 7051000):
-##    for uid in range(26001, 26399+1) + range (29751,29899+1):
-        
-        rec = {}
-        rec['uid'] = uid
-        rec['free'] = True
-
-        if ext_uids.has_key(uid):
-           rec['ext_accountid']  = ext_uids[uid]
-           rec['ext_shell']      = ext_users[rec['ext_accountid']].shell
-           rec['free']           = False
-
-           if rec['ext_shell'].find('nologin') > -1:
-               rec['ext_nologin'] = True
- 
-        if int_uids.has_key(uid):
-            rec['int_accountid'] = int_uids[uid]
-            rec['int_shell']     = int_users[rec['int_accountid']].shell           
-            rec['free']          = False
-
-            if rec['int_shell'].find('nologin') > -1:
-               rec['int_nologin'] = True
-
-        try:
-            user = User.objects.get(uid=uid)
-            rec['accountid'] = user.accountid
-            rec['userkey']   = userkey   = user.userkey
-            rec['free']      = False
-        except:
-            pass
-
-        if uid >= 7050000 and next_uid == 0:
-            if rec['free']:
-                next_uid =  uid
-
-        if rec['free']:
-            free_count = free_count + 1
-
-        output.append(rec)
-        
-    return render_to_response('display_free_uids.html', locals())
-
-@login_required()
-def display_free_gids (request):
-
-    ext_groups = NISaccounts.getExtGroupFile()
-
-    ext_gids = {}
-
-    for group in ext_groups.keys():
-        ext_gids[ext_groups[group].gid] = group 
-        print group, ext_groups[group].gid
-
-    int_groups = NISaccounts.getIntGroupFile()
-
-    int_gids = {}
-
-    for group in int_groups.keys():
-        int_gids[int_groups[group].gid] = group 
-        print group, int_groups[group].gid
-
-    output = []
-    next_gid = 0
-    free_count = 0
-
-    for gid in range(26001, 26399):
-        
-        rec = {}
-        rec['gid'] = gid
-        rec['free'] = True
-
-
-        udbdataset = Dataset.objects.filter(gid=gid)
-
-        if len(udbdataset) > 0:
-            rec['udb_group'] = udbdataset[0].datasetid
-            rec['free'] = False
-
-        if ext_gids.has_key(gid):
-            rec['ext_group']      = ext_gids[gid]
-            rec['free']           = False
-
-        if int_gids.has_key(gid):
-            rec['int_group']     = int_gids[gid]     
-            rec['free']          = False
-
-        if gid > 26170 and next_gid == 0:
-            if rec['free']:
-                next_gid =  gid
-
-        if rec['free']:
-            free_count = free_count + 1
-
-        output.append(rec)
-        
-    return render_to_response('display_free_gids.html', locals())
 
 @login_required()
 def ldap_user_groups (request, userkey):

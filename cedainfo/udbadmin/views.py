@@ -9,11 +9,11 @@ from django.contrib.auth.decorators import login_required
 from udbadmin.models import *
 from udbadmin.forms import *
 from udbadmin.SortHeaders import SortHeaders
-import LDAP
+from . import LDAP
 import json
-import public_keys
+from . import public_keys
 
-import udb_ldap
+from . import udb_ldap
 #
 # sort table headers: djangosnippets.org/snippets/308
 #

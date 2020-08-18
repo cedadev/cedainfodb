@@ -20,12 +20,12 @@ def process(infile, datasetid):
         try: 
             user = User.objects.get(accountid=username)
 
-            print "insert into tbdatasetjoin (userkey, datasetid, ver, endorsedby, endorseddate, expiredate, research) values (",            
-            print "%s, '%s', %s, '%s', '%s', '%s', '%s'" % (user.userkey, datasetid, 1,  ENDORSEDBY, "now", EXPIREDATE, RESEARCH),
+            print("insert into tbdatasetjoin (userkey, datasetid, ver, endorsedby, endorseddate, expiredate, research) values (", end=' ')            
+            print("%s, '%s', %s, '%s', '%s', '%s', '%s'" % (user.userkey, datasetid, 1,  ENDORSEDBY, "now", EXPIREDATE, RESEARCH), end=' ')
 
-            print ")"
+            print(")")
         except:
-            print 'Not Found: %s' % username
+            print('Not Found: %s' % username)
   
     f.close()
 

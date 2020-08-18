@@ -2,7 +2,7 @@
 Contains routines for checking if the user database has been updated.
 '''
 
-import md5
+import hashlib
 
 def get_udb_str (sql, cursor):
     '''
@@ -39,7 +39,7 @@ def user_updated (connection, reset=True, name='jasmin_user'):
     where uid>0;
     """
     user_str = get_udb_str(sql, cursor)
-    hash_string = md5.new(user_str).hexdigest()
+    hash_string = hashlib.md5(user_str.encode("utf-8")).hexdigest()
         
     if stored_hash == hash_string:
         return False
@@ -87,9 +87,10 @@ def group_updated (connection, reset=True, name='jasmin_group'):
     """
     
     group_str = get_udb_str(sql, cursor)
+    
+    user_str = dataset_join_str + group_str
+    hash_string = hashlib.md5(user_str.encode("utf-8")).hexdigest()
 
-    hash_string = md5.new(datasetjoin_str + group_str).hexdigest()
-        
     if stored_hash == hash_string:
         return False
     else:

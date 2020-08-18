@@ -15,7 +15,7 @@ def run (*args):
     archive_parent_dir = os.path.dirname(archive_path)
     insert_dir = args[1]
 
-    print archive_path, insert_dir
+    print(archive_path, insert_dir)
 
     if not os.path.isdir(archive_path):
         raise Exception("Need a existing directory in archive")
@@ -24,7 +24,7 @@ def run (*args):
         raise Exception("Can't have slashes in destination argument.")
 
     filesets_to_change = FileSet.objects.filter(logical_path__startswith=archive_path+"/")
-    print filesets_to_change
+    print(filesets_to_change)
 
     # new path
     new_path = os.path.join(archive_path, insert_dir)
@@ -33,5 +33,5 @@ def run (*args):
     # os.mkdir(new_path, mode=0o755)
 
     for fs in filesets_to_change:
-        print fs.logical_path
-        print fs.logical_path, " -> ", fs.logical_path.replace(archive_path, new_path)
+        print(fs.logical_path)
+        print(fs.logical_path, " -> ", fs.logical_path.replace(archive_path, new_path))

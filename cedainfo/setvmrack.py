@@ -8,13 +8,13 @@ from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
-from cedainfoapp.models import *
+from .cedainfoapp.models import *
 
 
 if __name__=="__main__":
 
     vhosts = Host.objects.filter(host_type = "virtual_server")
     for vh in vhosts:
-        print "Virtual host: %s (%s)  %s" % (vh, vh.hypervisor, vh.retired_on)
+        print("Virtual host: %s (%s)  %s" % (vh, vh.hypervisor, vh.retired_on))
         
  

@@ -14,6 +14,6 @@ def run():
        if vm.name.startswith('legacy:') or vm.name.startswith('00 unspecified'):
           continue
        else:
-           print vm.name
+           print(vm.name)
            
 

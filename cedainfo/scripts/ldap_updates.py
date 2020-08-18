@@ -34,4 +34,4 @@ connection = psycopg2.connect(dbname=dbconf['NAME'],
 
 cmds = udb_ldap.ldif_all_user_updates()
 
-print cmds
+print(cmds)

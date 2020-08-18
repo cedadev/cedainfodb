@@ -131,13 +131,13 @@ def run(*script_args):
             if vm_ip_private: vm_description += "\nIP (private): %s" % vm_ip_private
             if vm_other: vm_description  +=  "\nOther information: %s" % vm_other
 
-            print vm_name,  vm_description
-            print 'ROOT: vm_name %s' % vm_root_users
+            print(vm_name,  vm_description)
+            print('ROOT: vm_name %s' % vm_root_users)
             line_count = line_count + 1
 
             try:
                 a = VM.objects.get(name=vm_name)
-                print "vm name already exists"
+                print("vm name already exists")
                 continue
             except:
 

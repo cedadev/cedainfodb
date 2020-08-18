@@ -10,7 +10,7 @@ from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
-from cedainfoapp.models import FileSet, Partition, Audit
+from .cedainfoapp.models import FileSet, Partition, Audit
 
 
 if __name__=="__main__":

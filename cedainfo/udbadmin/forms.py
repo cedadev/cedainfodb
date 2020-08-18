@@ -1,9 +1,9 @@
 from django.forms import *
-from models import *
+from .models import *
 from django.contrib.admin import widgets
 from django.utils.safestring import mark_safe
-import choices
-import LDAP
+from . import choices
+from . import LDAP
 
 class JasminUsersForm(forms.Form):
     show_ceda_users  =  BooleanField(required=False)

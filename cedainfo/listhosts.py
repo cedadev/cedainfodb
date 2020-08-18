@@ -8,13 +8,13 @@ from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
-from cedainfoapp.models import *
+from .cedainfoapp.models import *
 
 
 if __name__=="__main__":
 
     hosts = Host.objects.filter(retired_on__isnull=True)
     for h in hosts:
-        print "%s" % h
+        print("%s" % h)
  
  

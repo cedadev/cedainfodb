@@ -7,7 +7,7 @@ from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
-from cedainfoapp.models import *
+from .cedainfoapp.models import *
 
 
 
@@ -25,7 +25,7 @@ if __name__=="__main__":
                  fs_to_break = f
              elif len(fs_to_break.logical_path) < len(f.logical_path):
                  fs_to_break = f      
-             print f, fs_to_break
+             print(f, fs_to_break)
  
  
     # if no break found exit
@@ -48,11 +48,11 @@ if __name__=="__main__":
     new_fs.save() 
     
     # rename the break dir as the spot
-    print "rename %s to %s" % (breakpath, new_fs.storage_path())
+    print("rename %s to %s" % (breakpath, new_fs.storage_path()))
     os.rename(breakpath, new_fs.storage_path())
 
     # make new link
-    print "symlink %s to %s" % (new_fs.storage_path(), new_fs.logical_path)
+    print("symlink %s to %s" % (new_fs.storage_path(), new_fs.logical_path))
     os.symlink(new_fs.storage_path(), new_fs.logical_path)
 
      

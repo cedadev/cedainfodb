@@ -1,12 +1,12 @@
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 # from django.contrib.gis import admin
-from models import *
-from filters import MountpointFilter
+from .models import *
+from .filters import MountpointFilter
 
 from django.utils.safestring import mark_safe
 
-from forms import *
+from .forms import *
 
 from django import forms
 from django.db import models
@@ -56,7 +56,7 @@ class ByteSizeField(forms.CharField):
                 return int(value)
         except:
             raise ValidationError(
-                u"Enter a value either as an integer number of bytes, or as a number followed by the suffix 'b', 'Mb', 'Gb', 'Tb', 'Pb, 'Eb'")
+                "Enter a value either as an integer number of bytes, or as a number followed by the suffix 'b', 'Mb', 'Gb', 'Tb', 'Pb, 'Eb'")
 
 
 # don't need to edit curation cat

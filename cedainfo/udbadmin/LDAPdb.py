@@ -55,4 +55,4 @@ class LDAPdb:
         return results
         
 a = LDAPdb()
-print a.members('jasmin-login', uid=True)
+print(a.members('jasmin-login', uid=True))

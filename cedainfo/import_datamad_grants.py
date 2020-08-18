@@ -41,19 +41,19 @@ def find_long_field(desc, text):
 for item in channel.findall('item'):
     desc = item.find('description').text
     title = item.find('title').text
-    print desc
+    print(desc)
     grant_ref =  find_field(desc, 'Grant Reference')
     PI =  find_field(desc, 'Grant Holder')
     PIemail = find_field(desc, 'E-Mail')
     abstract =  find_long_field(desc, 'Abstract')
     objectives =  find_long_field(desc, 'Objectives')
     
-    print title
-    print grant_ref
-    print PI
-    print abstract
-    print objectives
-    print '----------------------'
+    print(title)
+    print(grant_ref)
+    print(PI)
+    print(abstract)
+    print(objectives)
+    print('----------------------')
     
     # find grant if  does not exist make a new one
     grant = Grant.objects.filter(number=grant_ref)

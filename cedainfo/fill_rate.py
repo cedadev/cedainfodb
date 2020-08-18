@@ -8,7 +8,7 @@ from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
-from cedainfoapp.models import FileSet, Partition, FileSetSizeMeasurement
+from .cedainfoapp.models import FileSet, Partition, FileSetSizeMeasurement
 
 
 
@@ -62,13 +62,13 @@ def anal(fs):
 
 if __name__=="__main__":
 
-    print """script to update volume estimates for filesets that look wrong.
+    print("""script to update volume estimates for filesets that look wrong.
 The script looks for filesets that are stable for more than a year and asks if they need allocations revised downwards.
 If any fileset is exceeding it's allocation, or on track to exceed it, then the script will ask it it should be increased.
 
 Answering yes to all recommendations is a bad idea as you will overwrite manually entered numbers that may be more accurate.
 
-"""
+""")
 
 
 
@@ -79,24 +79,24 @@ Answering yes to all recommendations is a bad idea as you will overwrite manuall
     for fs in filesets:
         state, predicted = anal(fs)
         if predicted > fs.overall_final_size: 
-            print ' +++ Fileset needs more space  +++ ',fs, state, int((predicted - fs.overall_final_size)/1e9), 'GB'
+            print(' +++ Fileset needs more space  +++ ',fs, state, int((predicted - fs.overall_final_size)/1e9), 'GB')
             os.system("firefox http://cedadb.badc.rl.ac.uk/admin/cedainfoapp/fileset/%s" % fs.pk)
-            ans = raw_input("   Increase allocation from %s to %s? (y/n)> " % (fs.overall_final_size, predicted))
+            ans = input("   Increase allocation from %s to %s? (y/n)> " % (fs.overall_final_size, predicted))
             if ans == 'y':
                 fs.overall_final_size = predicted
                 #fs.save()
-                print "                                     ... increasing allocation." 
+                print("                                     ... increasing allocation.") 
         if fs.overall_final_size - predicted > 100000000000: 
-            print ' --- Fileset may release alloc --- ',fs, state, int((fs.overall_final_size - predicted)/1e9), 'GB'
+            print(' --- Fileset may release alloc --- ',fs, state, int((fs.overall_final_size - predicted)/1e9), 'GB')
             os.system("firefox http://cedadb.badc.rl.ac.uk/admin/cedainfoapp/fileset/%s" % fs.pk)
-            ans = raw_input("   Decrease allocation from %s to %s? (y/n)> " % (fs.overall_final_size, predicted))
+            ans = input("   Decrease allocation from %s to %s? (y/n)> " % (fs.overall_final_size, predicted))
             if ans == 'y': 
                 fs.overall_final_size = predicted
                 #fs.save()
-                print "                                     ... decreasing allocation " 
+                print("                                     ... decreasing allocation ") 
 
 
-        if fs_state.has_key(state): 
+        if state in fs_state: 
             fs_state[state] +=1
             fs_lists[state].append(fs)
         else: 

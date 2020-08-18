@@ -1,4 +1,4 @@
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import xml.etree.ElementTree as xml
 import sys
 from datetime import *
@@ -16,7 +16,7 @@ class SpotXMLReader():
     
     def __init__(self, id):
         uri = "http://storaged-monitor.esc.rl.ac.uk/storaged_ceda/CEDA_Fileset_File_Details_XML.php?" + id
-        self.xml = urllib2.urlopen(uri).read()
+        self.xml = urllib.request.urlopen(uri).read()
         self.root = xml.fromstring(self.xml)
         #self.root = self.tree.getroot()
         
@@ -39,7 +39,7 @@ class SpotXMLReader():
         spot_id = self.root.find("spot_id").text
         text = "Spot: %s\n" % spot_id
         
-        total_volume = 0L
+        total_volume = 0
         total_files = 0
         latest_time = datetime(1970, 1, 1, 0, 0, 0,)   
         
@@ -57,7 +57,7 @@ class SpotXMLReader():
                     latest_time = time
                 for item in i.findall("file"):
                     file_size = item.find("file_size").text
-                    total_volume = total_volume + long(file_size)
+                    total_volume = total_volume + int(file_size)
                     total_files += 1
         
         text += "Total volume: %s\n" % total_volume
@@ -80,7 +80,7 @@ class SpotXMLReader():
                 file_name = item.find("file_name").text
                 file_size = item.find("file_size").text
                 files[file_id] = {
-                    'name': urllib2.unquote(file_name),
+                    'name': urllib.parse.unquote(file_name),
                     'size': file_size,
                 }
         return files
@@ -94,7 +94,7 @@ class SpotXMLReader():
         for i in aggregations:
             for item in i.findall("file"):
                 file_name = item.find("file_name").text
-                files.append(urllib2.unquote(file_name))
+                files.append(urllib.parse.unquote(file_name))
         return files
                 
 def main():
@@ -102,9 +102,9 @@ def main():
     reader = SpotXMLReader(sys.argv[1])
     
     if len(sys.argv) > 2 and sys.argv[2] == "xml":
-        print reader.getXML()
+        print(reader.getXML())
     else:
-        print reader.getSpotSummary()
+        print(reader.getSpotSummary())
         
 if __name__=="__main__":
     main()

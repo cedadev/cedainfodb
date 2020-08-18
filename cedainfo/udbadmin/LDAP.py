@@ -82,7 +82,7 @@ def group_details (group):
         base = "cn=%s," % group + GROUP_BASE
         (dn, entry) = l.search_s(base , ldap.SCOPE_BASE)[0]
  
-        if entry.has_key('memberUid'):       
+        if 'memberUid' in entry:       
            entry['memberUid'] = sorted(entry['memberUid'])
 
         return entry

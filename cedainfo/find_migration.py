@@ -8,7 +8,7 @@ from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
-from cedainfoapp.models import *
+from .cedainfoapp.models import *
 
 
 if __name__=="__main__":
@@ -18,7 +18,7 @@ if __name__=="__main__":
     migration_part = Partition.objects.filter(mountpoint = migration_part ) 
     migration_part = migration_part[0]
 
-    print "using migration partition: %s" % migration_part
+    print("using migration partition: %s" % migration_part)
 
 
 
@@ -28,13 +28,13 @@ if __name__=="__main__":
     for part in Partition.objects.filter(status='Closed', mountpoint__startswith='/datacentre'):
         alloc = part.allocated()
         if margin* part.capacity_bytes < alloc:
-            print part
+            print(part)
             migration_size=alloc - margin*part.capacity_bytes
             filesets = FileSet.objects.filter(partition=part).order_by('overall_final_size')
             fs_list = []
             fs_list_size = 0 
             if len(filesets) == 1: 
-                print "don't move filesets on their own: %s" % filesets[0]
+                print("don't move filesets on their own: %s" % filesets[0])
                 continue
             for fs in filesets:
                 fssms = FileSetSizeMeasurement.objects.filter(fileset=fs).order_by('-date')
@@ -51,15 +51,15 @@ if __name__=="__main__":
                     break
             
             if len(fs_list) ==0:
-                print  "no good moves"
+                print("no good moves")
                 continue 
         #    print "best move: %s" % fs_list
             best = fs_list[-1]
-            print "%4.2f TB (need to move %4.2f TB) " % (fs_list_size*1e-12, migration_size*1e-12)
-            print "best start with %s (%4.2f TB)"   % (best, best.overall_final_size*1e-12)
-            ans = raw_input("Mark for migration? (y/n)> ")
+            print("%4.2f TB (need to move %4.2f TB) " % (fs_list_size*1e-12, migration_size*1e-12))
+            print("best start with %s (%4.2f TB)"   % (best, best.overall_final_size*1e-12))
+            ans = input("Mark for migration? (y/n)> ")
             if ans == 'y':
-                print "Marked %s to migrate to %s" % (best, migration_part)
+                print("Marked %s to migrate to %s" % (best, migration_part))
                 best.migrate_to = migration_part
                 best.save()        
 

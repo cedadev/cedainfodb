@@ -8,7 +8,7 @@ from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
-from cedainfoapp.models import *
+from .cedainfoapp.models import *
 
 
 if __name__=="__main__":
@@ -16,7 +16,7 @@ if __name__=="__main__":
     logical_path = sys.argv[1]
     filesets = FileSet.objects.filter(logical_path = logical_path)
     fs = filesets[0] 
-    print "found fileset %s" % fs
+    print("found fileset %s" % fs)
     fs.partition = fs.migrate_to
     fs.save()        
 

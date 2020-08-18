@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.template.context_processors import csrf
 
-import helpscoutdocs
+from . import helpscoutdocs
 
 from udbadmin.SortHeaders import SortHeaders
 
@@ -19,7 +19,7 @@ import re
 import requests
 import datetime
 import time
-import httplib
+import http.client
 import random
 
 logging = settings.LOG
@@ -182,7 +182,7 @@ def next_audit(request):
             break
             # skip if last audit not an analysed state then skip
         if last_audit.auditstate != 'analysed' and last_audit.auditstate != 'copy verified':
-            print "Ignore - last audit not 'analysed' or 'copy verified' state.  state=%s" % last_audit.auditstate
+            print("Ignore - last audit not 'analysed' or 'copy verified' state.  state=%s" % last_audit.auditstate)
             continue
         # see if this is the oldest audit
         if last_audit.starttime < oldest_audit:
@@ -564,7 +564,7 @@ def split_fileset(request):
                 parent = f
             elif len(parent.logical_path) < len(f.logical_path):
                 parent = f
-            print f, parent
+            print(f, parent)
 
     # if no parent found exit
     if parent == None:

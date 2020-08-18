@@ -8,7 +8,7 @@ from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
-from cedainfoapp.models import *
+from .cedainfoapp.models import *
 
 
 if __name__=="__main__":
@@ -20,14 +20,14 @@ if __name__=="__main__":
     for p in partitions:
         if p.mountpoint=='/disks/drizzle2': continue
         if p.mountpoint=='/disks/drizzle1': continue
-        print "************** %s **********" % p
+        print(("************** %s **********" % p))
         filesets = FileSet.objects.filter(partition=p)
         for fs in filesets:
             # for each fileset check spot and link exists
             spot_path = fs.storage_path()
-            if not os.path.isdir(spot_path): print "   FILESET ERROR -> %s is not a directory" % spot_path
-            if not os.path.islink(fs.logical_path): print "   FILESET ERROR -> %s is not a link" % fs.logical_path
-            elif os.readlink(fs.logical_path) != spot_path: print "   FILESET ERROR  %s does not link to %s" % (fs.logical_path, spot_path)
+            if not os.path.isdir(spot_path): print(("   FILESET ERROR -> %s is not a directory" % spot_path))
+            if not os.path.islink(fs.logical_path): print(("   FILESET ERROR -> %s is not a link" % fs.logical_path))
+            elif os.readlink(fs.logical_path) != spot_path: print(("   FILESET ERROR  %s does not link to %s" % (fs.logical_path, spot_path)))
  
            # print "    -> contains fileset %s" % fs
 
@@ -41,19 +41,19 @@ if __name__=="__main__":
 
             for fs in filesets:
                 if fs.storage_pot in spots: spots.remove(fs.storage_pot)
-            if len(spots)>0: print "ODD spots> ", spots 
+            if len(spots)>0: print(("ODD spots> ", spots)) 
             
             for s in spots: 
                 dupfilesets = FileSet.objects.filter(storage_pot=s)
-                if len(dupfilesets) == 0: print " !! %s not found elsewhere!" % s
+                if len(dupfilesets) == 0: print((" !! %s not found elsewhere!" % s))
                 for dup in dupfilesets:
-                    print " ==  %s looks like dup of %s (%s)" % (s, dup, dup.storage_path())
-                    print "To remove dup run:"
-                    print "rm -rf %s/archive/%s" %(p.mountpoint, s)
+                    print((" ==  %s looks like dup of %s (%s)" % (s, dup, dup.storage_path())))
+                    print("To remove dup run:")
+                    print(("rm -rf %s/archive/%s" %(p.mountpoint, s)))
                     # if migrate.txt file and on pan then its definitly safe to delete
                     if os.path.exists("%s/archive/%s/MIGRATED.txt" %(p.mountpoint, s)) and p.mountpoint[0:12] == '/datacentre/': script += "rm -rf %s/archive/%s\n" %(p.mountpoint, s)
                           
                     
-    print '\n\n\n\n\n'
-    print script
+    print('\n\n\n\n\n')
+    print(script)
 
