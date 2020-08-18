@@ -53,22 +53,22 @@ class ProblemsMixin(object):
 # class NodeListTag(models.Model):
 #    name=models.CharField(max_length=126, help_text="name of this tag")
 #    tag=models.ManyToManyField('self', null=True, blank=True, help_text="tag associated with this tag")
-#    def __unicode__(self):
+#    def __str__(self):
 #        return u'%s' % self.name
 
 # class NodeList(models.Model):
 #    name = models.CharField(max_length=126)
-#    def __unicode__(self):
+#    def __str__(self):
 #        return u'%s the nodelist' % self.name
 #
 # class HostList(models.Model):
 #    nodelist = models.OneToOneField(NodeList)
-#    def __unicode__(self):
+#    def __str__(self):
 #        return u'%s the hostlist' % self.nodelist.name
 #
 # class RackList(models.Model):
 #    nodelist = models.OneToOneField(NodeList)
-#    def __unicode__(self):
+#    def __str__(self):
 #        return u'%s the racklist' % self.nodelist.name
 
 
@@ -79,7 +79,7 @@ class Tenancy(models.Model):
     name = models.CharField(max_length=80)
     summary = models.CharField(max_length=80)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -93,7 +93,7 @@ class Rack(models.Model):
 
     # tag = models.ManyToManyField(NodeListTag, null=True, blank=True, help_text="tag for nodelist")
     #    racklist = models.ForeignKey(RackList, null=True, blank=True, help_text="list this rack belongs to (only one)")
-    def __unicode__(self):
+    def __str__(self):
         return '%s' % self.name
 
 
@@ -141,7 +141,7 @@ class Host(models.Model):
     # tag = models.ManyToManyField(NodeListTag, null=True, blank=True, help_text="tag for nodelist")
     # hostlist = models.ManyToManyField(HostList, null=True, blank=True, help_text="list(s) this host belongs to")
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s' % self.hostname
 
     def partitions(self):
@@ -369,11 +369,11 @@ class Partition(models.Model, ProblemsMixin):
                 msgs.append(p.problem_html("Partition overallocated", 2))
         return msgs
 
-    def __unicode__(self):
+    def __str__(self):
         tb_remaining = (self.capacity_bytes - self.used_bytes) / (1024 ** 4)
         return '%s (%d %s)' % (self.mountpoint, tb_remaining, 'Tb free')
 
-    __unicode__.allow_tags = True    # seem to need this in order to use __unicode__ as one of the fields
+    __str__.allow_tags = True    # seem to need this in order to use __str__ as one of the fields
                                      # in list_display in the admin view (see
                                      # http://docs.djangoproject.com/en/dev/ref/contrib/admin/#django.contrib.admin.ModelAdmin.list_display)
 
@@ -383,7 +383,7 @@ class CurationCategory(models.Model):
     category = models.CharField(max_length=5, help_text="Curation category label")
     description = models.CharField(max_length=1024, help_text="Longer description")
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s : %s" % (self.category, self.description)
 
 
@@ -396,7 +396,7 @@ class BackupPolicy(models.Model):
     type = models.CharField(max_length=45, help_text="Full, incremental, versioned")
     policy_version = models.IntegerField(help_text="Policy version number")
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s %s %s %s" % (self.tool, self.frequency, self.type, self.policy_version)
 
 
@@ -405,7 +405,7 @@ class AccessStatus(models.Model):
     status = models.CharField(max_length=45, help_text="Status label")
     comment = models.CharField(max_length=1024, help_text="Comment describing this status")
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s : %s" % (self.status, self.comment)
 
 
@@ -415,7 +415,7 @@ class Person(models.Model):
     email = models.EmailField(help_text="Email address")
     username = models.CharField(max_length=45, help_text="System username")
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s' % self.name
 
     class Meta:
@@ -452,7 +452,7 @@ class FileSet(models.Model, ProblemsMixin):
     complete_date = models.DateField(null=True, blank=True, help_text="Date when fileset was set to complete.")
     primary_on_tape = models.BooleanField(default=False, help_text="Primary media storage on tape.")
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s' % (self.logical_path,)
 
     # TODO custom save method (for when assigning a partition) : check that FileSet size
@@ -977,7 +977,7 @@ class DataEntity(models.Model):
 
     friendly_name.alphabetic_filter = True
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s (%s)' % (self.dataentity_id, self.symbolic_name)
 
 
@@ -1025,7 +1025,7 @@ class Service(models.Model):
     software_contact = models.ForeignKey(Person, null=True, blank=True, related_name='service_software_contact',
                                          help_text="CEDA or 3rd party contact who is responsible for the software component used for the service")
 
-    def __unicode__(self):
+    def __str__(self):
         the_host = ''
         if self.host is not None:
             the_host = self.host
@@ -1055,7 +1055,7 @@ class HostHistory(models.Model):
     history_desc = models.TextField(help_text="Details of event / noteworthy item in host's history")
     admin_contact = models.ForeignKey(Person, help_text="CEDA Person reporting this event")
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s|%s' % (self.host, self.date)
 
 
@@ -1067,7 +1067,7 @@ class ServiceBackupLog(models.Model):
     success = models.BooleanField(default=False, help_text="Success (True) or Failure (False) of backup event")
     comment = models.TextField(blank=True, help_text="Additional comment(s)")
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s|%s' % (self.service, self.date)
 
 
@@ -1079,7 +1079,7 @@ class FileSetSizeMeasurement(models.Model):
     alloc = models.BigIntegerField(help_text="Allocatoion Size in bytes")  # in bytes
     no_files = models.BigIntegerField(null=True, blank=True, help_text="Number of files")
 
-    def __unicode__(self):
+    def __str__(self):
         if self.size > 2000000000000:
             size = self.size / 1000000000000
             unit = "TB"
@@ -1134,7 +1134,7 @@ class Audit(models.Model, ProblemsMixin):
     unchanges_files = models.IntegerField(default=0)
     logfile = models.CharField(max_length=255, default='')
 
-    def __unicode__(self):
+    def __str__(self):
         return 'Audit of %s started %s  [[%s]]' % (self.fileset, self.starttime, self.auditstate)
 
     def fileset_link(self):
@@ -1419,7 +1419,7 @@ class Audit(models.Model, ProblemsMixin):
 #    vert_extent_lower = models.IntegerField(null=True, blank=True)
 #    vert_extend_upper = models.IntegerField(null=True, blank=True)
 #    objects = models.GeoManager()
-#    def __unicode__(self):
+#    def __str__(self):
 #        return 'spatiotemp for file %s' % self.file
 
 class GWSRequest(models.Model):
@@ -1467,7 +1467,7 @@ class GWSRequest(models.Model):
                             help_text='GWS to which this request pertains')
     timestamp = models.DateTimeField(auto_now=True, auto_now_add=False, help_text='time last modified')
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s' % self.gws_name
 
     # Actions : 
@@ -1648,7 +1648,7 @@ class GWS(models.Model):
         else:
             return None
 
-    def __unicode__(self):
+    def __str__(self):
         if self.path:
             path = self.path
         else:
@@ -1786,7 +1786,7 @@ class GWSSizeMeasurement(models.Model):
     size = models.BigIntegerField(help_text="Size in bytes")  # in bytes
     no_files = models.BigIntegerField(null=True, blank=True, help_text="Number of files")
 
-    def __unicode__(self):
+    def __str__(self):
         if self.no_files > 2000000:
             no_files = self.no_files / (1000 * 1000)
             funit = "Mfiles"
@@ -1831,7 +1831,7 @@ class VMRequest(models.Model):
     class Meta:
         ordering = ['vm_name']
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s' % self.vm_name
 
     def action_links(self):
@@ -2002,7 +2002,7 @@ class VM(models.Model):
     class Meta:
         ordering = ['name']
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s' % self.name
 
     def save(self, *args, **kwargs):
@@ -2136,7 +2136,7 @@ class VM(models.Model):
 class ServiceKeyword(models.Model):
     keyword = models.CharField(max_length=30)
 
-    def __unicode__(self):  # __unicode__ on Python 2
+    def __str__(self):  # __str__ on Python 2
         return self.keyword
 
     class Meta:
@@ -2219,7 +2219,7 @@ class NewService(models.Model):
     class Meta:
         verbose_name = "Service"
 
-    def __unicode__(self):
+    def __str__(self):
         theHost = ''
         if self.host is not None:
             theHost = self.host
