@@ -177,7 +177,7 @@ class Institute(models.Model):
 
 class Addresses(models.Model):
     addresskey = models.IntegerField(primary_key=True)
-    institutekey = models.ForeignKey(Institute, db_column='institutekey')
+    institutekey = models.ForeignKey(Institute, on_delete=models.PROTECT, db_column='institutekey')
     department = models.CharField(max_length=100, blank=True, help_text='Your department within your host institute')
 
     def __unicode__ (self):
@@ -216,7 +216,7 @@ class User (models.Model):
 
     surname = models.CharField(max_length=50, help_text='Surname')
     othernames = models.CharField(max_length=50, verbose_name='Other names', help_text='Christian or Forenames')
-    addresskey = models.OneToOneField(Addresses, db_column='addresskey')
+    addresskey = models.OneToOneField(Addresses, on_delete=models.PROTECT, db_column='addresskey')
     telephoneno = models.CharField('Telephone number', max_length=50, blank=True, help_text='Your contact telephone number in case we need to call you (e.g. helpdesk assistance)')
     emailaddress = models.EmailField('Email Address', max_length=100, unique=False, help_text='Your institute/work email address. A personal email address may be used, but may cause delays in processing access applications.')
     comments = models.TextField(blank=True)
@@ -463,8 +463,8 @@ class DatasetJoinManager(models.Manager):
                  
 class Datasetjoin(models.Model):
     id =      models.AutoField(primary_key=True)
-    userkey = models.ForeignKey(User, db_column='userkey')
-    datasetid = models.ForeignKey(Dataset, db_column='datasetid')
+    userkey = models.ForeignKey(User, on_delete=models.PROTECT, db_column='userkey')
+    datasetid = models.ForeignKey(Dataset, on_delete=models.PROTECT, db_column='datasetid')
     ver = models.IntegerField()
     endorsedby = models.CharField(max_length=50)
     endorseddate = models.DateTimeField()
@@ -515,8 +515,8 @@ class Datasetrequest(models.Model):
     PENDING  = 'pending'
     
     id = models.AutoField(primary_key=True)
-    userkey = models.ForeignKey(User, db_column='userkey')
-    datasetid = models.ForeignKey(Dataset, db_column='datasetid')
+    userkey = models.ForeignKey(User, on_delete=models.PROTECT, db_column='userkey')
+    datasetid = models.ForeignKey(Dataset, on_delete=models.PROTECT, db_column='datasetid')
     requestdate = models.DateTimeField()
     research = models.CharField(max_length=1500)
     nercfunded = models.IntegerField()
@@ -584,7 +584,7 @@ class Datasetrequest(models.Model):
 
 class Privilege(models.Model):
     id      = models.AutoField(primary_key=True)
-    userkey =  models.ForeignKey(User, db_column='userkey', to_field='userkey', null=True)
+    userkey =  models.ForeignKey(User, on_delete=models.PROTECT, db_column='userkey', to_field='userkey', null=True)
     type    = models.CharField(max_length=25,
                choices=(
                        ("authorise", "Authorise"), 
@@ -592,7 +592,7 @@ class Privilege(models.Model):
                        )
     )
     
-    datasetid = models.ForeignKey(Dataset, db_column='datasetid')
+    datasetid = models.ForeignKey(Dataset, on_delete=models.PROTECT, db_column='datasetid')
     comment = models.CharField(max_length=200, blank=True)
 
     def accountid (self):

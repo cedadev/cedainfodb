@@ -30,7 +30,7 @@ from django.core.validators import RegexValidator
 
 # https://timmyomahony.com/blog/reversing-admin-urls-and-creating-admin-links-you-models/
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 class ProblemsMixin(object):
     """Mixin class to add reporting of content problems."""
@@ -133,9 +133,9 @@ class Host(models.Model):
     os = models.CharField(max_length=512, blank=True, help_text="Operating system")
     capacity = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True,
                                    help_text="Rough estimate in Tb only")  # just an estimate (cf Partition which uses bytes from df)
-    rack = models.ForeignKey(Rack, blank=True, null=True,
+    rack = models.ForeignKey(Rack, on_delete=models.PROTECT, blank=True, null=True,
                              help_text="Rack (if virtual machine, give that of hypervisor)")
-    hypervisor = models.ForeignKey('self', blank=True, null=True,
+    hypervisor = models.ForeignKey('self', on_delete=models.PROTECT, blank=True, null=True,
                                    help_text="If host_type=virtual_server, give the name of the hypervisor which contains this one.")
 
     # tag = models.ManyToManyField(NodeListTag, null=True, blank=True, help_text="tag for nodelist")
@@ -154,7 +154,7 @@ class Host(models.Model):
 class Partition(models.Model, ProblemsMixin):
     '''Filesystem equipped with standard directory structure for archive storage'''
     mountpoint = models.CharField(blank=True, max_length=1024, help_text="E.g. /disks/machineN", unique=True)
-    host = models.ForeignKey(Host, blank=True, null=True, help_text="Host on which this partition resides")
+    host = models.ForeignKey(Host, on_delete=models.PROTECT, blank=True, null=True, help_text="Host on which this partition resides")
     used_bytes = models.BigIntegerField(default=0,
                                         help_text="\"Used\" value from df, i.e. no. of bytes used. May be populated by script.")
     capacity_bytes = models.BigIntegerField(default=0,
@@ -431,7 +431,7 @@ class FileSet(models.Model, ProblemsMixin):
     overall_final_size = models.BigIntegerField(
         help_text="The allocation given to a fileset is an estimate of the final size on disk. If the dataset is going to grow indefinitely then estimate the size for 4 years ahead. Filesets can't be bigger than a single partition, but in order to aid disk managment they should no exceed 20% of the size of a partition.")  # Additional data still expected (as yet uningested) in bytes
     notes = models.TextField(blank=True)
-    partition = models.ForeignKey(Partition, blank=True, null=True, limit_choices_to={'status': 'Allocating'},
+    partition = models.ForeignKey(Partition, on_delete=models.PROTECT, blank=True, null=True, limit_choices_to={'status': 'Allocating'},
                                   help_text="Actual partition where this FileSet is physically stored")
     storage_pot_type = models.CharField(max_length=64, blank=True, default='archive',
                                         help_text="The 'type' directory under which the data is held. This is archive for archive data and project_space for project space etc. DO NOT CHANGE AFTER SPOT CREATION",
@@ -440,9 +440,9 @@ class FileSet(models.Model, ProblemsMixin):
                                                  ("group_workspace", "group_workspace")))
     storage_pot = models.CharField(max_length=1024, blank=True, default='',
                                    help_text="The directory under which the data is held")
-    migrate_to = models.ForeignKey(Partition, blank=True, null=True, help_text="Target partition for migration",
+    migrate_to = models.ForeignKey(Partition, on_delete=models.PROTECT, blank=True, null=True, help_text="Target partition for migration",
                                    related_name='fileset_migrate_to_partition')
-    secondary_partition = models.ForeignKey(Partition, blank=True, null=True,
+    secondary_partition = models.ForeignKey(Partition, on_delete=models.PROTECT, blank=True, null=True,
                                             help_text="Target for secondary disk copy",
                                             related_name='fileset_secondary_partition')
     dmf_backup = models.BooleanField(default=False, help_text="Backup to DMF")
@@ -947,19 +947,19 @@ class DataEntity(models.Model):
     symbolic_name = models.CharField(max_length=1024, blank=True,
                                      help_text="Short abbreviation to be used for directory names etc")
     logical_path = models.CharField(max_length=1024, blank=True, help_text="Top level of location within archive")
-    curation_category = models.ForeignKey(CurationCategory, null=True, blank=True,
+    curation_category = models.ForeignKey(CurationCategory, on_delete=models.PROTECT, null=True, blank=True,
                                           help_text="Curation catagory : choose from list")
     notes = models.TextField(blank=True, help_text="Additional notes")
     availability_priority = models.BooleanField(default=False, help_text="Priority dataset : use highest spec hardware")
     availability_failover = models.BooleanField(default=False,
                                                 help_text="Whether or not this dataset requires redundant copies for rapid failover (different from recovery from backup)")
-    access_status = models.ForeignKey(AccessStatus, help_text="Security applied to dataset")
+    access_status = models.ForeignKey(AccessStatus, on_delete=models.PROTECT, help_text="Security applied to dataset")
     recipes_expression = models.CharField(max_length=1024, blank=True)
     recipes_explanation = models.TextField(blank=True,
                                            help_text="Verbal explanation of registration process. Can be HTML snippet. To be used in dataset index to explain to user steps required to gain access to dataset.")
     db_match = models.IntegerField(null=True, blank=True,
                                    help_text="Admin use only : please ignore")  # id match to "dataset" in old storage db
-    responsible_officer = models.ForeignKey(Person, blank=True, null=True,
+    responsible_officer = models.ForeignKey(Person, blank=True, null=True, on_delete=models.PROTECT, 
                                             help_text="CEDA person acting as contact for this dataset")
     last_reviewed = models.DateField(null=True, blank=True, help_text="Date of last dataset review")
     review_status = models.CharField(
@@ -984,7 +984,7 @@ class DataEntity(models.Model):
 class Service(models.Model):
     '''Software-based service'''
     # host = models.ManyToManyField(Host, help_text="Host machine on which service is deployed", null=True, blank=True)
-    host = models.ForeignKey(Host, help_text="Host machine on which service is deployed", null=True, blank=True)
+    host = models.ForeignKey(Host, on_delete=models.PROTECT, help_text="Host machine on which service is deployed", null=True, blank=True)
     name = models.CharField(max_length=512, help_text="Name of service")
     active = models.BooleanField(default=False, help_text="Is this service active or has it been decomissioned?")
     description = models.TextField(blank=True, help_text="Longer description if needed")
@@ -1018,11 +1018,11 @@ class Service(models.Model):
                                               default="disposable",
                                               help_text="How tolerant of unavailability we should be for this service"
                                               )
-    requester = models.ForeignKey(Person, null=True, blank=True, related_name='service_requester',
+    requester = models.ForeignKey(Person, on_delete=models.PROTECT, null=True, blank=True, related_name='service_requester',
                                   help_text="CEDA Person requesting deployment")
-    installer = models.ForeignKey(Person, null=True, blank=True, related_name='service_installer',
+    installer = models.ForeignKey(Person, on_delete=models.PROTECT, null=True, blank=True, related_name='service_installer',
                                   help_text="CEDA Person installing the service")
-    software_contact = models.ForeignKey(Person, null=True, blank=True, related_name='service_software_contact',
+    software_contact = models.ForeignKey(Person, on_delete=models.PROTECT, null=True, blank=True, related_name='service_software_contact',
                                          help_text="CEDA or 3rd party contact who is responsible for the software component used for the service")
 
     def __str__(self):
@@ -1050,10 +1050,10 @@ class Service(models.Model):
 
 class HostHistory(models.Model):
     """Entries detailing history of changes to a Host"""
-    host = models.ForeignKey(Host, help_text="Host name")
+    host = models.ForeignKey(Host, on_delete=models.PROTECT, help_text="Host name")
     date = models.DateField(help_text="Event date")
     history_desc = models.TextField(help_text="Details of event / noteworthy item in host's history")
-    admin_contact = models.ForeignKey(Person, help_text="CEDA Person reporting this event")
+    admin_contact = models.ForeignKey(Person, on_delete=models.PROTECT, help_text="CEDA Person reporting this event")
 
     def __str__(self):
         return '%s|%s' % (self.host, self.date)
@@ -1061,8 +1061,8 @@ class HostHistory(models.Model):
 
 class ServiceBackupLog(models.Model):
     """Backup history for a Service"""
-    service = models.ForeignKey(Service, help_text="Service being backed up")
-    backup_policy = models.ForeignKey(BackupPolicy, help_text="Backup policy implemented for this backup event")
+    service = models.ForeignKey(Service, on_delete=models.PROTECT, help_text="Service being backed up")
+    backup_policy = models.ForeignKey(BackupPolicy, on_delete=models.PROTECT, help_text="Backup policy implemented for this backup event")
     date = models.DateTimeField(help_text="Date and time of backup")
     success = models.BooleanField(default=False, help_text="Success (True) or Failure (False) of backup event")
     comment = models.TextField(blank=True, help_text="Additional comment(s)")
@@ -1073,7 +1073,7 @@ class ServiceBackupLog(models.Model):
 
 class FileSetSizeMeasurement(models.Model):
     """Date-stampted size measurement of a FileSet"""
-    fileset = models.ForeignKey(FileSet, help_text="FileSet that was measured")
+    fileset = models.ForeignKey(FileSet, on_delete=models.PROTECT, help_text="FileSet that was measured")
     date = models.DateTimeField(default=datetime.now, help_text="Date and time of measurement")
     size = models.BigIntegerField(help_text="Size in bytes")  # in bytes
     alloc = models.BigIntegerField(help_text="Allocatoion Size in bytes")  # in bytes
@@ -1444,7 +1444,7 @@ class GWSRequest(models.Model):
     )
     path = models.CharField(max_length=2048, help_text='storage path to this group workspace excluding GWS name',
                             choices=settings.GWS_PATH_CHOICES)
-    internal_requester = models.ForeignKey(User, help_text='CEDA person sponsoring the request')
+    internal_requester = models.ForeignKey(User, on_delete=models.PROTECT, help_text='CEDA person sponsoring the request')
     gws_manager = models.CharField(max_length=1024,
                                    help_text='External person who will manage the GWS during its lifetime')
     gws_manager_email = models.EmailField(help_text="Email address")
@@ -1611,7 +1611,7 @@ class GWS(models.Model):
     # Fields populated from GWS request
     path = models.CharField(max_length=2048, help_text='storage path to this group workspace excluding GWS name',
                             choices=settings.GWS_PATH_CHOICES)
-    internal_requester = models.ForeignKey(User, help_text='CEDA person sponsoring the GWS')
+    internal_requester = models.ForeignKey(User, on_delete=models.PROTECT, help_text='CEDA person sponsoring the GWS')
     gws_manager = models.CharField(max_length=1024,
                                    help_text='External person who will manage the GWS during its lifetime')
     gws_manager_email = models.EmailField(help_text="Email address")
@@ -1781,7 +1781,7 @@ class GWS(models.Model):
 
 class GWSSizeMeasurement(models.Model):
     '''Date-stampted size measurement of a GWS'''
-    gws = models.ForeignKey('GWS', help_text="GWS that was measured")
+    gws = models.ForeignKey('GWS', on_delete=models.PROTECT, help_text="GWS that was measured")
     date = models.DateTimeField(default=datetime.now, help_text="Date and time of measurement")
     size = models.BigIntegerField(help_text="Size in bytes")  # in bytes
     no_files = models.BigIntegerField(null=True, blank=True, help_text="Number of files")
@@ -1802,7 +1802,7 @@ class VMRequest(models.Model):
                             help_text="Type of VM, see REF")  # TODO update REF
     operation_type = models.CharField(max_length=127, choices=settings.VM_OP_TYPE_CHOICES,
                                       help_text="Operation type of VM (dev, test, production, ...)")
-    internal_requester = models.ForeignKey(User, help_text="CEDA person sponsoring the request",
+    internal_requester = models.ForeignKey(User, on_delete=models.PROTECT, help_text="CEDA person sponsoring the request",
                                            related_name='vmrequest_internal_requester_user')
     description = models.TextField(help_text="")
     date_required = models.DateField()
@@ -1814,7 +1814,7 @@ class VMRequest(models.Model):
     network_required = models.CharField(max_length=127, choices=settings.VM_NETWORK_ACTIVITY_REQUIRED_CHOICES)
     os_required = models.CharField(max_length=127, choices=settings.VM_OS_REQUIRED_CHOICES, default='centos7')
     other_info = models.TextField(blank=True)
-    patch_responsible = models.ForeignKey(User, related_name='vmrequest_patch_responsible_user',
+    patch_responsible = models.ForeignKey(User, on_delete=models.PROTECT, related_name='vmrequest_patch_responsible_user',
                                           limit_choices_to={'id__in': settings.ADMIN_USERS_PATCH_RESPONSIBLE},
                                           )
     root_users = models.ManyToManyField(User, related_name='vmrequest_root_users_user')
@@ -1973,7 +1973,7 @@ class VM(models.Model):
                             help_text="Type of VM, see REF")  # TODO update REF
     operation_type = models.CharField(max_length=127, choices=settings.VM_OP_TYPE_CHOICES,
                                       help_text="Operation type of VM (dev, test, production, ...)")
-    internal_requester = models.ForeignKey(User, help_text="CEDA person sponsoring the request",
+    internal_requester = models.ForeignKey(User, on_delete=models.PROTECT, help_text="CEDA person sponsoring the request",
                                            related_name='vm_internal_requester_user')
     description = models.TextField(help_text="")
     date_required = models.DateField()
@@ -1985,7 +1985,7 @@ class VM(models.Model):
     network_required = models.CharField(max_length=127, choices=settings.VM_NETWORK_ACTIVITY_REQUIRED_CHOICES)
     os_required = models.CharField(max_length=127, choices=settings.VM_OS_REQUIRED_CHOICES, default='rhel7')
     other_info = models.TextField(blank=True)
-    patch_responsible = models.ForeignKey(User, related_name='vm_patch_responsible_user',
+    patch_responsible = models.ForeignKey(User, on_delete=models.PROTECT, related_name='vm_patch_responsible_user',
                                           limit_choices_to={'id__in': settings.ADMIN_USERS_PATCH_RESPONSIBLE},
                                           )
     root_users = models.ManyToManyField(User, related_name='vm_root_users_user')
@@ -2146,7 +2146,7 @@ class ServiceKeyword(models.Model):
 class NewService(models.Model):
     '''Software-based service'''
     # host = models.ManyToManyField(Host, help_text="Host machine on which service is deployed", null=True, blank=True)
-    host = models.ForeignKey(VM, help_text="Host machine on which service is deployed", null=True, blank=True)
+    host = models.ForeignKey(VM, on_delete=models.PROTECT, help_text="Host machine on which service is deployed", null=True, blank=True)
     name = models.CharField(max_length=512, help_text="Name of service")
 
     status = models.CharField(
@@ -2186,13 +2186,13 @@ class NewService(models.Model):
             help_text="Intended visibility when operational"
     )
 
-    service_manager = models.ForeignKey(Person, null=True, blank=True, related_name='software_manager',
+    service_manager = models.ForeignKey(Person, on_delete=models.PROTECT, null=True, blank=True, related_name='software_manager',
                                         help_text="CEDA person who looks after this service")
 
-    deputy_service_manager = models.ForeignKey(Person, null=True, blank=True, related_name='deputy_service_manager',
+    deputy_service_manager = models.ForeignKey(Person, on_delete=models.PROTECT, null=True, blank=True, related_name='deputy_service_manager',
                                         help_text="Deputy for service manager")
 
-    owner = models.ForeignKey(Person, null=True, blank=True, related_name='owner', help_text="Owner of this service")
+    owner = models.ForeignKey(Person, on_delete=models.PROTECT, null=True, blank=True, related_name='owner', help_text="Owner of this service")
 
     last_reviewed = models.DateField(null=True, blank=True, help_text="Date of last review")
     review_status = models.CharField(
