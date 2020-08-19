@@ -1,6 +1,7 @@
 from django.db import models
 # from django.contrib.gis.db import models
 from datetime import datetime, timedelta
+from django.utils.html import format_html
 import os, sys
 import subprocess
 import string
@@ -1562,10 +1563,10 @@ class GWSRequest(models.Model):
 
     def action_links(self):
         if self.request_status == 'ceda pending':
-            return '<a href="/gwsrequest/%i/approve">approve</a> <a href="/gwsrequest/%i/reject">reject</a>' % (
-            self.id, self.id)
+            return format_html('<a href="/gwsrequest/%i/approve">approve</a> <a href="/gwsrequest/%i/reject">reject</a>' % (
+            self.id, self.id))
         elif self.request_status == 'ceda approved':
-            return '<a href="/gwsrequest/%i/convert">convert</a>' % self.id
+            return format_html('<a href="/gwsrequest/%i/convert">convert</a>' % self.id)
         else:
             return 'n/a'
 
@@ -1773,7 +1774,7 @@ class GWS(models.Model):
     last_size.allow_tags = True
 
     def action_links(self):
-        return '<a href="/gws/%i/df">df</a>' % self.id
+        return format_html('<a href="/gws/%i/df">df</a>' % self.id)
 
     action_links.allow_tags = True
     action_links.short_description = 'actions'
@@ -1840,10 +1841,10 @@ class VMRequest(models.Model):
 
     def action_links(self):
         if self.request_status == 'ceda pending':
-            return '<a href="/vmrequest/%i/approve">approve</a>|<a href="/vmrequest/%i/reject">reject</a>' % (
-            self.id, self.id)
+            return format_html('<a href="/vmrequest/%i/approve">approve</a>|<a href="/vmrequest/%i/reject">reject</a>' % (
+            self.id, self.id))
         elif self.request_status == 'ceda approved':
-            return '<a href="/vmrequest/%i/convert">convert</a>' % self.id
+            return format_html('<a href="/vmrequest/%i/convert">convert</a>' % self.id)
         else:
             return 'n/a'
 
@@ -1953,7 +1954,7 @@ class VMRequest(models.Model):
 
     def vm_link(self):
         if self.vm is not None:
-            return '<a href="/admin/cedainfoapp/vm/%i">%s</a>' % (self.vm.id, self.vm.name)
+            return format_html('<a href="/admin/cedainfoapp/vm/%i">%s</a>' % (self.vm.id, self.vm.name))
 
     vm_link.allow_tags = True
     vm_link.short_description = 'VM'
@@ -1965,7 +1966,7 @@ class VMRequest(models.Model):
             address = socket.gethostbyname(self.vm_name)
             return self.vm_name
         except:
-            return ('<span style="color:red;">%s</span>' % self.vm_name)
+            return (format_html('<span style="color:red;">%s</span>' % self.vm_name))
 
     coloured_vm_name.short_description = 'VM name'
     coloured_vm_name.allow_tags = True
@@ -2071,7 +2072,7 @@ class VM(models.Model):
         self.forceSave()
 
     def action_links(self):
-        return '<a href="/vm/%i/changestatus">change status</a>' % (self.id,)
+        return format_html('<a href="/vm/%i/changestatus">change status</a>' % (self.id,))
 
     action_links.allow_tags = True
     action_links.short_description = 'actions'
@@ -2120,7 +2121,7 @@ class VM(models.Model):
             address = socket.gethostbyname(self.name.replace('legacy:', ''))
             return self.name
         except:
-            return ('<span style="color:red;">%s</span>' % self.name)
+            return (format_html('<span style="color:red;">%s</span>' % self.name))
 
 
     def service_count(self):

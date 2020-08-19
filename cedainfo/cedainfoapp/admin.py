@@ -274,7 +274,7 @@ class NewServiceAdmin(admin.ModelAdmin):
     
     def docs(self):
         if self.documentation:
-            return mark_safe('<a href="%s" title="View Helpscout documentation">Helpscout</a>' % (self.documentation))
+            return format_html(mark_safe('<a href="%s" title="View Helpscout documentation">Helpscout</a>' % (self.documentation)))
         else:
             return ''
     docs.allow_tags = True
@@ -289,7 +289,7 @@ class NewServiceAdmin(admin.ModelAdmin):
         else:
             color = 'none'
         
-        return '<a href="/admin/cedainfoapp/vm/%s/" title="Status: %s"><span style="color: %s;">%s</span></a>' % (self.host.id, self.host.status, color, self.host.name)
+        return format_html('<a href="/admin/cedainfoapp/vm/%s/" title="Status: %s"><span style="color: %s;">%s</span></a>' % (self.host.id, self.host.status, color, self.host.name))
     vm_name.allow_tags = True
     vm_name.admin_order_field = "host__name"
     
