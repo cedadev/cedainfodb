@@ -1787,6 +1787,10 @@ class GWSSizeMeasurement(models.Model):
     no_files = models.BigIntegerField(null=True, blank=True, help_text="Number of files")
 
     def __str__(self):
+    
+        if not self.no_files:
+            self.no_files = 0
+ 
         if self.no_files > 2000000:
             no_files = self.no_files / (1000 * 1000)
             funit = "Mfiles"
