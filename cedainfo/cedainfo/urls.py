@@ -14,14 +14,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url, include
+from django.urls import path
 from django.contrib import admin
-from django.contrib.auth.views import login, logout_then_login
+from django.contrib.auth import login
+from django.contrib.auth import views as auth_views
 
 from cedainfoapp.urls import urlpatterns as cedainfoapp_urlpatterns
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^accounts/login/$', login, name='login'),
-    url(r'^accounts/logout/$', logout_then_login),
+    path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
+#    url(r'^accounts/login/$', login, name='login'),
+#    url(r'^accounts/logout/$', logout_then_login),
     url(r'^udbadmin/', include('udbadmin.urls')),
 #    url(r'^cedainfoapp/', include('cedainfoapp.urls')),    
 ]
