@@ -1782,7 +1782,7 @@ class GWS(models.Model):
 
 class GWSSizeMeasurement(models.Model):
     '''Date-stampted size measurement of a GWS'''
-    gws = models.ForeignKey('GWS', on_delete=models.PROTECT, help_text="GWS that was measured")
+    gws = models.ForeignKey('GWS', on_delete=models.CASCADE, help_text="GWS that was measured")
     date = models.DateTimeField(default=datetime.now, help_text="Date and time of measurement")
     size = models.BigIntegerField(help_text="Size in bytes")  # in bytes
     no_files = models.BigIntegerField(null=True, blank=True, help_text="Number of files")
