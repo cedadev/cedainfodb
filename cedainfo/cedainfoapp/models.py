@@ -1898,8 +1898,13 @@ class VMRequest(models.Model):
                     tenancy = self.tenancy,
             )
             # root_users is a ManyToManyField, so need to copy outside of create()
-            vm.root_users = self.root_users.all()
             vm.forceSave()
+
+            for user in self.root_users.all():
+                vm.root_users.add(user)
+            vm.forceSave()
+
+
 
             self.vm = vm
             # update the request status
@@ -1929,10 +1934,15 @@ class VMRequest(models.Model):
                 vm.patch_responsible = self.patch_responsible
                 vm.status = 'active'
                 vm.end_of_life = self.end_of_life
-                vm.root_users = self.root_users.all()
                 vm.other_info = self.other_info
                 vm.tenancy = self.tenancy
                 vm.forceSave()
+
+                for user in self.root_users.all():
+                     vm.root_users.add(user)
+ 
+                vm.forceSave()
+
 
                 # update the request status
                 self.request_status = 'completed'
@@ -1993,7 +2003,7 @@ class VM(models.Model):
     patch_responsible = models.ForeignKey(User, on_delete=models.PROTECT, related_name='vm_patch_responsible_user',
                                           limit_choices_to={'id__in': settings.ADMIN_USERS_PATCH_RESPONSIBLE},
                                           )
-    root_users = models.ManyToManyField(User, related_name='vm_root_users_user')
+    root_users  = models.ManyToManyField(User, related_name='vm_root_users_user')
     status = models.CharField(max_length=127, choices=settings.VM_STATUS_CHOICES, default='active')
     created = models.DateField(auto_now_add=True)
     end_of_life = models.DateField(default=datetime.now() + timedelta(days=3 * 365))  # 3 years from now
@@ -2046,7 +2056,9 @@ class VM(models.Model):
                 tenancy = self.tenancy,
                 vm=self,
         )
-        req.root_users = self.root_users.all()
+        req.save()
+        for user in self.root_users.all():
+            req.root_users.add(user)
         req.save()
         return req.id
 
