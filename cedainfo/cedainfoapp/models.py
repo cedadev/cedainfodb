@@ -1575,7 +1575,7 @@ class GWSRequest(models.Model):
 
     def gws_link(self):
         if self.gws_id is not None:
-            return '<a href="/admin/cedainfoapp/gws/%i">%s%s</a>' % (self.gws.id, self.gws.path, self.gws.name)
+            return format_html('<a href="/admin/cedainfoapp/gws/%i">%s%s</a>' % (self.gws.id, self.gws.path, self.gws.name))
 
     gws_link.allow_tags = True
     gws_link.short_description = 'GWS'
