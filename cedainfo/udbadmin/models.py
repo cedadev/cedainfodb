@@ -87,7 +87,7 @@ class Dataset(models.Model):
     public_key_required = models.BooleanField("Check for public key on registration", 
                                               default=False)
     
-    def __unicode__(self):
+    def __str__(self):
         return self.datasetid
  
     def get_absolute_url(self):
@@ -180,7 +180,7 @@ class Addresses(models.Model):
     institutekey = models.ForeignKey(Institute, on_delete=models.PROTECT, db_column='institutekey')
     department = models.CharField(max_length=100, blank=True, help_text='Your department within your host institute')
 
-    def __unicode__ (self):
+    def __str__ (self):
         return "%s" % self.addresskey
        
     class Meta:
@@ -433,7 +433,7 @@ class User (models.Model):
         return self.userkey -1
   
            
-    def __unicode__(self):
+    def __str__(self):
         return str(self.userkey)
 
     objects = UserManager() 

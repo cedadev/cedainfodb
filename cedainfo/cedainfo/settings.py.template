@@ -25,7 +25,7 @@ SECRET_KEY = 'd^g(yt46tlqs@yo8tkmb6oj^z!5g#!00bhg&2#pgxe*ag6la6k'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['cedadb.ceda.ac.uk', 'archman1-test.ceda.ac.uk', '127.0.0.1', '130.246.129.107']
+ALLOWED_HOSTS = ['cedadb.ceda.ac.uk', 'archman1-test.ceda.ac.uk', '127.0.0.1', '130.246.129.107', 'archman2.ceda.ac.uk']
 
 DATETIME_FORMAT = "d-M-Y H:i"
 SITE_ID = 1
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'udbadmin',
     'sizefield',
     'cedainfoapp',
+    'easyaudit',
 ]
 
 MIDDLEWARE = [
@@ -56,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'easyaudit.middleware.easyaudit.EasyAuditMiddleware',
 ]
 
 ROOT_URLCONF = 'cedainfo.urls'
@@ -85,7 +87,7 @@ DATABASES = {
         'NAME': 'cedainfo',                      # Or path to database file if using sqlite3.
         'USER': 'cedainfo',                      # Not used with sqlite3.
         'PASSWORD': 'xxx',                  # Not used with sqlite3.
-        'HOST': 'db1.ceda.ac.uk',                      # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': 'db-test1.ceda.ac.uk',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     },
 
@@ -94,8 +96,8 @@ DATABASES = {
         'NAME': 'userdb',                      # Or path to database file if using sqlite3.
         'USER': 'badc',                      # Not used with sqlite3.
         'PASSWORD': 'xxx',                  # Not used with sqlite3.
-        'HOST': 'db1.ceda.ac.uk',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '5432',                      # Set to empty string for default. Not used with sqlite3.
+        'HOST': 'db-test1.ceda.ac.uk',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 
 }
@@ -232,10 +234,10 @@ VM_MEM_REQUIRED_CHOICES = (
     ('multithreaded', 'multi-threaded processing (8 Gb)'),
     ('max12','max-12 science workload (12 Gb)'),
     ('max16','max-16 science workload (16 Gb)'),
-	('max24','max-24 science workload (24 Gb)'),
-	('max32','max-32 science workload (32 Gb)'),
-	('max48','max-48 science workload (48 Gb)'),
-	('max64','max-64 science workload (64 Gb)'),
+    ('max24','max-24 science workload (24 Gb)'),
+    ('max32','max-32 science workload (32 Gb)'),
+    ('max48','max-48 science workload (48 Gb)'),
+    ('max64','max-64 science workload (64 Gb)'),
 )
 
 VM_DISK_SPACE_REQUIRED_CHOICES = (
@@ -256,7 +258,6 @@ VM_NETWORK_ACTIVITY_REQUIRED_CHOICES = (
     ('moderate','moderate'),
     ('heavy','heavy'),
 )
-
 VM_OS_REQUIRED_CHOICES = (
     ('centos7','centos7'),
     ('centos6','centos6'),
@@ -265,7 +266,6 @@ VM_OS_REQUIRED_CHOICES = (
     ('rhel5','rhel5'),
     ('sles11','sles11'),
 )
-
 VM_REQUEST_STATUS_CHOICES = (
     ('ceda pending', 'ceda pending'), # initial state for new requests
     ('ceda rejected','ceda rejected'), # reviewed & rejected within CEDA
