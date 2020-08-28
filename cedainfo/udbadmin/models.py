@@ -47,22 +47,21 @@ import base64
 USERDB = 'userdb'
 
 class Base64Field(models.TextField):
-
-    def contribute_to_class(self, cls, name):
-        if self.db_column is None:
+    def contribute_to_class(self, cls, name, private_only=False):
+        if not self.db_column:
             self.db_column = name
+
         self.field_name = name + '_base64'
-        super(Base64Field, self).contribute_to_class(cls, self.field_name)
-        setattr(cls, name, property(self.get_data, self.set_data))
+        super().contribute_to_class(cls,
+                                    name)
+        setattr(cls, self.field_name, property(self.get_data, self.set_data))
 
     def get_data(self, obj):
-        if getattr(obj, self.field_name):
-            return base64.decodestring(getattr(obj, self.field_name))
-        return ''
+        return base64.b64encode(getattr(obj, self.name).encode('utf-8'))
 
     def set_data(self, obj, data):
-        setattr(obj, self.field_name, base64.encodestring(data))
-                 
+        setattr(obj, self.field_name, base64.b64decode(data).decode('utf-8'))
+	
 class Dataset(models.Model):
     datasetid = models.CharField(max_length=40, primary_key=True)
 
