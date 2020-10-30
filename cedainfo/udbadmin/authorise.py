@@ -127,31 +127,6 @@ def authorise_datasets(request, userkey):
                     except:
                         pass                     
 
-                 if dataset.datasetid == "jasmin-login" or \
-                    dataset.datasetid == "cems-login":
-
-                    if emailuser.lower() == "yes":  
-                        userkey = datasetRequest.userkey
-                        msg_sent = True
-                        cmd = "/usr/local/userdb/releases/current/new_datasets_notification/service_msg.py"
-                        m = Popen([cmd, "%s" % userkey, dataset.datasetid, "--send"])
-                        m.wait()
-                        msg_status = m.returncode
-
-                        mailmsg = Popen([cmd, "%s" % userkey, dataset.datasetid], stdout=PIPE).communicate()[0] 
-
-                 if dataset.datasetid.startswith("gws_"):
-
-                    if emailuser.lower() == "yes":  
-                        userkey = datasetRequest.userkey
-                        msg_sent = True
-                        cmd = "/usr/local/userdb/releases/current/new_datasets_notification/service_msg.py"
-                        m = Popen([cmd, "%s" % userkey, dataset.datasetid, "--send"])
-                        m.wait()
-                        msg_status = m.returncode
-
-                        mailmsg = Popen([cmd, "%s" % userkey, dataset.datasetid], stdout=PIPE).communicate()[0] 
-
                          
                  if dataset.manual_processing_required():
                      manualProcessingRequired += 1
@@ -183,7 +158,7 @@ def authorise_datasets(request, userkey):
        ##        userkey = 1  # Just for testing, so all messages go to Andrew rather than the user!
                userkey = datasetRequest.userkey
                msg_sent = True
-               cmd = "/usr/local/userdb/releases/current/new_datasets_notification/new_datasets_msg.py"
+               cmd = "/usr/local/userdb/new_datasets_notification/new_datasets_msg.py"
                m = Popen([cmd, "-send", "%s" % userkey])
                m.wait()
                msg_status = m.returncode
