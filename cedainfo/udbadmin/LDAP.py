@@ -391,10 +391,11 @@ def ldif_write (ldif, server=settings.LDAP_WRITE_URL):
        
     ldif = ldif.replace('\r', '')
 
-    (fh, input_file_name) = tempfile.mkstemp()
-
-    os.write(fh, ldif)
-    os.close(fh)
+    input_file_name = "/tmp/ldif.write"
+    
+    fh = open(input_file_name, "wt")
+    fh.write(ldif)
+    fh.close()
 #
 #   Call ldapmodify and read input from temporary file
 #    

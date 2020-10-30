@@ -587,7 +587,7 @@ def ldif_all_groups (add_additions_file=True):
     Returns all group information from the userdb as a sorted LDIF file
     Returns a filehandle for an open temporary file that can be read from.
     """
-    a = tempfile.NamedTemporaryFile()
+    a = tempfile.NamedTemporaryFile(mode='w+t')
     record = ldap_all_group_records(add_additions_file=add_additions_file)
     a.write(record)
     a.flush()
