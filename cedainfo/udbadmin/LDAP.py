@@ -275,7 +275,7 @@ def ldif_all_groups (filter_scarf_users=False, server=settings.LDAP_URL, select_
     p1 = subprocess.Popen(["ldapsearch", "-LLL",  "-x", "-H", server, "-b", GROUP_BASE, "-s", "one", group_filter], stdout=b)
     p1.wait()
 
-    bb = tempfile.NamedTemporaryFile()
+    bb = tempfile.NamedTemporaryFile(delete=True)
 
     if filter_scarf_users:
         cc = tempfile.NamedTemporaryFile()
@@ -383,7 +383,6 @@ def ldif_write (ldif, server=settings.LDAP_WRITE_URL):
     """
     Write the given ldif commands to the ldif server
     """
-
 #
 #   Write ldif commands to a temporary file
 #
@@ -391,7 +390,7 @@ def ldif_write (ldif, server=settings.LDAP_WRITE_URL):
        
     ldif = ldif.replace('\r', '')
 
-    input_file_name = "/tmp/ldif.write"
+    input_file_name = "/tmp/ldif.write." + str(os.getpid())
     
     fh = open(input_file_name, "wt")
     fh.write(ldif)
@@ -402,8 +401,8 @@ def ldif_write (ldif, server=settings.LDAP_WRITE_URL):
     tmp2 = open(input_file_name, 'r')
     
     p1 = subprocess.Popen(["ldapmodify", "-ZZZ", "-H", server, "-D", 
-                            settings.LDAP_WRITE_DN, 
-                            "-w", settings.LDAP_WRITE_PASSWD], stdin=tmp2, stdout=output, stderr=output)
+			    settings.LDAP_WRITE_DN, 
+			    "-w", settings.LDAP_WRITE_PASSWD], stdin=tmp2, stdout=output, stderr=output)
     p1.wait()
 
     os.remove(input_file_name)

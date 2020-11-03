@@ -587,12 +587,12 @@ def ldif_all_groups (add_additions_file=True):
     Returns all group information from the userdb as a sorted LDIF file
     Returns a filehandle for an open temporary file that can be read from.
     """
-    a = tempfile.NamedTemporaryFile(mode='w+t')
+    a = tempfile.NamedTemporaryFile(mode='w+t', delete=True)
     record = ldap_all_group_records(add_additions_file=add_additions_file)
     a.write(record)
     a.flush()
      
-    bb = tempfile.NamedTemporaryFile()
+    bb = tempfile.NamedTemporaryFile(delete=True)
     p2 = subprocess.Popen([LDAP.SORT_SCRIPT, "-a", "-k", "dn", a.name], stdout=bb)
     p2.wait()
             
@@ -602,10 +602,11 @@ def ldif_all_group_updates (server=settings.LDAP_URL, select_groups=[], add_addi
     """
     Returns ldiff commands to update LDAP group server as string array
     """
-
-    server_ldif = LDAP.ldif_all_groups(filter_scarf_users=True, server=server, select_groups=select_groups)                  
+    
+    server_ldif = LDAP.ldif_all_groups(filter_scarf_users=True, server=server, select_groups=select_groups)  
+    
     udb_ldif = ldif_all_groups(add_additions_file=add_additions_file)
-                
+                		
     tmp_out = tempfile.NamedTemporaryFile()
     script = settings.PROJECT_DIR + "/udbadmin/ldifdiff.pl"
     p1 = subprocess.Popen([script, "-k", "dn", "--sharedattrs", 
