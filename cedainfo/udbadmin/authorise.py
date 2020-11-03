@@ -158,7 +158,7 @@ def authorise_datasets(request, userkey):
        ##        userkey = 1  # Just for testing, so all messages go to Andrew rather than the user!
                userkey = datasetRequest.userkey
                msg_sent = True
-               cmd = "/usr/local/userdb/new_datasets_notification/new_datasets_msg.py"
+               cmd = "/usr/local/cedainfodb/releases/current/cedainfo/udbadmin/scripts/new_datasets_notification/new_datasets_msg.py"
                m = Popen([cmd, "-send", "%s" % userkey])
                m.wait()
                msg_status = m.returncode

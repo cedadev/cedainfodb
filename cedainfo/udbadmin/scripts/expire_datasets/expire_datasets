@@ -1,0 +1,42 @@
+#!/usr/local/cedainfodb/releases/current/venv/bin/python
+#
+# Remove all datasets which have passed their expiry date. Intended
+# to be run as a cron job.grep 
+#
+
+import sys
+import os
+from datetime import datetime, timedelta
+from pytz import timezone
+import smtplib
+import jinja2
+ 
+import django
+sys.path.append('/usr/local/cedainfodb/releases/current/cedainfo')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cedainfo.settings")
+django.setup()
+from django.conf import settings
+
+from udbadmin.models import *
+
+print ('Database name: ', settings.DATABASES['userdb']['NAME'])
+print ('Database host: ', settings.DATABASES['userdb']['HOST'])
+#
+#  Expire everything that has todays date. Have to set the time as the 'expire date' is 
+# is actually a date and time.
+#
+now = datetime.now(timezone('Europe/London'))
+check_date = '%s-%s-%s 23:59' % (now.year, now.month, now.day)
+
+print ('Cut off date: ', check_date)
+
+udjs = Datasetjoin.objects.filter(expiredate__lte=check_date).filter(removed=0).order_by('expiredate')
+
+for udj in udjs:
+
+    udj.removeDataset()
+     
+    if hasattr(udj, 'userkey'):       
+        print ('Expired userkey: %s datasetid: %s ver: %s expiredate: %s' % \
+              (udj.userkey, udj.datasetid, udj.ver, udj.expiredate))
+        

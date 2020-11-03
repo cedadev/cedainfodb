@@ -1,0 +1,40 @@
+From: {{from}}
+To: {{to}}
+Subject: {{subject}}
+
+Dear {{title}} {{surname}},
+
+Your CEDA account '{{accountid}}' has been updated. 
+
+The updated list of restricted datasets/services that you can access 
+is shown below.
+
+{% for dataset in datasets %}
+    o {{dataset.datasetid.description}}
+      {% if dataset.webdirectory -%}
+          Web: {{dataset.webdirectory}}
+      {% endif -%}    
+      {% if dataset.ftpdirectory -%}
+          FTP: ftp://ftp.ceda.ac.uk{{dataset.ftpdirectory}}
+      {% endif -%}       
+      {% if dataset.expire_string -%}
+         Access expires: {{ dataset.expire_string }}
+       {% endif -%}
+{% endfor %}
+
+
+You can find full details of all datasets that you have access to with details
+of how to renew your registration at
+
+http://archive.ceda.ac.uk/myceda  (under the 'My Datasets and Services' tab)
+
+You will need to enter your CEDA username and password to access this page.
+
+Regards,
+
+CEDA Support
+Centre for Environmental Data Analysis
+(incorporating BADC, NEODC, UKSSDC, SPARC and IPCC-DDC data centres)
+www.ceda.ac.uk 
+support@ceda.ac.uk 
++44 (0)1235 446432

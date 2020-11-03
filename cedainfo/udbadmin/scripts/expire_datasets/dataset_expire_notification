@@ -1,0 +1,138 @@
+#!/usr/local/cedainfodb/releases/current/venv/bin/python
+#
+# Send out email warning that dataset will expire shortly. Intended to
+# be run regularly as a cron job. This is a python version of the original 
+# perl script, dexpire_send_notification_messages.pl
+#
+
+import sys
+import os
+from datetime import datetime, timedelta
+from pytz import timezone
+import smtplib
+import jinja2
+ 
+
+import django
+sys.path.append('/usr/local/cedainfodb/releases/current/cedainfo')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cedainfo.settings")
+django.setup()
+from django.conf import settings
+
+
+from udbadmin.models import *
+
+MAXDAYS         = 90
+TEMPLATE_DIR    = os.path.dirname(__file__)
+IGNORE_DATASETS = ("gosta_cd", "climate", "envmip1b", "envsci1b")       
+ 
+def send_notification_email (user, dataset, endorseddate, expiredate):
+
+    template_loader = jinja2.FileSystemLoader(TEMPLATE_DIR)
+    env = jinja2.Environment(loader=template_loader)
+#
+#      'To' needs to be a list for smplib.sendmail if more than one address
+#
+    messageTo   = [user.emailaddress, "andrew.harwood@stfc.ac.uk"]
+#    messageTo   = ["andrew.harwood@stfc.ac.uk"]
+    
+    messageFrom =  "support@ceda.ac.uk"
+    
+    if dataset.datasetid == "jasmin-login" or dataset.datasetid == "cems-login" or \
+       dataset.datasetid == "commercial-login":
+        subject = "JASMIN/CEMS account expiry"
+        template = 'jasmin_expiry_email.jinja'
+    else:	
+        subject = "Dataset/service expiry"
+        template = 'ceda_dataset_expiry_email.jinja'
+    
+    template = env.get_template(template)
+    msg = template.render({"from":  messageFrom,
+                           "to":    user.emailaddress,
+                           "subject": subject,
+                           "title": user.title,
+                           "surname": user.surname,
+                           "granted": endorseddate,
+                           "expires": expiredate,
+                           "dataset": dataset})
+
+    try:        
+        server = smtplib.SMTP('localhost') 	
+        server.sendmail(messageFrom, messageTo, msg)
+        server.quit()
+    except:
+        sys.stderr.write('Error sending email to %s\n' % user.emailaddress)
+
+
+send_email = False
+
+if len(sys.argv) > 1:
+   if sys.argv[1] == "--send":
+      send_email = True
+
+print ('Send email: ', send_email)
+
+
+#now = datetime.now(timezone('Europe/London')) 
+#dataset = Dataset.objects.get(datasetid='aatsr_multimission')
+#user = User.objects.get(userkey=1)
+#send_notification_email (user, dataset, now, now)
+#sys.exit()
+
+
+#print 'Database name: ', dbsettings.DATABASES['userdb']['NAME']
+#print 'Database server:  ', dbsettings.DATABASES['userdb']['HOST']
+
+now = datetime.now(timezone('Europe/London')) + timedelta(days=MAXDAYS)
+check_date = '%s-%s-%s 23:59' % (now.year, now.month, now.day)
+print ('Check date: ', check_date)
+
+udjs = Datasetjoin.objects.filter(expiredate__lt=check_date).filter(removed=0).order_by('expiredate')
+
+
+for udj in udjs:
+#
+#   Skip this if the dataset is now public or has no registration defined or if it is being handled by the jasmin portal
+#
+    if udj.datasetid.authtype == 'none' or udj.datasetid.authtype == 'public' or udj.datasetid.authtype == 'reguser' or udj.datasetid.authtype == 'jasmin-portal':
+        continue
+#
+#   Skip if user not in database (shouldn't really happen, but you never know...)
+#
+    if not hasattr(udj, 'userkey'):
+        continue
+
+    if not udj.userkey.emailaddress:
+        print ('No email address for ', udj.userkey.userkey)
+        continue
+        
+    if udj.datasetid.datasetid in IGNORE_DATASETS:
+        continue
+#
+#   Check if we have already issued a notification for this dataset for this user
+#
+    recs = Datasetexpirenotification.objects.filter(userkey=udj.userkey.userkey, datasetid=udj.datasetid.datasetid, ver= udj.ver)
+
+    if not(recs):
+        print (udj.userkey, udj.datasetid, udj.endorseddate, udj.expiredate, udj.datasetid.authtype)
+        
+        if send_email:
+            send_notification_email (udj.userkey, udj.datasetid, udj.endorseddate, udj.expiredate)
+    #
+    #       Add record to database to indicate we have sent notification
+    #
+
+
+            notify = Datasetexpirenotification(userkey=udj.userkey.userkey,
+                                      datasetid = udj.datasetid,
+                                      ver = udj.ver,
+                                      date = datetime.now(timezone('Europe/London')),
+                                      emailaddress = udj.userkey.emailaddress)
+
+            notify.save()
+    else:
+        rec = recs.order_by('-date')[0]
+        print ('Already notified:', rec.userkey, rec.datasetid, rec.ver, rec.date)
+       
+
+

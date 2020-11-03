@@ -1,0 +1,7 @@
+#!/bin/sh
+
+TODAY=$(date +"%Y-%m-%d")
+
+LOGFILE="/var/log/ceda_dataset_expire/$TODAY-expire-emails.log"
+
+/usr/local/cedainfodb/releases/current/cedainfo/udbadmin/scripts/expire_datasets/dataset_expire_notification --send > $LOGFILE 2>&1
