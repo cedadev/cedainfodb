@@ -131,6 +131,7 @@ class ServiceHostFilter(SimpleListFilter):
         hosts = set([c.host for c in model_admin.model.objects.all()])
         hosts = list(hosts)
         hosts.sort(key=lambda x: x.name)
+##	hosts = list(filter(None, hosts))
         return [(c.id, c.name) for c in hosts]
 
     def queryset(self, request, queryset):

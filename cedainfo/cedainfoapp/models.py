@@ -2163,7 +2163,7 @@ class ServiceKeyword(models.Model):
 class NewService(models.Model):
     '''Software-based service'''
     # host = models.ManyToManyField(Host, help_text="Host machine on which service is deployed", null=True, blank=True)
-    host = models.ForeignKey(VM, on_delete=models.PROTECT, help_text="Host machine on which service is deployed", null=True, blank=True)
+    host = models.ForeignKey(VM, on_delete=models.PROTECT, help_text="Host machine on which service is deployed", null=True, blank=False)
     name = models.CharField(max_length=512, help_text="Name of service")
 
     status = models.CharField(
