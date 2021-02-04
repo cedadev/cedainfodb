@@ -11,7 +11,6 @@ from .forms import *
 from django import forms
 from django.db import models
 
-
 def prettySize(size):
     '''Returns file size in human readable format'''
 
@@ -436,6 +435,8 @@ class VMRequestAdmin(admin.ModelAdmin):
 
 admin.site.register(VMRequest, VMRequestAdmin)
 
+   
+    
 
 class VMAdmin(admin.ModelAdmin):
 
@@ -444,10 +445,17 @@ class VMAdmin(admin.ModelAdmin):
     os. short_description = "OS"
     os.admin_order_field = "os_required"
 
+    def service_count (self):
+
+        production_services_count = len(NewService.objects.filter(host_id=self.id, status='production')) 
+        return format_html('<a href="/admin/cedainfoapp/newservice/?host=%s&status__exact=production">%s</a>' % (self.id, production_services_count))
+ 
+#        return production_services_count
     
+#    service_count.admin_order_field = "_service_count"
     
     list_display = (
-    'coloured_vm_name', 'type', 'operation_type', 'internal_requester', 'patch_responsible',
+    'coloured_vm_name',  service_count, 'type', 'operation_type', 'internal_requester', 'patch_responsible',
     'timestamp', 'status', 'end_of_life',  os, 'ping_last_ok')
     list_filter = ('type', 'operation_type', 'status', 'patch_responsible', MountpointFilter, 'os_required')
     search_fields = ('name',)
