@@ -282,11 +282,11 @@ class NewServiceAdmin(admin.ModelAdmin):
     docs.admin_order_field = "documentation"
 
     def vm_name (self):
-    
-        if self.host.status == 'deprecated':
-            color = 'DarkViolet'
-        elif self.host.status == 'retired':
-            color = 'red'    
+
+        if self.host.status == 'retired':
+            color = 'red'
+        elif not self.host.dns_ok():
+            color = 'red'
         else:
             color = 'none'
         
