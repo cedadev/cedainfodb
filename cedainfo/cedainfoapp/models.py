@@ -2091,6 +2091,10 @@ class VM(models.Model):
 
     def dns_ok (self):
         '''Returns True if dns entry found for vm'''
+        
+        if self.name == '00 unspecified':
+            return True
+            
         try:
             address = socket.gethostbyname(self.name.replace('legacy:', ''))
             return True
