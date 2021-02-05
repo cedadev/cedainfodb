@@ -1155,6 +1155,9 @@ def service_unusedvms(request):
         #        if 'dev.' in vm.name or 'test.' in vm.name or 'dev1.' in vm.name or 'test1.' in vm.name:
         #    continue
 
+        if vm.status == 'retired':
+            continue
+
         if vm.type == 'legacy':
             continue
 
