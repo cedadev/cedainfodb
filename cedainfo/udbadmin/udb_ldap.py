@@ -19,7 +19,7 @@ EXCLUDE_USERS = []
 #
 # The following users should be a member of all archive access groups
 #
-ARCHIVE_ACCESS_STANDARD_USERS = ["badc", "prototype", "cwps", "archread", "archive"]
+ARCHIVE_ACCESS_STANDARD_USERS = ["badc", "prototype", "cwps", "archread", "archive", "c4cds"]
 
 
 ARCHIVE_ACCESS_GROUPS = {"cmip5_research": {"gid": 26059, "datasets" : ["cmip5_research", "cmip3", "cmip3_ukmo"]},
