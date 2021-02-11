@@ -38,12 +38,31 @@ Only services with the status 'production' or 'pre-production' are listed here. 
                <td><a href="{{service.documentation}}">Helpscout</a></td>
 
            {% else %}
-               <td style="background-color:red;">None</td>
+               <td><span style="color:red;">None</span></td>
            {% endif %}
 
 
-           <td><a title="Show host details" href="/admin/cedainfoapp/vm/{{service.host.id}}">{{service.host}}</a></td>
-          <td>{{service.host.os_required}}</td>
+           <td>
+	      {% if service.host.status == "retired"  %} 
+	            <a title="Host marked as retired" href="/admin/cedainfoapp/vm/{{service.host.id}}"><span style="color:red;">{{service.host}}</span></a>
+	      		    
+	   {% elif not service.host.dns_ok %} 
+	            <a title="No DNS entry for this host" href="/admin/cedainfoapp/vm/{{service.host.id}}"><span style="color:red;">{{service.host}}</span></a>
+	   
+	       
+	   {% else %}
+	   	<a title="Show host details" href="/admin/cedainfoapp/vm/{{service.host.id}}">{{service.host}}</a>
+
+	   {% endif %}   
+	   </td>
+	   
+	  {% if service.host.os_required == "centos7" %}
+              <td>{{service.host.os_required}}</td>
+           {% else %}
+              <td><span style="color:red;">{{service.host.os_required}}</span></td>
+	   {% endif %}
+	  
+	  
            <td>{{service.visibility}}</td>
        <td>{{service.status}}</td>
            <td>{{service.priority}}</td>
@@ -100,12 +119,33 @@ Only services with the status 'production' or 'pre-production' are listed here. 
                <td><a href="{{service.documentation}}">Helpscout</a></td>
 
            {% else %}
-               <td style="background-color:red;">None</td>
+               <td><span style="color:red;">None</span></td>
            {% endif %}
 
 
-           <td><a title="Show host details" href="/admin/cedainfoapp/vm/{{service.host.id}}">{{service.host}}</a></td>
-          <td>{{service.host.os_required}}</td>
+           <td>
+	      {% if service.host.status == "retired"  %} 
+	            <a title="Host marked as retired" href="/admin/cedainfoapp/vm/{{service.host.id}}"><span style="color:red;">{{service.host}}</span></a>
+	      		    
+	   {% elif not service.host.dns_ok %} 
+	            <a title="No DNS entry for this host" href="/admin/cedainfoapp/vm/{{service.host.id}}"><span style="color:red;">{{service.host}}</span></a>
+	   
+	       
+	   {% else %}
+	   	<a title="Show host details" href="/admin/cedainfoapp/vm/{{service.host.id}}">{{service.host}}</a>
+
+	   {% endif %}   
+	   </td>
+
+ 
+
+	  {% if service.host.os_required == "centos7" %}
+              <td>{{service.host.os_required}}</td>
+           {% else %}
+              <td><span style="color:red;">{{service.host.os_required}}</span></td>
+	   {% endif %}
+
+
            <td>{{service.visibility}}</td>
        <td>{{service.status}}</td>
            <td>{{service.priority}}</td>
@@ -152,7 +192,12 @@ Active VMs that you requested.
 
        <tr>
 
-           <td><a href="/admin/cedainfoapp/vm/{{vm.id}}">{{vm.name}}</a></td>
+            {% if vm.dns_ok %}
+                 <td><a href="/admin/cedainfoapp/vm/{{vm.id}}">{{vm.name}}</a></td>
+           {% else %}
+                 <td><a title="No DNS entry for this host" href="/admin/cedainfoapp/vm/{{vm.id}}"><span style="color:red">{{vm.name}}</span></a></td>
+           {% endif %}
+	   	         		 
            <td>{{vm.type}}</td>
            <td>{{vm.operation_type}}</td>
            <td>{{vm.date_required}}</td>
