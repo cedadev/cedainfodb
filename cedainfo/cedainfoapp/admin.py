@@ -282,9 +282,13 @@ class NewServiceAdmin(admin.ModelAdmin):
 
     def vm_name (self):
 
+        (dns_ok, cname) = self.host.dns_ok()
+	
         if self.host.status == 'retired':
             color = 'red'
-        elif not self.host.dns_ok():
+        elif dns_ok and cname:
+            color = 'green'
+        elif not dns_ok:
             color = 'red'
         else:
             color = 'none'

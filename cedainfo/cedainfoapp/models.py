@@ -2089,6 +2089,22 @@ class VM(models.Model):
     action_links.allow_tags = True
     action_links.short_description = 'actions'
 
+#    def dns_ok (self):
+#        '''Returns True if dns entry found for vm'''
+#        
+#        if self.name == '00 unspecified':
+#            return (True, False)
+#            
+#        try:
+#            name = self.name.replace('legacy:', '')
+#            (hostname, aliaslist, ipaddrlist) = socket.gethostbyname_ex(name)
+#            if name != hostname:
+#                return (True, True)
+#            else:
+#                return (True, False)
+#        except:
+#            return (False, False)
+
     def dns_ok (self):
         '''Returns True if dns entry found for vm'''
         
@@ -2096,10 +2112,11 @@ class VM(models.Model):
             return True
             
         try:
-            address = socket.gethostbyname(self.name.replace('legacy:', ''))
+            name = self.name.replace('legacy:', '')
+            (hostname, aliaslist, ipaddrlist) = socket.gethostbyname_ex(name)
             return True
         except:
-            return False
+            False
 
 
     def ping_check(self):
