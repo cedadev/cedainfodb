@@ -448,8 +448,19 @@ class VMAdmin(admin.ModelAdmin):
     def service_count (self):
 
         production_services_count = len(NewService.objects.filter(host_id=self.id, status='production')) 
-        return format_html('<a href="/admin/cedainfoapp/newservice/?host=%s&status__exact=production">%s</a>' % (self.id, production_services_count))
- 
+        
+        if self.dns_ok():
+            if production_services_count > 0:
+                return format_html('<a href="/admin/cedainfoapp/newservice/?host=%s&status__exact=production">%s</a>' % (self.id, production_services_count))          
+            else:
+                return format_html('<a href="/admin/cedainfoapp/newservice/?host=%s">%s</a>' % (self.id, production_services_count))          
+        
+        else:
+            if production_services_count == 0:
+                return format_html('<a href="/admin/cedainfoapp/newservice/?host=%s">%s</a></span>' % (self.id, production_services_count))
+            else:
+                return format_html('<a href="/admin/cedainfoapp/newservice/?host=%s&status__exact=production"><span style="color:red;">%s</a></span>' % (self.id, production_services_count))
+
 #        return production_services_count
     
 #    service_count.admin_order_field = "_service_count"
