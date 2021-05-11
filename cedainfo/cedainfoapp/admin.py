@@ -459,7 +459,7 @@ class VMAdmin(admin.ModelAdmin):
             if production_services_count == 0:
                 return format_html('<a href="/admin/cedainfoapp/newservice/?host=%s">%s</a></span>' % (self.id, production_services_count))
             else:
-                return format_html('<a href="/admin/cedainfoapp/newservice/?host=%s&status__exact=production"><span style="color:red;">%s</a></span>' % (self.id, production_services_count))
+                return format_html('<a href="/admin/cedainfoapp/newservice/?host=%s&status__exact=production"><span style="color:red;">** %s **</a></span>' % (self.id, production_services_count))
 
 #        return production_services_count
     
