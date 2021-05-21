@@ -439,7 +439,7 @@ def ldap_open_group_record():
 #
 #   Temporary modification only - add training accounts to open group
 #
-    for x in range (1,51):
+    for x in range (1,151):
         record = record + 'memberUid: train%03d\n' % x
     
 
