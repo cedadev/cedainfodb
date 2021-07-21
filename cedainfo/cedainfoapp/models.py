@@ -10,6 +10,7 @@ import time
 import socket
 import re
 import pwd, grp
+import dns.resolver
 
 from .storageDXMLClient import SpotXMLReader
 ##from fields import *  # custom MultiSelectField, MultiSelectFormField from http://djangosnippets.org/snippets/2753/
@@ -2101,6 +2102,19 @@ class VM(models.Model):
         except:
             return False
 
+    def cname (self):
+        '''Returns True if there is a cname for this vm name'''
+        
+        if self.name == '00 unspecified':
+            return False
+            
+        try:
+            host = self.name.replace('legacy:', '')
+            result = dns.resolver.query(host, 'CNAME')
+            return True
+        except:
+            return False
+
 
     def ping_check(self):
         '''Performs ping check on host. If successful records the time in the 'ping_last_ok' attribute and returns True'''
@@ -2131,10 +2145,24 @@ class VM(models.Model):
             return False
 #
 
+    # def coloured_vm_name(self):
+    #     '''Colour the vm name if no dns entry found. Remove legacy prefix before checking'''
+    #     try:
+    #         address = socket.gethostbyname(self.name.replace('legacy:', ''))
+    #         return self.name
+    #     except:
+    #         return (format_html('<span style="color:red;">%s</span>' % self.name))
+    
     def coloured_vm_name(self):
-        '''Colour the vm name if no dns entry found. Remove legacy prefix before checking'''
+        '''Colour the vm name if no dns entry found. Remove legacy prefix before checking.'''
         try:
-            address = socket.gethostbyname(self.name.replace('legacy:', ''))
+            name = self.name.replace('legacy:', '')
+            result = dns.resolver.query(name, 'A')
+            try:
+                result = dns.resolver.query(name, 'CNAME')
+                return (format_html('<span style="color:olive;">%s</span>' % self.name))
+            except:
+                pass
             return self.name
         except:
             return (format_html('<span style="color:red;">%s</span>' % self.name))
