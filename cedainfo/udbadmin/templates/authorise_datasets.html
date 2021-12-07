@@ -56,7 +56,12 @@ Click to view dataset details
       {% if request.datasetid.external_authoriser %}
       
           <td bgcolor="#F8C473">
-	        <input type=radio name="id_{{request.id}}" value="accept">
+	        {% if request.datasetid|escape == "ukmo_wx_gov" %}
+	           <input type=radio name="id_{{request.id}}" value="accept" checked="checked">
+		 {% else %}
+	           <input type=radio name="id_{{request.id}}" value="accept" >
+		   
+		 {% endif %}  
 
 	  <a href="{{ request.datasetid.get_absolute_url|escape }}" title="This dataset has additional authorisers:
 	  
@@ -64,7 +69,12 @@ Click to view dataset details
 	  ">Info</a>
 	  
       {% else %}
-         <td><input type=radio name="id_{{request.id}}" value="accept">
+         {% if request.datasetid|escape == "ukmo_wx" %}
+             <td><input type=radio name="id_{{request.id}}" value="accept" checked="checked">
+	 {% else %}
+	      <td><input type=radio name="id_{{request.id}}" value="accept">
+	 {% endif %}
+	 
       {% endif %}	 
       
       
