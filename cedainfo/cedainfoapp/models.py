@@ -2092,8 +2092,8 @@ class VM(models.Model):
 
     def dns_ok (self):
         '''Returns True if dns entry found for vm'''
-        
-        if self.name == '00 unspecified':
+
+        if self.name.startswith('00 '):                  
             return True
             
         try:
@@ -2105,7 +2105,7 @@ class VM(models.Model):
     def cname (self):
         '''Returns True if there is a cname for this vm name'''
         
-        if self.name == '00 unspecified':
+        if self.name.startswith('00 '):
             return False
             
         try:
