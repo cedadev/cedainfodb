@@ -1385,27 +1385,7 @@ def service_list_for_team_members (request):
    username = request.GET.get('username', None)
    person = Person.objects.get(username=username)
 
-   OWNER_HEADERS = (
-        ('Name', 'name'),
-        ('Docs', 'documentation'),
-        ('Host', 'host'),
-        ('OS', 'host__os_required'),
-        ('Visibility', 'visibility'),
-        ('Status', 'status'),
-        ('Priority', 'priority'),
-        ('Manager', 'service_manager'),
-        ('Deputy manager', 'deputy_service_manager')
-   )
-
-   owner_sort_headers = SortHeaders(request, OWNER_HEADERS)
-   owner_headers = list(owner_sort_headers.headers())
-
-   owner_services = NewService.objects.filter(owner__username=username).order_by('name')
-   owner_services = owner_services.filter(status='production') | owner_services.filter(status='pre-production')
-   owner_services = owner_services.order_by(owner_sort_headers.get_order_by())
-
-
-   MANAGER_HEADERS = (
+   SERVICE_HEADERS = (
         ('Name', 'name'),
         ('Docs', 'documentation'),
         ('Host', 'host'),
@@ -1414,15 +1394,30 @@ def service_list_for_team_members (request):
         ('Status', 'status'),
         ('Priority', 'priority'),
         ('Owner', 'owner'),
-        ('Deputy manager', 'deputy_service_manager')
+        ('Manager', 'service_manager'),
+        ('Deputy manager', 'deputy_service_manager'),
    )
 
-   manager_sort_headers = SortHeaders(request, MANAGER_HEADERS)
+   owner_sort_headers = SortHeaders(request, SERVICE_HEADERS)
+   owner_headers = list(owner_sort_headers.headers())
+
+   owner_services = NewService.objects.filter(owner__username=username).order_by('name')
+   owner_services = owner_services.filter(status='production') | owner_services.filter(status='pre-production')
+   owner_services = owner_services.order_by(owner_sort_headers.get_order_by())
+
+   manager_sort_headers = SortHeaders(request, SERVICE_HEADERS)
    manager_headers = list(manager_sort_headers.headers())
 
    manager_services = NewService.objects.filter(service_manager__username=username).order_by('name')
    manager_services = manager_services.filter(status='production') | manager_services.filter(status='pre-production')
    manager_services = manager_services.order_by(manager_sort_headers.get_order_by())
+
+   deputy_manager_sort_headers = SortHeaders(request, SERVICE_HEADERS)
+   deputy_manager_headers = list(deputy_manager_sort_headers.headers())
+
+   deputy_manager_services = NewService.objects.filter(deputy_service_manager__username=username).order_by('name')
+   deputy_manager_services = deputy_manager_services.filter(status='production') | deputy_manager_services.filter(status='pre-production')
+   deputy_manager_services = deputy_manager_services.order_by(deputy_manager_sort_headers.get_order_by())
 
    active_vms = VM.objects.filter(internal_requester__username=person.username).filter(status='active')
 
