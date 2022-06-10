@@ -10,16 +10,16 @@ from datetime import datetime
 from pytz import timezone
 
 
-msg = '''From: emailtest@archman1.ceda.ac.uk
-To: andrew.harwood@stfc.ac.uk
+msg = '''From: support@ceda.ac.uk 
+To: runnerharwood@gmail.com 
 Subject: My email test message
 
 This is just a test message
 
 '''
 
-messageFrom='emailtest@archman1.ceda.ac.uk'
-messageTo = 'andrew.harwood@stfc.ac.uk'
+messageFrom='support@ceda.ac.uk'
+messageTo = 'runnerharwood@gmail.com'
 
 now=datetime.today()
 
@@ -27,8 +27,8 @@ try:
    server = smtplib.SMTP('localhost') 	
    server.sendmail(messageFrom, messageTo, msg)
    server.quit()
-   print now, 'OK'
+   print (now, 'OK')
 except:
-   print now, 'ERROR'
+   print (now, 'ERROR')
     
  
