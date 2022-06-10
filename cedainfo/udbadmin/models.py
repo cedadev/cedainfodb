@@ -297,6 +297,7 @@ class User (models.Model):
     gid   = models.IntegerField(default=0, blank=True)  
     reset_token = models.CharField(max_length=40, blank=True)  
     token_expire = models.DateTimeField(blank=True)
+    secret_data = models.CharField(max_length=200, null=True, blank=True)
     
 #    onlinereg = models.IntegerField()
 
