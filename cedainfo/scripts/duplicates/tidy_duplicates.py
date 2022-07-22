@@ -20,22 +20,19 @@ def run():
         users = User.objects.filter(emailaddress=email, accounttype='Web')  
         
 
-        if len(users) == 2:
+        if len(users) >= 2:
         
 #           
 #
-                  datasets_0 = len(users[0].datasets(removed=True))
-                  datasets_1 = len(users[1].datasets(removed=True))
-#                  
-                  if datasets_0 >= 0 and datasets_1 >= 0:	
-#
-                      print (users[0].emailaddress, users[0].userkey, users[0].accountid,  datasets_0, users[0].startdate, users[0].secret_data)
-                      print (users[1].emailaddress, users[1].userkey, users[1].accountid,  datasets_1, users[1].startdate, users[1].secret_data)	   
+                    for user in users:
+                        datasets = len(user.datasets(removed=False))
+                        print (user.emailaddress, user.userkey, user.accountid,  datasets, user.startdate, user.secret_data)
+                    print (' ')
 #                      print (min(users[0].userkey, users[1].userkey), ",")
            #           for user in users:
            #               print (user.emailaddress, user.userkey, user.accountid, user.accounttype)
            #
-                      print (min(users[0].userkey, users[1].userkey), ",")
+#                      print (min(users[0].userkey, users[1].userkey), ",")
 
 
 #    for p in User.objects.all():

@@ -2197,7 +2197,7 @@ class NewService(models.Model):
     # host = models.ManyToManyField(Host, help_text="Host machine on which service is deployed", null=True, blank=True)
     host = models.ForeignKey(VM, on_delete=models.PROTECT, help_text="Host machine on which service is deployed", null=True, blank=False)
     name = models.CharField(max_length=512, help_text="Name of service")
-   # url = models.CharField(max_length=200, help_text="Url of service", default='')
+    url = models.URLField(max_length=200, help_text="", default='')
     status = models.CharField(
             max_length=50,
             choices=(

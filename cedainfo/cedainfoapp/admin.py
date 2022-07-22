@@ -280,6 +280,14 @@ class NewServiceAdmin(admin.ModelAdmin):
     docs.allow_tags = True
     docs.admin_order_field = "documentation"
 
+    def url(self):
+        if self.url:
+            return format_html(mark_safe('<a href="%s" title="Service url">%s</a>' % (self.url, self.url)))
+        else:
+            return ''
+    url.allow_tags = True
+    docs.admin_order_field = "url"
+
     def vm_name (self):
 
         if self.host.status == 'retired':
@@ -302,7 +310,7 @@ class NewServiceAdmin(admin.ModelAdmin):
     vm_os.admin_order_field = "host__os_required"
     vm_os. short_description = "OS"
     
-    list_display = ('name', docs, vm_name, vm_os, 'review_status', 'last_reviewed', 'visibility', 'status', 'priority', 'summary', 'service_manager', 'owner')
+    list_display = ('name', docs, vm_name, url, vm_os, 'review_status', 'last_reviewed', 'visibility', 'status', 'priority', 'summary', 'service_manager', 'owner')
     list_editable = ('priority',)
     list_filter = ('visibility', 'priority', 'status', 'review_status', 'keywords', ManagerFilter, OwnerFilter, ServiceHostFilter, SystemManagerFilter, VMStatusFilter)
     search_fields = ('description', 'name', 'host__name')
@@ -311,7 +319,7 @@ class NewServiceAdmin(admin.ModelAdmin):
     filter_horizontal = ('keywords',)
 
     formfield_overrides = {
-        models.URLField: {'widget': TextInput(attrs={'size': '120'})},
+        models.URLField: {'widget': TextInput(attrs={'size': '100'})},
         models.CharField: {'widget': TextInput(attrs={'size': '80'})},
     }
 
