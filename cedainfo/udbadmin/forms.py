@@ -12,8 +12,8 @@ class JasminUsersForm(forms.Form):
     
     email_only = BooleanField(required=False)
     
-class LDAPuserForm(forms.Form):
-    tagname = ChoiceField(choices=LDAP.peopleTagChoices())
+#class LDAPuserForm(forms.Form):
+#    tagname = ChoiceField(choices=LDAP.peopleTagChoices())
     
 class UdjForm(forms.Form):
     fundingtype = ChoiceField(choices=choices.FUNDING_TYPES)
