@@ -340,6 +340,19 @@ def edit_dataset_request (request, id):
 
    return render_to_response('edit_dataset_request.html', locals())
 
+@login_required()
+def change_user_password(request, userkey):
+    from keycloakutils.password import generate_hash_data
+
+    user        = request.user
+    cedauser    = User.objects.get(userkey=userkey)
+   
+    if request.method == 'POST':
+        password = request.POST.get('password', '')
+        cedauser.secret_data = generate_hash_data(password.strip())
+        cedauser.save()
+
+    return render_to_response('change_user_password.html', locals())
 
 @login_required()
 def add_user_datasets(request, userkey):

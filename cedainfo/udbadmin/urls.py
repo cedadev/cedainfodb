@@ -20,7 +20,9 @@ urlpatterns = [
     url(r'^external/user/account-details/(?P<userkey>\d{1,6})/$', user_account_details),
     url(r'^user/getemail/(?P<accountid>[\d\w]+)$', user_getemail),
 
-    url(r'^user/datasets/add/(?P<userkey>\d{1,6})/$', add_user_datasets),        
+    url(r'^user/datasets/add/(?P<userkey>\d{1,6})/$', add_user_datasets), 
+
+    url(r'^user/change-password/(?P<userkey>\d{1,6})/$', change_user_password),        
 
     url(r'^dataset/details/(?P<datasetid>.+)/$', dataset_details),    
     url(r'^dataset/users/(?P<datasetid>.+)/$', list_users_for_dataset),

@@ -147,7 +147,7 @@ class UserAdmin(admin.ModelAdmin):
 
     def password (self):
           
-       a = '<a target="_blank" href="http://team.ceda.ac.uk/cgi-bin/userdb/change_web_passwd.cgi.pl?accountid=%s">Change password</a>' % self.userkey
+       a = '<a target="_blank" href="/udbadmin/user/change-password/%s">Change password</a>' % self.userkey
        
        return mark_safe(a)
        
