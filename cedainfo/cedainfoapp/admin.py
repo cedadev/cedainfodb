@@ -313,7 +313,7 @@ class NewServiceAdmin(admin.ModelAdmin):
     list_display = ('name', docs, vm_name, url, vm_os, 'review_status', 'last_reviewed', 'visibility', 'status', 'priority', 'summary', 'service_manager', 'owner')
     list_editable = ('priority',)
     list_filter = ('visibility', 'priority', 'status', 'review_status', 'keywords', ManagerFilter, OwnerFilter, ServiceHostFilter, SystemManagerFilter, VMStatusFilter)
-    search_fields = ('description', 'name', 'host__name')
+    search_fields = ('description', 'review_info', 'name', 'url', 'host__name')
     ordering = ('name',)
 
     filter_horizontal = ('keywords',)
