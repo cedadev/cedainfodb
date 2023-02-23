@@ -21,7 +21,7 @@ import datetime
 import time
 import http.client
 import random
-import uptimerobot
+from cedainfoapp.uptimerobot import get_all_monitors
 
 logging = settings.LOG
 
@@ -38,8 +38,10 @@ class HostList(ListView):
 @login_required()
 def uptimerobot_monitors(request):
 
-    monitors = uptimerobot.get_all_monitors()
-    return render_to_response('cedainfoapp/uptimerobot_monitors.html', {'monitors': monitors)
+    monitors = get_all_monitors()
+    monitors = sorted(monitors, key=lambda d: d["friendly_name"].lower())
+
+    return render_to_response('cedainfoapp/uptimerobot_monitors.html', {'monitors': monitors})
 
 # host_detail view: includes details of host, plus services and history entries for that host
 @login_required()
