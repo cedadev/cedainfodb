@@ -14,8 +14,12 @@ Uptime robot monitors
 
     {% for monitor in monitors %}
         <tr>
-            <td>{monitor.id}</td>
+            <td>{{monitor.id}}</td>
+            <td>{{monitor.friendly_name}}</td>
+            <td>{{monitor.url}}</td>
         </tr>
     {% endfor %}
 
 </table>
+
+{% endblock %}
