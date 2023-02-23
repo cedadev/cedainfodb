@@ -42,7 +42,7 @@ def get_monitors(offset=0):
 
 if (__name__ == '__main__'):
     all_monitors = get_all_monitors()
-    all_monitors = sorted(all_monitors, key=lambda d: d["friendly_name"])
+    all_monitors = sorted(all_monitors, key=lambda d: d["friendly_name"].lower())
 
     count = 1
     for monitor in all_monitors:
