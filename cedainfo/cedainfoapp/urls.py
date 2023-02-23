@@ -17,6 +17,7 @@ urlpatterns = [
     #   - list view of hosts subsetted url(e.g. in_pool, not_retired)
 #    url(r'^hosts/(?P<subset>\w+)$', host_list),
  
+    url(r'^services/uptimerobot/$', uptimerobot_monitors)
     url(r'^services/listbyvm/$', service_list_by_vm),
     url(r'^services/list4team/$', service_list_for_team_members),
     url(r'^services/owner_managers/$', service_owner_manager_list),

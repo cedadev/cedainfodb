@@ -1,0 +1,21 @@
+{% extends "base_site.html" %}
+
+{% block title %}
+Uptime robot monitors
+{% endblock %}
+
+{% block header %}
+<h2>Uptimerobot monitors</h2>
+{% endblock %}
+
+{% block content %}
+
+<table border="1">
+
+    {% for monitor in monitors %}
+        <tr>
+            <td>{monitor.id}</td>
+        </tr>
+    {% endfor %}
+
+</table>
