@@ -1369,7 +1369,7 @@ def service_owner_manager_list (request):
         rec['manager_count'] = manager_count
         rec['deputy_manager_count'] = deputy_manager_count
         rec['vm_count'] = vm_count
-        total = owner_count + manager_count + deputy_manager_count + vm_count
+        total = owner_count + manager_count + deputy_manager_count
 
 #        counts.append(rec)
 

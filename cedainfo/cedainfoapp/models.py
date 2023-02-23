@@ -2243,6 +2243,7 @@ class NewService(models.Model):
 
     owner = models.ForeignKey(Person, on_delete=models.PROTECT, null=True, blank=True, related_name='owner', help_text="Owner of this service")
 
+    startdate = models.DateField(null=True, blank=True, help_text="Approximate date service went into production")
     last_reviewed = models.DateField(null=True, blank=True, help_text="Date of last review")
     review_status = models.CharField(
         max_length=50,

@@ -6,8 +6,10 @@ from django.db import connections
 def run():
 
     sql = """
-    select distinct emailaddress from tbusers where emailaddress in 
-    (SELECT emailaddress from tbusers group by emailaddress having count(emailaddress) > 1)
+select distinct lower(emailaddress) from tbusers where lower(emailaddress) in 
+(
+SELECT lower(emailaddress) from tbusers group by lower(emailaddress) having count(emailaddress) > 1)
+
     """
     
     with connections['userdb'].cursor() as cursor:
@@ -17,16 +19,17 @@ def run():
     for row in rows:  
         email = row[0]
         
-        users = User.objects.filter(emailaddress=email, accounttype='Web')  
+        users = User.objects.filter(emailaddress__iexact=email, accounttype='Web')  
         
 
-        if len(users) >= 2:
-        
-#           
+        if len(users) > 1:
+#        
+#           #
 #
                     for user in users:
                         datasets = len(user.datasets(removed=False))
-                        print (user.emailaddress, user.userkey, user.accountid,  datasets, user.startdate, user.secret_data)
+                        print (user.accountid, datasets)
+#                        print (user.emailaddress, user.userkey, user.accountid,  datasets, user.startdate, user.secret_data)
                     print (' ')
 #                      print (min(users[0].userkey, users[1].userkey), ",")
            #           for user in users:
