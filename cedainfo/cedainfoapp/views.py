@@ -1224,6 +1224,24 @@ def service_review_selection(request):
 
     return render_to_response('services/review_selection.html', locals())
 
+@login_required()
+def service_uptime_robot_check (request):
+    HEADERS = (
+        ('Name', 'name'),
+        ('Visibility', 'visibility'),
+        ('Status', 'status'),
+
+    )
+
+    sort_headers = SortHeaders(request, HEADERS)
+
+    headers = list(sort_headers.headers())
+
+    services = NewService.objects.filter(status='production')
+
+    services = services.order_by(sort_headers.get_order_by())
+
+    return render_to_response('services/uptime_robot_check.html', locals())
 
 
 @login_required()
