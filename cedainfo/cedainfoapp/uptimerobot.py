@@ -44,7 +44,14 @@ if (__name__ == '__main__'):
     all_monitors = get_all_monitors()
     all_monitors = sorted(all_monitors, key=lambda d: d["friendly_name"].lower())
 
-    count = 1
-    for monitor in all_monitors:
-        print(count, monitor["id"], monitor["friendly_name"], monitor["url"])
-        count = count + 1
+   # print (where(all_monitors["id"] == 786954357))
+  #  print ((lambda monitor: monitor['id'] == 786954357)(all_monitors))
+
+
+    myid = 886954357
+    res = next((sub for sub in all_monitors if sub['id'] ==  myid), {})
+    print (res)
+ #   count = 1
+ #   for monitor in all_monitors:
+ #       print(count, monitor["id"], monitor["friendly_name"], monitor["url"])
+ #       count = count + 1
