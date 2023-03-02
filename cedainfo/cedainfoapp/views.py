@@ -1536,10 +1536,16 @@ def service_uptime_robot_check(request):
 
     for service in services:
         if service.uptimerobot_monitor_id:
-            res = next((monitor for monitor in monitors if monitor['id'] == service.uptimerobot_monitor_id), None)
+            res = next(
+                (
+                    monitor
+                    for monitor in monitors
+                    if monitor["id"] == service.uptimerobot_monitor_id
+                ),
+                None,
+            )
             if res:
-                service.monitor = service.res
-
+                service.monitor = res
 
     return render_to_response(
         "services/uptime_robot_check.html", {"monitors": monitors, "services": services}
