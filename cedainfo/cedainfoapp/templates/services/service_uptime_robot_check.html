@@ -11,23 +11,26 @@
 
 <table border="1">
 
-{% for header in headers %}
-   <th>
-     {% if header.sortable %}<a href="{{header.url|escape}}&review_status={{review_status}}&visibility={{visibility}}&status={{status}}" title="Click to sort by this column">{% endif %}
-     {{ header.text }}
-     {% if header.sortable %}</a>{% endif %}
-   </th>
-{% endfor %}
+  {% for header in headers %}
+  <th>
+    {% if header.sortable %}<a
+      href="{{header.url|escape}}&review_status={{review_status}}&visibility={{visibility}}&status={{status}}"
+      title="Click to sort by this column">{% endif %}
+      {{ header.text }}
+      {% if header.sortable %}</a>{% endif %}
+  </th>
+  {% endfor %}
 
 
-{% for service in services %}
-  
-<tr>
-<td><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}}</a>
-<td>{{service.visibility}}
-<td>{{service.status}}
-</td>
-{% endfor %}
+  {% for service in services %}
+
+  <tr>
+    <td><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}}</a>
+    <td>{{service.visibility}}
+    <td>{{service.status}}
+    <td>{{service.monitor.friendly_name</td>
+    </td>
+    {% endfor %}
 </table>
 
 {% endblock %}
