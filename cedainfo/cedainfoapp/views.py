@@ -1522,6 +1522,7 @@ def service_uptime_robot_check(request):
         ("Name", "name"),
         ("Visibility", "visibility"),
         ("Status", "status"),
+        ("Monitor name"),
     )
 
     sort_headers = SortHeaders(request, HEADERS)
