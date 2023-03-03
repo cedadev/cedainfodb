@@ -2838,7 +2838,7 @@ class NewService(models.Model):
     name = models.CharField(max_length=512, help_text="Name of service")
     url = models.URLField(max_length=200, help_text="", default="", blank=True)
     uptimerobot_monitor_id = models.IntegerField(
-        help_text="ID number of UptimeRobot monitor for this service"
+        help_text="ID number of UptimeRobot monitor for this service", blank=True
     )
     status = models.CharField(
         max_length=50,
