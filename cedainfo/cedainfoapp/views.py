@@ -35,14 +35,6 @@ class HostList(ListView):
         return ordering
 
 
-@login_required()
-def uptimerobot_monitors(request):
-    monitors = get_all_monitors()
-    monitors = sorted(monitors, key=lambda d: d["friendly_name"].lower())
-
-    return render_to_response(
-        "cedainfoapp/uptimerobot_monitors.html", {"monitors": monitors}
-    )
 
 
 # host_detail view: includes details of host, plus services and history entries for that host
@@ -1514,6 +1506,15 @@ def service_review_selection(request):
     services = services.order_by(sort_headers.get_order_by())
 
     return render_to_response("services/review_selection.html", locals())
+
+@login_required()
+def uptimerobot_monitors(request):
+    monitors = get_all_monitors()
+    monitors = sorted(monitors, key=lambda d: d["friendly_name"].lower())
+
+    return render_to_response(
+        "cedainfoapp/uptimerobot_monitors.html", {"monitors": monitors}
+    )
 
 
 @login_required()
