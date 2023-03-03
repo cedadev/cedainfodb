@@ -1522,7 +1522,6 @@ def service_uptime_robot_check(request):
         ("Name", "name"),
         ("Visibility", "visibility"),
         ("Status", "status"),
-        ("Monitor name"),
     )
 
     sort_headers = SortHeaders(request, HEADERS)
@@ -1550,7 +1549,7 @@ def service_uptime_robot_check(request):
 
     return render_to_response(
         "services/uptime_robot_check.html",
-        {"monitors": monitors, "services": services, "headers": headers},
+        locals(),
     )
 
 
