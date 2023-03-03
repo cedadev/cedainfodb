@@ -35,8 +35,6 @@ class HostList(ListView):
         return ordering
 
 
-
-
 # host_detail view: includes details of host, plus services and history entries for that host
 @login_required()
 def host_detail(request, host_id):
@@ -1507,6 +1505,7 @@ def service_review_selection(request):
 
     return render_to_response("services/review_selection.html", locals())
 
+
 @login_required()
 def uptimerobot_monitors(request):
     monitors = get_all_monitors()
@@ -1549,7 +1548,8 @@ def service_uptime_robot_check(request):
                 service.monitor = res
 
     return render_to_response(
-        "services/uptime_robot_check.html", {"monitors": monitors, "services": services}
+        "services/uptime_robot_check.html",
+        {"monitors": monitors, "services": services, "headers": headers},
     )
 
 
