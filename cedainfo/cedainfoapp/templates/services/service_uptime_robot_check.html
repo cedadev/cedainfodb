@@ -25,7 +25,13 @@
     <td><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}}</a>
     <td>{{service.visibility}}
     <td>{{service.status}}
+
+      {% if service.uptimerobot_monitor_id %}
     <td>{{service.uptimerobot_monitor_id}}</td>
+    {% else %}
+    <td></td>
+    {% endif %}
+
     <td>{{service.monitor.friendly_name}}</td>
     <td>{{service.monitor.url}}</td>
   </tr>
