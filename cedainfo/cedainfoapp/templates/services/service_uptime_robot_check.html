@@ -1,16 +1,10 @@
 {% extends "base_site.html" %}
-
+<title>UptimeRobot service monitor check</title>
 {% block content %}
 
 <h1>UptimeRobot service monitor check</h1>
 
-
-Hello there
-<p>
-
-</p>
-
-<p>
+<p></p>
 
 <table border="1">
 
@@ -31,9 +25,8 @@ Hello there
     <td><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}}</a>
     <td>{{service.visibility}}
     <td>{{service.status}}
-    <td>{{service.monitor.friendly_name</td>
+    <td>{{service.monitor.friendly_name}}</td>
     <td>{{service.monitor.url}}</td>
-    <td>aa</td>
   </tr>
   {% endfor %}
 </table>
