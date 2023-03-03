@@ -1548,7 +1548,7 @@ def service_uptime_robot_check(request):
                 service.monitor = res
 
     return render_to_response(
-        "services/uptime_robot_check.html",
+        "services/service_uptime_robot_check.html",
         locals(),
     )
 
