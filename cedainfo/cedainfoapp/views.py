@@ -1533,7 +1533,7 @@ def service_uptime_robot_check(request):
     services = services.order_by(sort_headers.get_order_by())
 
     monitors = get_all_monitors()
-    a = "a"
+    
     for service in services:
         if service.uptimerobot_monitor_id:
             res = next(
