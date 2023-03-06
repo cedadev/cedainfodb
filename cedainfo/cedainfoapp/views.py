@@ -1519,7 +1519,7 @@ def uptimerobot_monitors(request):
 @login_required()
 def service_uptime_robot_check(request):
     HEADERS = (
-        ("Name", "name"),
+        ("Name", "Service name"),
         ("Visibility", "visibility"),
         ("Status", "status"),
         ("Monitor ID", "uptimerobot_monitor_id"),
