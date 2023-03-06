@@ -1522,6 +1522,7 @@ def service_uptime_robot_check(request):
         ("Name", "name"),
         ("Visibility", "visibility"),
         ("Status", "status"),
+        ("Monitor ID", "uptimerobot_monitor_id"),
     )
 
     sort_headers = SortHeaders(request, HEADERS)
@@ -1533,7 +1534,7 @@ def service_uptime_robot_check(request):
     services = services.order_by(sort_headers.get_order_by())
 
     monitors = get_all_monitors()
-    
+
     for service in services:
         if service.uptimerobot_monitor_id:
             res = next(
