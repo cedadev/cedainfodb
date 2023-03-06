@@ -5,19 +5,24 @@ Uptime robot monitors
 {% endblock %}
 
 {% block header %}
-<h2>Uptimerobot monitors</h2>
+<title>Uptimerobot monitors</title>
 {% endblock %}
 
 {% block content %}
+<h2>List of current UptimeRobot monitors</h2>
 
+This page lists all current UptimeRobot monitors.
+<p></p>
 <table border="1">
-
+    <th>ID</th>
+    <th>Name</th>
+    <th>url</th>
     {% for monitor in monitors %}
-        <tr>
-            <td>{{monitor.id}}</td>
-            <td>{{monitor.friendly_name}}</td>
-            <td>{{monitor.url}}</td>
-        </tr>
+    <tr>
+        <td>{{monitor.id}}</td>
+        <td>{{monitor.friendly_name}}</td>
+        <td><a href="{{monitor.url}}">{{monitor.url}}</a></td>
+    </tr>
     {% endfor %}
 
 </table>
