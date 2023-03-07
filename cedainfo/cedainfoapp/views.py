@@ -1510,8 +1510,7 @@ def service_review_selection(request):
 def uptimerobot_monitors(request):
     monitors = get_all_monitors()
     monitors = sorted(monitors, key=lambda d: d["friendly_name"].lower())
-    services = NewService.objects.all()
-    services.filter.exclude(status="decommisioned")
+    services = NewService.objects.exclude(status="decommisioned")
 
     return render_to_response("cedainfoapp/uptimerobot_monitors.html", locals())
 
