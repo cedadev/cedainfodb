@@ -1514,10 +1514,10 @@ def uptimerobot_monitors(request):
 
     for monitor in monitors:
         for service in services:
-            if monitor.id == service.uptimerobot_monitor_id:
+            if monitor["id"] == service["uptimerobot_monitor_id"]:
                 monitor.has_service = True
                 break
-            
+
     return render_to_response("cedainfoapp/uptimerobot_monitors.html", locals())
 
 
