@@ -1512,15 +1512,11 @@ def uptimerobot_monitors(request):
     monitors = sorted(monitors, key=lambda d: d["friendly_name"].lower())
     services = NewService.objects.exclude(status="decomissioned")
 
-    n = 0
-
     for monitor in monitors:
-        n = n + 1
-
-         for service in services:
-             if int(monitor["id"]) == int(service.uptimerobot_monitor_id):
-                 monitor["has_service"] = True
-                 break
+        for service in services:
+            if int(monitor["id"]) == int(service.uptimerobot_monitor_id):
+                monitor["has_service"] = True
+                break
 
     return render_to_response("cedainfoapp/uptimerobot_monitors.html", locals())
 
