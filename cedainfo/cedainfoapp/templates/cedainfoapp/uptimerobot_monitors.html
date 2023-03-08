@@ -11,7 +11,8 @@ Uptime robot monitors
 {% block content %}
 <h2>List of current UptimeRobot monitors</h2>
 
-This page lists all current UptimeRobot monitors. See <a href="/services/uptimerobot-check">UptimeRobot services
+This page lists all current UptimeRobot monitors. Monitors highlighted in red are not matched with a CEDA service
+record. See <a href="/services/uptimerobot-check">UptimeRobot services
     check</a> to check that all CEDA services have an UptimeRobot monitor.
 
 <p></p>
@@ -31,17 +32,6 @@ This page lists all current UptimeRobot monitors. See <a href="/services/uptimer
 
         <td>{{monitor.friendly_name}}</td>
         <td><a href="{{monitor.url}}">{{monitor.url}}</a></td>
-    </tr>
-    {% endfor %}
-
-</table>
-
-<table border="1">
-
-    {% for service in services %}
-    <tr>
-        <td>{{service.name}}</td>
-        <td>{{service.status}}</td>
     </tr>
     {% endfor %}
 
