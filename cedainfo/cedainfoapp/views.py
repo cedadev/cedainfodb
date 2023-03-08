@@ -1515,7 +1515,7 @@ def uptimerobot_monitors(request):
     for monitor in monitors:
         for service in services:
             if service.uptimerobot_monitor_id:
-                if int(monitor["id"]) == int(service.uptimerobot_monitor_id):
+                if monitor["id"] == service.uptimerobot_monitor_id:
                     monitor["has_service"] = True
                     break
 
