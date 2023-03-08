@@ -1510,7 +1510,9 @@ def service_review_selection(request):
 def uptimerobot_monitors(request):
     monitors = get_all_monitors()
     monitors = sorted(monitors, key=lambda d: d["friendly_name"].lower())
-    services = NewService.objects.exclude(status="decomissioned")
+    services = NewService.objects.filter(uptimerobot_monitor_id__isnull=False).exclude(
+        status="decomissioned"
+    )
 
     for monitor in monitors:
         for service in services:
