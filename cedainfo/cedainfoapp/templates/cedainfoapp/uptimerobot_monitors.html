@@ -26,12 +26,11 @@ This page lists all current UptimeRobot monitors. See <a href="/services/uptimer
         {% if monitor.has_service %}
         <td>{{monitor.id}}</td>
         {% else %}
-        <td><span style="color:red;">{{monitor.service}}</span></td>
+        <td><span style="color:red;">{{monitor.id}}</span></td>
         {% endif %}
 
         <td>{{monitor.friendly_name}}</td>
         <td><a href="{{monitor.url}}">{{monitor.url}}</a></td>
-        <td>{{monitor.has_service}}</td>
     </tr>
     {% endfor %}
 
