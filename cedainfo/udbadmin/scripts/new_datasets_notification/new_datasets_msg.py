@@ -122,6 +122,8 @@ msg = template.render({"from":  messageFrom,
 
 if args.send:
     print ('Sending email...')
+
+    msg = msg.encode('utf8')
     
     try:
         server = smtplib.SMTP('localhost')
