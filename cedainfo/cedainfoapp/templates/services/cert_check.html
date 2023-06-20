@@ -1,0 +1,41 @@
+{% extends "base_site.html" %}
+<title>Service certificate check</title>
+{% block content %}
+
+<h1>Service certificate check</h1>
+
+
+<table border="1">
+
+  {% for header in headers %}
+  <th>
+    {% if header.sortable %}<a href="{{header.url|escape}}" title="Click to sort by this column">{% endif %}
+      {{ header.text }}
+      {% if header.sortable %}</a>{% endif %}
+  </th>
+  {% endfor %}
+  <th><a href="{{request.path}}?orderby=cert-issuer">Cert issuer</a></th>
+  <th>Domain (tmp)</th>
+  <th><a href="{{request.path}}?orderby=cert-expire-date">Cert expire date</a></th>
+
+  {% for service in services %}
+
+  <tr>
+    <td><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}}</a>
+    <td>{{service.visibility}}
+    <td>{{service.status}}
+    <td><a href="{{service.url}}">{{service.url}}</a></td>
+    <td>{{service.cert_issuer}}</td>
+    <td>{{service.domain}}</td>
+
+    {% if service.cert_expire_date == '01-jan-1900' %}
+    <td></td>
+    {% else %}
+    <td>{{service.cert_expire_date}}</td>
+    {% endif %}
+  </tr>
+  {% endfor %}
+
+</table>
+
+{% endblock %}

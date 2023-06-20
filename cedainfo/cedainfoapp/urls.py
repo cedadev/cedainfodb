@@ -18,6 +18,7 @@ urlpatterns = [
     url(r"^services/uptimerobot-check/$", service_uptime_robot_check),
     url(r"^services/listbyvm/$", service_list_by_vm),
     url(r"^services/list4team/$", service_list_for_team_members),
+    url(r"^services/certcheck/$", service_cert_check),
     url(r"^services/owner_managers/$", service_owner_manager_list),
     url(r"^services/internetfacing/$", service_internet_facing),
     url(r"^services/unusedvms/$", service_unusedvms),

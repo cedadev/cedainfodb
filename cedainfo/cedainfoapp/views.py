@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.http import HttpResponse
 from cedainfoapp.models import *
 from cedainfoapp.forms import *
-from django.shortcuts import redirect, render_to_response, get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404
 from django.views.generic.list import ListView
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
@@ -21,6 +21,7 @@ import datetime
 import time
 import http.client
 import random
+import ssl
 from cedainfoapp.uptimerobot import get_all_monitors
 
 logging = settings.LOG
@@ -43,7 +44,8 @@ def host_detail(request, host_id):
         host = get_object_or_404(Host, pk=host_id)
         services = Service.objects.filter(host=host)
         history = HostHistory.objects.filter(host=host)
-        return render_to_response(
+        return render(
+            request,
             "cedainfoapp/host_detail.html",
             {
                 "host": host,
@@ -54,7 +56,7 @@ def host_detail(request, host_id):
         )
     except:
         message = "Unable to find host with id='%s'" % (host_id)
-        return render_to_response(
+        return render(
             "error.html", {"message": message, "url": url, "user": request.user}
         )
 
@@ -62,7 +64,7 @@ def host_detail(request, host_id):
 @login_required()
 def home(request):
     # Home page view
-    return render_to_response("cedainfoapp/home.html", {"user": request.user})
+    return render(request, "cedainfoapp/home.html", {"user": request.user})
 
 
 @login_required()
@@ -73,7 +75,7 @@ def problems(request):
     part_probs = Partition.problems()
     audit_probs = Audit.problems()
 
-    return render_to_response(
+    return render(
         "cedainfoapp/problems.html",
         {
             "user": request.user,
@@ -126,7 +128,7 @@ def underallocated_fs(request):
         lastsize = fs.last_size()
         if lastsize and (lastsize.size > fs.overall_final_size):
             filesets.append(fs)
-    return render_to_response(
+    return render(
         "cedainfoapp/underallocated.html", {"filesets": filesets, "user": request.user}
     )
 
@@ -156,7 +158,7 @@ def audit_totals(request):
         total_time += a.endtime - a.starttime
         naudits += 1
 
-    return render_to_response(
+    return render(
         "cedainfoapp/audit_totals.html",
         {
             "total_files": total_files,
@@ -195,7 +197,7 @@ def audit_trace(request, path):
             if line[0 : len(rel_path)] == rel_path:
                 a.loglines.append(line.strip())
 
-    return render_to_response(
+    return render(
         "cedainfoapp/audit_trace.html",
         {"audits": audits, "path": path, "rel_path": rel_path},
     )
@@ -252,7 +254,7 @@ def next_audit(request):
     else:
         audit = None
 
-    return render_to_response("cedainfoapp/next_audit.txt", {"audit": audit})
+    return render("cedainfoapp/next_audit.txt", {"audit": audit})
 
 
 def upload_audit_results(request, id):
@@ -264,7 +266,7 @@ def upload_audit_results(request, id):
         audit.auditstate = "error"
         audit.endtime = datetime.datetime.utcnow()
         audit.save()
-        return render_to_response("cedainfoapp/next_audit.txt", {"audit": audit})
+        return render("cedainfoapp/next_audit.txt", {"audit": audit})
 
     if "checkm_loc" in request.POST:
         checkm = open(request.POST["checkm_loc"]).read()
@@ -288,7 +290,7 @@ def upload_audit_results(request, id):
 
     audit.analyse()
 
-    return render_to_response("cedainfoapp/next_audit.txt", {"audit": audit})
+    return render("cedainfoapp/next_audit.txt", {"audit": audit})
 
 
 def audit_report(request, id):
@@ -299,7 +301,7 @@ def audit_report(request, id):
         result = audit.compare(prev_audit)
     else:
         result = None
-    return render_to_response(
+    return render(
         "cedainfoapp/audit_report.html",
         {
             "audit": audit,
@@ -349,7 +351,7 @@ def partition_list(request):
         filtered_partitions = partitions
 
     # Use the object_list view.
-    return render_to_response(
+    return render(
         "cedainfoapp/partition_list.html",
         {"partitions": filtered_partitions, "user": request.user},
     )
@@ -370,7 +372,7 @@ def partition_vis(request, id):
         f.overalloc = max(size - f.overall_final_size, 0)
         f.totalsize = max(f.overall_final_size, f.overall_final_size + f.overalloc)
         unalloc -= f.totalsize
-    return render_to_response(
+    return render(
         "cedainfoapp/partition_vis.html",
         {"part": part, "filesets": filesets, "unalloc": unalloc},
     )
@@ -391,7 +393,7 @@ def partition_peplerdiagram(request, id):
         f.overalloc = max(size - f.overall_final_size, 0)
         f.totalsize = max(f.overall_final_size, f.overall_final_size + f.overalloc)
         unalloc -= f.totalsize
-    return render_to_response(
+    return render(
         "cedainfoapp/partition_peplerdiagram.html",
         {"part": part, "filesets": filesets, "unalloc": unalloc},
     )
@@ -423,7 +425,7 @@ def markcomplete(request, id):
         fileset.save()
         return redirect("/admin/cedainfoapp/fileset/%s" % id)
     else:
-        return render_to_response(
+        return render(
             "cedainfoapp/fileset_markcomplete.html",
             {"fileset": fileset, "user": request.user},
         )
@@ -527,7 +529,7 @@ def storagesummary(request):
         sumtable[6]["sec_allocused"] += part.secondary_used_by_filesets()
         sumtable[6]["capacity"] += part.capacity_bytes
 
-    return render_to_response(
+    return render(
         "cedainfoapp/sumtable.html", {"sumtable": sumtable, "user": request.user}
     )
 
@@ -538,7 +540,7 @@ def primary_on_tape(request):
     filesets = FileSet.objects.filter(
         sd_backup=True, storage_pot__isnull=False, primary_on_tape=True
     ).exclude(storage_pot="")
-    return render_to_response(
+    return render(
         "cedainfoapp/primary_on_tape.txt",
         {"filesets": filesets, "user": request.user},
         content_type="text/plain",
@@ -553,13 +555,13 @@ def storaged_spotlist(request):
         sd_backup=True, storage_pot__isnull=False
     ).exclude(storage_pot="")
     if withpath != None:
-        return render_to_response(
+        return render(
             "cedainfoapp/storage-d_spotlist_withpath.html",
             {"filesets": filesets, "user": request.user},
             content_type="text/plain",
         )
     else:
-        return render_to_response(
+        return render(
             "cedainfoapp/storage-d_spotlist.html",
             {"filesets": filesets, "user": request.user},
             content_type="text/plain",
@@ -595,7 +597,7 @@ def detailed_spotlist(request):
             fs.latest_size = fssms[len(fssms) - 1]
         else:
             fs.latest_suze = 0
-    return render_to_response(
+    return render(
         "cedainfoapp/detailed_spotlist.html",
         {"filesets": filesets, "user": request.user},
         content_type="text/plain",
@@ -609,7 +611,7 @@ def make_secondary_copies(request):
     filesets = FileSet.objects.filter(secondary_partition__isnull=False).exclude(
         storage_pot=""
     )
-    return render_to_response(
+    return render(
         "cedainfoapp/make_secondary_copies.txt",
         {"filesets": filesets, "user": request.user},
         content_type="text/plain",
@@ -621,7 +623,7 @@ def make_secondary_copies(request):
 #
 def download_conf(request):
     filesets = FileSet.objects.all().exclude(storage_pot="")
-    return render_to_response(
+    return render(
         "cedainfoapp/download_conf.txt",
         {"filesets": filesets, "user": request.user},
         content_type="text/plain",
@@ -633,7 +635,7 @@ def download_conf(request):
 #
 def complete_filesets(request):
     filesets = FileSet.objects.all()
-    return render_to_response(
+    return render(
         "cedainfoapp/complete.txt",
         {"filesets": filesets, "user": request.user},
         content_type="text/plain",
@@ -645,7 +647,7 @@ def complete_filesets(request):
 #
 def spotlist(request):
     filesets = FileSet.objects.all()
-    return render_to_response(
+    return render(
         "cedainfoapp/spotlist.txt",
         {"filesets": filesets, "user": request.user},
         content_type="text/plain",
@@ -667,7 +669,7 @@ def make_fileset(request):
 
     # check parameters ok
     if path is None:
-        return render_to_response(
+        return render(
             template,
             {
                 "path": path,
@@ -678,7 +680,7 @@ def make_fileset(request):
             content_type=mimetype,
         )
     if not size_in:
-        return render_to_response(
+        return render(
             template,
             {
                 "path": path,
@@ -710,7 +712,7 @@ def make_fileset(request):
         new_fs.make_fileset(path, size, on_tape)
     except FilseSetCreationError:
         error_msg = "Fileset creation error: %s" % sys.exc_info()[1]
-        return render_to_response(
+        return render(
             template,
             {
                 "path": path,
@@ -721,7 +723,7 @@ def make_fileset(request):
             content_type=mimetype,
         )
 
-    return render_to_response(
+    return render(
         template,
         {
             "path": "",
@@ -738,12 +740,12 @@ def split_fileset(request):
     path = request.GET.get("path", None)
     size_in = request.GET.get("size", None)
     if path == None:
-        return render_to_response(
+        return render(
             "cedainfoapp/fileset_split.html",
             {"path": path, "size": size_in, "error": "Need a path."},
         )
     if size_in == None:
-        return render_to_response(
+        return render(
             "cedainfoapp/fileset_split.html",
             {"path": path, "size": size_in, "error": "Need a size."},
         )
@@ -778,7 +780,7 @@ def split_fileset(request):
 
     # if no parent found exit
     if parent == None:
-        return render_to_response(
+        return render(
             "cedainfoapp/fileset_split.html",
             {"path": path, "size": size_in, "error": "No parent fileset found"},
         )
@@ -786,7 +788,7 @@ def split_fileset(request):
     try:
         new_fs = parent.split_fileset(path, size)
     except FilseSetCreationError:
-        return render_to_response(
+        return render(
             "cedainfoapp/fileset_split.html",
             {
                 "path": path,
@@ -795,7 +797,7 @@ def split_fileset(request):
             },
         )
 
-    return render_to_response(
+    return render(
         "cedainfoapp/fileset_split.html",
         {"path": path, "size": size_in, "error": "Fileset split.", "fs": new_fs},
     )
@@ -807,7 +809,7 @@ def reject_gwsrequest(request, id):
     gwsrequest = GWSRequest.objects.get(pk=id)
     error = gwsrequest.reject()
     if error:
-        return render_to_response("error.html", {"error": error, "user": request.user})
+        return render("error.html", {"error": error, "user": request.user})
     else:
         return redirect(request.META["HTTP_REFERER"])
 
@@ -818,7 +820,7 @@ def approve_gwsrequest(request, id):
     gwsrequest = GWSRequest.objects.get(pk=id)
     error = gwsrequest.approve()
     if error:
-        return render_to_response("error.html", {"error": error, "user": request.user})
+        return render("error.html", {"error": error, "user": request.user})
     else:
         return redirect(request.META["HTTP_REFERER"])
 
@@ -829,7 +831,7 @@ def convert_gwsrequest(request, id):
     gwsrequest = GWSRequest.objects.get(pk=id)
     error = gwsrequest.convert()
     if error:
-        return render_to_response("error.html", {"error": error, "user": request.user})
+        return render("error.html", {"error": error, "user": request.user})
     else:
         return redirect(request.META["HTTP_REFERER"])
 
@@ -842,7 +844,7 @@ def create_gws_update_request(request, id):
     if reqid:
         return redirect("/admin/cedainfoapp/gwsrequest/%i" % reqid)
     else:
-        return render_to_response(
+        return render(
             "error.html", {"error": "no update id generated", "user": request.user}
         )
 
@@ -853,7 +855,7 @@ def reject_vmrequest(request, id):
     vmrequest = VMRequest.objects.get(pk=id)
     error = vmrequest.reject()
     if error:
-        return render_to_response("error.html", {"error": error, "user": request.user})
+        return render("error.html", {"error": error, "user": request.user})
     else:
         return redirect(request.META["HTTP_REFERER"])
 
@@ -864,7 +866,7 @@ def approve_vmrequest(request, id):
     vmrequest = VMRequest.objects.get(pk=id)
     error = vmrequest.approve()
     if error:
-        return render_to_response("error.html", {"error": error, "user": request.user})
+        return render("error.html", {"error": error, "user": request.user})
     else:
         return redirect(request.META["HTTP_REFERER"])
 
@@ -875,7 +877,7 @@ def convert_vmrequest(request, id):
     vmrequest = VMRequest.objects.get(pk=id)
     error = vmrequest.convert()
     if error:
-        return render_to_response("error.html", {"error": error, "user": request.user})
+        return render("error.html", {"error": error, "user": request.user})
     else:
         return redirect(request.META["HTTP_REFERER"])
 
@@ -888,7 +890,7 @@ def create_vm_update_request(request, id):
     if reqid:
         return redirect("/admin/cedainfoapp/vmrequest/%i" % reqid)
     else:
-        return render_to_response(
+        return render(
             "error.html", {"error": "no update id generated", "user": request.user}
         )
 
@@ -919,7 +921,7 @@ def gwsrequest_list(request):
         "items": items,
     }
 
-    return render_to_response("cedainfoapp/gwsrequest_list.html", c)
+    return render("cedainfoapp/gwsrequest_list.html", c)
 
 
 @login_required()
@@ -930,7 +932,7 @@ def gwsrequest_detail(request, id):
         "item": item,
         "form": form,
     }
-    return render_to_response("cedainfoapp/gwsrequest_detail.html", c)
+    return render("cedainfoapp/gwsrequest_detail.html", c)
 
 
 # list of VMRequests presented for external viewers
@@ -975,7 +977,7 @@ def vmrequest_list(request):
     #        'items': items,
     #    })
     #    c.update(csrf(request))
-    return render_to_response("cedainfoapp/vmrequest_list.html", ctx)
+    return render(request, "cedainfoapp/vmrequest_list.html", ctx)
 
 
 def check_dns_entry(hostname):
@@ -999,7 +1001,7 @@ def vmrequest_detail(request, id):
         "item": item,
         "form": form,
     }
-    return render_to_response("cedainfoapp/vmrequest_detail.html", c)
+    return render(request, "cedainfoapp/vmrequest_detail.html", c)
 
 
 # toggle operational status of a VM
@@ -1008,7 +1010,7 @@ def change_status(request, id):
     vm = VM.objects.get(pk=id)
     error = vm.change_status()
     if error:
-        return render_to_response("error.html", {"error": error, "user": request.user})
+        return render(request, "error.html", {"error": error, "user": request.user})
     else:
         return redirect(request.META["HTTP_REFERER"])
 
@@ -1046,7 +1048,7 @@ def gws_list(request):
         "total_volume": total_volume,
     }
 
-    return render_to_response("cedainfoapp/gws_list.html", c)
+    return render(request, "cedainfoapp/gws_list.html", c)
 
 
 # GWS dashboard
@@ -1060,7 +1062,7 @@ def gws_dashboard(request):
         },
     )
     c.update(csrf(request))
-    return render_to_response("cedainfoapp/gws_dashboard.html", c)
+    return render(request, "cedainfoapp/gws_dashboard.html", c)
 
 
 # do du for a gws and redirect back to gws list
@@ -1083,7 +1085,8 @@ def gwsdf(request, id):
 # needs to be public to interact with scripts.
 def gws_list_etexport(request):
     gwss = GWS.objects.filter(status="active")
-    return render_to_response(
+    return render(
+        request, 
         "cedainfoapp/gws_list_etexport.html", {"items": gwss}, content_type="text/plain"
     )
 
@@ -1356,7 +1359,7 @@ def service_list_by_vm(request):
             vm.prodservices = recs
             vms.append(vm)
 
-    return render_to_response("services/list_by_vm.html", locals())
+    return render(request, "services/list_by_vm.html", locals())
 
 
 @login_required()
@@ -1397,7 +1400,7 @@ def service_internet_facing(request):
             vm.prodservices = recs
             vms.append(vm)
 
-    return render_to_response("services/internet_facing_service_list.html", locals())
+    return render(request, "services/internet_facing_service_list.html", locals())
 
 
 @login_required()
@@ -1460,7 +1463,7 @@ def service_unusedvms(request):
             vm.nservices = len(services)
             vms.append(vm)
 
-    return render_to_response("services/list_unused_vms.html", locals())
+    return render(request, "services/list_unused_vms.html", locals())
 
 
 @login_required()
@@ -1503,7 +1506,7 @@ def service_review_selection(request):
 
     services = services.order_by(sort_headers.get_order_by())
 
-    return render_to_response("services/review_selection.html", locals())
+    return render(request, "services/review_selection.html", locals())
 
 
 @login_required()
@@ -1521,7 +1524,7 @@ def uptimerobot_monitors(request):
                     monitor["has_service"] = True
                     break
 
-    return render_to_response("cedainfoapp/uptimerobot_monitors.html", locals())
+    return render(request, "cedainfoapp/uptimerobot_monitors.html", locals())
 
 
 @login_required()
@@ -1558,11 +1561,105 @@ def service_uptime_robot_check(request):
             if res:
                 service.monitor = res
 
-    return render_to_response(
+    return render(
+        request, 
         "services/service_uptime_robot_check.html",
         locals(),
     )
 
+@login_required()
+def service_cert_check(request):
+
+    HEADERS = (
+        ("Service name", "name"),
+        ("Visibility", "visibility"),
+        ("Status", "status"),
+        ("Service url", "url"),
+    )
+
+    orderby = None
+
+    if request.method == 'GET' and 'orderby' in request.GET:
+        orderby = request.GET['orderby']
+
+    sort_headers = SortHeaders(request, HEADERS)
+
+    headers = list(sort_headers.headers())
+
+    services = NewService.objects.filter(status="production")
+    services = services.order_by(sort_headers.get_order_by())
+
+    for service in services:
+        service.cert_expire_date = '01-jan-1900'
+        service.cert_issuer = ''
+
+        if service.url:
+            service.domain = get_domain(service.url)
+
+            if check_dns_entry(service.domain):
+                (expireDate, issuer) = get_certificate_details (service.domain)
+
+                if issuer:
+                    service.cert_issuer = issuer
+                if expireDate:
+                    service.cert_expire_date = expireDate
+
+    if orderby == 'cert-issuer':
+        services = sorted(services, key=lambda d: d.cert_issuer) 
+    if orderby == 'cert-expire-date':
+        services = sorted(services, key=lambda d: datetime.datetime.strptime(d.cert_expire_date, "%d-%b-%Y"))
+
+
+    return render(
+        request,
+        "services/cert_check.html",
+        locals(),
+    )
+
+def get_domain (url):
+
+    domain = url.replace('https://', '')
+    domain = domain.replace('http://', '')
+    loc = domain.find('/')
+
+    if loc != -1:
+        domain = domain[0:loc]
+    
+    domain = domain.strip()
+
+    return domain
+
+def fetch_certificate (domain):
+     
+    PORT = 443
+
+    try:
+        context = ssl.create_default_context()
+        with socket.create_connection((domain, PORT), timeout=5) as sock:
+            with context.wrap_socket(sock, server_hostname=domain) as ssock:
+                certificate = ssock.getpeercert()
+
+        return certificate
+    except:
+        return None           
+
+def get_certificate_details (domain):
+
+    certificate = fetch_certificate(domain)
+    expireDate = None
+    issuer = None
+
+    if certificate:
+        expireDate = datetime.datetime.strptime(certificate["notAfter"], "%b %d %H:%M:%S %Y %Z")
+        expireDate = datetime.datetime.strftime(expireDate, '%d-%b-%Y')
+        issuer_full = certificate["issuer"][2][0][1]
+        
+        if issuer_full == 'R3':
+            issuer = "LetsEncrypt"
+        else:
+            issuer = "Other"
+
+    return (expireDate, issuer)
 
 @login_required()
 def service_doc_check(request):
@@ -1629,7 +1726,7 @@ def service_doc_check(request):
         if not found:
             not_in_cedainfodb.append(url)
 
-    return render_to_response("services/doc_check.html", locals())
+    return render(request, "services/doc_check.html", locals())
 
 
 @login_required()
@@ -1647,7 +1744,7 @@ def decomissioned_service_doc_check(request):
             service.url_ok = _url_exists(service.documentation)
             in_current.append(service)
 
-    return render_to_response("services/decomissioned_doc_check.html", locals())
+    return render(request, "services/decomissioned_doc_check.html", locals())
 
 
 @login_required()
@@ -1671,7 +1768,7 @@ def vm_ping_check(request):
     #        if len(missing) > 2:
     #            break
 
-    return render_to_response("vm_ping_check.html", locals())
+    return render(request, "vm_ping_check.html", locals())
 
 
 def _url_exists(url):
@@ -1734,7 +1831,7 @@ def service_owner_manager_list(request):
         if total > 0:
             counts.append(rec)
 
-    return render_to_response("services/service_owner_manager_list.html", locals())
+    return render(request, "services/service_owner_manager_list.html", locals())
 
 
 @login_required()
@@ -1794,7 +1891,7 @@ def service_list_for_team_members(request):
         status="active"
     )
 
-    return render_to_response("services/list_services_for_team_members.html", locals())
+    return render(request, "services/list_services_for_team_members.html", locals())
 
 
 # @login_required()
@@ -1810,4 +1907,4 @@ def service_list_for_team_members(request):
 #    owner_services = NewService.objects.filter(owner__username=username).order_by('name')
 #    owner_services = owner_services.filter(status='production') | owner_services.filter(status='pre-production')
 #
-#    return render_to_response('services/list_services_for_team_members.html', locals())
+#    return render('services/list_services_for_team_members.html', locals())
