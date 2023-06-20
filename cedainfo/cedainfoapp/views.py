@@ -1574,6 +1574,7 @@ def service_cert_check(request):
         ("Service name", "name"),
         ("Visibility", "visibility"),
         ("Status", "status"),
+        ("Host", "host"),
         ("Service url", "url"),
     )
 

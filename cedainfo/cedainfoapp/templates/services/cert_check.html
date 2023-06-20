@@ -3,8 +3,10 @@
 {% block content %}
 
 <h1>Service certificate check</h1>
-
-
+Lists the certificate status for all production services. Certificate details come from the live services. A certificate
+type of 'other' usually means the certificate
+was obtained via STFC IT services. Click on column headings to sort the table.
+<p></p>
 <table border="1">
 
   {% for header in headers %}
@@ -15,7 +17,6 @@
   </th>
   {% endfor %}
   <th><a href="{{request.path}}?orderby=cert-issuer">Cert issuer</a></th>
-  <th>Domain (tmp)</th>
   <th><a href="{{request.path}}?orderby=cert-expire-date">Cert expire date</a></th>
 
   {% for service in services %}
@@ -24,9 +25,9 @@
     <td><a href="/admin/cedainfoapp/newservice/{{service.id}}">{{service.name}}</a>
     <td>{{service.visibility}}
     <td>{{service.status}}
+    <td>{{service.host}}</td> 
     <td><a href="{{service.url}}">{{service.url}}</a></td>
     <td>{{service.cert_issuer}}</td>
-    <td>{{service.domain}}</td>
 
     {% if service.cert_expire_date == '01-jan-1900' %}
     <td></td>
