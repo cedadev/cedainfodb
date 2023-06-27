@@ -84,19 +84,19 @@ WSGI_APPLICATION = 'cedainfo.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'cedainfo',                      # Or path to database file if using sqlite3.
-        'USER': 'cedainfo',                      # Not used with sqlite3.
-        'PASSWORD': 'xxx',                  # Not used with sqlite3.
-        'HOST': 'db-test1.ceda.ac.uk',                      # Set to empty string for localhost. Not used with sqlite3.
+        'NAME': '',                      # Or path to database file if using sqlite3.
+        'USER': '',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
+        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     },
 
     'userdb': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'userdb',                      # Or path to database file if using sqlite3.
-        'USER': 'badc',                      # Not used with sqlite3.
-        'PASSWORD': 'xxx',                  # Not used with sqlite3.
-        'HOST': 'db-test1.ceda.ac.uk',                      # Set to empty string for localhost. Not used with sqlite3.
+        'NAME': '',                      # Or path to database file if using sqlite3.
+        'USER': '',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
+        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 
@@ -310,7 +310,7 @@ ADMIN_USERS_PATCH_RESPONSIBLE = [
 #
 LDAP_URL       = 'ldap://homer.esc.rl.ac.uk'
 LDAP_WRITE_URL    = LDAP_URL
-LDAP_WRITE_PASSWD = 'xxx'
+LDAP_WRITE_PASSWD = ''
 LDAP_WRITE_DN     = 'cn=cedaadmin,ou=software,ou=People,o=hpc,dc=rl,dc=ac,dc=uk'
 
 ADDITIONAL_LDAP_GROUP_FILE = "/datacentre/opshome/etc/infrastructure/accounts/ldap/ldap_additional_groups.txt"
