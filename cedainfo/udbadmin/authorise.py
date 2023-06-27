@@ -165,7 +165,7 @@ def authorise_datasets(request, userkey):
 
                mailmsg = Popen([cmd, "%s" % userkey], stdout=PIPE).communicate()[0] 
 
-        return render_to_response ('authorise_datasets_response.html', locals())
+        return render (request, 'authorise_datasets_response.html', locals())
       
    
    try:
@@ -197,7 +197,7 @@ def authorise_datasets(request, userkey):
    authorisors = SiteUser.objects.all()
 
    user = request.user
-   return render_to_response('authorise_datasets.html', locals())
+   return render (request, 'authorise_datasets.html', locals())
 
 def get_dataset_authoriser_string (datasetid):
 #

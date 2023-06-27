@@ -65,7 +65,7 @@ DATASET_USERS_HEADERS = (
 @login_required()
 def home(request):
     user = request.user
-    return render_to_response('home.html', locals())
+    return render (request, 'home.html', locals())
 
 @login_required()
 def user_edit_by_accountid(request, accountid):
@@ -159,7 +159,7 @@ def list_keys(request):
     if sort_headers.get_order_by() == 'length':          
         cedausers = sorted(cedausers, key=itemgetter('key_length'))
      
-    return render_to_response('list_keys.html', locals())
+    return render (request, 'list_keys.html', locals())
 
     
 @login_required()
@@ -180,7 +180,7 @@ def list_current_user_datasets(request, userkey):
     headers = list(sort_headers.headers())
     datasets=cedauser.datasetjoin_set.all().filter(removed__exact=0).order_by(sort_headers.get_order_by())
 
-    return render_to_response('list_current_user_datasets.html', locals())
+    return render (request, 'list_current_user_datasets.html', locals())
 
 @login_required()
 def list_removed_user_datasets(request, userkey):
@@ -192,7 +192,7 @@ def list_removed_user_datasets(request, userkey):
     headers = list(sort_headers.headers())
     datasets=cedauser.datasetjoin_set.all().filter(removed__exact=-1).order_by(sort_headers.get_order_by())
 
-    return render_to_response('list_removed_user_datasets.html', locals())
+    return render (request, 'list_removed_user_datasets.html', locals())
 
 
 @login_required()
@@ -210,7 +210,7 @@ def dataset_details(request, datasetid):
    authorisers = get_dataset_authorisers(dataset.datasetid)
    viewers = get_dataset_viewers(dataset.datasetid)
       
-   return render_to_response('dataset_details.html', locals())
+   return render (request, 'dataset_details.html', locals())
 
 
 def get_dataset_authorisers (datasetid):
@@ -299,7 +299,7 @@ def edit_user_dataset_join (request, id):
    
    authorisors = SiteUser.objects.exclude(last_name__exact="").order_by('first_name') 
 
-   return render_to_response('edit_user_dataset_join.html', locals())
+   return render (request, 'edit_user_dataset_join.html', locals())
 
 
 @login_required()
@@ -338,7 +338,7 @@ def edit_dataset_request (request, id):
    
    authorisors = SiteUser.objects.exclude(last_name__exact="").order_by('first_name') 
 
-   return render_to_response('edit_dataset_request.html', locals())
+   return render (request, 'edit_dataset_request.html', locals())
 
 @login_required()
 def change_user_password(request, userkey):
@@ -352,7 +352,7 @@ def change_user_password(request, userkey):
         cedauser.secret_data = generate_hash_data(password.strip())
         cedauser.save()
 
-    return render_to_response('change_user_password.html', locals())
+    return render (request, 'change_user_password.html', locals())
 
 @login_required()
 def add_user_datasets(request, userkey):
@@ -379,7 +379,7 @@ def add_user_datasets(request, userkey):
 
          return redirect ('/udbadmin/udj/%s' % udj.id)
  
-   return render_to_response('add_user_dataset.html', locals())
+   return render( request, 'add_user_dataset.html', locals())
 
 
 @login_required()
@@ -408,7 +408,7 @@ def list_users_for_dataset(request, datasetid):
     except:
        return HttpResponse('dataset not found')
 
-    return render_to_response('list_users_for_dataset.html', locals())
+    return render (request, 'list_users_for_dataset.html', locals())
 
 @login_required()
 def list_accounts_for_dataset(request, datasetid):
@@ -429,7 +429,7 @@ def list_accounts_for_dataset(request, datasetid):
     accounts = list(set(accounts))
     accounts.sort()        
         
-    return render_to_response('list_accounts_for_dataset.html', locals())
+    return render (request, 'list_accounts_for_dataset.html', locals())
 
 
 @login_required()
@@ -443,4 +443,4 @@ def list_users_email_for_dataset(request, datasetid):
     except:
        return HttpResponse('Not found')
        
-    return render_to_response('list_users_email_for_dataset.html', locals())
+    return render (request, 'list_users_email_for_dataset.html', locals())
