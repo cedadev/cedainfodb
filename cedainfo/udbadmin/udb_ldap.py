@@ -205,6 +205,7 @@ def all_users(order_by="userkey"):
        optionally the results can be ordered by the given field'''
 
     sql = "select distinct tbusers.* from tbusers where tbusers.jasminaccountid !=''" + \
+          " and tbusers.accounttype != 'None' " + \
           "order by %s" % order_by
     
 #    sql = "select distinct tbusers.* from tbusers, tbdatasetjoin where (tbusers.userkey=tbdatasetjoin.userkey)" + \

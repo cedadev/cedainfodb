@@ -311,7 +311,7 @@ class NewServiceAdmin(admin.ModelAdmin):
     vm_os. short_description = "OS"
     
     list_display = ('name', 'startdate', docs, vm_name, url, 'review_status', 'last_reviewed', 'visibility', 'status', 'priority','service_manager', 'owner')
-    list_editable = ('priority',)
+#    list_editable = ('priority',)
     list_filter = ('visibility', 'priority', 'status', 'review_status', 'keywords', ManagerFilter, OwnerFilter, ServiceHostFilter, SystemManagerFilter, VMStatusFilter)
     search_fields = ('description', 'review_info', 'name', 'url', 'host__name')
     ordering = ('name',)

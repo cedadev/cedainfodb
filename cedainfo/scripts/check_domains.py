@@ -29,19 +29,18 @@ def fetch_certificate (domain):
      
     PORT = 443
 
-    try:
-        context = ssl.create_default_context()
-        with socket.create_connection((domain, PORT), timeout=5) as sock:
-            with context.wrap_socket(sock, server_hostname=domain) as ssock:
-                certificate = ssock.getpeercert()
+    context = ssl.create_default_context()
+    with socket.create_connection((domain, PORT), timeout=30) as sock:
+        with context.wrap_socket(sock, server_hostname=domain) as ssock:
+            certificate = ssock.getpeercert()
 
-        return certificate
-    except:
-        return None           
-
+    return certificate
+       
+       
 def get_certificate_details (domain):
 
     certificate = fetch_certificate(domain)
+    
     expireDate = None
     issuer = None
 
