@@ -571,7 +571,7 @@ class Datasetrequest(models.Model):
         try:
             keycloak_user, _ = KeycloakUser.get_or_create(self.userkey)
             keycloak_user.set_group(self.datasetid.datasetid)
-            LOG.error("Keycloak account ({0}) group set for '{1}'".format(keycloak_user.id, self.userkey.accountid))
+            LOG.info("Keycloak account ({0}) group set for '{1}'".format(keycloak_user.id, self.userkey.accountid))
         except Exception as e:
             LOG.error("Error setting Keycloak group for user '{0}': {1}".format(self.userkey.accountid, e))
             raise e
