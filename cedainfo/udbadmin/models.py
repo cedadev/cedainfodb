@@ -565,17 +565,17 @@ class Datasetrequest(models.Model):
                         expiredate=expireDate,
                         agreement=self.agreement)
         b.save()
-
-        # Set new password in Keycloak
-        LOG.info("Setting Keycloak group at {0} for user '{1}'".format(settings.KEYCLOAK_URL, self.userkey.accountid))
+	    
+#       Add user to group in keycloak
+        LOG.info("Setting Keycloak group {0} at {1} for user '{2}'".format(self.datasetid.datasetid, settings.KEYCLOAK_URL, self.userkey.accountid))
         try:
             keycloak_user, _ = KeycloakUser.get_or_create(self.userkey)
             keycloak_user.set_group(self.datasetid.datasetid)
-            LOG.info("Keycloak account ({0}) group set for '{1}'".format(keycloak_user.id, self.userkey.accountid))
+            LOG.info("Keycloak account ({0}) group {1} set for '{2}'".format(keycloak_user.id, self.datasetid.datasetid, self.userkey.accountid))
         except Exception as e:
-            LOG.error("Error setting Keycloak group for user '{0}': {1}".format(self.userkey.accountid, e))
+            LOG.error("Error setting Keycloak group {0} for user '{1}': {2}".format(self.datasetid.datasetid, self.userkey.accountid, e))
             raise e
-
+       
         self.status = self.ACCEPTED
         self.save()
 
