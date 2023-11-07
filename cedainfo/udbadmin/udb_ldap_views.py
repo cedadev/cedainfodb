@@ -535,4 +535,4 @@ def write_to_ldap_server(request):
             output = LDAP.ldif_write(ldif)
 #           return HttpResponse(out, content_type="text/html")
  
-    return render_to_response('write_to_ldap_server.html', locals())
+    return render(request, 'write_to_ldap_server.html', locals())
