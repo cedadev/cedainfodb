@@ -2384,7 +2384,7 @@ class VMRequest(models.Model):
         max_length=127, choices=settings.VM_NETWORK_ACTIVITY_REQUIRED_CHOICES
     )
     os_required = models.CharField(
-        max_length=127, choices=settings.VM_OS_REQUIRED_CHOICES, default="centos7"
+        max_length=127, choices=settings.VM_OS_REQUIRED_CHOICES, default="rocky9"
     )
     other_info = models.TextField(blank=True)
     patch_responsible = models.ForeignKey(

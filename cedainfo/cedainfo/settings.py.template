@@ -259,6 +259,7 @@ VM_NETWORK_ACTIVITY_REQUIRED_CHOICES = (
     ('heavy','heavy'),
 )
 VM_OS_REQUIRED_CHOICES = (
+    ('rocky9', 'rocky9'),
     ('centos7','centos7'),
     ('centos6','centos6'),
     ('rhel7','rhel7'),
@@ -308,7 +309,7 @@ ADMIN_USERS_PATCH_RESPONSIBLE = [
 #
 # Url for LDAP server
 #
-LDAP_URL       = 'ldap://homer.esc.rl.ac.uk'
+LDAP_URL       = ''
 LDAP_WRITE_URL    = LDAP_URL
 LDAP_WRITE_PASSWD = ''
 LDAP_WRITE_DN     = 'cn=cedaadmin,ou=software,ou=People,o=hpc,dc=rl,dc=ac,dc=uk'
@@ -321,3 +322,10 @@ SIZEFIELD_AMBIGUOUS_SUFFIX = False
 SIZEFIELD_ASSUME_BINARY = False
 
 PROJECT_DIR = BASE_DIR
+
+
+KEYCLOAK_URL = "https://accounts.ceda.ac.uk/"
+KEYCLOAK_ADMIN_CLIENT = "admin-cli"
+KEYCLOAK_ADMIN_USER = ""
+KEYCLOAK_ADMIN_PASSWORD = ""
+KEYCLOAK_VERIFY = True
