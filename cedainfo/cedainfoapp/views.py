@@ -1604,6 +1604,8 @@ def service_cert_check(request):
                     service.cert_issuer = issuer
                 if expireDate:
                     service.cert_expire_date = expireDate
+                else:
+                    service.cert_invalid = True
 
     if orderby == 'cert-issuer':
         services = sorted(services, key=lambda d: d.cert_issuer) 

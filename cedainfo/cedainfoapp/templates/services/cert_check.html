@@ -27,7 +27,13 @@ was obtained via STFC IT services (see <a href="https://ceda-internal.helpscoutd
     <td>{{service.visibility}}
     <td>{{service.status}}
     <td>{{service.host}}</td> 
-    <td><a href="{{service.url}}">{{service.url}}</a></td>
+
+    {% if service.cert_invalid %}
+        <td><a href="{{service.url}}"><span style="color:red">{{service.url}}</span></a></td>
+    {% else %}
+        <td><a href="{{service.url}}">{{service.url}}</a></td>    
+    {% endif %}
+    
     <td>{{service.cert_issuer}}</td>
 
     {% if service.cert_expire_date == '01-jan-1900' %}
