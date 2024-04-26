@@ -574,7 +574,7 @@ class Datasetrequest(models.Model):
             LOG.info("Keycloak account ({0}) group {1} set for '{2}'".format(keycloak_user.id, self.datasetid.datasetid, self.userkey.accountid))
         except Exception as e:
             LOG.error("Error setting Keycloak group {0} for user '{1}': {2}".format(self.datasetid.datasetid, self.userkey.accountid, e))
-            raise e
+            ##raise e
        
         self.status = self.ACCEPTED
         self.save()
