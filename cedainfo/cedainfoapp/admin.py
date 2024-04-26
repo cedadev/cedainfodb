@@ -248,6 +248,27 @@ class VMStatusFilter(SimpleListFilter):
         else:
             return queryset
 
+
+
+class ProductionDeploymentFilter(SimpleListFilter):
+    title = 'Production deployments'
+    parameter_name = 'deployment'
+
+    def lookups(self, request, model_admin):
+ 
+        return [('pages', 'GitHub pages'), ('vm', 'VM')]
+
+    def queryset(self, request, queryset):
+
+        if self.value() == 'vm':
+            return NewService.objects.exclude(host__name__startswith='00').filter(status='production')
+ 
+        elif self.value() == 'pages':
+            return queryset.filter(status='production').filter(host__name='00 GitHub Pages')
+        else:
+            return queryset
+
+
 class NewServiceAdmin(admin.ModelAdmin):
     #    def wikiLink(self):
     #        url = self.documentation
@@ -312,7 +333,7 @@ class NewServiceAdmin(admin.ModelAdmin):
     
     list_display = ('name', 'startdate', docs, vm_name, url, 'review_status', 'last_reviewed', 'visibility', 'status', 'priority','service_manager', 'owner')
 #    list_editable = ('priority',)
-    list_filter = ('visibility', 'priority', 'status', 'review_status', 'keywords', ManagerFilter, OwnerFilter, ServiceHostFilter, SystemManagerFilter, VMStatusFilter)
+    list_filter = ('visibility', 'priority', 'status', 'review_status', 'keywords', ManagerFilter, OwnerFilter, ServiceHostFilter, SystemManagerFilter, VMStatusFilter, ProductionDeploymentFilter)
     search_fields = ('description', 'review_info', 'name', 'url', 'host__name')
     ordering = ('name',)
 

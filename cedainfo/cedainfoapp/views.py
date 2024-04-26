@@ -1908,9 +1908,13 @@ def service_stats (request):
     data_array.append(['GitHub pages', len(services.filter(host__name='00 GitHub Pages'))])
     data_array.append(['Cloud VM', len(services.filter(host__name='00 cloud'))])
     data_array.append(['kubernetes', len(services.filter(host__name='00 kubernetes'))])    
-    data_array.append(['VM', len(services.filter(host__name='00 unspecified'))])
+    data_array.append(['Hosted elsewhere', len(services.filter(host__name='00 unspecified'))])
     data_array.append(['R9', len(services.filter(host__name='00 unspecified R9'))])
-            
+ #
+ # Assume that any service that does not have a hostname starting with '00' is a regular VM deployment
+ #   
+    data_array.append(['VM', len(NewService.objects.exclude(host__name__startswith='00').filter(status='production'))])
+                
     h_title = 'Production services by deployment type'	    
     return render(request, "services/stats.html", locals())
 
