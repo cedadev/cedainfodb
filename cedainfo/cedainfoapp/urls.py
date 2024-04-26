@@ -25,6 +25,7 @@ urlpatterns = [
     url(r"^services/review/$", service_review_selection),
     url(r"^services/doc-check/$", service_doc_check),
     url(r"^services/decomissioned-doc-check/$", decomissioned_service_doc_check),
+    url(r"^services/stats/$", service_stats),
     url(r"^vm-ping-check/$", vm_ping_check),
     url(r"^txt/hosts/$", txt_host_list),
     url(r"^txt/vms/(?P<vmname>.*)$", txt_vms_list),

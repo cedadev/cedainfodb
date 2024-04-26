@@ -1897,6 +1897,24 @@ def service_list_for_team_members(request):
     return render(request, "services/list_services_for_team_members.html", locals())
 
 
+
+@login_required()
+def service_stats (request):
+ 
+    services = NewService.objects.filter(status="production").order_by("name")
+    
+    data_array = []
+    
+    data_array.append(['GitHub pages', len(services.filter(host__name='00 GitHub Pages'))])
+    data_array.append(['Cloud VM', len(services.filter(host__name='00 cloud'))])
+    data_array.append(['kubernetes', len(services.filter(host__name='00 kubernetes'))])    
+    data_array.append(['VM', len(services.filter(host__name='00 unspecified'))])
+    data_array.append(['R9', len(services.filter(host__name='00 unspecified R9'))])
+            
+    h_title = 'Production services by deployment type'	    
+    return render(request, "services/stats.html", locals())
+
+
 # @login_required()
 # def service_list_for_team_members (request):
 #
