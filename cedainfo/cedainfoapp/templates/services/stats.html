@@ -1,4 +1,7 @@
-<head>
+{% extends "base_site.html" %}
+
+{% block content %}
+
     <!--Load the AJAX API-->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
@@ -20,7 +23,7 @@
         data.addColumn('number', 'Services');
         data.addRows({{data_array|safe}});	
 
-        var options = {'title': '{{h_title|safe}}',
+        var options = {'title': '',
                        'width':800,
                        'height':600};
 
@@ -28,22 +31,29 @@
         chart.draw(data, options);
       }
     </script>
-  </head>
+ 
 
-
-<table>
+<table border=0>
+<tr><td colspan="2" align="center"><h2>Production services by deployment type</h2></td></tr>
 <tr>
   <td><div id="chart_div"</div></td>
   <td>
+  <p/>
+  <h3>View details for production services in each deployment category:</h3>
   <ul>
   <li><a href="/admin/cedainfoapp/newservice/?Host=598&status__exact=production">GitHub pages</a>
+  <p/>
   <li><a href="/admin/cedainfoapp/newservice/?Host=576&status__exact=production">Cloud VM</a>
+  <p/>
   <li><a href="/admin/cedainfoapp/newservice/?Host=575&status__exact=production">Kubernetes</a>
-  
+  <p/>
   <li><a href="/admin/cedainfoapp/newservice/?Host=198&status__exact=production">Hosted elsewhere/other hosting</a>
+  <p/>
   <li><a href="/admin/cedainfoapp/newservice/?Host=607&status__exact=production">R9</a>  
+  <p/>
   <li><a href="/admin/cedainfoapp/newservice/?deployment=vm">VM </a>    
   </ul>
   </td>
 </tr>
 <table>
+{% endblock %}
