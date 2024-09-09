@@ -1657,7 +1657,7 @@ def get_certificate_details (domain):
         expireDate = datetime.datetime.strftime(expireDate, '%d-%b-%Y')
         issuer_full = certificate["issuer"][2][0][1]
         
-        if issuer_full == 'R3':
+        if issuer_full == 'R10':
             issuer = "LetsEncrypt"
         else:
             issuer = "Other"
