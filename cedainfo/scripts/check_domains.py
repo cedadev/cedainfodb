@@ -8,7 +8,7 @@
 import sys
 
 from cedainfoapp.models import *
-from datetime import datetime
+import datetime
 import OpenSSL
 import ssl
 
@@ -25,35 +25,40 @@ def check_dns_entry(hostname):
     except:
         return False
 
+
 def fetch_certificate (domain):
      
     PORT = 443
 
-    context = ssl.create_default_context()
-    with socket.create_connection((domain, PORT), timeout=30) as sock:
-        with context.wrap_socket(sock, server_hostname=domain) as ssock:
-            certificate = ssock.getpeercert()
+    try:
+        context = ssl.create_default_context()
+        with socket.create_connection((domain, PORT), timeout=5) as sock:
+            with context.wrap_socket(sock, server_hostname=domain) as ssock:
+                certificate = ssock.getpeercert()
 
-    return certificate
-       
+        return certificate
+    except:
+        return None           
        
 def get_certificate_details (domain):
 
     certificate = fetch_certificate(domain)
-    
     expireDate = None
     issuer = None
 
     if certificate:
-        expireDate = datetime.strptime(certificate["notAfter"], "%b %d %H:%M:%S %Y %Z")
+        expireDate = datetime.datetime.strptime(certificate["notAfter"], "%b %d %H:%M:%S %Y %Z")
+        expireDate = datetime.datetime.strftime(expireDate, '%d-%b-%Y')
         issuer_full = certificate["issuer"][2][0][1]
         
-        if issuer_full == 'R3':
+        if issuer_full == 'R10' or issuer_full == 'R11' or issuer_full == 'E5' or issuer_full == 'E6':
             issuer = "LetsEncrypt"
         else:
             issuer = "Other"
 
     return (expireDate, issuer)
+       
+
 
 def run():
 
@@ -69,7 +74,7 @@ def run():
             (expireDate, issuer) = get_certificate_details (domain)
 
             if (expireDate):
-                print (datetime.strftime(expireDate, '%d-%b-%Y'), issuer, end="") 
+                print (expireDate, issuer, end="") 
 
         else:
             print ('No DNS', end=" ")
