@@ -11,6 +11,7 @@ from django.contrib.auth.models import Group
 #admin.site.unregister(Group)
 
 
+@admin.register(Datasetjoin)
 class DatasetjoinAdmin(admin.ModelAdmin):
 
    def has_add_permission(self, request, obj=None):
@@ -22,7 +23,6 @@ class DatasetjoinAdmin(admin.ModelAdmin):
    def editLink(self):
       url = "/%s/udj/%s" % (self._meta.app_label, self.id)
       return mark_safe('<a href="%s">Edit</a>' % url)
-   editLink.allow_tags = True
    editLink.short_description = 'Edit'
    
    list_display = (editLink, 'userkey', 'datasetid', 'ver', 'research', 'expiredate', 'removed')
@@ -31,10 +31,10 @@ class DatasetjoinAdmin(admin.ModelAdmin):
    search_fields =['research']
 
 
-admin.site.register(Datasetjoin, DatasetjoinAdmin)
 
 
 
+@admin.register(Dataset)
 class DatasetAdmin(admin.ModelAdmin):
 
    form = DatasetForm
@@ -47,7 +47,6 @@ class DatasetAdmin(admin.ModelAdmin):
 
    def showUsers (self):
       return  mark_safe ('<a href="/udbadmin/dataset/users/%s">Users</a>' % self.datasetid)
-   showUsers.allow_tags = True
    showUsers.short_description = 'Show users'   
 
    list_display = ('datasetid', 'authtype', 'grp', 'description', 'datacentre', showUsers)
@@ -66,9 +65,9 @@ class DatasetAdmin(admin.ModelAdmin):
            return ('datasetid',) + self.readonly_fields
        return self.readonly_fields   
        
-admin.site.register(Dataset, DatasetAdmin)
 
 
+@admin.register(Institute)
 class InstituteAdmin(admin.ModelAdmin):
 
 #
@@ -83,8 +82,8 @@ class InstituteAdmin(admin.ModelAdmin):
    list_filter = ('type', 'country')
    search_fields = ('name',)
 
-admin.site.register(Institute, InstituteAdmin)
     
+@admin.register(User)
 class UserAdmin(admin.ModelAdmin):
 
     form = UserForm
@@ -206,8 +205,8 @@ class UserAdmin(admin.ModelAdmin):
             )
        
 
-admin.site.register(User, UserAdmin)
 
+@admin.register(Datasetrequest)
 class DatasetrequestAdmin(admin.ModelAdmin):
 
    def has_add_permission(self, request, obj=None):
@@ -226,14 +225,12 @@ class DatasetrequestAdmin(admin.ModelAdmin):
    def accountidLink(self):
       return mark_safe('<a href="/admin/%s/user/%s" title="View user details">%s</a>' % (self._meta.app_label, self.userkey, self.accountid()) )
 
-   accountidLink.allow_tags = True         
    accountidLink.admin_order_field = 'userkey__accountid'
    accountidLink.short_description = 'AccountID'
                
    def authoriseLink(self):
       url = "/%s/authorise/%s" % (self._meta.app_label, self.userkey)
       return mark_safe('<a href="%s" target="_blank"><img src="http://artefacts.ceda.ac.uk/graphics/misc/tick.gif"></a>' % url)
-   authoriseLink.allow_tags = True
    authoriseLink.short_description = 'Authorise'
                  
    def nerc(self):
@@ -246,7 +243,6 @@ class DatasetrequestAdmin(admin.ModelAdmin):
    def editLink(self):
       url = "/%s/request/%s" % (self._meta.app_label, self.id)
       return mark_safe('<a href="%s">Edit</a>' % url)
-   editLink.allow_tags = True
    editLink.short_description = 'Edit'
 
                         
@@ -260,9 +256,9 @@ class DatasetrequestAdmin(admin.ModelAdmin):
                  
    search_fields =['research']
 
-admin.site.register(Datasetrequest, DatasetrequestAdmin)
 
 
+@admin.register(Privilege)
 class PrivilegeAdmin(admin.ModelAdmin):
 
    
@@ -272,7 +268,6 @@ class PrivilegeAdmin(admin.ModelAdmin):
    def accountidLink(self):
       return mark_safe('<a href="/admin/%s/user/%s" title="View user details">%s</a>' % (self._meta.app_label, self.userkey, self.accountid()) )
 
-   accountidLink.allow_tags = True         
    accountidLink.admin_order_field = 'userkey__accountid'
    accountidLink.short_description = 'AccountID'
         
@@ -283,9 +278,9 @@ class PrivilegeAdmin(admin.ModelAdmin):
    
    fields = ('userkey',  'type', 'datasetid', 'comment')
 
-admin.site.register(Privilege, PrivilegeAdmin)
 
 
+@admin.register(Datasetexpirenotification)
 class DatasetexpirenotificationAdmin(admin.ModelAdmin):
 
    def has_add_permission(self, request, obj=None):
@@ -300,7 +295,6 @@ class DatasetexpirenotificationAdmin(admin.ModelAdmin):
    readonly_fields = ('id', 'userkey', 'datasetid', 'ver', 'date', 'emailaddress', 'extrainfo')
 #   fields = ('userkey', 'accountid', 'type', 'datasetid', 'comment')
 
-admin.site.register(Datasetexpirenotification, DatasetexpirenotificationAdmin)
 #
 # Remove 'delete selected' option on list page
 #

@@ -64,12 +64,12 @@ class ByteSizeField(forms.CharField):
 # don't need to change in admin interface
 # admin.site.register(AccessStatus)
 
+@admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
     ordering = ('name',)
     list_display = ('name', 'username', 'email')
 
 
-admin.site.register(Person, PersonAdmin)
 
 # admin.site.register(HostHistory)
 # admin.site.register(FileSetSizeMeasurement)
@@ -80,6 +80,7 @@ admin.site.register(Person, PersonAdmin)
 admin.site.register(ServiceKeyword)
 
 
+@admin.register(Host)
 class HostAdmin(admin.ModelAdmin):
     list_display = ('hostname', 'ip_addr', 'serial_no', 'arrival_date', 'host_type', 'hypervisor', 'rack')
     list_filter = ('supplier', 'planned_end_of_life', 'retired_on', 'host_type', 'rack',)
@@ -95,7 +96,6 @@ class HostAdmin(admin.ModelAdmin):
         return super(HostAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-admin.site.register(Host, HostAdmin)
 
 
 # For the service admin we need a form with hosts listed in alphabetical order.
@@ -269,6 +269,7 @@ class ProductionDeploymentFilter(SimpleListFilter):
             return queryset
 
 
+@admin.register(NewService)
 class NewServiceAdmin(admin.ModelAdmin):
     #    def wikiLink(self):
     #        url = self.documentation
@@ -298,7 +299,6 @@ class NewServiceAdmin(admin.ModelAdmin):
             return format_html(mark_safe('<a href="%s" title="View Helpscout documentation">Helpscout</a>' % (self.documentation)))
         else:
             return ''
-    docs.allow_tags = True
     docs.admin_order_field = "documentation"
 
     def url(self):
@@ -306,7 +306,6 @@ class NewServiceAdmin(admin.ModelAdmin):
             return format_html(mark_safe('<a href="%s" title="Service url">%s</a>' % (self.url, self.url)))
         else:
             return ''
-    url.allow_tags = True
     docs.admin_order_field = "url"
 
     def vm_name (self):
@@ -319,7 +318,6 @@ class NewServiceAdmin(admin.ModelAdmin):
             color = 'none'
         
         return format_html('<a href="/admin/cedainfoapp/vm/%s/" title="Status: %s"><span style="color: %s;">%s</span></a>' % (self.host.id, self.host.status, color, self.host.name))
-    vm_name.allow_tags = True
     vm_name.admin_order_field = "host__name"
     
     
@@ -345,7 +343,6 @@ class NewServiceAdmin(admin.ModelAdmin):
     }
 
 
-admin.site.register(NewService, NewServiceAdmin)
 
 
 # customise the Rack admin interface
@@ -396,12 +393,14 @@ actions = ['update_df']
 list_editable = ['status']
 
 
+@admin.action(
+    description="Do a df on selected partitions"
+)
 def update_df(self, request, queryset):
     for i in queryset.all():
         i.df()
 
 
-update_df.short_description = "Do a df on selected partitions"
 ##admin.site.register(Partition, PartitionAdmin)
 
 
@@ -409,12 +408,13 @@ update_df.short_description = "Do a df on selected partitions"
 #    pass
 # admin.site.register(SpatioTemp, SpatioTempAdmin)
 
+@admin.register(Tenancy)
 class TenancyAdmin(admin.ModelAdmin):
     list_display = ('name', 'summary')
     
-admin.site.register(Tenancy, TenancyAdmin)
 
 
+@admin.register(GWSRequest)
 class GWSRequestAdmin(admin.ModelAdmin):
     list_display = (
     'gws_name', 'action_links', 'internal_requester', 'gws_manager', 'volume_filesize', 'et_quota_filesize',
@@ -425,9 +425,9 @@ class GWSRequestAdmin(admin.ModelAdmin):
     search_fields = ('gws_name', 'path')
 
 
-admin.site.register(GWSRequest, GWSRequestAdmin)
 
 
+@admin.register(GWS)
 class GWSAdmin(admin.ModelAdmin):
     list_display = (
     'name', 'path', 'requested_volume_filesize', 'used_volume_filesize', 'et_quota_filesize', 'et_used_filesize',
@@ -442,9 +442,9 @@ class GWSAdmin(admin.ModelAdmin):
         return False
 
 
-admin.site.register(GWS, GWSAdmin)
 
 
+@admin.register(VMRequest)
 class VMRequestAdmin(admin.ModelAdmin):
     list_display = (
     'coloured_vm_name', 'action_links', 'type', 'operation_type', 'internal_requester', 'patch_responsible',
@@ -462,11 +462,11 @@ class VMRequestAdmin(admin.ModelAdmin):
         return super(VMRequestAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-admin.site.register(VMRequest, VMRequestAdmin)
 
    
     
 
+@admin.register(VM)
 class VMAdmin(admin.ModelAdmin):
 
     def os (self):
@@ -514,4 +514,3 @@ class VMAdmin(admin.ModelAdmin):
         return super(VMAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-admin.site.register(VM, VMAdmin)
