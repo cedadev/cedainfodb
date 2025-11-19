@@ -13,7 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url, include
+from django.urls import include, path, re_path
 from django.urls import path
 from django.contrib import admin
 from django.contrib.auth import login
@@ -21,11 +21,11 @@ from django.contrib.auth import views as auth_views
 
 from cedainfoapp.urls import urlpatterns as cedainfoapp_urlpatterns
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    re_path(r'^admin/', admin.site.urls),
     path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
 #    url(r'^accounts/login/$', login, name='login'),
 #    url(r'^accounts/logout/$', logout_then_login),
-    url(r'^udbadmin/', include('udbadmin.urls')),
+    path('udbadmin/', include('udbadmin.urls')),
 #    url(r'^cedainfoapp/', include('cedainfoapp.urls')),    
 ]
 

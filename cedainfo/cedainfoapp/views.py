@@ -404,7 +404,7 @@ def partition_peplerdiagram(request, id):
 def df(request, id):
     part = Partition.objects.get(pk=id)
     part.df()
-    return redirect(request.META["HTTP_REFERER"])
+    return redirect(request.headers["referer"])
 
 
 # do du for a fileset and redirect back to fileset list
@@ -412,7 +412,7 @@ def df(request, id):
 def du(request, id):
     fileset = FileSet.objects.get(pk=id)
     fileset.du()
-    return redirect(request.META["HTTP_REFERER"])
+    return redirect(request.headers["referer"])
 
 
 @login_required()
@@ -811,7 +811,7 @@ def reject_gwsrequest(request, id):
     if error:
         return render("error.html", {"error": error, "user": request.user})
     else:
-        return redirect(request.META["HTTP_REFERER"])
+        return redirect(request.headers["referer"])
 
 
 # approve an existing gwsrequest
@@ -822,7 +822,7 @@ def approve_gwsrequest(request, id):
     if error:
         return render("error.html", {"error": error, "user": request.user})
     else:
-        return redirect(request.META["HTTP_REFERER"])
+        return redirect(request.headers["referer"])
 
 
 # convert an existing gwsrequest into a gws
@@ -833,7 +833,7 @@ def convert_gwsrequest(request, id):
     if error:
         return render("error.html", {"error": error, "user": request.user})
     else:
-        return redirect(request.META["HTTP_REFERER"])
+        return redirect(request.headers["referer"])
 
 
 # create an update request for a GWS
@@ -857,7 +857,7 @@ def reject_vmrequest(request, id):
     if error:
         return render("error.html", {"error": error, "user": request.user})
     else:
-        return redirect(request.META["HTTP_REFERER"])
+        return redirect(request.headers["referer"])
 
 
 # convert an existing vmrequest into a vm
@@ -868,7 +868,7 @@ def approve_vmrequest(request, id):
     if error:
         return render("error.html", {"error": error, "user": request.user})
     else:
-        return redirect(request.META["HTTP_REFERER"])
+        return redirect(request.headers["referer"])
 
 
 # convert an existing vmrequest into a vm
@@ -879,7 +879,7 @@ def convert_vmrequest(request, id):
     if error:
         return render("error.html", {"error": error, "user": request.user})
     else:
-        return redirect(request.META["HTTP_REFERER"])
+        return redirect(request.headers["referer"])
 
 
 # create an update request for a VM
@@ -1012,7 +1012,7 @@ def change_status(request, id):
     if error:
         return render(request, "error.html", {"error": error, "user": request.user})
     else:
-        return redirect(request.META["HTTP_REFERER"])
+        return redirect(request.headers["referer"])
 
 
 # list of actual GWSs presented for external viewers
@@ -1070,7 +1070,7 @@ def gws_dashboard(request):
 def gwsdu(request, id):
     gws = GWS.objects.get(pk=id)
     gws.du()
-    return redirect(request.META["HTTP_REFERER"])
+    return redirect(request.headers["referer"])
 
 
 # do df for a gws and redirect back to gws list
@@ -1078,7 +1078,7 @@ def gwsdu(request, id):
 def gwsdf(request, id):
     gws = GWS.objects.get(pk=id)
     gws.pan_df()
-    return redirect(request.META["HTTP_REFERER"])
+    return redirect(request.headers["referer"])
 
 
 # GWS Manager list, for digestion by Elastic Tape system
