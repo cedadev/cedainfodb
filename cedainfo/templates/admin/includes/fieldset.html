@@ -26,25 +26,25 @@
                         {% else %}
                             {{ field.field }}
                         {% endif %}
-                    {% ifequal field.field.name "documentation" %}
+                    {% if field.field.name == "documentation" %}
                           {% if field.field.value %}
                         
                              <a href="{{field.field.value}}" class="historylink">View {{field.field.contents}}</a>
                           {% endif %}
-                    {% endifequal %}
-                    {% ifequal field.field.name "url" %}
+                    {% endif %}
+                    {% if field.field.name == "url" %}
                           {% if field.field.value %}
                            <br>
                              <a style="background-color: rgb(230, 225, 225);"  href="{{field.field.value}}" target="_blank"   class="historylink">{{field.field.value}}</a>
                         
                           {% endif %}
-                    {% endifequal %}
+                    {% endif %}
 
-                    {% ifequal field.field.name "host" %}
+                    {% if field.field.name == "host" %}
                           {% if field.field.value %}
                              <a href="/admin/cedainfoapp/vm/{{field.field.value}}" class="historylink">View host details{{field.field.contents}}</a>
                           {% endif %}
-                    {% endifequal %}
+                    {% endif %}
 
 
                     {% endif %}
