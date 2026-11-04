@@ -41,8 +41,15 @@ def get_monitors(offset=0):
     return json.loads(data.decode("utf-8"))
 
 if (__name__ == '__main__'):
+
+    import pprint
+
     all_monitors = get_all_monitors()
     all_monitors = sorted(all_monitors, key=lambda d: d["friendly_name"].lower())
+
+    for monitor in all_monitors:
+        pprint.pp (monitor)
+        print ('')
 
    # print (where(all_monitors["id"] == 786954357))
   #  print ((lambda monitor: monitor['id'] == 786954357)(all_monitors))
