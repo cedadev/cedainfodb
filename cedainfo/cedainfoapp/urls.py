@@ -7,13 +7,6 @@ from django.urls import path, re_path
 urlpatterns = [
     path("", home),
     path("home/", home),
-    path("problems/", problems),
-    #  - hosts
-    #   - list view of all hosts
-    path("hosts/", HostList.as_view()),
-    #    url(r'^hosts/$', host_list),
-    #   - list view of hosts subsetted url(e.g. in_pool, not_retired)
-    #    url(r'^hosts/(?P<subset>\w+)$', host_list),
     path("services/uptimerobot/", uptimerobot_monitors),
     path("services/uptimerobot-check/", service_uptime_robot_check),
     path("services/listbyvm/", service_list_by_vm),
@@ -32,8 +25,6 @@ urlpatterns = [
     path("txt/vmrequests/", txt_vm_request_list),
     re_path(r"^txt/services/(?P<vmname>.*)$", txt_service_list),
     re_path(r"^txt/services2/(?P<vmname>.*)$", txt_service_list2),
-    #   - detail view of 1 host, by id
-    path("host/<int:host_id>/", host_detail),
     re_path(r"^vmrequest/(?P<id>\d+)/approve", approve_vmrequest),
     re_path(r"^vmrequest/(?P<id>\d+)/reject", reject_vmrequest),
     re_path(r"^vmrequest/(?P<id>\d+)/convert", convert_vmrequest),

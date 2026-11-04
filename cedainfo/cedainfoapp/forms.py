@@ -54,19 +54,6 @@ class MultipleSelectWithPop(SelectMultiple):
 
         return html+popupplus
 # end of popupplus stuff
-
-# Form for filters when displaying list of GWSRequests
-class GWSRequestListFilterForm(ModelForm):
-    class Meta:
-        model = GWSRequest
-        fields = ('request_status',)
-
-# Form for filters when displaying list of GWSs
-class GWSListFilterForm(ModelForm):
-    class Meta:
-        model = GWS
-        fields = ('status','path')
-    path = ChoiceField(choices=settings.GWS_PATH_CHOICES, required=False)
         
 # Form for filters when displaying list of VMRequests
 class VMRequestListFilterForm(ModelForm):
@@ -83,19 +70,6 @@ class VMRequestDetailForm(ModelForm):
             'name': TextInput(attrs={'size': 80,}),
         }
         exclude = ('',)
-
-# Form for displaying (not editing) a single GWSRequest
-class GWSRequestDetailForm(ModelForm):
-    class Meta:
-        model = GWSRequest
-        # customise some of the widgets
-        widgets = {
-            'name': TextInput(attrs={'size': 80,}),
-            'path': TextInput(attrs={'size': 80,}),
-            'requested_volume': TextInput(attrs={'size': 80,}),
-            'related_url': TextInput(attrs={'size': 80,}),
-        }
-        exclude=('',)
 
 class ServiceForm(ModelForm):
     review_status = ChoiceField(choices=( 
