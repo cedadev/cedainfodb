@@ -13,7 +13,7 @@ from django.template.context_processors import csrf
 
 from . import helpscoutdocs
 
-from udbadmin.SortHeaders import SortHeaders
+from .SortHeaders import SortHeaders
 
 import re
 import requests

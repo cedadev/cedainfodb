@@ -34,41 +34,6 @@ urlpatterns = [
     re_path(r"^txt/services2/(?P<vmname>.*)$", txt_service_list2),
     #   - detail view of 1 host, by id
     path("host/<int:host_id>/", host_detail),
-    # Recreate the SDDCS "nodelist" file as a view
-    # url(r'^nodelist$', nodelist),
-    path("fileset/index/", fileset_list),
-    path("fileset/second_copy_rsyncs/", make_secondary_copies),
-    path("fileset/primary_on_tape/", primary_on_tape),
-    path("fileset/download_conf/", download_conf),
-    path("fileset/complete/", complete_filesets),
-    path("fileset/spotlist/", spotlist),
-    path("fileset/underallocated/", underallocated_fs),
-    re_path(r"^fileset/(?P<id>\d+)/markcomplete", markcomplete),
-    path("fileset/<int:id>/du", du),
-    path("partition/", partition_list),
-    path("partition/<int:id>/df", df),
-    path("partition/<int:id>/vis", partition_vis),
-    path("partition/<int:id>/peplerdiagram", partition_peplerdiagram),
-    path("latest/volumes/", VolFeed()),
-    path("storagesummary", storagesummary),
-    path("storage-d/spotlist", storaged_spotlist),
-    path("external/storage-d/spotlist", storaged_spotlist_public),
-    path("detailed_spotlist", detailed_spotlist),
-    re_path(r"^gwsrequest/(?P<id>\d+)/approve", approve_gwsrequest),
-    re_path(r"^gwsrequest/(?P<id>\d+)/reject", reject_gwsrequest),
-    re_path(r"^gwsrequest/(?P<id>\d+)/convert", convert_gwsrequest),
-    path("gwsrequest/index/", gwsrequest_list),  # list for external viewers
-    path(
-        "gwsrequest/<int:id>/", gwsrequest_detail
-    ),  # detail view for external viewers
-    re_path(r"^gws/(?P<id>\d+)/update", create_gws_update_request),
-    path("gws/index/", gws_list),  # list for external viewers
-    path("gws/dashboard/", gws_dashboard),  # dashboard with more detail
-    path("gws/<int:id>/du", gwsdu),  # du to create size measurement for GWS
-    path("gws/<int:id>/df", gwsdf),  # du to create size measurement for GWS
-    path(
-        "gws/etexport/", gws_list_etexport
-    ),  # list for export to Elastic Tape system
     re_path(r"^vmrequest/(?P<id>\d+)/approve", approve_vmrequest),
     re_path(r"^vmrequest/(?P<id>\d+)/reject", reject_vmrequest),
     re_path(r"^vmrequest/(?P<id>\d+)/convert", convert_vmrequest),
