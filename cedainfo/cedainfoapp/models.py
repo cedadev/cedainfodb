@@ -13,8 +13,6 @@ import re
 import pwd, grp
 import dns.resolver
 
-from .storageDXMLClient import SpotXMLReader
-
 ##from fields import *  # custom MultiSelectField, MultiSelectFormField from http://djangosnippets.org/snippets/2753/
 from multiselectfield import MultiSelectField
 

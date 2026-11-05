@@ -17,14 +17,11 @@ urlpatterns = [
     path("services/unusedvms/", service_unusedvms),
     path("services/review/", service_review_selection),
     path("services/doc-check/", service_doc_check),
+
     path("services/decomissioned-doc-check/", decomissioned_service_doc_check),
     path("services/stats/", service_stats),
     path("vm-ping-check/", vm_ping_check),
-    path("txt/hosts/", txt_host_list),
-    re_path(r"^txt/vms/(?P<vmname>.*)$", txt_vms_list),
-    path("txt/vmrequests/", txt_vm_request_list),
-    re_path(r"^txt/services/(?P<vmname>.*)$", txt_service_list),
-    re_path(r"^txt/services2/(?P<vmname>.*)$", txt_service_list2),
+
     re_path(r"^vmrequest/(?P<id>\d+)/approve", approve_vmrequest),
     re_path(r"^vmrequest/(?P<id>\d+)/reject", reject_vmrequest),
     re_path(r"^vmrequest/(?P<id>\d+)/convert", convert_vmrequest),
