@@ -641,7 +641,6 @@ def service_list_for_team_members(request):
         ("Name", "name"),
         ("Docs", "documentation"),
         ("Host", "host"),
-        ("OS", "host__os_required"),
         ("Visibility", "visibility"),
         ("Status", "status"),
         ("Priority", "priority"),
