@@ -1,1 +1,1 @@
-Contains code for cedainfodb django application. Moved from svn in October 2019.
+Code for CEDA services catalogue. Previous versions also ran userdb admin interface, gws info etc.
