@@ -80,24 +80,6 @@ class PersonAdmin(admin.ModelAdmin):
 admin.site.register(ServiceKeyword)
 
 
-@admin.register(Host)
-class HostAdmin(admin.ModelAdmin):
-    list_display = ('hostname', 'ip_addr', 'serial_no', 'arrival_date', 'host_type', 'hypervisor', 'rack')
-    list_filter = ('supplier', 'planned_end_of_life', 'retired_on', 'host_type', 'rack',)
-    ordering = ('hostname', 'planned_end_of_life')
-    search_fields = ['hostname', 'notes', 'serial_no']
-
-    # for the "hypervisor" field, restrict the list of available hosts to those with host_type="hypervisor_server"
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "hypervisor":
-            # kwargs["queryset"] =#Host.objects.filter(host_type="hypervisor_server").order_by('hypervisor') # seems to have no effect
-            kwargs["queryset"] = Host.objects.filter(host_type="hypervisor_server")
-            return db_field.formfield(**kwargs)
-        return super(HostAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
-
-
-
-
 # For the service admin we need a form with hosts listed in alphabetical order.
 # Create a custom form, then use it in the ServiceAdmin class
 class ServiceAdminForm(forms.ModelForm):
@@ -345,101 +327,11 @@ class NewServiceAdmin(admin.ModelAdmin):
 
 
 
-# customise the Rack admin interface
-# class RackAdmin(admin.ModelAdmin):
-#    list_display = ('name', 'room')
-#    list_filter = ('room',)
-#    ordering = ('name', 'room')
-# admin.site.register(Rack, RackAdmin)
-
-# customise the DataEntity admin interface
-# class DataEntityAdmin(admin.ModelAdmin):
-#    list_display = ('dataentity_id','symbolic_name','responsible_officer','last_reviewed','recipes_expression',)
-#    list_filter = ('friendly_name', 'curation_category','responsible_officer','last_reviewed','access_status','availability_priority','availability_failover',)
-#    ordering = ('dataentity_id','symbolic_name','responsible_officer','last_reviewed')
-#    search_fields = ['dataentity_id','symbolic_name',]
-#
-#    formfield_overrides = {
-#           models.CharField: {'widget': TextInput(attrs={'size':'80'})},
-#        }
-
-# admin.site.register(DataEntity, DataEntityAdmin)
-
-class PartitionAdminForm(forms.ModelForm):
-    used_bytes = ByteSizeField()
-    capacity_bytes = ByteSizeField()
-
-    class Meta:
-        model = Partition
-        exclude = ('',)
-
-class PartitionAdmin(admin.ModelAdmin):
-    form = PartitionAdminForm
-    list_display = ('__unicode__',
-                    # 'exists', 
-                    # 'meter',
-                    'text_meter',
-                    #'mountpoint',
-                    'status',
-                    # 'list_allocated',
-                    #'links',
-                    )
-    list_filter = ('status',)
-
-
-formfield_overrides = {ByteSizeField: {'widget': BigIntegerInput}}
-search_fields = ['mountpoint']
-actions = ['update_df']
-list_editable = ['status']
-
-
-@admin.action(
-    description="Do a df on selected partitions"
-)
-def update_df(self, request, queryset):
-    for i in queryset.all():
-        i.df()
-
-
-##admin.site.register(Partition, PartitionAdmin)
-
-
-# class SpatioTempAdmin(admin.OSMGeoAdmin):
-#    pass
-# admin.site.register(SpatioTemp, SpatioTempAdmin)
 
 @admin.register(Tenancy)
 class TenancyAdmin(admin.ModelAdmin):
     list_display = ('name', 'summary')
     
-
-
-@admin.register(GWSRequest)
-class GWSRequestAdmin(admin.ModelAdmin):
-    list_display = (
-    'gws_name', 'action_links', 'internal_requester', 'gws_manager', 'volume_filesize', 'et_quota_filesize',
-    'backup_requirement', 'expiry_date', 'request_type', 'request_status', 'gws_link', 'timestamp')
-    list_filter = ('request_status',)
-    # readonly_fields = ('request_status',)
-    ordering = ('timestamp',)
-    search_fields = ('gws_name', 'path')
-
-
-
-
-@admin.register(GWS)
-class GWSAdmin(admin.ModelAdmin):
-    list_display = (
-    'name', 'path', 'requested_volume_filesize', 'used_volume_filesize', 'et_quota_filesize', 'et_used_filesize',
-    'action_links', 'last_size')
-    list_filter = ('status', 'path',)
-    search_fields = ('name', 'path')
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
 
 
 
@@ -461,10 +353,6 @@ class VMRequestAdmin(admin.ModelAdmin):
 
         return super(VMRequestAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
-
-
-   
-    
 
 @admin.register(VM)
 class VMAdmin(admin.ModelAdmin):

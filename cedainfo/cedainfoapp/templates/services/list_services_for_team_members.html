@@ -14,7 +14,7 @@ Only services with the status 'production' or 'pre-production' are listed here. 
 
 <p></p>
 
-{% if owner_services|length_is:"0" %}
+{% if owner_services|length == 0 %}
     <em> - No records to display.</em>
 {% else %}
 
@@ -55,13 +55,7 @@ Only services with the status 'production' or 'pre-production' are listed here. 
 
 	   {% endif %}   
 	   </td>
-	   
-	  {% if service.host.os_required == "centos7" %}
-              <td>{{service.host.os_required}}</td>
-           {% else %}
-              <td><span style="color:red;">{{service.host.os_required}}</span></td>
-	   {% endif %}
-	  
+		  
 	  
            <td>{{service.visibility}}</td>
            <td>{{service.status}}</td>
@@ -98,7 +92,7 @@ Only services with the status 'production' or 'pre-production' are listed here. 
     (regardless of owner or status)
 <p></p>
 
-{% if manager_services|length_is:"0" %}
+{% if manager_services|length == 0 %}
     <em> - No records to display.</em>
 {% else %}
 
@@ -138,13 +132,6 @@ Only services with the status 'production' or 'pre-production' are listed here. 
 
 {% endif %}   
 </td>
-
-{% if service.host.os_required == "centos7" %}
-       <td>{{service.host.os_required}}</td>
-    {% else %}
-       <td><span style="color:red;">{{service.host.os_required}}</span></td>
-{% endif %}
-
 
     <td>{{service.visibility}}</td>
     <td>{{service.status}}</td>
@@ -187,7 +174,7 @@ Only services with the status 'production' or 'pre-production' are listed here. 
 Only services with the status 'production' or 'pre-production' are listed here. 
 <p></p>
 
-{% if deputy_manager_services|length_is:"0" %}
+{% if deputy_manager_services|length == 0 %}
     <em> - No records to display.</em>
 {% else %}
 
@@ -228,12 +215,6 @@ Only services with the status 'production' or 'pre-production' are listed here.
 {% endif %}   
 </td>
 
-{% if service.host.os_required == "centos7" %}
-       <td>{{service.host.os_required}}</td>
-    {% else %}
-       <td><span style="color:red;">{{service.host.os_required}}</span></td>
-{% endif %}
-
 
     <td>{{service.visibility}}</td>
     <td>{{service.status}}</td>
@@ -273,7 +254,7 @@ Only services with the status 'production' or 'pre-production' are listed here.
 
 Active VMs that you requested.
         <p></p>
-{% if active_vms|length_is:"0" %}
+{% if active_vms|length == 0 %}
     <em> - No records to display.</em>
 {% else %}
 

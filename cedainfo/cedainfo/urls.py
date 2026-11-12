@@ -25,7 +25,7 @@ urlpatterns = [
     path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
 #    url(r'^accounts/login/$', login, name='login'),
 #    url(r'^accounts/logout/$', logout_then_login),
-    path('udbadmin/', include('udbadmin.urls')),
+#    path('udbadmin/', include('udbadmin.urls')),
 #    url(r'^cedainfoapp/', include('cedainfoapp.urls')),    
 ]
 
