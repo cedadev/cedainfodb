@@ -6,6 +6,6 @@ setup(
     author='Andrew Harwood',
     author_email='andrew.harwood@stfc.ac.uk',
     description='CEDA services catalogue',
-    packages=find_packages(),    
+    packages=['cedainfo'],    
 )
 
