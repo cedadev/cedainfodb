@@ -6,6 +6,7 @@ setup(
     author='Andrew Harwood',
     author_email='andrew.harwood@stfc.ac.uk',
     description='CEDA services catalogue',
-    packages=['cedainfo/cedainfoapp', 'cedainfo/cedainfo', ]
+    package_dir = {'': 'cedainfo'},
+    packages=['cedainfoapp', 'cedainfo'],
 )
 
