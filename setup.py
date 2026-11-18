@@ -7,6 +7,7 @@ setup(
     author_email='andrew.harwood@stfc.ac.uk',
     description='CEDA services catalogue',
     package_dir = {'': 'cedainfo'},
+    package_data={'': ['templates/*', 'static/*']},
     packages=['cedainfoapp', 'cedainfo'],
 )
 
