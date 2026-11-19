@@ -13,3 +13,5 @@ requests==2.34.2
 sqlparse==0.6.1
 urllib3==2.8.0
 setuptools==78.1.1
+mozilla-django-oidc
+django-oidc-extras @ git+https://github.com/cedadev/django-oidc-extras.git
