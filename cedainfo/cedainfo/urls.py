@@ -23,6 +23,8 @@ from cedainfoapp.urls import urlpatterns as cedainfoapp_urlpatterns
 urlpatterns = [
     re_path(r'^admin/', admin.site.urls),
     path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
+    path("oidc/", include("mozilla_django_oidc.urls")),
+
 #    url(r'^accounts/login/$', login, name='login'),
 #    url(r'^accounts/logout/$', logout_then_login),
 #    path('udbadmin/', include('udbadmin.urls')),
