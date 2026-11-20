@@ -1,17 +1,21 @@
 asgiref==3.13.0
 certifi==2026.10.23
+cffi==2.1.1
 charset-normalizer==3.5.2
+cryptography==50.0.2
 django==5.2
 django-easy-audit==1.3.9
 django-extensions==4.1
 django-multiselectfield==1.0.1
+django-oidc-extras @ git+https://github.com/cedadev/django-oidc-extras.git@3210fea039f7f5c17dbbe9df104eecdf8cbfb4e6
 django-sizefield==2.1.0
 dnspython==2.1.0
 idna==3.20
+mozilla-django-oidc==5.0.2
 psycopg2-binary==2.9.13
+pycparser==3.12
+pyjwt==2.15.1
 requests==2.34.2
+setuptools==78.1.1
 sqlparse==0.6.1
 urllib3==2.8.0
-setuptools==78.1.1
-mozilla-django-oidc
-django-oidc-extras @ git+https://github.com/cedadev/django-oidc-extras.git
