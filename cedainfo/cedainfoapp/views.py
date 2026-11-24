@@ -22,7 +22,6 @@ from cedainfoapp.uptimerobot import get_all_monitors
 logging = settings.LOG
 
 
-
 class AdminLoginView(View):
     def get(self, request, **kwargs):
 
