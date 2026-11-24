@@ -1,7 +1,7 @@
 # Create your views here.
 
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from cedainfoapp.models import *
 from cedainfoapp.forms import *
 from django.shortcuts import redirect, render, get_object_or_404
