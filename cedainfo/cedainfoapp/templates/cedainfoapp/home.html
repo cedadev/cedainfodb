@@ -20,54 +20,39 @@ the <a href="/admin">Home</a> link on the bar above.
 
 <a href="/admin">View using Django admin interface</a>
                
-    	        <ul>
-           
-
-		<li><h4>Services and VMs</h4>
-		
-		See the <a href="http://ceda-internal.helpscoutdocs.com/article/4450-service-information-main-page">CEDA service information main page</a> in Helpscout
-		</li>
-                <p/>
-
-		<li><h4>Storage</h4>
-		This has now moved to a new server and is available as <a
-		href="http://cedaarchiveapp.ceda.ac.uk">http://cedaarchiveapp.ceda.ac.uk</a><br>
-		Note that this server has a separate user login (but should have the same usernames and passwords).
-		</li>
-		
-        
-        	<li><h4>VM & GWS Requests</h4>
-			<ul>
-				<li><a href="/vmrequest/index">list VM Requests</a></li>
-				<li><a href="/gwsrequest/index">list GWS Requests</a></li>
-			</ul>
 
 
-                <li><h4>Existing VMs & GWSs</h4>
-                     <ul>
-                        <li><a href="/gws/index">Summary of all GWSs</a></li>
-                     </ul>
-                </li>
-
-
-        	<li><h4>DMP</h4>
-		This has now moved to a new server and is available as <a
-		href="http://dmp.ceda.ac.uk/dmp">http://dmp.ceda.ac.uk/dmp</a><br>
-		Note that this server has a separate user login.
-		</li>
-		
-		
-				<li><h4>Hosts</h4>
-			<ul>
-				<li><a href="/hosts/">List of all hosts</a></li>
-                                <li><a href="/admin/cedainfoapp/host">Searchable list of hosts</a></li>
-				<li><a href="/hosts/active">List of all active hosts</a></li>
-                                <li><a href="/admin/cedainfoapp/host/add">Add new host</a></li>
-			</ul>
-		</li>
-                <p/>
-
-		
-          </ul>
+<h4>Service information</h4>
+<ul>
+ <li><a href="/admin/cedainfoapp/newservice?status__exact=production">List of production services</a></li>
+ <li><a href="/services/listbyvm">List of services by VM</a></li>
+ <li><a href="/services/owner_managers/">Services owner/managers summary list</a> (see the services you are responsible for)</li>
+ <li><a href="/admin/cedainfoapp/vm">List of VMs</a></li>
+ <li><a href="/services/unusedvms">list VMs with no service associated</a></li>
+ <li><a href="/admin/cedainfoapp/newservice/add">Add new service</a></li>
+ <li><a href="//ceda-internal.helpscoutdocs.com/article/4652-service-manager-and-service-owner-definitions#gsc.tab=0">Service owner and manager definitions</a></li>
+ <li><a href="https://cedadb.ceda.ac.uk/services/stats/">Statistics</a></li>
+</ul>
+<h4>Checks</h4>
+<h4>
+ <ul>
+  <li><a href="/services/certcheck/?orderby=cert-expire-date">Check service SSL certificates</a></li>
+  <li>UptimeRobot checks: <a href="/services/uptimerobot/">List of UptimeRobot monitors</a> |&nbsp; <a href="/services/uptimerobot-check/">List of production services with corresponding UptimeRobot check</a></li>
+  <li><a href="/services/doc-check/">Helpscout docs check</a> (Checks references to Helpscout docs in service records)</li>
+  <li><a href="/services/decomissioned-doc-check/">Decommissioned services docs check</a> checks for service records where the documentation is still held in the 'Services - current' helpscout collection. These should probably be moved to the 'Services -decommissioned collection, but make sure that the document is not referenced by another service record first</li>
+ </ul>
+</h4>
+<h4>Procedures</h4>
+<ul>
+ <li><a href="//ceda-internal.helpscoutdocs.com/article/4360-service-review-procedure">Service review procedure</a></li>
+ <li><a href="//ceda-internal.helpscoutdocs.com/article/4141-acceptable-software-versions-for-ceda-services">Acceptable software versions</a></li>
+ <li><a href="//ceda-internal.helpscoutdocs.com/article/4283-how-to-remove-a-vm">How to remove a VM</a></li>
+ <li><a href="//ceda-internal.helpscoutdocs.com/article/4637-service-deployment-and-update-procedure">Service deployment and update procedure</a></li>
+ <li><a href="https://github.com/cedadev/service-testing/projects/2">Service testing procedure</a> (testing by data scientists)</li>
+ <li>Helpdesk procedures (Helpdesk need to trace who looks after services in response to queries. They also need to create notifications for downtime with an awareness of dependencies between services)</li>
+ <li>Service manager/Owner review (The owner and manager should periodically&nbsp; look to check if there is any need to update service records or take action on a service)</li>
+ <li>System Manager review (System managers should look at the services deployed on platforms they look after to consider things like performance or security)</li>
+ <li><a href="https://docs.google.com/document/d/1DdAYmVYAiD64iU152BgTKZPaUFsC7vs8CvLeTofwVDU/edit#"></a></li>
+</ul>
 
 {% endblock %}

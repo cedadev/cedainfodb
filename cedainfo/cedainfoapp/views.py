@@ -10,6 +10,8 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.template.context_processors import csrf
+from django.views import View
+
 
 from . import helpscoutdocs
 
@@ -25,6 +27,15 @@ import ssl
 from cedainfoapp.uptimerobot import get_all_monitors
 
 logging = settings.LOG
+
+
+class AdminLoginView(View):
+    def get(self, request, **kwargs):
+
+        return HttpResponseRedirect(
+            reverse("oidc_authentication_init")
+            + (f"?next={request.GET.get('next', '/admin/')}")
+        )
 
 
 
