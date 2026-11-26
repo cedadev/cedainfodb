@@ -1,17 +1,12 @@
 # Create your views here.
 
 from django.db.models import Q
-from django.http import HttpResponseRedirect
 from cedainfoapp.models import *
 from cedainfoapp.forms import *
 from django.shortcuts import redirect, render, get_object_or_404
-from django.views.generic.list import ListView
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from django.template import RequestContext
-from django.template.context_processors import csrf
 from django.views import View
-
 
 from . import helpscoutdocs
 
@@ -21,8 +16,6 @@ import re
 import requests
 import datetime
 import time
-import http.client
-import random
 import ssl
 from cedainfoapp.uptimerobot import get_all_monitors
 
