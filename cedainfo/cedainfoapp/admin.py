@@ -11,71 +11,12 @@ from .forms import *
 from django import forms
 from django.db import models
 
-def prettySize(size):
-    '''Returns file size in human readable format'''
 
-    suffixes = [("B", 1), ("K", 1000), ("M", 1000000), ("G", 1000000000), ("T", 1000000000000)]
-    level_up_factor = 2000.0
-    for suf, multipler in suffixes:
-        if float(size) / multipler > level_up_factor:
-            continue
-        else:
-            return round(size / float(multipler), 2).__str__() + suf
-    return round(size / float(multipler), 2).__str__() + suf
-
-
-class BigIntegerInput(forms.TextInput):
-    def __init__(self, *args, **kwargs):
-        attrs = kwargs.setdefault('attrs', {})
-        attrs.setdefault('size', 80)
-        super(BigIntegerInput, self).__init__(*args, **kwargs)
-
-
-BYTE_UNIT_SUFFIXES = {
-    'b': 1,  # byte
-    'kb': 1024,  # kilobyte
-    'Mb': 1024 * 1024,  # megabyte
-    'Gb': 1024 * 1024 * 1024,  # gigabyte
-    'Tb': 1024 * 1024 * 1024 * 1024,  # terabyte
-    'Pb': 1024 * 1024 * 1024 * 1024,  # petabyte
-    'Eb': 1024 * 1024 * 1024 * 1024 * 1024,  # exabyte
-}
-
-
-class ByteSizeField(forms.CharField):
-    def clean(self, value):
-        try:
-            # If it's a number followed by a suffix e.g. "4.23 Mb", split it & look at the suffix to determine the factor.
-            if len(value.split()) > 1:
-                (size, suffix) = value.split()
-                # Find the matching suffix and multiply value by corresponding factor
-                value = int(float(size) * BYTE_UNIT_SUFFIXES[suffix])
-                return value
-            else:
-                return int(value)
-        except:
-            raise ValidationError(
-                "Enter a value either as an integer number of bytes, or as a number followed by the suffix 'b', 'Mb', 'Gb', 'Tb', 'Pb, 'Eb'")
-
-
-# don't need to edit curation cat
-# admin.site.register(CurationCategory)
-
-# don't need to change in admin interface
-# admin.site.register(AccessStatus)
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
     ordering = ('name',)
     list_display = ('name', 'username', 'email')
-
-
-
-# admin.site.register(HostHistory)
-# admin.site.register(FileSetSizeMeasurement)
-# admin.site.register(ServiceBackupLog)
-
-# customise the Host admin interface
 
 admin.site.register(ServiceKeyword)
 
@@ -109,10 +50,10 @@ class ServiceHostFilter(SimpleListFilter):
     parameter_name = 'Host'
 
     def lookups(self, request, model_admin):
-        hosts = set([c.host for c in model_admin.model.objects.all()])
+##        hosts = set([c.host for c in model_admin.model.objects.all()])
+        hosts = set([c.host for c in model_admin.model.objects.filter(status='production')])
         hosts = list(hosts)
         hosts.sort(key=lambda x: x.name)
-##	hosts = list(filter(None, hosts))
         return [(c.id, c.name) for c in hosts]
 
     def queryset(self, request, queryset):
@@ -123,24 +64,25 @@ class ServiceHostFilter(SimpleListFilter):
             return queryset
 
 
-class ManagerFilter(SimpleListFilter):
-    title = 'Manager'
+class ManagerFilterProduction(SimpleListFilter):
+    title = 'Manager (production only)'
     parameter_name = 'manager'
 
     def lookups(self, request, model_admin):
-        users = set([c.service_manager for c in model_admin.model.objects.all()])
+        users = set([c.service_manager for c in model_admin.model.objects.filter(status='production')])
         if None in users: users.remove(None)
         #
         #       Sort results
         #
         users = list(users)
-        users.sort(key=lambda x: x.username)
+        users.sort(key=lambda x: x.name)
 
-        count = {}
+        pcount = {}
+
         for u in users:
-            count[u.username] = len(model_admin.model.objects.filter(service_manager__username=u.username))
-
-        return [(c.id, c.username + ' (%s)' % count[c.username]) for c in users]
+            pcount[u.username] = len(model_admin.model.objects.filter(service_manager__username=u.username).filter(status='production'))
+    
+        return [(c.id, c.name + ' (%s)' % (pcount[c.username])) for c in users]
 
     def queryset(self, request, queryset):
 
@@ -150,12 +92,42 @@ class ManagerFilter(SimpleListFilter):
             return queryset
 
 
-class OwnerFilter(SimpleListFilter):
-    title = 'Owner'
+class ManagerFilterAll(SimpleListFilter):
+    title = 'Manager (production)'
+    parameter_name = 'manager'
+
+    def lookups(self, request, model_admin):
+        users = set([c.service_manager for c in model_admin.model.objects.all()])
+        if None in users: users.remove(None)
+        #
+        #       Sort results
+        #
+        users = list(users)
+        users.sort(key=lambda x: x.name)
+
+        pcount = {}
+
+        for u in users:
+            pcount[u.username] = len(model_admin.model.objects.filter(service_manager__username=u.username).filter(status='production'))
+    
+        return [(c.id, c.name + ' (%s)' % (pcount[c.username])) for c in users]
+
+    def queryset(self, request, queryset):
+
+        if self.value():
+            return queryset.filter(service_manager__id__exact=self.value())
+        else:
+            return queryset
+
+
+
+
+class OwnerFilterProduction(SimpleListFilter):
+    title = 'Owner (production only)'
     parameter_name = 'owner'
 
     def lookups(self, request, model_admin):
-        users = set([c.owner for c in model_admin.model.objects.all()])
+        users = set([c.owner for c in model_admin.model.objects.filter(status='production')])
         if None in users: users.remove(None)
         #
         #       Sort results
@@ -165,9 +137,9 @@ class OwnerFilter(SimpleListFilter):
 
         count = {}
         for u in users:
-            count[u.username] = len(model_admin.model.objects.filter(owner__username=u.username))
+            count[u.username] = len(model_admin.model.objects.filter(owner__username=u.username).filter(status='production'))
 
-        return [(c.id, c.username + ' (%s)' % count[c.username]) for c in users]
+        return [(c.id, c.name + ' (%s)' % count[c.username]) for c in users]
 
     def queryset(self, request, queryset):
 
@@ -177,32 +149,23 @@ class OwnerFilter(SimpleListFilter):
             return queryset
 
 
-class SystemManagerFilter(SimpleListFilter):
-    title = 'System Manager'
-    parameter_name = 'sysadmin'
+class ProductionDeploymentFilter(SimpleListFilter):
+    title = 'Production deployments'
+    parameter_name = 'deployment'
 
     def lookups(self, request, model_admin):
-        users = set([c.host.patch_responsible for c in model_admin.model.objects.all()])
-        if None in users: users.remove(None)
-        #
-        #       Sort results
-        #
-        users = list(users)
-        users.sort(key=lambda x: x.username)
-
-        count = {}
-        for u in users:
-            count[u.username] = len(model_admin.model.objects.filter(host__patch_responsible__username=u.username))
-
-        return [(c.id, c.username + ' (%s)' % count[c.username]) for c in users]
+ 
+        return [('pages', 'GitHub pages'), ('vm', 'VM')]
 
     def queryset(self, request, queryset):
 
-        if self.value():
-            return queryset.filter(host__patch_responsible__id__exact=self.value())
+        if self.value() == 'vm':
+            return NewService.objects.exclude(host__name__startswith='00').filter(status='production')
+ 
+        elif self.value() == 'pages':
+            return queryset.filter(status='production').filter(host__name='00 GitHub Pages')
         else:
             return queryset
-
 
 class VMStatusFilter(SimpleListFilter):
     title = 'VM status'
@@ -229,27 +192,6 @@ class VMStatusFilter(SimpleListFilter):
             return queryset.filter(host__status__exact=self.value())
         else:
             return queryset
-
-
-
-class ProductionDeploymentFilter(SimpleListFilter):
-    title = 'Production deployments'
-    parameter_name = 'deployment'
-
-    def lookups(self, request, model_admin):
- 
-        return [('pages', 'GitHub pages'), ('vm', 'VM')]
-
-    def queryset(self, request, queryset):
-
-        if self.value() == 'vm':
-            return NewService.objects.exclude(host__name__startswith='00').filter(status='production')
- 
-        elif self.value() == 'pages':
-            return queryset.filter(status='production').filter(host__name='00 GitHub Pages')
-        else:
-            return queryset
-
 
 @admin.register(NewService)
 class NewServiceAdmin(admin.ModelAdmin):
@@ -313,7 +255,7 @@ class NewServiceAdmin(admin.ModelAdmin):
     
     list_display = ('name', 'startdate', docs, vm_name, url, 'review_status', 'last_reviewed', 'visibility', 'status', 'priority','service_manager', 'owner')
 #    list_editable = ('priority',)
-    list_filter = ('visibility', 'priority', 'status', 'review_status', 'keywords', ManagerFilter, OwnerFilter, ServiceHostFilter, SystemManagerFilter, VMStatusFilter, ProductionDeploymentFilter)
+    list_filter = ('visibility', 'priority', 'status', 'keywords', ManagerFilterProduction, OwnerFilterProduction, ServiceHostFilter, VMStatusFilter, ProductionDeploymentFilter)
     search_fields = ('description', 'review_info', 'name', 'url', 'host__name')
     ordering = ('name',)
 
